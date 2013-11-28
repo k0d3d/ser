@@ -1,0 +1,10 @@
+tr(ng-repeat="cmp in judge")
+  td {{cmp.nafdacRegName}}
+  td {{cmp.orderAmount}}
+  td {{cmp.orderDate | date:medium}}
+  td {{cmp.orderSupplier.supplierName}}
+  td {{cmp.orderStatus}}
+  td 
+    a(href="", ng-click="commons.href('hospital/'+cmp.hospitalId)"){{cmp.name}}
+  td
+    button.btn.btn-warning(ng-click="changeStatus($index)", ng-disabled="cmp.orderStatus == 'supplied'") Supply this

@@ -1,0 +1,34 @@
+.page-header
+    h1
+      i.icon-table-2
+      | Hospital List
+      small All registered hospitals
+.row
+  .col-md-12
+    .box-widget
+      table.table.paper-tbl-theme.table-bordered.responsive.table-paper
+        thead
+          tr
+            th
+              | Hospital Name
+            th
+              | Contact Person
+            th
+              | Phone Number
+            th
+              | Location
+            th
+              | Action
+        tbody
+          tr(ng-repeat="h in hospitals")
+            td
+              | {{h.name}}
+            td
+              | {{h.personel}}
+            td
+              | {{h.phonenumber}}
+            td
+              | {{h.location}}
+            td
+              button.btn.btn-xs.btn-primary Edit
+              button.btn.btn-xs.btn-danger(ng-click="removeh($index)") Remove

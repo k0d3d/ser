@@ -1,0 +1,28 @@
+block body
+  .row-fluid.row-break(ng-init="plcordr= true;searchndl=false")
+    .col-md-12
+      .row  
+        .col-md-11.col-md-offset-1
+          .row
+            .col-md-12
+              h2 Orders
+              .form-content(style="margin-bottom: 30px")
+                form.form-inline(name="searchform", novalidate, ng-submit="searchcmp()")
+                  .form-group
+                    .col-md-5
+                      input.input-large.form-control(type="search", ng-model="drugname")
+                    .col-md-7
+                    button.btn.btn-primary.btn-sm(type="submit") Search Hospital 
+                    button.btn.btn-primary.btn-sm(type="submit") Search Supplier 
+              table.table.table-hover.table-bordered(style="margin-top: 30px")
+                thead
+                  tr
+                    th Drug Name
+                    th Amount
+                    th Date / Time
+                    th Supplier
+                    th Status
+                    th Hospital
+                    th 
+                tbody(judge="orders")
+    

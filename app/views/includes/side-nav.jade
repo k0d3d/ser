@@ -1,0 +1,87 @@
+.left-bar.merge-left
+  //
+     SEARCH BAR 
+  .search-bar
+    .input-group
+      input.form-control(type='text')
+      span.input-group-btn
+        button.btn.btn-default(type='button')
+          i.icon-search
+  //
+     LEFT NAV 
+  .left-nav
+    ul#nav-accordion.side-navigation.accordion
+      li
+        a(href='index.html')
+          i.icon-home
+          | Home
+      li
+        a(href='#')
+          i.icon-office
+          | Hospitals
+        ul
+          li
+            a(href='#', ng-click="commons.href('hospital/add')")
+              i.icon-double-angle-right
+              | New Hospital
+              span.nav-instruction  Register a new hospital
+          li
+            a(href='', ng-click="commons.href('hospital')")
+              i.icon-double-angle-right
+              | All Hospitals
+              span.nav-instruction  All Registered hospitals
+      li
+        a(href='#')
+          i.icon-address-book-2
+          | Suppliers
+        ul
+          li
+            a(href='', ng-click="commons.href('suppliers/add')")
+              i.icon-double-angle-right
+              | Add Supplier
+              span.nav-instruction  Adds a new supplier
+          li
+            a(href='', ng-click="commons.href('suppliers')")
+              i.icon-double-angle-right
+              | Suppliers
+              span.nav-instruction  List of all suppliers
+      li
+        a(href='#')
+          i.icon-columns
+          | Orders
+        ul
+          li
+            a(href='boxy-grids-porlets.html')
+              i.icon-double-angle-right
+              | Place Order
+              span.nav-instruction  Place an order
+          li
+            a(href='', ng-click="commons.href('orders')")
+              i.icon-double-angle-right
+              | View Orders
+              span.nav-instruction  View order history
+      li
+        a(href='#')
+          i.icon-medkit
+          | Drugs and Medical Equip.
+        ul
+          li
+            a(href='#')
+              i.icon-double-angle-right
+              | New Drug
+              span.nav-instruction  Add a new drug item
+          li
+            a(href='', ng-click="commons.href('drugs')")
+              i.icon-double-angle-right
+              | Registered Drugs
+              span.nav-instruction  List all registered drugs
+          li
+            a(href='fixed-leftbar.html')
+              i.icon-double-angle-right
+              | New Equip.
+              span.nav-instruction  Add a new medical equipment
+          li
+            a(href='top-dropdown-menu.html')
+              i.icon-double-angle-right
+              | Registered Medical Equip.
+              span.nav-instruction  List all medical equip.
