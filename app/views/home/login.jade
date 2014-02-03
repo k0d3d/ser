@@ -1,0 +1,24 @@
+.login-wrap
+    .login-head
+        h3 Login
+      form(action='#', method='get')
+        .login-form
+          ul
+            li
+              i.icon-user
+              input.login-user-input(type='text')
+            li
+              i.icon-key
+              input.login-pass-input(type='password')
+        .login-action
+          button.backend-login-btn.btn.btn-block.btn-large.btn-inverse(type='submit') Login
+          ul.login-initial.clearfix
+            li.pull-left
+              a(href='#') Forgot Password?
+            li.pull-right
+              span.rem-check
+                input(type='checkbox', checked='checked')
+              | Remember Me
+      h5
+        | Don't have an account?
+        a(href='#') Create one now

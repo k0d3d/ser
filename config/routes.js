@@ -4,26 +4,26 @@ module.exports = function(app, passport, auth) {
     users.routes(app, passport, auth);
     //Hospital Routes
     var hospital = require('../app/controllers/hospitals');
-    hospital.routes(app, passport, auth);
+    hospital.routes(app, auth);
     //Supplier Routes
     var supplier = require('../app/controllers/suppliers');
-    supplier.routes(app);
+    supplier.routes(app, auth);
     //Drug Routes
     var drug = require('../app/controllers/drugs');
-    drug.routes(app);
+    drug.routes(app, auth);
     //Orders Routes
     var order = require('../app/controllers/orders');
-    order.routes(app);
+    order.routes(app, auth);
 
 
     //Home route
-    app.get('/', function(req, res){
+    app.get('/', auth.requiresLogin,  function(req, res){
       res.render('index',{
         title: 'Dashboard'
       });
     });
 
-    app.get('/home/index', function(req, res){
+    app.get('/home/index', auth.requiresLogin, function(req, res){
       res.render('home/index',{
         title: 'Dashboard'
       });
@@ -36,8 +36,9 @@ module.exports = function(app, passport, auth) {
 
     // home route
     app.get('/:parent/:child', function(req, res){
-    var parent = req.params.parent;
-    var child = req.params.child;
+      console.log(req.isAuthenticated());
+      var parent = req.params.parent;
+      var child = req.params.child;
       res.render(parent+'/'+child);
       //res.render('/');
     });    

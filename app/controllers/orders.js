@@ -201,10 +201,13 @@ OrderController.prototype.removeOrder = function(order_id, callback){
   }, callback);
 };
 
-OrderController.prototype.orderUpdates = function(hospitalId, since, cb){
+OrderController.prototype.orderUpdates = function(hospitalId, dayte, cb){
+
+  var d = new Date(dayte);
+  var sinceDate = d.toString();
   OrderStatus.find({hospitalId : hospitalId})
-  .gt('date', since)
-  .populate('order_id', 'orderAmount nafdacRegName orderSupplier')
+  .gt('date', sinceDate)
+  .populate('order_id', 'orderAmount nafdacRegName orderSupplier h_order_Id', 'Order')
   .exec(function(err, i){
     if(err) return cb(err);
     cb(i);
@@ -214,21 +217,19 @@ OrderController.prototype.orderUpdates = function(hospitalId, since, cb){
 module.exports.order = OrderController;
 var order = new OrderController();
 
-module.exports.routes = function(app){
+module.exports.routes = function(app, auth){
 
-  app.get('/dashboard/order', function(req, res){
+  app.get('/dashboard/order', auth.requiresLogin, function(req, res){
       res.render('index',{
         title: 'Place new order'
       });
     }
   );
-  app.get('/dashboard/order/:id', function(req, res){
-      res.render('index',{
-        title: 'Place new order'
-      });
+  app.get('/dashboard/order/:id', auth.requiresLogin, function(req, res){
+      res.render('index',{});
     }
   );
-  app.get('/orders', function(req, res){
+  app.get('/orders', auth.requiresLogin, function(req, res){
       res.render('index',{
         title: 'All orders'
       });
@@ -248,8 +249,8 @@ module.exports.routes = function(app){
 
   app.get('/api/orders/supplier/typeahead/:query', suppliersTypeahead);
 
-  app.get('/api/orders/hospital/:hospitalId/updates', function(req, res, next){
-    order.orderUpdates(req.params.hospitalId, req.body.since, function(r){
+  app.get('/api/orders/hospital/:hospitalId/updates/:since', function(req, res, next){
+    order.orderUpdates(req.params.hospitalId, req.params.since, function(r){
       if(utils.isError(r)){
         next(r);
       }else{

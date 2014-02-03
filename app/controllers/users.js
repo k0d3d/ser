@@ -24,9 +24,10 @@ UserController.prototype.authCallback = function(req, res, next) {
  * Show login form
  */
 UserController.prototype.signin = function(req, res) {
+    var msg = req.flash('error');
     res.render('users/signin', {
         title: 'Signin',
-        message: req.flash('error')
+        message: msg[0]
     });
 };
 
@@ -53,6 +54,12 @@ UserController.prototype.signout = function(req, res) {
  */
 UserController.prototype.session = function(req, res) {
     res.redirect('/');
+};
+/**
+ * Session
+ */
+UserController.prototype.apiSession = function(req, res) {
+    res.json(404, false);
 };
 
 /**
@@ -112,7 +119,7 @@ var users = new UserController();
 module.exports.routes = function(app, passport){
     app.get('/signin', users.signin);
     app.get('/signup', users.signup);
-    app.get('/signout', users.signout);   
+    app.get('/signout', users.signout);
 
     //Setting up the users api
     app.post('/users', function(req, res, next){
@@ -130,6 +137,10 @@ module.exports.routes = function(app, passport){
     });
 
     app.post('/users/session', passport.authenticate('local', {
+        failureRedirect: '/signin',
+        failureFlash: true
+    }), users.session);
+    app.post('/api/users/session', passport.authenticate('local', {
         failureRedirect: '/signin',
         failureFlash: 'Invalid email or password.'
     }), users.session);

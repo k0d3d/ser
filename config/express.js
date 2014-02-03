@@ -57,8 +57,8 @@ module.exports = function (app, config, passport) {
     }));
 
     // use passport session
-    //app.use(passport.initialize())
-    //app.use(passport.session())
+    app.use(passport.initialize())
+    app.use(passport.session())
 
     // connect flash for flash messages - should be declared after sessions
     app.use(flash())

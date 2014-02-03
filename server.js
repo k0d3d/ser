@@ -3,8 +3,8 @@
  */
 
 var express = require('express'),
-	fs = require('fs'),
-	passport = require('passport');
+  fs = require('fs'),
+  passport = require('passport');
 
 /**
  * Main application entry file.
@@ -14,7 +14,8 @@ var express = require('express'),
 // Load configurations
 // if test env, load example file
 var env = process.env.NODE_ENV || 'development',
-	config = require('./config/config');
+   config = require('./config/config'),
+   auth = require('./config/middlewares/authorization');
 
 // Bootstrap models
 var models_path = __dirname + '/app/models';
@@ -30,7 +31,7 @@ var app = express();
 require('./config/express')(app, config, passport);
 
 // Bootstrap routes
-require('./config/routes')(app, passport);
+require('./config/routes')(app, passport, auth);
 
 
 app.on('listening',function(){

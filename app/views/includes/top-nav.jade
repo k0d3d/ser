@@ -44,56 +44,6 @@
                       span.notification-time 8 hours ago
               .action-btn
                 button.btn.btn-block View All
-          li.dropdown
-            a.dropdown-toggle(href='#', data-toggle='dropdown')
-              span.count-noty 12
-              i.icon-envelop-opened
-            .dropdown-menu
-              .dropdown-head
-                h6 You have 32 new messages
-              ul.msg-list
-                li.clearfix
-                  a(href='#')
-                    span.dropdown-thumb
-                      img(width='40', height='40', alt='Avatar', src='/images/avatar-40x40/binjal.png')
-                    span
-                      i binjal
-                      | is posted an article. lacus est congue...
-                    span.notification-meta  12 hours ago 
-                li.clearfix
-                  a(href='#')
-                    span.dropdown-thumb
-                      img(width='40', height='40', alt='Avatar', src='/images/avatar-40x40/sharmin.png')
-                    span
-                      i sharmin
-                      | is posted an article. lacus est congue...
-                    span.notification-meta  12 hours ago 
-                li.clearfix
-                  a(href='#')
-                    span.dropdown-thumb
-                      img(width='40', height='40', alt='Avatar', src='/images/avatar-40x40/shusi.png')
-                    span
-                      i shusi
-                      | is posted an article. lacus est congue...
-                    span.notification-meta  12 hours ago 
-                li.clearfix
-                  a(href='#')
-                    span.dropdown-thumb
-                      img(width='40', height='40', alt='Avatar', src='/images/avatar-40x40/jamjam.png')
-                    span
-                      i jamjam
-                      | is posted an article. lacus est congue...
-                    span.notification-meta  12 hours ago 
-                li.clearfix
-                  a(href='#')
-                    span.dropdown-thumb
-                      img(width='40', height='40', alt='Avatar', src='/images/avatar-40x40/sinha.png')
-                    span
-                      i sinha
-                      | is posted an article. lacus est congue...
-                    span.notification-meta  12 hours ago 
-              .action-btn
-                button.btn.btn-block View All
       .col-sm-4.col-md-4.clearfix.responsive-log-mnu
         //
            ADMIN DRODOWN MENU 
@@ -103,7 +53,6 @@
               a.dropdown-toggle.clearfix(data-toggle='dropdown')
                 span.pull-left.loged-user-name King Mykel Koded
                 span.logged-user-thumb.pull-right
-                  img.img-circle(src='/images/admin-avatar.jpg', alt='Admin')
               .dropdown-menu
                 ul.pull-right
                   li
@@ -114,6 +63,5 @@
                     a(href='#') Inbox
                   li.divider
                   li
-                    a.logout-link(href='#')
-                      i.icon-lock-3
+                    a.logout-link(href='/signout')
                       | Logout

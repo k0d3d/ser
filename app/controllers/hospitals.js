@@ -81,20 +81,20 @@ HospitalController.prototype.delete = function(h_id, u_id, callback){
 module.exports.hospital = HospitalController;
 var hospital = new HospitalController();
 
-module.exports.routes = function (app) {
+module.exports.routes = function (app, auth) {
   
   //Load the hospital index / list page
-  app.get('/hospital', function (req, res) {
+  app.get('/hospital', auth.requiresLogin, function (req, res) {
     res.render('index', {});
   });
 
   //loads page to add a new hospital account\
-  app.get('/hospital/add', function (req, res) {
+  app.get('/hospital/add', auth.requiresLogin, function (req, res) {
     res.render('index', {});
   });
 
   //fetches list of registered hospitals
-  app.get('/api/hospital/:page', function (req, res, next) {
+  app.get('/api/hospital/:page', auth.requiresLogin, function (req, res, next) {
     hospital.list(req.params.page, function (r) {
       if (util.isError(r)) {
         next(r);

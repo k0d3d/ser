@@ -39,7 +39,9 @@
     "grunt-cli": "latest",
     "grunt-env": "latest",
     "restler": "~2.0.1",
-    "mongoose-pureautoinc": "~2012.1.0"
+    "mongoose-pureautoinc": "~2012.1.0",
+    "moment": "~2.1.0",
+    "express-flash": "0.0.2"
   },
   "devDependencies": {
     "supertest": "latest",

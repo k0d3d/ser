@@ -14,7 +14,8 @@ var app = angular.module('integraApp', [
   'hospital',
   'directives',
   'services',
-  'language'
+  'language',
+  'user'
   ]);
 app.config(function ($routeProvider, $locationProvider) {
   $routeProvider.

@@ -1,0 +1,16 @@
+!!! 5
+html(lang='en', xmlns='http://www.w3.org/1999/xhtml', xmlns:fb='https://www.facebook.com/2008/fbml',ng-app="integraApp")
+  include ../includes/head
+  body(ng-controller='MainController')
+    block mainbody
+      .main-wrapper
+        .scroll-top
+          a.tip-top(href='#', title='Go Top')
+            i.icon-arrow-up      
+        include ../includes/header
+        include ../includes/top-nav
+        include ../includes/side-nav
+        block body
+
+        include ../includes/footer
+        include ../includes/foot

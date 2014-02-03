@@ -1,20 +1,25 @@
-extends auth
+extends ../layouts/session
 
-block auth
-  form.signin.form-horizontal(action="/users/session", method="post")
-    p.error= message
-    .control-group
-      label.control-label(for='email') Email
-      .controls
-        input#email(type='text', name="email", placeholder='Email')
+block body
+  .alert.alert-danger
+    p #{message}
+  .login-wrap
+    .login-head
+      h3 Login
+    form(action="/users/session", method="post")
+      .login-form
+        ul
+          li
+            i.icon-user
+            input.login-user-input(type="email", name="email" )
+          li
+            i.icon-key
+            input.login-pass-input(type="password", name="password")
+      .login-action
+        button.backend-login-btn.btn.btn-block.btn-large.btn-inverse(type='submit') Login
+        ul.login-initial.clearfix
+          li.pull-right
+            span.rem-check
+              input(type='checkbox', checked='checked')
+            | Remember Me
 
-    .control-group
-      label.control-label(for='password') Password
-      .controls
-        input#password(type='password', name="password", placeholder='Password')
-
-    .form-actions
-      button.btn.btn-primary(type='submit') Sign in
-      &nbsp;
-      | or&nbsp;
-      a.show-signup(href="/signup") Sign up

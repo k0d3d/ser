@@ -82,9 +82,10 @@ DrugController.prototype.priceUpdate = function (id, price, callback){
 };
 
 DrugController.prototype.checkUpdate = function(since, cb){
+  
   DUH.find()
   .gt('lastUpdated', since)
-  .populate('product_id', 'productName composition man_imp_supp')
+  .populate('product_id', 'productName composition man_imp_supp regNo')
   .exec(function(err, i){
     if(err) return cb(err);
     cb(i);
@@ -94,13 +95,13 @@ DrugController.prototype.checkUpdate = function(since, cb){
 module.exports.drug = DrugController;
 var drugs = new DrugController();
 
-module.exports.routes = function(app) {
+module.exports.routes = function(app, auth) {
 
-  app.get('/drugs', function(req, res){
+  app.get('/drugs', auth.requiresLogin, function(req, res){
     res.render('index');
   });
 
-  app.get('/medeqp', function(req, res){
+  app.get('/medeqp', auth.requiresLogin, function(req, res){
     res.render('index');
   });
 
