@@ -1,0 +1,82 @@
+.leftpanel
+    .logopanel
+        h1
+          span [
+          | StocCloud
+          span ]
+      //
+         logopanel 
+      .leftpanelinner
+        //
+           This is only visible to small devices 
+        .visible-xs.hidden-sm.hidden-md.hidden-lg
+          .media.userlogged
+            img.media-object(alt='', src='images/photos/loggeduser.png')
+            .media-body
+              h4 John Doe
+              span "Life is so..."
+          h5.sidebartitle.actitle Account
+          ul.nav.nav-pills.nav-stacked.nav-bracket.mb30
+            li
+              a(href='profile.html')
+                i.fa.fa-user
+                span Profile
+            li
+              a(href='#')
+                i.fa.fa-cog
+                span Account Settings
+            li
+              a(href='#')
+                i.fa.fa-question-circle
+                span Help
+            li
+              a(href='signout.html')
+                i.fa.fa-sign-out
+                span Sign Out
+        h5.sidebartitle Navigation
+        button.btn.btn-success.btn-block(style="margin-bottom: 5px") 
+          i.fa.fa-shopping-cart
+          | Place Order
+        hr
+        ul.nav.nav-pills.nav-stacked.nav-bracket
+          li.active
+            a(href='index.html')
+              i.fa.fa-home
+              span Dashboard
+          li
+            a(href='email.html')
+              i.fa.fa-envelope-o
+              span Orders
+          li
+            a(href='#')
+              i.fa.fa-edit
+              span Suppliers 
+          li
+            a(href='#')
+              i.fa.fa-suitcase
+              span Hospitals
+          li
+            a(href='tables.html')
+              i.fa.fa-th-list
+              span Drugs and Equipment
+          li.nav-parent
+            a(href='#')
+              i.fa.fa-file-text
+              span Resources
+            ul.children
+              li
+                a(href='calendar.html')
+                  i.fa.fa-caret-right
+                  | Sales Agents
+              li
+                a(href='media-manager.html')
+                  i.fa.fa-caret-right
+                  | Distributors
+              li
+                a(href='timeline.html')
+                  i.fa.fa-caret-right
+                  | Pharmaceutical Companies
+              li
+                a(href='blog-list.html')
+                  i.fa.fa-caret-right
+                  | StocCloud Admins

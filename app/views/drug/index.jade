@@ -1,0 +1,57 @@
+block body
+  .row-fluid.row-break(ng-init="plcordr= true;searchndl=false")
+    .col-md-12
+      .row  
+        .col-md-11.col-md-offset-1
+          .row
+            .col-md-7
+              h2 Drugs
+              .form-content(style="margin-bottom: 30px")
+                form.form-inline(name="searchform", novalidate, ng-submit="searchcmp()")
+                  .form-group
+                    .col-md-7
+                      input.input-large.form-control(type="search", ng-model="drugname")
+                    button.btn.btn-primary.btn-sm(type="submit") Search by Name
+              table.table.table-hover.table-bordered(style="margin-top: 30px")
+                thead
+                  tr
+                    th Drug Name
+                    th Composition
+                    th Price / Packaging
+                tbody
+                  tr(ng-repeat="cmp in drugs", ng-click="more($index)")
+                    td {{cmp.productName}}
+                    td {{cmp.composition}}
+                    td {{cmp.currentPrice}}
+            .col-md-4.col-md-offset-1
+              .row(style="margin-top: 123px")
+                .box-widget
+                  .widget-head.clearfix
+                    span.h-icon
+                      i.icon-paragraph-justify-2
+                    h4 Item Summary
+                  .widget-container
+                    .widget-block
+                      .widget-content.box-padding
+                        i.icon-list-3(ng-show="!summary", style="font-size: 100px;color: #ddd;margin-left: 70px;")
+                        dl(ng-show="summary")
+                          dt Name
+                          dd {{summary.productName}}
+                          dt Composition
+                          dd {{summary.composition}}
+                          dt Manufacturer / Supplier
+                          dd {{summary.man_imp_sup}}
+                          dt Current Price (N)
+                          dd {{summary.currentPrice}}
+                          dt Category
+                          dd {{summary.category}}
+                          dt Last Updated
+                          dd {{summary.lastUpdated | date:'medium'}}
+                        br
+                        form(ng-show="summary", ng-submit="up(summary._id, newprice, summary.index)")
+                          .form-group()
+                            .col-md-6
+                              input.form-control(type="number", ng-model="newprice", placeholder="New Price")
+                          .form-group
+                            button.btn.btn-success(type="submit") Update Price
+    

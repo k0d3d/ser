@@ -1,0 +1,184 @@
+.headerbar
+    a.menutoggle
+      i.fa.fa-bars
+    form.searchform(action='http://themepixels.com/demo/webpage/bracket/index.html', method='post')
+      input.form-control(type='text', name='keyword', placeholder='Search here...')
+    .header-right
+      ul.headermenu
+        li
+          .btn-group
+            button.btn.btn-default.dropdown-toggle.tp-icon(data-toggle='dropdown')
+              i.glyphicon.glyphicon-user
+              span.badge 2
+            .dropdown-menu.dropdown-menu-head.pull-right
+              h5.title 2 Newly Registered Users
+              ul.dropdown-list.user-list
+                li.new
+                  .thumb
+                    a(href='#')
+                      img(src='images/photos/user1.png', alt='')
+                  .desc
+                    h5
+                      a(href='#') Draniem Daamul (@draniem)
+                      span.badge.badge-success new
+                li.new
+                  .thumb
+                    a(href='#')
+                      img(src='images/photos/user2.png', alt='')
+                  .desc
+                    h5
+                      a(href='#') Zaham Sindilmaca (@zaham)
+                      span.badge.badge-success new
+                li
+                  .thumb
+                    a(href='#')
+                      img(src='images/photos/user3.png', alt='')
+                  .desc
+                    h5
+                      a(href='#') Weno Carasbong (@wenocar)
+                li
+                  .thumb
+                    a(href='#')
+                      img(src='images/photos/user4.png', alt='')
+                  .desc
+                    h5
+                      a(href='#') Nusja Nawancali (@nusja)
+                li
+                  .thumb
+                    a(href='#')
+                      img(src='images/photos/user5.png', alt='')
+                  .desc
+                    h5
+                      a(href='#') Lane Kitmari (@lane_kitmare)
+                li.new
+                  a(href='#') See All Users
+        li
+          .btn-group
+            button.btn.btn-default.dropdown-toggle.tp-icon(data-toggle='dropdown')
+              i.glyphicon.glyphicon-envelope
+              span.badge 1
+            .dropdown-menu.dropdown-menu-head.pull-right
+              h5.title You Have 1 New Message
+              ul.dropdown-list.gen-list
+                li.new
+                  a(href='#')
+                    span.thumb
+                      img(src='images/photos/user1.png', alt='')
+                    span.desc
+                      span.name
+                        | Draniem Daamul
+                        span.badge.badge-success new
+                      span.msg Lorem ipsum dolor sit amet...
+                li
+                  a(href='#')
+                    span.thumb
+                      img(src='images/photos/user2.png', alt='')
+                    span.desc
+                      span.name Nusja Nawancali
+                      span.msg Lorem ipsum dolor sit amet...
+                li
+                  a(href='#')
+                    span.thumb
+                      img(src='images/photos/user3.png', alt='')
+                    span.desc
+                      span.name Weno Carasbong
+                      span.msg Lorem ipsum dolor sit amet...
+                li
+                  a(href='#')
+                    span.thumb
+                      img(src='images/photos/user4.png', alt='')
+                    span.desc
+                      span.name Zaham Sindilmaca
+                      span.msg Lorem ipsum dolor sit amet...
+                li
+                  a(href='#')
+                    span.thumb
+                      img(src='images/photos/user5.png', alt='')
+                    span.desc
+                      span.name Veno Leongal
+                      span.msg Lorem ipsum dolor sit amet...
+                li.new
+                  a(href='#') Read All Messages
+        li
+          .btn-group
+            button.btn.btn-default.dropdown-toggle.tp-icon(data-toggle='dropdown')
+              i.glyphicon.glyphicon-globe
+              span.badge 5
+            .dropdown-menu.dropdown-menu-head.pull-right
+              h5.title You Have 5 New Notifications
+              ul.dropdown-list.gen-list
+                li.new
+                  a(href='#')
+                    span.thumb
+                      img(src='images/photos/user4.png', alt='')
+                    span.desc
+                      span.name
+                        | Zaham Sindilmaca
+                        span.badge.badge-success new
+                      span.msg is now following you
+                li.new
+                  a(href='#')
+                    span.thumb
+                      img(src='images/photos/user5.png', alt='')
+                    span.desc
+                      span.name
+                        | Weno Carasbong
+                        span.badge.badge-success new
+                      span.msg is now following you
+                li.new
+                  a(href='#')
+                    span.thumb
+                      img(src='images/photos/user3.png', alt='')
+                    span.desc
+                      span.name
+                        | Veno Leongal
+                        span.badge.badge-success new
+                      span.msg likes your recent status
+                li.new
+                  a(href='#')
+                    span.thumb
+                      img(src='images/photos/user3.png', alt='')
+                    span.desc
+                      span.name
+                        | Nusja Nawancali
+                        span.badge.badge-success new
+                      span.msg downloaded your work
+                li.new
+                  a(href='#')
+                    span.thumb
+                      img(src='images/photos/user3.png', alt='')
+                    span.desc
+                      span.name
+                        | Nusja Nawancali
+                        span.badge.badge-success new
+                      span.msg send you 2 messages
+                li.new
+                  a(href='#') See All Notifications
+        li
+          .btn-group
+            button.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown')
+              img(src='images/photos/loggeduser.png', alt='')
+              | #{userData.username}
+              span.caret
+            ul.dropdown-menu.dropdown-menu-usermenu.pull-right
+              li
+                a(href='/user/profile')
+                  i.glyphicon.glyphicon-user
+                  | My Profile
+              li
+                a(href='#')
+                  i.glyphicon.glyphicon-cog
+                  | Account Settings
+              li
+                a(href='#')
+                  i.glyphicon.glyphicon-question-sign
+                  | Help
+              li
+                a(href='signin.html')
+                  i.glyphicon.glyphicon-log-out
+                  | Log Out
+        li
+          button#chatview.btn.btn-default.tp-icon.chat-icon
+            i.glyphicon.glyphicon-comment
+    //
+       header-right 

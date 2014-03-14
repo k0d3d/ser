@@ -1,0 +1,34 @@
+mixin register()
+  form(name="register_new_account", ng-submit="send_registration()")
+      h3.nomargin Sign Up
+      p.mt5.mb20
+        | Already a member?
+        a(href='/signin')
+          strong Sign In
+
+      .mb10
+        label.control-label Username
+        input.form-control(type='text', required, ng-model="form.username")
+      .mb10
+        label.control-label Password
+        input.form-control(type='password', required, equals, ng-model="form.password", id="password_true")
+        span.msg-error(ng-show="register_new_account.verifyPassword.$error.passwordMatch") Passwords Must Match.
+          
+      .mb10
+        label.control-label Retype Password
+        input.form-control(type='password', required, equals, ng-model="form.password_c", password-match, name="verifyPassword")
+      .mb10
+        label.control-label Email Address
+        input.form-control(type='email', required, ng-model="form.email")
+      .mb10
+        label.control-label Account Type
+        select.form-control.chosen-select(data-placeholder='Facility, Distributor, Sales Agent..', required, ng-model="form.account_type")
+          option(value='')
+          option(value="3") Medical Facility
+          option(value="0") Pharmaceutical Company
+          option(value="1") Distributor
+          option(value="2") Sales Agent
+      br
+      button.btn.btn-success.btn-block(type="submit", ng-disabled="register_new_account.$invalid") Sign Up
+  //
+     col-sm-6 

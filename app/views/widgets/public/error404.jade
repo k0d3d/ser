@@ -1,0 +1,11 @@
+mixin error404
+  h1 404!
+  h3 The page you are looking for has not been found!
+  h4
+    | The page you are looking for might have been removed, had its name changed, or unavailable.
+    br
+    | Maybe you could try a search:
+  form(action='http://themepixels.com/demo/webpage/bracket/search-results.html')
+    input.form-control(type='text', placeholder='Search for page')
+    button.btn.btn-success Search
+

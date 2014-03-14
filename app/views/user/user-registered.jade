@@ -1,0 +1,23 @@
+extends ../layouts/public
+
+block mainbody
+  section(ng-controller="errorController")
+    .notfoundpanel
+      .logopanel
+        h1
+          span [
+          | StocCloud
+          span ]      
+      .panel.panel-success
+          .panel-heading
+              h3.panel-title Success
+            .panel-body
+              p
+                | You have successfully registered for a StocCloud
+                | Account. Please check your email for activation
+                | instructions.
+              p
+                a.btn.btn-success(href="/signin") Return to Login Page 
+
+append foot
+  script(src="/js/modules/public.js")

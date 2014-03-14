@@ -1,0 +1,26 @@
+doctype html
+html(lang='en', xmlns='http://www.w3.org/1999/xhtml', xmlns:fb='https://www.facebook.com/2008/fbml',ng-app="stocUser")
+  include ../includes/head
+  body()
+    #preloader
+      #status
+        i.fa.fa-spinner.fa-spin
+    section
+      block leftpanel
+        include ../includes/side-nav
+
+      block mainpanel
+        .mainpanel
+          include ../includes/headerbar
+          include ../includes/pageheader
+          
+          block contentpanel
+
+      block rightpanel
+        include ../includes/right-nav
+
+    block footer
+      include ../includes/footer
+    block foot
+      include ../includes/foot
+

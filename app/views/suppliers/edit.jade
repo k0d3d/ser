@@ -1,0 +1,42 @@
+append head
+  link(rel='stylesheet', href='/css/table-fixed-header.css')
+
+append mainbody
+  include ../includes/modals/supplier/modal-more.jade
+.row-fluid.row-break
+  .span2.actioncol
+    button.btn.btn-large.btn-block.btn-primary(ng-click="update()") Update
+    button.btn.btn-large.btn-block.btn-default(ng-click="commons.backBtn()") Go Back
+  .span8.offset1
+    h3 Edit Supplier Form
+    form.editsupplier(name="editsupplier")
+      .control-group
+          label.control-label Supplier Name
+          .controls
+              input.input-medium(type="text",name="patientname", ng-model="supplierForm.supplierName", required)
+      .control-group
+          label.control-label Address
+          .controls
+              textarea.input-medium(type="text",name="company", ng-model="supplierForm.address", required)
+      .control-group
+          label.control-label Phone Number
+          .controls
+              input.input-medium(type="tel",name="phoneNumber", ng-model="supplierForm.phoneNumber", required)
+      .control-group
+          label.control-label Other Contact
+          .controls
+              textarea.input-medium(type="text",name="otherContact", ng-model="supplierForm.otherContact")
+      .control-group
+          label.control-label Email Address
+          .controls
+              input.input-medium(type="email",name="email", ng-model="supplierForm.email")    
+      .control-group
+          label.control-label Contact Person
+          .controls
+              input.input-large(type="text",name="contactPerson", ng-model="supplierForm.contactPerson", required)       
+      .control-group
+          label.control-label Contact Person Phone
+          .controls
+              input.input-large(type="tel",name="contactPersonPhone", ng-model="supplierForm.contactPersonPhone", required)                                            
+append foot
+  script(src="js/table-fixed-header.js")                

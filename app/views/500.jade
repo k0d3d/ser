@@ -1,0 +1,9 @@
+extends layouts/public
+
+block mainbody
+  section(ng-controller="errorController")
+    .notfoundpanel
+      include widgets/public/error5xx
+      +error5xx()
+append foot
+  script(src="/js/modules/public.js")
