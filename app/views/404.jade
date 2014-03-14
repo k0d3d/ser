@@ -1,13 +1,9 @@
-extends layouts/default
+extends layouts/public
 
-block main
-  h1 Oops something went wrong
-  br
-  span 404
-
-block content
-  #error-message-box
-    #error-stack-trace
-      pre
-        code!= error
-
+block mainbody
+  section(ng-controller="errorController")
+    .notfoundpanel
+      include widgets/public/error404
+      +error404()
+append foot
+  script(src="/js/modules/public.js")

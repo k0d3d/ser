@@ -225,14 +225,21 @@ module.exports.routes = function(app, auth){
       });
     }
   );
+
   app.get('/dashboard/order/:id', auth.requiresLogin, function(req, res){
       res.render('index',{});
     }
   );
+
   app.get('/orders', auth.requiresLogin, function(req, res){
       res.render('index',{
         title: 'All orders'
       });
+    }
+  );
+
+  app.get('/orders/new', auth.requiresLogin, function(req, res){
+      res.render('index');
     }
   );
   //Order  GET routes

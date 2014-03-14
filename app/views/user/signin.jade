@@ -1,0 +1,44 @@
+extends ../layouts/public
+
+block mainbody
+  section(ng-controller="userController")
+      .signinpanel
+          .row
+            .col-md-7
+              .signin-info
+                .logopanel
+                  h1
+                    span [
+                    | StocCloud
+                    span ]
+                //
+                   logopanel 
+                .mb20
+                h5
+                  strong Welcome to Integra StocCloud
+                ul
+                  li
+                    i.fa.fa-arrow-circle-o-right.mr5
+                    | Manage Medical Orders and Supplies
+                  li
+                    i.fa.fa-arrow-circle-o-right.mr5
+                    | Intelligent Reporting
+                  li
+                    i.fa.fa-arrow-circle-o-right.mr5
+                    | Real-time Medical Item Prices  
+                  li
+                    i.fa.fa-arrow-circle-o-right.mr5
+                    | and much more...
+                .mb20
+                strong
+                  | Not a member? 
+                  a(href='/signup') Sign Up
+              //
+                 signin0-info 
+            //
+               col-sm-7 
+            .col-md-5
+              include ../widgets/public/signin
+              +signin()
+append foot
+  script(src="/js/modules/public.js")

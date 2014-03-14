@@ -176,40 +176,161 @@
           }
       };
   });
-  angular.module('directives').directive('pagination', ["supplierServices", function(ss){
+  angular.module('directives').directive('pagination', [function(){
     function link(scope, element, attrs){
-      scope.pageno = 1;
-      scope.$watch(attrs.pagination, function(n){
-        if(!n || n.length) return element.hide();
-        if(n.length > 0){
-          element.show();
-        }
-        if(n.length === 0){
-          element.hide();
-        }
-      })
+      scope.pageno = 0;
+      scope.limit = 10;
       $('button.prevbtn', element).on('click', function(e){
         var page = scope.pageno - 1;
-        if(scope.pageno <= 1) return false;
-        ss.all(page, function(r){
-          scope.pagination = r;
-          console.log(typeof(scope.pageno));
-          scope.pageno--;
-        });
+        if(scope.pageno === 1) return false;
+        scope.pageTo({pageNo: page, limit: scope.limit, cb: function(r){
+          if(r) scope.pageno--;
+        }});
       });
       $('button.nextbtn', element).on('click', function(e){
         var page = scope.pageno + 1;
-        ss.all(page, function(r){
-          scope.pagination = r;
-          scope.pageno++;
+        scope.pageTo({pageNo: page, limit: scope.limit, cb: function(r){
+          if(r) scope.pageno++;
+        }});
+      });
+      scope.pagelimit = function(limit){
+        scope.pageTo({pageNo: scope.pageno, limit: limit, cb: function(r){
+          if(r) scope.limit = limit;
+        }});        
+      };
+    }
+
+    function Ctrl () {
+      // init
+      $scope.sort = {       
+        sortingOrder : 'id',
+        reverse : false
+      };
+      
+      $scope.gap = 5;
+      
+      $scope.filteredItems = [];
+      $scope.groupedItems = [];
+      $scope.itemsPerPage = 5;
+      $scope.pagedItems = [];
+      $scope.currentPage = 0;
+
+      var searchMatch = function (haystack, needle) {
+          if (!needle) {
+            return true;
+          }
+          return haystack.toLowerCase().indexOf(needle.toLowerCase()) !== -1;
+      };
+
+      // init the filtered items
+      $scope.search = function () {
+        $scope.filteredItems = $filter('filter')($scope.items, function (item) {
+          for(var attr in item) {
+            if (searchMatch(item[attr], $scope.query))
+              return true;
+          }
+          return false;
         });
-      });    
+        // take care of the sorting order
+        if ($scope.sort.sortingOrder !== '') {
+          $scope.filteredItems = $filter('orderBy')($scope.filteredItems, $scope.sort.sortingOrder, $scope.sort.reverse);
+        }
+        $scope.currentPage = 0;
+        // now group by pages
+        $scope.groupToPages();
+      };
+      
+    
+      // calculate page in place
+      $scope.groupToPages = function () {
+          $scope.pagedItems = [];
+          
+          for (var i = 0; i < $scope.filteredItems.length; i++) {
+              if (i % $scope.itemsPerPage === 0) {
+                  $scope.pagedItems[Math.floor(i / $scope.itemsPerPage)] = [ $scope.filteredItems[i] ];
+              } else {
+                  $scope.pagedItems[Math.floor(i / $scope.itemsPerPage)].push($scope.filteredItems[i]);
+              }
+          }
+      };
+      
+      $scope.range = function (size,start, end) {
+          var ret = [];        
+          console.log(size,start, end);
+                        
+          if (size < end) {
+              end = size;
+              start = size-$scope.gap;
+          }
+          for (var i = start; i < end; i++) {
+              ret.push(i);
+          }        
+           console.log(ret);        
+          return ret;
+      };
+      
+      $scope.prevPage = function () {
+          if ($scope.currentPage > 0) {
+              $scope.currentPage--;
+          }
+      };
+      
+      $scope.nextPage = function () {
+          if ($scope.currentPage < $scope.pagedItems.length - 1) {
+              $scope.currentPage++;
+          }
+      };
+      
+      $scope.setPage = function () {
+          $scope.currentPage = this.n;
+      };
+
+      // functions have been describe process the data for display
+      $scope.search();
+
+      fessmodule.directive("customSort", function() {
+
+      });
+
     }
     return {
       link: link,
       scope: {
-        pagination: "=",
+        pageTo: '&',
+        items : '@paginationss'
       },
-      template:"<button class='btn btn-success prevbtn'>Previous</button><span>{{pageno}}</span><button class='btn btn-success nextbtn'>Next</button>"
-    }
+      controller: Ctrl,
+      templateUrl: '/templates/pagination'
+    };
   }]);
+
+'use strict';
+
+angular.module('directives').directive('equals', function() {
+  return {
+    restrict: 'A', // only activate on element attribute
+    require: '?ngModel', // get a hold of NgModelController
+    link: function(scope, elem, attrs, ngModel) {
+      if(!ngModel) return; // do nothing if no ng-model
+
+      // watch own value and re-validate on change
+      scope.$watch(attrs.ngModel, function() {
+        validate();
+      });
+
+      // observe the other value and re-validate on change
+      attrs.$observe('equals', function (val) {
+        validate();
+      });
+
+      var validate = function() {
+        // values
+        var val1 = ngModel.$viewValue;
+        var val2 = attrs.equals;
+
+        // set validity
+        ngModel.$setValidity('equals', val1 === val2);
+      };
+    }
+  }
+});

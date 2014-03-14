@@ -1,137 +1,587 @@
-.row
-  .col-md-12
-    .page-header
-      h1
-        | Dashboard
-.container
-
-.stat-board-widget
+.contentpanel
   .row
     .col-sm-6.col-md-3
-      .stat-widget-wrap
-        .stat-widget-container
-          ul.clearfix
-            li.pull-left
-              span.stat-widget-icon
-                i.icon-envelop-opened
-            li.pull-right.stat-widget-info
-              span.stat-widget-count 554
-              span.stat-widget-label New Feedback
-          a.btn.btn-default.btn-block.stat-btn(href='#') View All
+      .panel.panel-success.panel-stat
+        .panel-heading
+          .stat
+            .row
+              .col-xs-4
+                img(src='images/is-user.png', alt='')
+              .col-xs-8
+                small.stat-label Visits Today
+                h1 900k+
+            //
+               row 
+            .mb15
+            .row
+              .col-xs-6
+                small.stat-label Pages / Visit
+                h4 7.80
+              .col-xs-6
+                small.stat-label % New Visits
+                h4 76.43%
+            //
+               row 
+          //
+             stat 
+        //
+           panel-heading 
+      //
+         panel 
+    //
+       col-sm-6 
     .col-sm-6.col-md-3
-      .stat-widget-wrap
-        .stat-widget-container
-          ul.clearfix
-            li.pull-left
-              span.stat-widget-icon
-                i.icon-coin
-            li.pull-right.stat-widget-info
-              span.stat-widget-count 3254
-              span.stat-widget-label New Orders
-          a.btn.btn-default.btn-block.stat-btn(href='#') View All
+      .panel.panel-danger.panel-stat
+        .panel-heading
+          .stat
+            .row
+              .col-xs-4
+                img(src='images/is-document.png', alt='')
+              .col-xs-8
+                small.stat-label % Unique Visitors
+                h1 54.40%
+            //
+               row 
+            .mb15
+            small.stat-label Avg. Visit Duration
+            h4 01:80:22
+          //
+             stat 
+        //
+           panel-heading 
+      //
+         panel 
+    //
+       col-sm-6 
     .col-sm-6.col-md-3
-      .stat-widget-wrap
-        .stat-widget-container
-          ul.clearfix
-            li.pull-left
-              span.stat-widget-icon
-                i.icon-clipboard-2
-            li.pull-right.stat-widget-info
-              span.stat-widget-count 453
-              span.stat-widget-label New Task
-          a.btn.btn-default.btn-block.stat-btn(href='#') View All
+      .panel.panel-primary.panel-stat
+        .panel-heading
+          .stat
+            .row
+              .col-xs-4
+                img(src='images/is-document.png', alt='')
+              .col-xs-8
+                small.stat-label Page Views
+                h1 300k+
+            //
+               row 
+            .mb15
+            small.stat-label % Bounce Rate
+            h4 34.23%
+          //
+             stat 
+        //
+           panel-heading 
+      //
+         panel 
+    //
+       col-sm-6 
     .col-sm-6.col-md-3
-      .stat-widget-wrap
-        .stat-widget-container
-          ul.clearfix
-            li.pull-left
-              span.stat-widget-icon
-                i.icon-truck
-            li.pull-right.stat-widget-info
-              span.stat-widget-count 254
-              span.stat-widget-label Order Shipped
-          a.btn.btn-default.btn-block.stat-btn(href='#') View All
-.row
-  .col-md-12.widget-module
-    .box-widget
-      .widget-head.clearfix
-        span.h-icon
-          i.icon-user
-        h4.pull-left Hospitals
-        .pull-right.widget-action
+      .panel.panel-dark.panel-stat
+        .panel-heading
+          .stat
+            .row
+              .col-xs-4
+                img(src='images/is-money.png', alt='')
+              .col-xs-8
+                small.stat-label Today's Earnings
+                h1 $655
+            //
+               row 
+            .mb15
+            .row
+              .col-xs-6
+                small.stat-label Last Week
+                h4 $32,322
+              .col-xs-6
+                small.stat-label Last Month
+                h4 $503,000
+            //
+               row 
+          //
+             stat 
+        //
+           panel-heading 
+      //
+         panel 
+    //
+       col-sm-6 
+  //
+     row 
+  .row
+    .col-sm-8.col-md-9
+      .panel.panel-default
+        .panel-body
+          .row
+            .col-sm-8
+              h5.subtitle.mb5 Network Performance
+              p.mb15 Duis autem vel eum iriure dolor in hendrerit in vulputate...
+              #basicflot(style='width: 100%; height: 300px; margin-bottom: 20px;')
+            //
+               col-sm-8 
+            .col-sm-4
+              h5.subtitle.mb5 Server Status
+              p.mb15 Summary of the status of your server.
+              span.sublabel CPU Usage (40.05 - 32 cpus)
+              .progress.progress-sm
+                .progress-bar.progress-bar-primary(style='width: 40%;', aria-valuemax='100', aria-valuemin='0', aria-valuenow='40', role='progressbar')
+              //
+                 progress 
+              span.sublabel Memory Usage (32.2%)
+              .progress.progress-sm
+                .progress-bar.progress-bar-success(style='width: 32%;', aria-valuemax='100', aria-valuemin='0', aria-valuenow='40', role='progressbar')
+              //
+                 progress 
+              span.sublabel Disk Usage (82.2%)
+              .progress.progress-sm
+                .progress-bar.progress-bar-danger(style='width: 82%;', aria-valuemax='100', aria-valuemin='0', aria-valuenow='40', role='progressbar')
+              //
+                 progress 
+              span.sublabel Databases (63/100)
+              .progress.progress-sm
+                .progress-bar.progress-bar-warning(style='width: 63%;', aria-valuemax='100', aria-valuemin='0', aria-valuenow='40', role='progressbar')
+              //
+                 progress 
+              span.sublabel Domains (2/10)
+              .progress.progress-sm
+                .progress-bar.progress-bar-success(style='width: 20%;', aria-valuemax='100', aria-valuemin='0', aria-valuenow='40', role='progressbar')
+              //
+                 progress 
+              span.sublabel Email Account (13/50)
+              .progress.progress-sm
+                .progress-bar.progress-bar-success(style='width: 26%;', aria-valuemax='100', aria-valuemin='0', aria-valuenow='40', role='progressbar')
+              //
+                 progress 
+            //
+               col-sm-4 
+          //
+             row 
+        //
+           panel-body 
+      //
+         panel 
+    //
+       col-sm-9 
+    .col-sm-4.col-md-3
+      .panel.panel-default
+        .panel-body
+          h5.subtitle.mb5 Most Browser Used
+          p.mb15 Duis autem vel eum iriure dolor in hendrerit in vulputate...
+          #donut-chart2(style='text-align: center; height: 298px;')
+        //
+           panel-body 
+      //
+         panel 
+    //
+       col-sm-3 
+  //
+     row 
+  .row
+    .col-sm-7
+      .table-responsive.dashboard-datatable
+        table#table1.table
+          thead
+            tr
+              th Rendering engine
+              th Browser
+              th Platform(s)
+          tbody
+            tr.odd.gradeX
+              td Trident
+              td
+                | Internet
+                | Explorer 4.0
+              td Win 95+
+            tr.even.gradeC
+              td Trident
+              td
+                | Internet
+                | Explorer 5.0
+              td Win 95+
+            tr.odd.gradeA
+              td Trident
+              td
+                | Internet
+                | Explorer 5.5
+              td Win 95+
+            tr.even.gradeA
+              td Trident
+              td
+                | Internet
+                | Explorer 6
+              td Win 98+
+            tr.odd.gradeA
+              td Trident
+              td Internet Explorer 7
+              td Win XP SP2+
+            tr.even.gradeA
+              td Trident
+              td AOL browser (AOL desktop)
+              td Win XP
+            tr.gradeA
+              td Gecko
+              td Firefox 1.0
+              td Win 98+ / OSX.2+
+            tr.gradeA
+              td Gecko
+              td Firefox 1.5
+              td Win 98+ / OSX.2+
+            tr.gradeA
+              td Gecko
+              td Firefox 2.0
+              td Win 98+ / OSX.2+
+            tr.gradeA
+              td Gecko
+              td Firefox 3.0
+              td Win 2k+ / OSX.3+
+            tr.gradeA
+              td Gecko
+              td Camino 1.0
+              td OSX.2+
+            tr.gradeA
+              td Gecko
+              td Camino 1.5
+              td OSX.3+
+            tr.gradeA
+              td Gecko
+              td Netscape 7.2
+              td Win 95+ / Mac OS 8.6-9.2
+            tr.gradeA
+              td Gecko
+              td Netscape Browser 8
+              td Win 98SE+
+            tr.gradeA
+              td Gecko
+              td Netscape Navigator 9
+              td Win 98+ / OSX.2+
+            tr.gradeA
+              td Gecko
+              td Mozilla 1.0
+              td Win 95+ / OSX.1+
+            tr.gradeA
+              td Gecko
+              td Mozilla 1.1
+              td Win 95+ / OSX.1+
+            tr.gradeA
+              td Gecko
+              td Mozilla 1.2
+              td Win 95+ / OSX.1+
+            tr.gradeA
+              td Gecko
+              td Mozilla 1.3
+              td Win 95+ / OSX.1+
+            tr.gradeA
+              td Gecko
+              td Mozilla 1.4
+              td Win 95+ / OSX.1+
+            tr.gradeA
+              td Gecko
+              td Mozilla 1.5
+              td Win 95+ / OSX.1+
+            tr.gradeA
+              td Gecko
+              td Mozilla 1.6
+              td Win 95+ / OSX.1+
+            tr.gradeA
+              td Gecko
+              td Mozilla 1.7
+              td Win 98+ / OSX.1+
+            tr.gradeA
+              td Gecko
+              td Mozilla 1.8
+              td Win 98+ / OSX.1+
+            tr.gradeA
+              td Gecko
+              td Seamonkey 1.1
+              td Win 98+ / OSX.2+
+            tr.gradeA
+              td Gecko
+              td Epiphany 2.20
+              td Gnome
+            tr.gradeA
+              td Webkit
+              td Safari 1.2
+              td OSX.3
+            tr.gradeA
+              td Webkit
+              td Safari 1.3
+              td OSX.3
+            tr.gradeA
+              td Webkit
+              td Safari 2.0
+              td OSX.4+
+            tr.gradeA
+              td Webkit
+              td Safari 3.0
+              td OSX.4+
+            tr.gradeA
+              td Webkit
+              td OmniWeb 5.5
+              td OSX.4+
+            tr.gradeA
+              td Webkit
+              td iPod Touch / iPhone
+              td iPod
+            tr.gradeA
+              td Webkit
+              td S60
+              td S60
+            tr.gradeA
+              td Presto
+              td Opera 7.0
+              td Win 95+ / OSX.1+
+            tr.gradeA
+              td Presto
+              td Opera 7.5
+              td Win 95+ / OSX.2+
+            tr.gradeA
+              td Presto
+              td Opera 8.0
+              td Win 95+ / OSX.2+
+            tr.gradeA
+              td Presto
+              td Opera 8.5
+              td Win 95+ / OSX.2+
+            tr.gradeA
+              td Presto
+              td Opera 9.0
+              td Win 95+ / OSX.3+
+            tr.gradeA
+              td Presto
+              td Opera 9.2
+              td Win 88+ / OSX.3+
+            tr.gradeA
+              td Presto
+              td Opera 9.5
+              td Win 88+ / OSX.3+
+            tr.gradeA
+              td Presto
+              td Opera for Wii
+              td Wii
+            tr.gradeA
+              td Presto
+              td Nokia N800
+              td N800
+            tr.gradeA
+              td Presto
+              td Nintendo DS browser
+              td Nintendo DS
+            tr.gradeC
+              td KHTML
+              td Konqureror 3.1
+              td KDE 3.1
+            tr.gradeA
+              td KHTML
+              td Konqureror 3.3
+              td KDE 3.3
+            tr.gradeA
+              td KHTML
+              td Konqureror 3.5
+              td KDE 3.5
+            tr.gradeX
+              td Tasman
+              td Internet Explorer 4.5
+              td Mac OS 8-9
+            tr.gradeC
+              td Tasman
+              td Internet Explorer 5.1
+              td Mac OS 7.6-9
+            tr.gradeC
+              td Tasman
+              td Internet Explorer 5.2
+              td Mac OS 8-X
+            tr.gradeA
+              td Misc
+              td NetFront 3.1
+              td Embedded devices
+            tr.gradeA
+              td Misc
+              td NetFront 3.4
+              td Embedded devices
+            tr.gradeX
+              td Misc
+              td Dillo 0.8
+              td Embedded devices
+            tr.gradeX
+              td Misc
+              td Links
+              td Text only
+            tr.gradeX
+              td Misc
+              td Lynx
+              td Text only
+            tr.gradeC
+              td Misc
+              td IE Mobile
+              td Windows Mobile 6
+            tr.gradeC
+              td Misc
+              td PSP browser
+              td PSP
+            tr.gradeU
+              td Other browsers
+              td All others
+              td -
+      //
+         table-responsive 
+    //
+       col-sm-7 
+    .col-sm-5
+      .panel.panel-success
+        .panel-heading.padding5
+          #line-chart(style='height: 248px;')
+        .panel-body
+          .tinystat.pull-left
+            #sparkline.chart.mt5
+            .datainfo
+              span.text-muted Average Sales
+              h4 $630,201
+          //
+             tinystat 
+          .tinystat.pull-right
+            #sparkline2.chart.mt5
+            .datainfo
+              span.text-muted Total Sales
+              h4 $139,201
+          //
+             tinystat 
+      //
+         panel 
+    //
+       col-sm-6 
+  //
+     row 
+  .row
+    .col-sm-6.col-md-4
+      .panel.panel-default.widget-photoday
+        .panel-body
+          a.photoday(href='#')
+            img(src='images/photos/photo1.png', alt='')
+          .photo-details
+            h4.photo-title Strawhat In The Beach
+            small.text-muted
+              i.fa.fa-map-marker
+              | San Franciso, California, USA
+            small
+              | By:
+              a(href='#') ThemePixels
+          //
+             photo-details 
+          ul.photo-meta
+            li
+              span
+                i.fa.fa-eye
+                | 32,102
+            li
+              a(href='#')
+                i.fa.fa-heart
+                | 1,003
+            li
+              a(href='#')
+                i.fa.fa-comments
+                | 52
+        //
+           panel-body 
+      //
+         panel 
+    //
+       col-sm-6 
+    .col-sm-6.col-md-4
+      .panel.panel-default.panel-alt.widget-messaging
+        .panel-heading
+          .panel-btns
+            a.panel-edit(href='#')
+              i.fa.fa-edit
+          //
+             panel-btns 
+          h3.panel-title Messaging
+        .panel-body
           ul
             li
-              a.widget-collapse(href='#')
-                i.icon-arrow-down
+              small.pull-right Dec 10
+              h4.sender Jennier Lawrence
+              small Lorem ipsum dolor sit amet...
             li
-              a.widget-remove(href='#')
-                i.icon-remove-sign
-      .widget-container
-        .widget-block
-          .widget-content
+              small.pull-right Dec 9
+              h4.sender Marsha Mellow
+              small Lorem ipsum dolor sit amet...
+            li
+              small.pull-right Dec 9
+              h4.sender Holly Golightly
+              small Lorem ipsum dolor sit amet...
+            li
+              small.pull-right Dec 10
+              h4.sender Jennier Lawrence
+              small Lorem ipsum dolor sit amet...
+            li
+              small.pull-right Dec 9
+              h4.sender Marsha Mellow
+              small Lorem ipsum dolor sit amet...
+        //
+           panel-body 
+      //
+         panel 
+    //
+       col-sm-6 
+    .col-sm-6.col-md-4
+      .panel.panel-dark.panel-alt.widget-quick-status-post
+        .panel-heading
+          .panel-btns
+            a.panel-close(href='#') ×
+            a.minimize(href='#') −
+          //
+             panel-btns 
+          h3.panel-title Quick Status Post
+        .panel-body
+          ul.nav.nav-tabs.nav-justified
+            li.active
+              a(href='#post-status', data-toggle='tab')
+                i.fa.fa-pencil
+                strong Status
+            li
+              a(href='#post-photo', data-toggle='tab')
+                i.fa.fa-picture-o
+                strong Photo
+            li
+              a(href='#post-checkin', data-toggle='tab')
+                i.fa.fa-map-marker
+                strong Check-In
+          .tab-content
+            #post-status.tab-pane.active
+              input.form-control(type='text', placeholder='What\'s your status?')
+            #post-photo.tab-pane
+              input.form-control(type='text', placeholder='Choose photo')
+            #post-checkin.tab-pane
+              input.form-control(type='text', placeholder='Search location')
+            button.btn.btn-primary.btn-block.mt10 Submit Post
+          //
+             tab-content 
+        //
+           panel-body 
+      //
+         panel 
+      .mb20
+      .row
+        .col-xs-6
+          .panel.panel-warning.panel-alt.widget-today
+            .panel-heading.text-center
+              i.fa.fa-calendar-o
+            .panel-body.text-center
+              h3.today Fri, Dec 13
             //
-              box-spacing define 20px padding for all content here
-            table.table.responsive
-              thead
-                tr
-                  th
-                    | User Name
-                  th
-                    | Name
-                  th
-                    | Address
-                  th
-                    | Email
-                  th
-                    | Thumb
-                  th
-                    | Status
-                  th
-                    | Action
-              tbody
-                tr
-                  td
-                    a(href='#') Jhon
-                  td
-                    a(href='#') Jhon Doe
-                  td
-                    | Address Line
-                  td
-                    | jhon@hostname.com
-                  td
-                    .user-thumb
-                      a(href='#')
-                        img(height='40', width='40', alt='User', src='images/user-thumb1.png')
-                  td
-                    span.label.label-info New
-                    span.label.label-warning Pending
-                  td.action-bar
-                    a.btn.btn-mini.btn-primary(href='#', title='Edit')
-                      i.icon-pencil-2
-                    a.btn.btn-mini.btn-danger(href='#', title='Edit')
-                      i.icon-remove-2
-                    a.btn.btn-mini.btn-success(href='#', title='Edit')
-                      i.icon-ok
-                tr
-                  td
-                    a(href='#') Jaman
-                  td
-                    a(href='#') Ui Jaman
-                  td
-                    | Address Line
-                  td
-                    | jaman@hostname.com
-                  td
-                    .user-thumb
-                      a(href='#')
-                        img(height='40', width='40', alt='User', src='images/user-thumb2.png')
-                  td
-                    span.label.label-danger Suspended
-                  td.action-bar
-                    a.btn.btn-mini.btn-primary(href='#', title='Edit')
-                      i.icon-pencil-2
-                    a.btn.btn-mini.btn-danger(href='#', title='Edit')
-                      i.icon-remove-2
-                    a.btn.btn-mini.btn-success(href='#', title='Edit')
-                      i.icon-ok
-
+               panel-body 
+          //
+             panel 
+        .col-xs-6
+          .panel.panel-danger.panel-alt.widget-time
+            .panel-heading.text-center
+              i.glyphicon.glyphicon-time
+            .panel-body.text-center
+              h3.today 4:50AM PST
+            //
+               panel-body 
+          //
+             panel 
+    //
+       col-sm-6 
+   

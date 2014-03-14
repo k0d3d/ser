@@ -76,7 +76,18 @@ HospitalController.prototype.delete = function(h_id, u_id, callback){
       })
     }
   })
-}
+};
+
+HospitalController.prototype.fetchOne = function (userId, cb) {
+  Hospital.findOne({user: userId})
+  .exec(function (err, i) {
+    if (err || _.isEmpty(i)) {
+      cb(new Error('We can not seem to find this facility information'));
+    } else {
+      cb(i);
+    }
+  });
+};
 
 module.exports.hospital = HospitalController;
 var hospital = new HospitalController();
@@ -84,17 +95,22 @@ var hospital = new HospitalController();
 module.exports.routes = function (app, auth) {
   
   //Load the hospital index / list page
-  app.get('/hospital', auth.requiresLogin, function (req, res) {
+  app.get('/hospitals', auth.requiresLogin, function (req, res) {
     res.render('index', {});
   });
 
   //loads page to add a new hospital account\
-  app.get('/hospital/add', auth.requiresLogin, function (req, res) {
+  app.get('/hospitals/add', auth.requiresLogin, function (req, res) {
+    res.render('index', {});
+  });
+
+  //loads page to add a new hospital account\
+  app.get('/hospitals/:hospitalId', auth.requiresLogin, function (req, res) {
     res.render('index', {});
   });
 
   //fetches list of registered hospitals
-  app.get('/api/hospital/:page', auth.requiresLogin, function (req, res, next) {
+  app.get('/api/hospitals/pages/:page', auth.requiresLogin, function (req, res, next) {
     hospital.list(req.params.page, function (r) {
       if (util.isError(r)) {
         next(r);
@@ -104,8 +120,18 @@ module.exports.routes = function (app, auth) {
     });
   });
 
+  app.get('/api/hospitals/:hospitalId', function (req, res, next) {
+    hospital.fetchOne(req.params.hospitalId, function (r) {
+      if (util.isError(r)) {
+        next(r);
+      } else {
+        res.json(200, r);
+      }
+    });
+  });
+
   //Creates a new hospital
-  app.post('/api/hospital', function (req, res, next) {
+  app.post('/api/hospitals', function (req, res, next) {
     hospital.create(req.body, function (r) {
       if (util.isError(r)) {
         next(r);
@@ -116,8 +142,8 @@ module.exports.routes = function (app, auth) {
   });
 
   //Remove hospital record and user
-  app.del('/api/hospital/:hos_id/user/:userid', function(req, res, next){
-    hospital.delete(req.params.hos_id, req.params.userid, function(r){
+  app.del('/api/hospitals/:hospitalId', function(req, res, next){
+    hospital.delete(req.params.hospitalId, req.params.userid, function(r){
       if (util.isError(r)) {
         next(r);
       } else {

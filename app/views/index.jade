@@ -1,13 +1,4 @@
 extends layouts/default
 
-block body
-  .main-container
-    .container
-      div#wrap(ng-view)
-      div.md-overlay(ng-class="modal.state.overlay")
-      div.notification-bar.navbar.navbar-fixed-bottom(ng-class="notification.type", ng-show="notification.message.length > 0", style="z-index: 99999")
-      .navbar-inner
-          p.navbar-text
-              i.fa(ng-class="notification.icon")
-              {{notification.message}}
-        
+block contentpanel
+  .x-view(ng-view)

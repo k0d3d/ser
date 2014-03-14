@@ -6,13 +6,17 @@
 var hospital = angular.module('hospital', []);
 hospital.config(['$routeProvider', function ($routeProvider){
   $routeProvider
-  .when('/hospital', {
+  .when('/hospitals', {
     templateUrl: '/hospital/index', 
     controller: 'hospitalIndexController'
   })
-  .when('/hospital/add',{
+  .when('/hospitals/add',{
     templateUrl: '/hospital/new',
     controller: 'hospitalAddController'
+  })
+  .when('/hospitals/:hospitalId',{
+    templateUrl: '/hospital/details',
+    controller: 'hospitalDeetsController'
   });
 }]);
 
@@ -26,7 +30,8 @@ hospital.controller('hospitalIndexController', ['$scope', 'hospitalService', fun
     hs.remove($scope.hospitals[index]._id,$scope.hospitals[index].user, function(r){
       $scope.hospitals.splice(index, 1);
     });
-  }
+  };
+
 }]);
 
 hospital.controller('hospitalAddController', ['$scope', 'hospitalService', function indexController($scope, hs){
@@ -43,13 +48,26 @@ hospital.controller('hospitalAddController', ['$scope', 'hospitalService', funct
   };
 
 }]);
+hospital.controller('hospitalDeetsController', ['$scope', 'hospitalService', '$routeParams', function indexController($scope, hs, $routeParams){
+  function init () {
+    $scope.form = {};
+
+    var userId  = $routeParams.hospitalId;
+    hs.deets(userId, function (r) {
+      $scope._deets = r;
+    });
+  }
+  init();
+
+
+}]);
 
 hospital.factory('hospitalService',['$http', 'Notification', 'Language',  function($http, N, Lang){
   var h = {};
 
   //Get the list of register hospitals
   h.all = function(options, callback){
-    $http.get('/api/hospital/'+options.page)
+    $http.get('/api/hospitals/pages/'+options.page)
     .success(function(d, r){
       callback(d);
     })
@@ -59,11 +77,25 @@ hospital.factory('hospitalService',['$http', 'Notification', 'Language',  functi
         type: 'error'
       });
     });
+  };
+
+  h.deets = function (id, cb) {
+    $http.get('/api/hospitals/' + id)
+    .success(function (r) {
+      cb(r);
+    })
+    .error(function (err) {
+      N.notifier({
+        message: err,
+        type: 'error'
+      });      
+    });
   }
+
 
   //Send a new registration request
   h.register = function(post, callback){
-    $http.post('/api/hospital', post)
+    $http.post('/api/hospitals', post)
     .success(function(d, r){
       N.notifier({
         message: Lang[Lang.set].hospital.register.success,
@@ -78,11 +110,11 @@ hospital.factory('hospitalService',['$http', 'Notification', 'Language',  functi
       });
       callback(true);
     });
-  }
+  };
 
   //send a delete hospital request
   h.remove = function(hospitalId, userId, callback){
-    $http.delete('/api/hospital/'+hospitalId+'/user/'+userId)
+    $http.delete('/api/hospitals/'+hospitalId+'/user/'+userId)
     .success(function(d, r){
       N.notifier({
         message: Lang[Lang.set].hospital.delete.success,

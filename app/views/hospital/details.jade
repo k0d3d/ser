@@ -1,0 +1,39 @@
+.page-header
+  h1
+    i.icon-office
+    | Hospital Registration
+    small  Register a new Hospital
+.row
+  .col-md-8.widget-module
+    .square-widget.widget-collapsible
+      .widget-container
+        form.form-horizontal(novalidate, ng-submit="regnew()", name="newreg")
+          .form-group
+            label.col-lg-2.control-label Hospital Name
+            .col-lg-10
+              p.form-control-static
+                | {{_deets.name}}
+          .form-group
+            label.col-lg-2.control-label Email
+            .col-lg-10
+              p.form-control-static {{_deets.email}}         
+          .form-group
+            label.col-lg-2.control-label Contact Personel
+            .col-lg-10
+              p.form-control-static {{_deets.personel}}
+          .form-group
+            label.col-lg-2.control-label Hospital Address
+            .col-lg-10
+              p.form-control-static{{_deets.address}}   
+          .form-group
+            label.col-lg-2.control-label Hospital Phone Number
+            .col-lg-10
+              p.form-control-static {{_deets.phonenumber}}            
+          .form-group
+            label.col-lg-2.control-label  
+            .col-lg-10
+              .form-actions
+                button.btn.btn-primary.btn-sm(type='submit', ng-disabled="newreg.$invalid") Edit
+  .col-md-4
+    .facility-logo
+      img.img-circle(src="/img/facility-logo.jpg", style="width: 140px")

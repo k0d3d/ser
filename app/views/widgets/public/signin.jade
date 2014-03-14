@@ -1,0 +1,11 @@
+mixin signin()
+  form(name="signin_form", ng-submit="send_login()")
+    .alert.alert-danger(ng-show="auth_message.length > 0")
+      | {{auth_message}}
+    h4.nomargin Sign In
+    p.mt5.mb20 Login to access your account.
+    input.form-control.uname(type='text', placeholder='Username or email', ng-model="form.email", ng-keyup="auth_message =''")
+    input.form-control.pword(type='password', placeholder='Password', ng-model="form.password")
+    a(href='#')
+      small Forgot Your Password?
+    button.btn.btn-success.btn-block(type="submit") Sign In

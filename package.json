@@ -3,10 +3,10 @@
   "description": "Online, Health, Medical, Orders, Suppliers, Dashboard, Management",
   "version": "0.1.0",
   "private": true,
-  "author": "Amos Haviv",
+  "author": "Michael RHema",
   "repository": {
     "type": "git",
-    "url": "https://github.com/linnovate/mean.git"
+    "url": "https://github.com/k0d3d/ser.git"
   },
   "engines": {
     "node": "0.10.x",
@@ -25,6 +25,7 @@
     "connect-flash": "latest",
     "crypto": "latest",
     "passport": "latest",
+    "passport-http": "latest",
     "passport-local": "latest",
     "passport-facebook": "latest",
     "passport-twitter": "latest",
@@ -41,7 +42,11 @@
     "restler": "~2.0.1",
     "mongoose-pureautoinc": "~2012.1.0",
     "moment": "~2.1.0",
-    "express-flash": "0.0.2"
+    "express-flash": "0.0.2",
+    "redis": "^0.10.1",
+    "lockit-sendmail": "^0.1.2",
+    "lockit": "^0.6.2",
+    "lockit-mongodb-adapter": "^0.1.0"
   },
   "devDependencies": {
     "supertest": "latest",

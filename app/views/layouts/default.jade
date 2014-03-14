@@ -1,16 +1,26 @@
-!!! 5
-html(lang='en', xmlns='http://www.w3.org/1999/xhtml', xmlns:fb='https://www.facebook.com/2008/fbml',ng-app="integraApp")
+doctype html
+html(lang='en', xmlns='http://www.w3.org/1999/xhtml', xmlns:fb='https://www.facebook.com/2008/fbml',ng-app="stocUser")
   include ../includes/head
-  body(ng-controller='MainController')
-    block mainbody
-      .main-wrapper
-        .scroll-top
-          a.tip-top(href='#', title='Go Top')
-            i.icon-arrow-up      
-        include ../includes/header
-        include ../includes/top-nav
+  body()
+    #preloader
+      #status
+        i.fa.fa-spinner.fa-spin
+    section
+      block leftpanel
         include ../includes/side-nav
-        block body
 
-        include ../includes/footer
-        include ../includes/foot
+      block mainpanel
+        .mainpanel
+          include ../includes/headerbar
+          include ../includes/pageheader
+          
+          block contentpanel
+
+      block rightpanel
+        include ../includes/right-nav
+
+    block footer
+      include ../includes/footer
+    block foot
+      include ../includes/foot
+

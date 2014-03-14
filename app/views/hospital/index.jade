@@ -20,7 +20,7 @@
             th
               | Action
         tbody
-          tr(ng-repeat="h in hospitals")
+          tr.h_row(ng-repeat="h in hospitals", ng-click="commons.href('hospitals/' + h.user)")
             td
               | {{h.name}}
             td

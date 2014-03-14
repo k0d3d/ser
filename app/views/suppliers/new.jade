@@ -2,37 +2,37 @@ append head
   link(rel='stylesheet', href='/css/table-fixed-header.css')
 
 .row-fluid.row-break
-  .span8.offset1(ng-controller="supplierAddController")
+  .col-md-5.offset1(ng-controller="supplierAddController")
     h3 New Supplier Entry Form
     form.newsupplier(name="newsupplier", novalidate)
-      .control-group
+      .form-group
           label.control-label Supplier Name
           .controls
-              input.input-medium(type="text",name="patientname", ng-model="supplierForm.supplierName", required)
-      .control-group
+              input.input-medium.form-control(type="text",name="patientname", ng-model="supplierForm.supplierName", required)
+      .form-group
           label.control-label Address
           .controls
-              textarea.input-medium(type="text",name="company", ng-model="supplierForm.address", required)
-      .control-group
+              textarea.input-medium.form-control(type="text",name="company", ng-model="supplierForm.address", required)
+      .form-group
           label.control-label Phone Number
           .controls
-              input.input-medium(type="tel",name="phoneNumber", ng-model="supplierForm.phoneNumber", required)
-      .control-group
+              input.input-medium.form-control(type="tel",name="phoneNumber", ng-model="supplierForm.phoneNumber", required)
+      .form-group
           label.control-label Other Contact
           .controls
-              textarea.input-medium(type="text",name="otherContact", ng-model="supplierForm.otherContact")
-      .control-group
+              textarea.input-medium.form-control(type="text",name="otherContact", ng-model="supplierForm.otherContact")
+      .form-group
           label.control-label Email Address
           .controls
-              input.input-medium(type="email",name="email", ng-model="supplierForm.email")    
-      .control-group
+              input.input-medium.form-control(type="email",name="email", ng-model="supplierForm.email")    
+      .form-group
           label.control-label Contact Person
           .controls
-              input.input-large(type="text",name="contactPerson", ng-model="supplierForm.contactPerson", required)       
-      .control-group
+              input.input-large.form-control(type="text",name="contactPerson", ng-model="supplierForm.contactPerson", required)       
+      .form-group
           label.control-label Contact Person Phone
           .controls
-              input.input-large(type="tel",name="contactPersonPhone", ng-model="supplierForm.contactPersonPhone", required)                                            
+              input.input-large.form-control(type="tel",name="contactPersonPhone", ng-model="supplierForm.contactPersonPhone", required)                                            
       button.btn.btn-primary(ng-click="addSupplier()",ng-init="saveButtonText='Save'", ng-disabled="newsupplier.$invalid") {{saveButtonText}}
 
 append foot

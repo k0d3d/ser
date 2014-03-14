@@ -1,3 +1,6 @@
+append head
+  link(rel='stylesheet', href='/css/table-fixed-header.css')
+    
 .row-fluid.row-break
   .col-md-10
     .row-fluid.fixed-table
@@ -22,6 +25,9 @@
                 td 
                   button.btn.btn-primary.btn-mini(ng-click="viewMore($index)") More
                   button.btn.btn-danger.btn-mini(ng-click="removeSupplier($index)") Delete
-        .pagination(pagination="supplierList")
+        .x-pagination(pagination, page-to="page(pageNo, limit, cb)")
         h2(ng-show="supplierList.length == 0") No Suppliers Added
              
+
+append foot
+  script(src="js/table-fixed-header.js")                

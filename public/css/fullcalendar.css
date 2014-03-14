@@ -1,5 +1,5 @@
 /*!
- * FullCalendar v1.6.1 Stylesheet
+ * FullCalendar v1.6.4 Stylesheet
  * Docs & License: http://arshaw.com/fullcalendar/
  * (c) 2013 Adam Shaw
  */
@@ -8,7 +8,15 @@
 .fc {
 	direction: ltr;
 	text-align: left;
-	}
+	background: #fff;
+	padding: 20px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
+	-moz-box-shadow: 0 3px 0 rgba(12,12,12,0.03);
+   -webkit-box-shadow: 0 3px 0 rgba(12,12,12,0.03);
+   box-shadow: 0 3px 0 rgba(12,12,12,0.03);
+}
 	
 .fc table {
 	border-collapse: collapse;
@@ -28,8 +36,7 @@ html .fc,
 
 
 
-/* Header
-------------------------------------------------------------------------*/
+/* Header */
 
 .fc-header td {
 	white-space: nowrap;
@@ -55,9 +62,13 @@ html .fc,
 	}
 	
 .fc-header-title h2 {
-	margin-top: 0;
+	margin-top: 7px;
 	white-space: nowrap;
-	}
+	font-size: 18px;
+	text-transform: uppercase;
+	color: #333;
+	font-family: 'LatoBold';
+}
 	
 .fc .fc-header-space {
 	padding-left: 10px;
@@ -97,31 +108,43 @@ html .fc,
 	
 	
 	
-/* Content
-------------------------------------------------------------------------*/
+/* Content */
 	
 .fc-content {
 	clear: both;
-	}
+	zoom: 1;
+	margin-top: 10px;
+}
 	
 .fc-view {
-	width: 100%; /* needed for view switching (when view is absolute) */
+	width: 100%;
 	overflow: hidden;
 	}
 	
 	
 
-/* Cell Styles
-------------------------------------------------------------------------*/
+/* Cell Styles */
 
-.fc-widget-header,    /* <th>, usually */
-.fc-widget-content {  /* <td>, usually */
-	border: 1px solid #ddd;
-	}
+.fc-widget-header {
+	text-transform: uppercase;
+	font-weight: normal;
+	font-family: 'LatoBold';
+	font-size: 13px;
+	height: 40px;
+}
+
+.fc-widget-content { 
+	border: 1px solid #eee;
+}
+
+.fc-widget-content > div {
+	margin: 2px;
+	padding: 3px;
+}
 	
-.fc-state-highlight { /* <td> today cell */ /* TODO: add .fc-today to <th> */
-	background: #fcf8e3;
-	}
+.fc-state-highlight {
+	background: #f7f7f7;
+}
 	
 .fc-cell-overlay { /* semi-transparent rectangle while dragging */
 	background: #bce8f1;
@@ -137,26 +160,21 @@ html .fc,
 .fc-button {
 	position: relative;
 	display: inline-block;
-	padding: 0 .6em;
+	padding: 6px 10px;
 	overflow: hidden;
-	height: 1.9em;
 	line-height: 1.9em;
 	white-space: nowrap;
 	cursor: pointer;
 	}
-	
-.fc-state-default { /* non-theme */
-	border: 1px solid;
-	}
 
 .fc-state-default.fc-corner-left { /* non-theme */
-	border-top-left-radius: 4px;
-	border-bottom-left-radius: 4px;
+	border-top-left-radius: 3px;
+	border-bottom-left-radius: 3px;
 	}
 
 .fc-state-default.fc-corner-right { /* non-theme */
-	border-top-right-radius: 4px;
-	border-bottom-right-radius: 4px;
+	border-top-right-radius: 3px;
+	border-bottom-right-radius: 3px;
 	}
 
 /*
@@ -198,19 +216,10 @@ html .fc,
 */
 
 .fc-state-default {
-	background-color: #f5f5f5;
-	background-image: -moz-linear-gradient(top, #ffffff, #e6e6e6);
-	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#e6e6e6));
-	background-image: -webkit-linear-gradient(top, #ffffff, #e6e6e6);
-	background-image: -o-linear-gradient(top, #ffffff, #e6e6e6);
-	background-image: linear-gradient(to bottom, #ffffff, #e6e6e6);
-	background-repeat: repeat-x;
-	border-color: #e6e6e6 #e6e6e6 #bfbfbf;
-	border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
-	color: #333;
-	text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
-	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
-	}
+	border: 1px solid #ddd;
+	font-size: 12px;
+	text-transform: uppercase;
+}
 
 .fc-state-hover,
 .fc-state-down,
@@ -232,28 +241,40 @@ html .fc,
 
 .fc-state-down,
 .fc-state-active {
-	background-color: #cccccc;
+	background-color: #eee;
 	background-image: none;
 	outline: 0;
-	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
-	}
+}
 
 .fc-state-disabled {
 	cursor: default;
-	background-image: none;
 	opacity: 0.65;
 	filter: alpha(opacity=65);
 	box-shadow: none;
+	background: none;
+	color: #ccc;
 	}
 
-	
+.fc-button-next,
+.fc-button-prev {
+	line-height: 20px;
+}
 
 /* Global Event Styles
 ------------------------------------------------------------------------*/
+
+.fc-event-container > * {
+	z-index: 8;
+	}
+
+.fc-event-container > .ui-draggable-dragging,
+.fc-event-container > .ui-resizable-resizing {
+	z-index: 9;
+	}
 	 
 .fc-event {
-	border: 1px solid #3a87ad; /* default BORDER color */
-	background-color: #3a87ad; /* default BACKGROUND color */
+	border: 1px solid #428BCA; /* default BORDER color */
+	background-color: #428BCA; /* default BACKGROUND color */
 	color: #fff;               /* default TEXT color */
 	font-size: .85em;
 	cursor: default;
@@ -281,6 +302,7 @@ a.fc-event,
 .fc-event-time,
 .fc-event-title {
 	padding: 0 1px;
+	padding-left: 5px;
 	}
 	
 .fc .ui-resizable-handle {
@@ -369,8 +391,19 @@ table.fc-border-separate {
 	
 	
 
-/* Month View, Basic Week View, Basic Day View
-------------------------------------------------------------------------*/
+/* Month View, Basic Week View, Basic Day View */
+
+.fc-week td:first-child {
+	border-left: 0;
+}
+
+.fc-week td:last-child {
+	border-right: 0;
+}
+
+.fc-week:last-child td {
+	border-bottom: 0;
+}
 
 .fc-grid th {
 	text-align: center;

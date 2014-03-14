@@ -31,7 +31,7 @@ var app = express();
 require('./config/express')(app, config, passport);
 
 // Bootstrap routes
-require('./config/routes')(app, passport, auth);
+require('./app/controllers/routes')(app, passport, auth);
 
 
 app.on('listening',function(){

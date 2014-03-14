@@ -6,7 +6,15 @@
 angular.module('order', []).
 
 config(['$routeProvider',function($routeProvider){
-  $routeProvider.when('/orders', {templateUrl: '/order/index', controller: 'ordersIndexController'});
+  $routeProvider
+  .when('/orders', {
+    templateUrl: '/order/index', 
+    controller: 'ordersIndexController'
+  })
+  .when('/orders/new', {
+    templateUrl: '/order/new', 
+    controller: 'ordersIndexController'
+  });
 }]).
 controller('ordersIndexController', function($scope, $http, $location, ordersService){
   (function(){
@@ -136,7 +144,7 @@ controller('ordersIndexController', function($scope, $http, $location, ordersSer
       judge: '=',
       dx:'@'
     },
-    templateUrl: '/order/order-list-tpl',
+    templateUrl: '/templates/order-list-tpl',
     controller: judgeCtrl
   };
 }])

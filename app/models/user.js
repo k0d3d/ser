@@ -10,15 +10,22 @@ var mongoose = require('mongoose'),
  * User Schema
  */
 var UserSchema = new Schema({
-    name: String,
-    email: String,
+    email: {
+        type: String,
+        unique: true
+    },
     username: {
         type: String,
         unique: true
     },
-    provider: String,
     hashed_password: String,
     salt: String,
+    account_type: {type: Number}
+
+});
+
+var clientSchema = new Schema({
+    clientId: {type: String}
 });
 
 /**
@@ -38,13 +45,6 @@ UserSchema.virtual('password').set(function(password) {
 var validatePresenceOf = function(value) {
     return value && value.length;
 };
-
-// the below 4 validations only apply if you are signing up traditionally
-UserSchema.path('name').validate(function(name) {
-    // if you are authenticating by any of the oauth strategies, don't validate
-    //if (authTypes.indexOf(this.provider) !== -1) return true;
-    return name.length;
-}, 'Name cannot be blank');
 
 UserSchema.path('email').validate(function(email) {
     // if you are authenticating by any of the oauth strategies, don't validate
