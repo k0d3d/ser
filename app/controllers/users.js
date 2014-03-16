@@ -4,7 +4,11 @@
  var mongoose = require('mongoose'),
  util = require('util'),
  User = mongoose.model('User'),
+ Q = require('q'),
+ SalesAgent = require('../models/sales_agent'),
+ _ = require("underscore"),
  passport = require('passport');
+
 
  function UserController(){
 
@@ -89,7 +93,7 @@ UserController.prototype.apiSession = function(req, res) {
 /**
  * Create user
  */
- UserController.prototype.create = function(body, callback) {
+UserController.prototype.create = function(body, callback) {
   var user = new User(body);
   user.save(function(err) {
     if(err){
@@ -98,6 +102,44 @@ UserController.prototype.apiSession = function(req, res) {
       callback(user);
     }
   });
+};
+
+/**
+ * Updates User Profile
+ * @param  {ObjectId}   id     the ObjectId to change values for
+ * @param  {Object}   body     [description]
+ * @param  {Object}   account_type    This refers to the type of account / profile to update. Since 
+ * user accounts are global and the model ObjectId is the reference to a profile/account type which 
+ * could be Hospital / Facility, Sales Agent, Distributor and Pharma Comp.
+ * @param  {Function} callback [description]
+ * @return {[type]}            [description]
+ */
+UserController.prototype.update = function(id, body, account_type) {
+
+  console.log(id, body, account_type);
+  var d = Q.defer(), Model;
+
+  if (account_type === '2') {
+    Model = SalesAgent;
+  }  
+
+  Model.update({
+    userId : id
+  }, {
+    $set: body
+  }, {upsert: true}, function(err, i) {
+
+    if (err) {
+      return d.reject(err);
+    }
+    if (i === 1) {
+      return d.resolve(true);
+    } else {
+      return d.reject(new Error('update failed'));
+    }
+  });
+
+  return d.promise;
 };
 
 /**
@@ -133,6 +175,29 @@ UserController.prototype.user = function(req, res, next, id) {
     req.profile = user;
     next();
   });
+}
+
+UserController.prototype.getProfile = function (userId, account_type) {
+  var d = Q.defer(), Model;
+
+  if (account_type === 2) {
+    Model = SalesAgent;
+  }
+
+  Model.findOne({
+    userId: userId
+  })
+  .exec(function (err, i) {
+    if (err) {
+      return d.reject(err);
+    }
+    if (_.isEmpty(i)) {
+      return d.reject(new Error('User not found'));
+    }
+    return d.resolve(i);
+  });
+
+  return d.promise;
 };
 
 module.exports.users  = UserController;
@@ -150,6 +215,19 @@ module.exports.routes = function(app, passport, auth){
       userData : req.user
     });
   });
+  app.get('/user/profile', auth.requiresLogin, function (req, res, next) {
+    console.log(req.user);
+    var userId = req.user._id;
+    var account_type = req.user.account_type;
+    users.getProfile(userId, account_type).then(function (r) {
+      res.render('user/profile', {
+        userData : req.user,
+        userProfile: r
+      });
+    }, function (err) {
+      next(err);
+    });
+  });
 
   //Handle Public user registration
   app.post('/users', function (req, res, next){
@@ -163,12 +241,19 @@ module.exports.routes = function(app, passport, auth){
   });
   //Handle Public user registration
   app.put('/users/profile', function (req, res, next){
-    users.update(req.body, function (r){
-      if (util.isError(r)) {
-        next(r);
-      } else {
-        res.json(200, {nextUrl: '/user-registered'});
-      }
+    var id = req.body.pk;
+    var body = {},
+        account_type = req.query.account_type;
+
+    body[req.body.name] = req.body.value
+
+
+    users.update(id, body, account_type)
+    .then(function (r) {
+      res.json(200, {message: 'Saved'});
+    })
+    .fail(function (err) {
+      next(err);
     });
   });
 

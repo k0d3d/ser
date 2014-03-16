@@ -14,7 +14,9 @@ module.exports = function(app, passport, auth) {
     //Orders Routes
     var order = require('./orders');
     order.routes(app, auth);
-
+    //Organization
+    var organization = require('./organization');
+    organization.routes(app, auth);
 
     //Home route
     app.get('/', auth.requiresLogin,  function(req, res){
@@ -39,7 +41,9 @@ module.exports = function(app, passport, auth) {
     app.get('/:parent/:child', function(req, res){
       var parent = req.params.parent;
       var child = req.params.child;
-      res.render(parent+'/'+child);
+      res.render(parent+'/'+child, {
+        userData: req.user
+      });
       //res.render('/');
     });    
 

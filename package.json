@@ -46,7 +46,8 @@
     "redis": "^0.10.1",
     "lockit-sendmail": "^0.1.2",
     "lockit": "^0.6.2",
-    "lockit-mongodb-adapter": "^0.1.0"
+    "lockit-mongodb-adapter": "^0.1.0",
+    "q": "^1.0.1"
   },
   "devDependencies": {
     "supertest": "latest",

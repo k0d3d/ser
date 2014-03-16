@@ -1,9 +1,10 @@
 .leftpanel
     .logopanel
         h1
-          span [
-          | StocCloud
-          span ]
+          a(href='', ng-click="commons.href('/')")
+            span [
+            | StocCloud
+            span ]
       //
          logopanel 
       .leftpanelinner
@@ -40,7 +41,7 @@
         hr
         ul.nav.nav-pills.nav-stacked.nav-bracket
           li.active
-            a(href='index.html')
+            a(href='')
               i.fa.fa-home
               span Dashboard
           li
@@ -62,21 +63,21 @@
           li.nav-parent
             a(href='#')
               i.fa.fa-file-text
-              span Resources
+              span Organization
             ul.children
               li
-                a(href='calendar.html')
+                a(href='#', ng-click="commons.href('/organization')")
                   i.fa.fa-caret-right
                   | Sales Agents
               li
-                a(href='media-manager.html')
+                a(href='#', ng-click="commons.href('/organization')")
                   i.fa.fa-caret-right
                   | Distributors
               li
-                a(href='timeline.html')
+                a(href='#', ng-click="commons.href('/organization')")
                   i.fa.fa-caret-right
                   | Pharmaceutical Companies
               li
-                a(href='blog-list.html')
+                a(href='#', ng-click="commons.href('/organization')")
                   i.fa.fa-caret-right
                   | StocCloud Admins

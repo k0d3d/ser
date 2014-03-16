@@ -1,0 +1,27 @@
+mixin addStaff (account_type) 
+  .col-sm-4.col-md-3
+    h4.subtitle.mb5 Add a staff
+    form(name="new_staff_form", ng-submit="create_new_staff()")
+      label.control-label Full Name / Company
+      input.form-control(type='text', placeholder='', ng-model="new_staff.name", required)
+      label.control-label Email Address
+      input.form-control(type='text', placeholder='', ng-model="new_staff.email", required)
+      label.control-label Phone Number
+      input.form-control(type='text', placeholder='', ng-model="new_staff.phone", required)
+      a.btn.btn-line(ng-click="moreFormFields = !moreFormFields", href="") more
+      label.control-label(ng-show="moreFormFields") Coverage
+      input.form-control(type='text', placeholder='', ng-show="moreFormFields", ng-model="new_staff.coverage")
+      label.control-label(ng-show="moreFormFields") Office Address
+      textarea.form-control(type='text', placeholder='', ng-show="moreFormFields", ng-model="new_staff.address")
+      .mb20
+      label.control-label(ng-show="moreFormFields") Staff Type
+      select.form-control.chosen-select(data-placeholder='Distributor or Sales Agent', ng-show="moreFormFields")
+        option(value='')
+        option(value='1') Distributor
+        option(value='2') Sales Agent
+      .mb20
+      button.btn.btn-info.btn-block(type="submit", ng-disabled="new_staff_form.$invalid") Send Invite
+    br
+    h4.subtitle.mb5 Upload Staff
+    button.btn.btn-info.btn-block() Choose file.
+

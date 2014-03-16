@@ -3,8 +3,7 @@
  */
 var mongoose = require('mongoose'),
     Schema = mongoose.Schema,
-    pureautoinc  = require('mongoose-pureautoinc'),
-    _ = require('underscore');
+    pureautoinc  = require('mongoose-pureautoinc');
 
 var HospitalSchema =  new Schema({
   hospitalId: {type: Number},
@@ -14,6 +13,7 @@ var HospitalSchema =  new Schema({
   location: {type: String},
   user:{type: Schema.ObjectId, ref: 'User'},
   personel: {type: String},
+  personelContactNumber: {type: String},
   favicon: {type: String}
 });
 
@@ -24,3 +24,5 @@ HospitalSchema.plugin(pureautoinc.plugin, {
 });
 
 mongoose.model('Hospital', HospitalSchema);
+
+module.exports = mongoose.model('Hospital');

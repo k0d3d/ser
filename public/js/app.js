@@ -3,7 +3,9 @@
 
 var app = angular.module('stocUser', [
   'ngRoute',
-  'user'
+  'services',
+  'user',
+  'organization'
   ]);
 app.config(function ($routeProvider, $locationProvider) {
   $routeProvider
@@ -13,21 +15,22 @@ app.config(function ($routeProvider, $locationProvider) {
   $locationProvider.html5Mode(true);
 });
 
-app.controller('MainController', function($scope, $http, $location, Notification){
+app.controller('MainController', function ($scope, $http, $location, Notification) {
   $scope.modal = {};
   $scope.notification = {};
   $scope.waiting = '';
-  function href(target){
-    $scope.modal = {};
-    $location.path(target);
-  }
-  function backBtn(){
-    history.back();
-  }
+
+  $scope.appName = 'stocCloud';
 
   $scope.commons = {
-    href : href,
-    backBtn: backBtn
+    href : function href (target) {
+      //clear any modal-overlay displayed
+      $scope.modal = {};
+      $location.path(target);
+    },
+    backBtn: function backBtn() {
+      history.back();
+    }
 
   };
 

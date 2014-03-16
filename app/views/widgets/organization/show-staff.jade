@@ -1,0 +1,56 @@
+mixin oneStaff(staff)
+  .col-md-6
+      .people-item
+          .media
+            a.pull-left(href='#')
+              img.thumbnail.media-object(alt='', src='images/photos/user2.png')
+            .media-body
+              h4.person-name Ray Sin
+              .text-muted
+                i.fa.fa-map-marker
+                | Cebu City, Philippines
+              .text-muted
+                i.fa.fa-briefcase
+                | Software Engineer at
+                a(href='#') SomeCompany, Inc.
+              ul.social-list
+                li
+                  a.tooltips(href='#', data-toggle='tooltip', data-placement='top', title='', data-original-title='Email')
+                    i.fa.fa-envelope-o
+                li
+                  a.tooltips(href='#', data-toggle='tooltip', data-placement='top', title='', data-original-title='Facebook')
+                    i.fa.fa-facebook
+                li
+                  a.tooltips(href='#', data-toggle='tooltip', data-placement='top', title='', data-original-title='Twitter')
+                    i.fa.fa-twitter
+
+mixin showStaff()
+  .col-sm-8.col-md-9
+    .panel.panel-default
+      .panel-heading
+        ul.pagination.nomargin.pull-right
+          li.disabled
+            a(href='#')
+              i.fa.fa-angle-left
+          li
+            a(href='#') 1
+          li.active
+            a(href='#') 2
+          li
+            a(href='#') 3
+          li
+            a(href='#') 4
+          li
+            a(href='#') 5
+          li
+            a(href='#')
+              i.fa.fa-angle-right
+        h4.panel-title Search results for "Web Design"
+        p About 1,370 results (0.13 seconds)
+      //
+         panel-heading 
+      .panel-body
+        .results-list
+          mixin oneStaff({})
+
+

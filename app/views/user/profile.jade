@@ -5,7 +5,7 @@
         .mb30
         h5.subtitle About
         p.mb10.x-editable(data-type="textarea", data-name="summary")
-          | Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitat...
+          | #{userProfile.summary}
         a(href='#') Show More
         .mb10        
         h5.subtitle Connect
@@ -19,28 +19,27 @@
 
         .mb30
         h5.subtitle Office Address
-        address.x-editable(data-type="textarea", data-name="address")
-          | 795 Folsom Ave, Suite 600
-          br
-          | San Francisco, CA 94107
-          br
+        address.x-editable(data-type="textarea", data-name="address", data-defaultValue="Address")
+          | #{userProfile.address}
         h5.subtitle Telephone
-        p.x-editable(title='Phone', data-type="text", data-name="phone")
-          | (123) 456-7890
+        p.x-editable(title='Phone', data-type="text", data-name="phone", data-default-value="Your Phone Number")
+          | #{userProfile.phone}
       //
          col-sm-3 
       .col-sm-9
         .profile-header
-          h2.profile-name.x-editable(data-name="name", data-type="text") Eileen Sideways
+          h2.profile-name.x-editable(data-name="name", data-type="text", data-default-value="Full Name or Company Name") #{userProfile.name}
           .profile-location
-            i.fa.fa-map-marker
-            span.x-editable(data-type="text", data-name="coverage")
-              | San Francisco, California, USA
+            span(style="display: block", title="Your Coverage / Territory") 
+              i.fa.fa-map-marker
+              | Coverage
+            span.x-editable(data-type="text", data-name="coverage", data-default-value="Territory")
+              | #{userProfile.coverage}
           .profile-position
             i.fa.fa-briefcase
-            span.x-editable(data-name="position", data-type="text") Software Engineer 
+            span.x-editable(data-name="position", data-type="text", title="Position", data-default-value="Position") #{userProfile.position} 
             span(style="margin: 0 2px;") at 
-            a.x-editable(href='#', data-type="text", data-name="employer") SomeCompany, Inc.
+            a.x-editable(href='#', data-type="text", data-name="employer", title="Employer", data-default-value="Employer") #{userProfile.employer}
           .mb20
           button.btn.btn-success.mr5.start-edit
             i.fa.fa-user
@@ -92,12 +91,12 @@ script.
     jQuery(this).attr('rel', jQuery(this).data('rel'));
     });
 
-    $.fn.editable.defaults.pk = '48389749837483'; 
+    $.fn.editable.defaults.pk = '#{userData._id}'; 
     $.fn.editable.defaults.ajaxOptions =  {
       type: "PUT"
     };
 
-    $.fn.editable.defaults.url = '/users/profile';
+    $.fn.editable.defaults.url = '/users/profile?account_type=2';
 
     $('.x-editable').editable('disable');
     $(document).on('click', '.start-edit', function (e) {

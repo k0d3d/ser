@@ -1,3 +1,4 @@
+
 /* Services */
 
 angular.module('services', [])
@@ -9,6 +10,7 @@ angular.module('services', [])
 	s.message = {
 		heading: '',
 		body: '',
+
 		type: '',
 		state:{},
 		close: function(){
