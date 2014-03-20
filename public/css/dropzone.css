@@ -170,9 +170,9 @@
   -o-transition: opacity 0.3s ease-in-out;
   -ms-transition: opacity 0.3s ease-in-out;
   transition: opacity 0.3s ease-in-out;
-  background-image: url("../images/uploadfile.png");
+/*  background-image: url("../images/uploadfile.png");
   background-repeat: no-repeat;
-  background-position: 0 0;
+  background-position: 0 0;*/
   position: absolute;
   width: 256px;
   height: 256px;

@@ -40,7 +40,7 @@ publicModule.controller('userController', [
     };
     $scope.send_registration = function() {
       userServices.register($scope.form).then(function (r) {
-        $window.location.href = r.nextUrl;
+        $window.location.href = r.data.nextUrl;
       });
     };
   }

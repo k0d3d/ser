@@ -8,21 +8,18 @@ var mongoose = require('mongoose'),
   Schema = mongoose.Schema;
 
 
-var NafdacdrugSchema = new Schema ({
-  productName : {type: String, default: '', required: true},
-  composition : {type: String, default: '', required: true},
-  regNo : {type: String, default: '', required: true},
-  man_imp_supp : {type: String, default: ''},
-  mis_address : {type: String, default: '', required: true},
-  mis_regDate : {type: String, default: '', required: true},
-  mis_expDate : {type: String, default: '', required: true},
+var DrugSchema = new Schema ({
+  itemName : {type: String, default: '', required: true},
+  sciName : {type: String, default: '', required: true},
+  nafdacRegNo : {type: String, default: '', required: true},
   category : {type: String, default: '', required: true},
   currentPrice: {type: Number},
   lastUpdated: {type: Date},
-  supplierID: {type: Schema.ObjectId}
+  pharmaId: {type: Schema.ObjectId},
+  images: [{type: String}]
 });
 
-NafdacdrugSchema.statics = {
+DrugSchema.statics = {
   /**
   * Auto Complete
   * @param {regex} itemName
@@ -42,6 +39,6 @@ var updateHistorySchema = new Schema({
   price: {type: Number}
 });
 
-mongoose.model('drug', NafdacdrugSchema);
+mongoose.model('drug', DrugSchema);
 mongoose.model('drugUpdateHistory', updateHistorySchema);
 module.exports = mongoose.model('drug');

@@ -10,6 +10,7 @@ var mongoose = require('mongoose'),
     _ = require("underscore"),
     Drug = mongoose.model('drug'),
     DUH = mongoose.model('drugUpdateHistory'),
+    Q = require('q'),
     utils = require("util");
 
 
@@ -41,6 +42,21 @@ DrugController.prototype.search = function(string, page, callback) {
     }
   });
 };
+
+DrugController.prototype.addDrug = function (item, owner) {
+  var d = Q.defer();
+  var drug = new Drug(item);
+  drug.pharmaId = owner;
+  drug.save(function (err, i) {
+    if (err) {
+      return d.reject(err);
+    } else {
+      return d.resolve(i);
+    }
+  });
+
+  return d.promise;
+}
 
 DrugController.prototype.summary = function (id, callback) {
   Drug.findOne({ _id : id})
@@ -92,13 +108,56 @@ DrugController.prototype.checkUpdate = function(since, cb){
   });
 }
 
+DrugController.prototype.fetchAll = function (options) {
+  var d = Q.defer();
+  Drug.find({})
+  //.sort()
+  .limit(options.limit)
+  .skip(options.limit * options.page)
+  .lean()
+  .exec(function (err, i) {
+    if (err) {
+      return d.reject(err);
+    } else {
+      return d.resolve(i);
+    }
+  });
+
+  return d.promise;
+};
+
+DrugController.prototype.fetchOneById = function (id) {
+  var d = Q.defer();
+
+  Drug.findOne({
+    _id : id
+  })
+  .lean()
+  .exec(function (err, i) {
+    if (err) {
+      return d.reject(err);
+    } else {
+      return d.resolve(i);
+    }
+  });
+
+  return d.promise;
+};
+
 module.exports.drug = DrugController;
 var drugs = new DrugController();
 
 module.exports.routes = function(app, auth) {
 
   app.get('/drugs', auth.requiresLogin, function(req, res){
-    res.render('index');
+    res.render('index', {
+      userData : req.user
+    });
+  });
+  app.get('/drugs/add-new', auth.requiresLogin, function(req, res){
+    res.render('index', {
+      userData : req.user
+    });
   });
 
   app.get('/medeqp', auth.requiresLogin, function(req, res){
@@ -134,6 +193,40 @@ module.exports.routes = function(app, auth) {
       }else{
         res.json(200, r);
       }
+    });
+  });
+
+  app.get('/api/drugs', function (req, res, next) {
+    drugs.fetchAll({
+      page: req.query.page || 0,
+      limit: req.query.limit || 10
+    })
+    .then(function (r) {
+      res.json(200, r);
+    }, function (err) {
+      next(err);
+    });
+  });
+
+  app.get('/api/drugs/:drugId', function (req, res, next) {
+    var id = req.params.drugId;
+
+    drugs.fetchOne(id)
+    .then(function (r) {
+      res.json(200, r);
+    }, function (err) {
+      next(err);
+    });
+  });
+
+  app.post('/api/drugs', function (req, res, next) {
+    var item = req.body;
+    var owner = req.user._id;
+    drugs.addDrug(item, owner)
+    .then(function (r) {
+      res.json(200, true);
+    }, function (err) {
+      next(err);
     });
   });
 

@@ -4,3 +4,6 @@ a.btn-line {
 .people-item{
   border: solid 1px #ddd;
 }
+.dropzone{
+  min-height: 0px;
+}

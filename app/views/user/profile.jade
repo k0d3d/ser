@@ -1,7 +1,7 @@
 .contentpanel
   .row
       .col-sm-3
-        img.thumbnail.img-responsive(src='images/photos/profile-1.png', alt='')
+        img.thumbnail.img-responsive(src='/images/photos/#{userProfile.image}' , alt='')
         .mb30
         h5.subtitle About
         p.mb10.x-editable(data-type="textarea", data-name="summary")
@@ -16,6 +16,17 @@
           li
             i.fa.fa-facebook
             a.x-editable(href='#', data-type="text", data-name="facebook") facebook.com/eileen
+
+        .mb20    
+        .panel.panel-default
+            .panel-body
+              a(href="#")
+                | 8 Distributors 
+        .mb20    
+        .panel.panel-default
+            .panel-body
+              a(href="#")
+                | 10 Sales Agent
 
         .mb30
         h5.subtitle Office Address
@@ -64,6 +75,9 @@
           li
             a(href='#prospects', data-toggle='tab')
               strong Prospects
+          li
+            a(href='#prospects', data-toggle='tab')
+              strong Map
         //
            Tab panes 
         .tab-content
@@ -76,6 +90,9 @@
           include ../widgets/profile/calendar
           +loadCalendar()
 
+          include ../widgets/profile/prospects
+          +loadProspects()
+          
           include ../widgets/profile/prospects
           +loadProspects()
 
@@ -96,7 +113,7 @@ script.
       type: "PUT"
     };
 
-    $.fn.editable.defaults.url = '/users/profile?account_type=2';
+    $.fn.editable.defaults.url = '/users/profile';
 
     $('.x-editable').editable('disable');
     $(document).on('click', '.start-edit', function (e) {

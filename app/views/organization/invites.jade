@@ -1,0 +1,42 @@
+append head
+  link(href="/css/jquery.datatables.css")
+.contentpanel
+    .row
+      .table-responsive
+          table#table1.table
+              thead
+                tr
+                  th Email
+                  th Phone Number
+                  th Account Type
+                  th Date Sent
+                  th
+              tbody
+                tr(ng-repeat="iv in invites")
+                  td {{iv.email}}
+                  td {{iv.phone}}
+                  td {{iv.account_type}}
+                  td {{iv.created | moment}}
+                  td 
+                    button.btn.btn-info.btn-xs 
+                      i.fa.fa-check
+                      | Activate
+                    button.btn.btn-danger.btn-xs 
+                      i.fa.fa-times
+                      | Cancel
+
+
+
+append scripts 
+  script(src="/js/jquery.datatables.min.js")
+  script.
+    //- jQuery('#table1').dataTable({
+    //-   "bProcessing" : true,
+    //-   "sAjaxSource" : "/api/organization/invites",
+    //-   "aoColoumns" : [
+    //-     {"mData" : "email"},
+    //-     {"mData" : "phone"},
+    //-     {"mData" : "account_type"},
+    //-     {"mData" : "created"},
+    //-   ]
+    //-   });

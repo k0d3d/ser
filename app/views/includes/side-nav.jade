@@ -35,10 +35,13 @@
                 i.fa.fa-sign-out
                 span Sign Out
         h5.sidebartitle Navigation
-        button.btn.btn-success.btn-block(style="margin-bottom: 5px") 
+        button.btn.btn-success-alt.btn-block(style="margin-bottom: 5px") 
           i.fa.fa-shopping-cart
           | Place Order
-        hr
+        button.btn.btn-success-alt.btn-block(style="margin-bottom: 5px", href='#', ng-click="commons.href('/drugs/add-new')") 
+          i.fa.fa-shopping-cart
+          | Add Item    
+        hr     
         ul.nav.nav-pills.nav-stacked.nav-bracket
           li.active
             a(href='')
@@ -53,13 +56,13 @@
               i.fa.fa-edit
               span Suppliers 
           li
+            a(href='#', ng-click="commons.href('/drugs')")
+              i.fa.fa-edit
+              span Drug Pages 
+          li
             a(href='#')
               i.fa.fa-suitcase
               span Hospitals
-          li
-            a(href='tables.html')
-              i.fa.fa-th-list
-              span Drugs and Equipment
           li.nav-parent
             a(href='#')
               i.fa.fa-file-text
@@ -81,3 +84,7 @@
                 a(href='#', ng-click="commons.href('/organization')")
                   i.fa.fa-caret-right
                   | StocCloud Admins
+              li
+                a(href='#', ng-click="commons.href('/organization/invitations')")
+                  i.fa.fa-caret-right
+                  | Invitations

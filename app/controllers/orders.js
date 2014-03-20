@@ -9,6 +9,7 @@ var mongoose = require('mongoose'),
   Supplier = mongoose.model('Supplier'),
   _ = require('underscore'),
   Hospital = mongoose.model('Hospital'),
+  Q = require("q"),
   utils = require("util");
 
 

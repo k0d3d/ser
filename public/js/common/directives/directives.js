@@ -6,31 +6,14 @@
   */
   angular.module('directives', []);
   angular.module('directives').directive('typeAhead',function(ordersService, itemsService){
-    var ser;
 
     var linker = function(scope, element, attrs){
-        ser = {
-          suppliername : ordersService.getSupplierName,
-          itemname : itemsService.getItemName,
-          nafdacdrugs: itemsService.getNafdacDrug
-        };
-        scope.selectedItem ={
-          suppliername: '',
-          itemname: '',
-          nafdacDrug: ''
-        };
-        element.typeahead({
-          source: function(query, process){
-            return ser[attrs.thName](query,function(results){
-              return process(results);
-            });
-          },
-          updater: function(item){
-            scope.selectedItem[attrs.thName] = item;
-            scope.$apply();
-            return item;
-          }
-        });
+      $(element).typeahead({
+        name: 'item-search',
+        remote: '/search.php?query=%QUERY',
+        // minLength: 3,
+        // limit: 10
+      })
     };
     return{
       restrict: 'A',

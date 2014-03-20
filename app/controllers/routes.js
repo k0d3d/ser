@@ -18,6 +18,10 @@ module.exports = function(app, passport, auth) {
     var organization = require('./organization');
     organization.routes(app, auth);
 
+    //File upload handler/controller
+    var fileupload = require('./upload');
+    fileupload(app);
+
     //Home route
     app.get('/', auth.requiresLogin,  function(req, res){
       res.render('index',{

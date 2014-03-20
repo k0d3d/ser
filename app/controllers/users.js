@@ -6,6 +6,7 @@
  User = mongoose.model('User'),
  Q = require('q'),
  SalesAgent = require('../models/sales_agent'),
+ PharmaComp = require('../models/pharmacomp'),
  _ = require("underscore"),
  passport = require('passport');
 
@@ -91,7 +92,10 @@ UserController.prototype.apiSession = function(req, res) {
 };
 
 /**
- * Create user
+ * creates a user account.
+ * @param  {[type]}   body     [description]
+ * @param  {Function} callback [description]
+ * @return {[type]}            [description]
  */
 UserController.prototype.create = function(body, callback) {
   var user = new User(body);
@@ -119,8 +123,12 @@ UserController.prototype.update = function(id, body, account_type) {
   console.log(id, body, account_type);
   var d = Q.defer(), Model;
 
-  if (account_type === '2') {
+  if (account_type === 2) {
     Model = SalesAgent;
+  }  
+
+  if (account_type === 0) {
+    Model = PharmaComp;
   }  
 
   Model.update({
@@ -184,6 +192,10 @@ UserController.prototype.getProfile = function (userId, account_type) {
     Model = SalesAgent;
   }
 
+  if (account_type === 0) {
+    Model = PharmaComp;
+  }
+
   Model.findOne({
     userId: userId
   })
@@ -192,7 +204,9 @@ UserController.prototype.getProfile = function (userId, account_type) {
       return d.reject(err);
     }
     if (_.isEmpty(i)) {
-      return d.reject(new Error('User not found'));
+      return d.resolve({
+
+      });
     }
     return d.resolve(i);
   });
@@ -243,9 +257,9 @@ module.exports.routes = function(app, passport, auth){
   app.put('/users/profile', function (req, res, next){
     var id = req.body.pk;
     var body = {},
-        account_type = req.query.account_type;
+        account_type = req.user.account_type;
 
-    body[req.body.name] = req.body.value
+    body[req.body.name] = req.body.value;
 
 
     users.update(id, body, account_type)

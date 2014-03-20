@@ -1,6 +1,8 @@
 doctype html
 html(lang='en', xmlns='http://www.w3.org/1999/xhtml', xmlns:fb='https://www.facebook.com/2008/fbml',ng-app="stocUser")
-  include ../includes/head
+  head
+    block head
+      include ../includes/head
   body(ng-controller="MainController")
     #preloader
       #status

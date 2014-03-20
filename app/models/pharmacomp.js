@@ -12,7 +12,9 @@ PharmaCompSchema = new Schema({
   twitter: {type: String},
   facebook: {type: String},
   address: {type: String},
-  phone: {type: String}
+  phone: {type: String},
+  image: {type: String}
+  
 });
 
 mongoose.model('PharmaComp', PharmaCompSchema);

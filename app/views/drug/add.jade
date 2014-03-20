@@ -1,0 +1,44 @@
+.contentpanel
+    .panel.panel-default
+        .panel-heading
+          .panel-btns
+            a.panel-close(href='#') ×
+            a.minimize(href='#') −
+          h4.panel-title Add new item
+
+        .panel-body.panel-body-nopadding
+          form.form-horizontal.form-bordered(ng-submit="add_drug(add_item_form)", novalidate, name="addItemForm")
+            .form-group
+              label.col-sm-3.control-label Brand Name
+              .col-sm-6
+                input.form-control.item-name(type='text', placeholder='', ng-model="add_item_form.itemName", required, type-ahead="autoCompleteItemName", remote="/ndl/search?query=%QUERY", name="item-name")
+            .form-group
+              label.col-sm-3.control-label Composition
+              .col-sm-6
+                input.form-control(type='text', placeholder='', ng-model="add_item_form.sciName", required)
+            .form-group
+              label.col-sm-3.control-label NAFDAC Reg No.
+              .col-sm-6
+                input.form-control(type='text', placeholder='', ng-model="add_item_form.nafdacRegNo", required)
+            .form-group
+              label.col-sm-3.control-label Category
+              .col-sm-6
+                input.form-control(type='text', placeholder='', ng-model="add_item_form.category", required)
+            .form-group
+              label.col-sm-3.control-label Price
+              .col-sm-6
+                input.form-control(type='number', placeholder='', ng-model="add_item_form.currentPrice", required)
+            .form-group
+              label.col-sm-3 Upload Image
+              .col-sm-6.dropzone(dropzone, ng-model="add_item_form.images")
+                  input(name='itemImage', type='file', multiple='multiple', style="display: none")     
+                  span.help-text 
+                    | Add an image for this item. You can click here or drag and drop file right here, easy!                           
+            .form-group
+              .col-sm-6.col-sm-offset-3
+                button.btn.btn-primary(type="submit", ng-disabled="addItemForm.$invalid") Submit
+                button.btn.btn-primary(type="submit", ng-disabled="addItemForm.$invalid") Submit and Add Another
+                button.btn.btn-default(type="reset") Cancel
+  append scripts
+  script(src="/js/dropzone.min.js")
+  

@@ -10,8 +10,17 @@ angular.module('drug', [])
 
   .config(['$routeProvider', function ($routeProvider) {
     $routeProvider.when('/drugs', {templateUrl: '/drug/index', controller: 'drugIndexController'})
+    .when('/drugs/add-new', {templateUrl: '/drug/add', controller: 'drugAddController'});
   }])
   .controller('drugIndexController', ['$scope', 'drugService', function drugIndexController ($scope, ds){
+    //Change header title
+    $scope.$parent.headerTitle = 'All Drug Items';
+
+    ds.fetchAll()
+    .then(function (r) {
+      $scope._drugs = r;
+    });
+
     //ds.search
     $scope.searchcmp = function () {
       $scope.summary = $scope.newprice = '';
@@ -35,8 +44,75 @@ angular.module('drug', [])
       });
     };
   }])
-  .factory('drugService', ['$http', 'Language', 'Notification', function ($http, L, N) {
+  .controller('drugAddController', ['$scope', 'drugService', function ($scope, ds) {
+    //Init the add item form model and 
+    //the images field array
+    $scope.add_item_form = {
+      images: []
+    }
+
+    $scope.autoCompleteItemName = function (query) {
+
+    }
+
+    $scope.add_drug = function (data) {
+      ds.addDrug(data)
+      .then(function (r) {
+        $scope.commons.href('/drugs');
+      });
+    };
+
+  }])
+  .factory('drugService', ['$http', function ($http) {
     var d = {};
+
+    d.addDrug = function (data) {
+      return $http.post('/api/drugs', data)
+      .then(function (r) {
+        return r.data;
+      }, function (err) {
+        console.log(err);
+        return err;
+      });
+    }
+
+    d.fetchAll = function (options)  {
+      options = options || {};
+      return $http.get('/api/drugs', options)
+      .then(function (r) {
+        return r.data;
+      }, function (err) {
+        return err;
+      });
+    };
+
+    d.fetchOne = function (id) {
+      return $http.get('/api/drugs/' + id)
+      .then(function (r) {
+        return d.data;
+      }, function (err) {
+        return err;
+      });
+    };
+    
+    d.updateOne = function (id) {
+      return $http.put('/api/drugs/' + id)
+      .then(function (r) {
+        return d.data;
+      }, function (err) {
+        return err;
+      });
+    };    
+    d.deleteOne = function (id) {
+      return $http.delete('/api/drugs/' + id)
+      .then(function (r) {
+        return d.data;
+      }, function (err) {
+        return err;
+      });
+    };
+
+
 
     d.search = function (srchstr, page, callback) {
       $http.get('/api/drugs/' + srchstr + '/page/' + page)

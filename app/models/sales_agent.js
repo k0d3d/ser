@@ -7,12 +7,14 @@ SalesAgentSchema = new Schema({
   name : {type: String},
   coverage: {type: String},
   position: {type: String},
-  employer: {type: String},
+  employer: [{type: Schema.ObjectId}],
   summary: {type: String},
   twitter: {type: String},
   facebook: {type: String},
   address: {type: String},
-  phone: {type: String}
+  phone: {type: String},
+  image: {type: String}
+  
 });
 
 mongoose.model('SalesAgent', SalesAgentSchema);

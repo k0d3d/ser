@@ -5,7 +5,8 @@ var app = angular.module('stocUser', [
   'ngRoute',
   'services',
   'user',
-  'organization'
+  'organization',
+  'drug'
   ]);
 app.config(function ($routeProvider, $locationProvider) {
   $routeProvider
@@ -19,6 +20,7 @@ app.controller('MainController', function ($scope, $http, $location, Notificatio
   $scope.modal = {};
   $scope.notification = {};
   $scope.waiting = '';
+  $scope.headerTitle = 'Dashboard'
 
   $scope.appName = 'stocCloud';
 
@@ -47,3 +49,25 @@ app.filter('moment', function(){
         return m.fromNow();
     };
 });
+app.directive('dropzone', [function () {
+  return {
+    link : function (scope, element, attrs) {
+      $(element).dropzone({ 
+        url: "/upload-doc",
+        paramName: 'itemImage',
+        maxFiles : 5,
+        //uploadMultiple: true,
+        autoProcessQueue: true,
+        init : function () {
+          this.on("success", function (file) {
+            scope.ngModel.push(file.name);
+          })
+        }
+      });
+    },
+    scope: {
+      ngModel: '='
+    },
+    require: 'ngModel'
+  };
+}]);
