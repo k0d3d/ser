@@ -2,25 +2,6 @@ var publicModule = angular.module('stocPublic', [
   'ngRoute'
   ]);
 
-publicModule.config(function ($routeProvider, $locationProvider) {
-  // $routeProvider
-  // .otherwise({
-  //   redirectTo: '/signin'
-  // })
-  // .when(
-  //   '/signin',{
-  //     templateUrl: '/users/signin',
-  //     controller: 'loginController'
-  //   })
-  // .when(
-  //   '/signup',{
-  //     templateUrl: '/users/signin',
-  //     controller: 'loginController'
-  //   });
-
-  $locationProvider.html5Mode(true);
-
-});
 publicModule.controller('userController', [
   '$scope',
   'userServices',

@@ -2,21 +2,16 @@
 mixin staffOptions(account, index, account_type)
   if (index > account_type)
     option(value='#{index}') #{account}
-    //
-      option(value='0') Pharmaceutical Company
-      option(value='1') Distributor
-      option(value='2') Sales Agent
+
 
 
 mixin addStaff (account_type) 
-  -accounts = ['Pharmaceutical Company', 'Distributor', 'Sales Agent'] 
+  -accounts = ['Pharmaceutical Company', 'Pharma Manager', 'Distributor', 'Dist. Manager', 'Sales Agent'] 
   .col-sm-4.col-md-3
     h4.subtitle.mb5 Add a staff
     form(name="new_staff_form", ng-submit="create_new_staff()")
       label.control-label Email Address
       input.form-control(type='text', placeholder='', ng-model="new_staff.email", required)
-      label.control-label Phone Number
-      input.form-control(type='text', placeholder='', ng-model="new_staff.phone", required)
       .mb20
       label.control-label() Staff Type
       select.form-control.chosen-select(placeholder='Distributor or Sales Agent', ng-model="new_staff.account_type", required)

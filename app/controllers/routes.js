@@ -1,3 +1,5 @@
+var login = require('connect-ensure-login');
+
 module.exports = function(app, passport, auth) {
     //User Routes
     var users = require('./users');
@@ -23,14 +25,14 @@ module.exports = function(app, passport, auth) {
     fileupload(app);
 
     //Home route
-    app.get('/', auth.requiresLogin,  function(req, res){
+    app.get('/', login.ensureLoggedIn(),  function(req, res){
       res.render('index',{
         title: 'Dashboard',
         userData: req.user
       });
     });
 
-    app.get('/home/index', auth.requiresLogin, function(req, res){
+    app.get('/home/index', login.ensureLoggedIn(), function(req, res){
       res.render('home/index',{
         title: 'Dashboard'
       });

@@ -16,12 +16,11 @@ var UserSchema = new Schema({
         unique: true
     },
     phone: {
-        type: String,
-        unique: true
+        type: String
     },
     hashed_password: String,
     salt: String,
-    account_type: {type: Number},
+    account_type: {type: Number, required: true},
     activated : {type: Boolean, default: false},
     activatedDate: {type: Date},
     isTempPassword: {type: Boolean, default: true}

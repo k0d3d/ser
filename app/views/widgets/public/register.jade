@@ -7,8 +7,8 @@ mixin register()
           strong Sign In
 
       .mb10
-        label.control-label Username
-        input.form-control(type='text', required, ng-model="form.username")
+        label.control-label Email Address
+        input.form-control(type='email', required, ng-model="form.email")
       .mb10
         label.control-label Password
         input.form-control(type='password', required, equals, ng-model="form.password", id="password_true")
@@ -17,9 +17,6 @@ mixin register()
       .mb10
         label.control-label Retype Password
         input.form-control(type='password', required, equals, ng-model="form.password_c", password-match, name="verifyPassword")
-      .mb10
-        label.control-label Email Address
-        input.form-control(type='email', required, ng-model="form.email")
       .mb10
         label.control-label Account Type
         select.form-control.chosen-select(data-placeholder='Facility, Distributor, Sales Agent..', required, ng-model="form.account_type")

@@ -1,5 +1,5 @@
 {
-    "db": "mongodb://localhost/online",
+    "db": "mongodb://localhost/stoccloud",
     "app": {
         "name": "Integra Supplier Order Server"
     },

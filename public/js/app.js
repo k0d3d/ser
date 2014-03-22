@@ -49,6 +49,13 @@ app.filter('moment', function(){
         return m.fromNow();
     };
 });
+app.filter('acctype', function () {
+  
+  return function (index) {
+    var accounts = ['Pharmaceutical Company', 'Pharma Manager', 'Distributor', 'Dist. Manager', 'Sales Agent'];
+    return accounts[index];
+  };
+})
 app.directive('dropzone', [function () {
   return {
     link : function (scope, element, attrs) {

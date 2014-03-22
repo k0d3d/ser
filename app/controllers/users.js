@@ -98,6 +98,8 @@ UserController.prototype.apiSession = function(req, res) {
  * @return {[type]}            [description]
  */
 UserController.prototype.create = function(body, callback) {
+  console.log('Creating User Account');
+  console.log(body);
   var user = new User(body);
   user.save(function(err) {
     if(err){
