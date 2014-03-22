@@ -7,7 +7,10 @@ ManagerSchema = new Schema({
   name : {type: String},
   coverage: {type: String},
   position: {type: String},
-  employer: [{type: Schema.ObjectId}],
+  employer: [{
+    employerId :{type: Schema.ObjectId},
+    dateAdded : {type: Date, default: Date.now}
+  }],  
   summary: {type: String},
   twitter: {type: String},
   facebook: {type: String},

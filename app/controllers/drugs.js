@@ -11,6 +11,7 @@ var mongoose = require('mongoose'),
     Drug = mongoose.model('drug'),
     DUH = mongoose.model('drugUpdateHistory'),
     Q = require('q'),
+    login = require('connect-ensure-login'),
     utils = require("util");
 
 
@@ -149,18 +150,18 @@ var drugs = new DrugController();
 
 module.exports.routes = function(app, auth) {
 
-  app.get('/drugs', auth.requiresLogin, function(req, res){
+  app.get('/drugs', login.ensureLoggedIn(), function(req, res){
     res.render('index', {
       userData : req.user
     });
   });
-  app.get('/drugs/add-new', auth.requiresLogin, function(req, res){
+  app.get('/drugs/add-new', login.ensureLoggedIn(), function(req, res){
     res.render('index', {
       userData : req.user
     });
   });
 
-  app.get('/medeqp', auth.requiresLogin, function(req, res){
+  app.get('/medeqp', login.ensureLoggedIn(), function(req, res){
     res.render('index');
   });
 

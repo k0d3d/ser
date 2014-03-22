@@ -7,7 +7,6 @@ PharmaCompSchema = new Schema({
   name : {type: String},
   coverage: {type: String},
   position: {type: String},
-  employer: {type: String},
   summary: {type: String},
   twitter: {type: String},
   facebook: {type: String},

@@ -5,9 +5,10 @@
  util = require('util'),
  User = mongoose.model('User'),
  Q = require('q'),
- SalesAgent = require('../models/sales_agent'),
+ Staff = require('../models/staff.js'),
  PharmaComp = require('../models/pharmacomp'),
  _ = require("underscore"),
+ login = require('connect-ensure-login'),
  passport = require('passport');
 
 
@@ -18,7 +19,23 @@
  UserController.prototype.constructor = UserController;
 
 
+UserController.prototype.findUserByEmail = function (doc) {
+  var d = Q.defer();
 
+  User.findOne({"email" : doc.email })
+  .exec(function (err, i) {
+    if (err) {
+      return d.reject(err);
+    }
+    if(!i || _.isEmpty(i)) {
+      return d.reject(new Error('account not found'));
+    }
+    console.log('Account found');
+    return d.resolve(i);
+  });
+
+  return d.promise;
+}
 /**
  * Auth callback
  */
@@ -110,6 +127,44 @@ UserController.prototype.create = function(body, callback) {
   });
 };
 
+
+UserController.prototype.findOrCreate = function (doc) {
+  var findOrCreateUser = Q.defer(), user = new User();
+
+  User.findOne({
+    email : doc.email
+  })
+  .exec(function (err, i) {
+    console.log(err, i);
+    //if error occurs
+    if (err) {
+      return findOrCreateUser.reject(err);
+    }
+    //if user not found
+    if (!i) {
+      console.log('Creating New Account');
+      user.email = doc.email;
+      user.password = doc.password;
+      user.account_type = doc.account_type;
+      user.save(function (err, new_user) {
+        if (err) {
+          return findOrCreateUser.reject(err);
+        }
+        if (new_user) {
+          console.log('Created new account');
+          return findOrCreateUser.resolve(new_user);
+        }
+      });
+    } else {
+      //if user found
+      console.log('Found existing account');
+      return findOrCreateUser.resolve(i);
+    }
+
+  })
+  return findOrCreateUser.promise;
+}
+
 /**
  * Updates User Profile
  * @param  {ObjectId}   id     the ObjectId to change values for
@@ -126,7 +181,7 @@ UserController.prototype.update = function(id, body, account_type) {
   var d = Q.defer(), Model;
 
   if (account_type === 2) {
-    Model = SalesAgent;
+    Model = Staff;
   }  
 
   if (account_type === 0) {
@@ -226,18 +281,16 @@ module.exports.routes = function(app, passport, auth){
   app.get('/user-registered', function(req, res) {
     res.render('user/user-registered');
   });
-  app.get('/profile', auth.requiresLogin, function (req, res) {
+  app.get('/profile', login.ensureLoggedIn('/signin'), function (req, res) {
     res.render('index', {
-      userData : req.user
     });
   });
-  app.get('/user/profile', auth.requiresLogin, function (req, res, next) {
+  app.get('/user/profile', login.ensureLoggedIn('/signin'), function (req, res, next) {
     console.log(req.user);
     var userId = req.user._id;
     var account_type = req.user.account_type;
     users.getProfile(userId, account_type).then(function (r) {
       res.render('user/profile', {
-        userData : req.user,
         userProfile: r
       });
     }, function (err) {
