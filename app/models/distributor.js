@@ -16,7 +16,7 @@ DistrubutorSchema = new Schema({
   facebook: {type: String},
   address: {type: String},
   phone: {type: String},
-  image: {type: String}
+  image: {type: String, default: 'distributor-avatar-400.jpg'}
 });
 
 mongoose.model('Distributor', DistrubutorSchema);

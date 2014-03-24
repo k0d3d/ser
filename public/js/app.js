@@ -49,13 +49,23 @@ app.filter('moment', function(){
         return m.fromNow();
     };
 });
+app.filter('dashed', function () {
+  
+  return function (word) {
+    if ('undefined' === typeof(word)) {
+      return 'Empty Profile';
+    } else {
+      return word;
+    }
+  };
+});
 app.filter('acctype', function () {
   
   return function (index) {
     var accounts = ['Pharmaceutical Company', 'Pharma Manager', 'Distributor', 'Dist. Manager', 'Sales Agent'];
     return accounts[index];
   };
-})
+});
 app.directive('dropzone', [function () {
   return {
     link : function (scope, element, attrs) {
@@ -77,4 +87,33 @@ app.directive('dropzone', [function () {
     },
     require: 'ngModel'
   };
+}]);
+
+app.directive('typeAhead', [function () {
+  return {
+    link : function (scope, element, attrs) {
+   
+      // constructs the suggestion engine
+      var _states = new Bloodhound({
+        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+        queryTokenizer: Bloodhound.tokenizers.whitespace,
+        // `states` is an array of state names defined in "The Basics"
+        remote: '/api/internal/items/typeahead?query=%QUERY'
+      });
+
+      _states.initialize();
+
+      $(element).typeahead({
+        hint: true,
+        highlight: true,
+        minLength: 1
+      },
+      {
+        name: 'states',
+        // `ttAdapter` wraps the suggestion engine in an adapter that
+        // is compatible with the typeahead jQuery plugin
+        source: _states.ttAdapter()
+      });
+    }
+  }
 }]);

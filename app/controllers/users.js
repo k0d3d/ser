@@ -9,7 +9,9 @@
  PharmaComp = require('../models/pharmacomp'),
  _ = require("underscore"),
  login = require('connect-ensure-login'),
- passport = require('passport');
+ passport = require('passport'),
+ Organization = require('./organization.js');
+
 
 
  function UserController(){
@@ -17,6 +19,8 @@
  }
 
  UserController.prototype.constructor = UserController;
+
+
 
 
 UserController.prototype.findUserByEmail = function (doc) {
@@ -178,17 +182,10 @@ UserController.prototype.findOrCreate = function (doc) {
 UserController.prototype.update = function(id, body, account_type) {
 
   console.log(id, body, account_type);
-  var d = Q.defer(), Model;
+  var d = Q.defer();
 
-  if (account_type === 2) {
-    Model = Staff;
-  }  
 
-  if (account_type === 0) {
-    Model = PharmaComp;
-  }  
-
-  Model.update({
+  Organization.staffFunctions.getMeMyModel(account_type).update({
     userId : id
   }, {
     $set: body
@@ -243,17 +240,9 @@ UserController.prototype.user = function(req, res, next, id) {
 }
 
 UserController.prototype.getProfile = function (userId, account_type) {
-  var d = Q.defer(), Model;
+  var d = Q.defer();
 
-  if (account_type === 2) {
-    Model = SalesAgent;
-  }
-
-  if (account_type === 0) {
-    Model = PharmaComp;
-  }
-
-  Model.findOne({
+  Organization.staffFunctions.getMeMyModel(account_type).findOne({
     userId: userId
   })
   .exec(function (err, i) {
@@ -282,7 +271,9 @@ module.exports.routes = function(app, passport, auth){
     res.render('user/user-registered');
   });
   app.get('/profile', login.ensureLoggedIn('/signin'), function (req, res) {
+    console.log(req.user);
     res.render('index', {
+      userData : req.user
     });
   });
   app.get('/user/profile', login.ensureLoggedIn('/signin'), function (req, res, next) {
@@ -291,7 +282,8 @@ module.exports.routes = function(app, passport, auth){
     var account_type = req.user.account_type;
     users.getProfile(userId, account_type).then(function (r) {
       res.render('user/profile', {
-        userProfile: r
+        userProfile: r,
+        userData: req.user
       });
     }, function (err) {
       next(err);
@@ -309,7 +301,7 @@ module.exports.routes = function(app, passport, auth){
     });
   });
   //Handle Public user registration
-  app.put('/users/profile', function (req, res, next){
+  app.put('/api/users/profile', function (req, res, next){
     var id = req.body.pk;
     var body = {},
         account_type = req.user.account_type;
@@ -322,6 +314,7 @@ module.exports.routes = function(app, passport, auth){
       res.json(200, {message: 'Saved'});
     })
     .fail(function (err) {
+      console.log(err);
       next(err);
     });
   });

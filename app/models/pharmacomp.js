@@ -12,7 +12,7 @@ PharmaCompSchema = new Schema({
   facebook: {type: String},
   address: {type: String},
   phone: {type: String},
-  image: {type: String}
+  image: {type: String, default: 'pharma-avatar-400.png'}
   
 });
 

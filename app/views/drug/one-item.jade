@@ -1,0 +1,64 @@
+.contentpanel
+  .row
+      .col-sm-3
+        img.thumbnail.img-responsive(src='/images/item-images/item-avatar.jpg' , alt='')
+        .mb30
+        h5.subtitle Drug Name
+        p.mb10.x-editable(data-type="textarea", data-name="summary")
+          | ..
+        .mb10        
+        h5.subtitle Composition
+        p.x-editable 
+        h5.subtitle Item Form
+        p.x-editable
+        h5.subtitle Item Packaging
+        p.x-editable
+        h5.subtitle Category
+        p.x-editable
+        h5.subtitle Nafdac Reg No
+        p.x-editable
+
+        .mb20    
+        .panel.panel-default
+            .panel-body
+              a(href="#")
+                | 0 Distributors
+        .mb20    
+        .panel.panel-default
+            .panel-body
+              a(href="#")
+                | 0 Staff 
+
+      //
+         col-sm-3 
+      .col-sm-9
+        //
+           Nav tabs 
+        ul.nav.nav-tabs.nav-justified.nav-profile
+          li.active
+            a(href='#extended-info', data-toggle='tab')
+              strong Extended Info
+          li
+            a(href='#prospects', data-toggle='tab')
+              strong Prospects and Activity
+          li
+            a(href='#prospects', data-toggle='tab')
+              strong Map
+          li
+            a(href='#comments', data-toggle='tab')
+              strong Comments  
+              span.label.label-info
+                | 3              
+        //
+           Tab panes 
+        .tab-content
+          include ../widgets/item/extended-info
+          +loadItemExtendedInfo()
+
+          include ../widgets/item/item-comments
+          +itemComments()
+
+append scripts
+script(src='/js/jquery.prettyPhoto.js')
+script(src='/js/holder.js')
+

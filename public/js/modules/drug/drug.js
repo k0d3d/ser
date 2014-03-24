@@ -10,6 +10,7 @@ angular.module('drug', [])
 
   .config(['$routeProvider', function ($routeProvider) {
     $routeProvider.when('/drugs', {templateUrl: '/drug/index', controller: 'drugIndexController'})
+    .when('/drugs/:drugId/item', {templateUrl: '/drug/one-item', controller: 'drugPageController'})
     .when('/drugs/add-new', {templateUrl: '/drug/add', controller: 'drugAddController'});
   }])
   .controller('drugIndexController', ['$scope', 'drugService', function drugIndexController ($scope, ds){
@@ -62,6 +63,9 @@ angular.module('drug', [])
       });
     };
 
+  }])
+  .controller('drugPageController', ['$scope', 'drugService', function ($scope, ds) {
+      
   }])
   .factory('drugService', ['$http', function ($http) {
     var d = {};

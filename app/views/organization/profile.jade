@@ -1,7 +1,7 @@
-.contentpanel(data-user-id="#{userData._id}")
+.contentpanel
   .row
       .col-sm-3
-        img.thumbnail.img-responsive(src='/images/#{userProfile.image}' , alt='')
+        img.thumbnail.img-responsive(src='/images/photos/#{userProfile.image}' , alt='')
         .mb30
         h5.subtitle About
         p.mb10.x-editable(data-type="textarea", data-name="summary")
@@ -21,12 +21,12 @@
         .panel.panel-default
             .panel-body
               a(href="#")
-                | 0 Distributors 
+                | 8 Distributors 
         .mb20    
         .panel.panel-default
             .panel-body
               a(href="#")
-                | 0 Sales Agent
+                | 10 Sales Agent
 
         .mb30
         h5.subtitle Office Address
@@ -50,11 +50,8 @@
             i.fa.fa-briefcase
             span.x-editable(data-name="position", data-type="text", title="Position", data-default-value="Position") #{userProfile.position} 
             span(style="margin: 0 2px;") at 
-            a.x-editable(href='#', data-type="text", data-name="employer", title="Employer", data-default-value="Employer") 
+            a.x-editable(href='#', data-type="text", data-name="employer", title="Employer", data-default-value="Employer") #{userProfile.employer}
           .mb20
-          button.btn.btn-success.mr5.start-edit
-            i.fa.fa-user
-            | Edit Profile
           button.btn.btn-white
             i.fa.fa-envelope-o
             | Message
@@ -99,4 +96,4 @@
 append scripts
 script(src='/js/jquery.prettyPhoto.js')
 script(src='/js/holder.js')
-script(src="/js/modules/user/profile.js")
+

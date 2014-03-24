@@ -109,9 +109,9 @@ DrugController.prototype.checkUpdate = function(since, cb){
   });
 }
 
-DrugController.prototype.fetchAll = function (options) {
+DrugController.prototype.fetchAllMyDrugs = function (options, owner) {
   var d = Q.defer();
-  Drug.find({})
+  Drug.find({pharmaId: owner})
   //.sort()
   .limit(options.limit)
   .skip(options.limit * options.page)
@@ -165,6 +165,13 @@ module.exports.routes = function(app, auth) {
     res.render('index');
   });
 
+  //Displays one item page
+  app.get('/drugs/:drugId/item', function (req, res) {
+    res.render('index', {
+      userData : req.user
+    });
+  });
+
   //Search for nafdac reg drugs by category
   app.get('/api/drugs/:needle/page/:page', function(req, res, next){
     drugs.search(req.params.needle, req.params.page, function(r){
@@ -198,10 +205,10 @@ module.exports.routes = function(app, auth) {
   });
 
   app.get('/api/drugs', function (req, res, next) {
-    drugs.fetchAll({
+    drugs.fetchAllMyDrugs({
       page: req.query.page || 0,
       limit: req.query.limit || 10
-    })
+    }, req.user._id)
     .then(function (r) {
       res.json(200, r);
     }, function (err) {
@@ -229,6 +236,66 @@ module.exports.routes = function(app, auth) {
     }, function (err) {
       next(err);
     });
+  });
+
+
+
+  //run typeahead
+  app.get('/api/internal/items/typeahead', function (req, res, next) {
+    var states = [
+  {
+    "year": "1928/1929",
+    "value": "The Broadway Melody",
+    "tokens": [
+      "The",
+      "Broadway",
+      "Melody"
+    ]
+  },
+  {
+    "year": "1935",
+    "value": "Mutiny on the Bounty",
+    "tokens": [
+      "Mutiny",
+      "on",
+      "the",
+      "Bounty"
+    ]
+  },
+  {
+    "year": "1946",
+    "value": "The Best Years of Our Lives",
+    "tokens": [
+      "The",
+      "Best",
+      "Years",
+      "of",
+      "Our",
+      "Lives"
+    ]
+  },
+  {
+    "year": "1957",
+    "value": "The Bridge on the River Kwai",
+    "tokens": [
+      "The",
+      "Bridge",
+      "on",
+      "the",
+      "River",
+      "Kwai"
+    ]
+  },
+  {
+    "year": "1959",
+    "value": "Ben-Hur",
+    "tokens": [
+      "Ben-Hur"
+    ]
+  }
+]
+
+    res.json(200, states);
   });
 
   //Updates the price of the drug

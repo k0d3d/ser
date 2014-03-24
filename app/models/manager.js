@@ -16,7 +16,7 @@ ManagerSchema = new Schema({
   facebook: {type: String},
   address: {type: String},
   phone: {type: String},
-  image: {type: String}
+  image: {type: String, default: 'manager-avatar-400.png'}
 });
 
 mongoose.model('Manager', ManagerSchema);
