@@ -24,8 +24,18 @@ module.exports = function(app, passport, auth) {
     var fileupload = require('./upload');
     fileupload(app);
 
+    //Minimal middleware that adds 
+    //logged in user details to view
+    // app.get('/*', function (req, res, next) {
+    //   if (req.user) {
+    //     console.log(req.user);
+    //     res.locals.userData = req.user;
+    //   }
+    //   next();
+    // })
+
     //Home route
-    app.get('/', login.ensureLoggedIn(),  function(req, res){
+    app.get('/', login.ensureLoggedIn('/signin'),  function(req, res){
       res.render('index',{
         title: 'Dashboard',
         userData: req.user

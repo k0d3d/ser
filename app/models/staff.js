@@ -2,21 +2,24 @@ var mongoose = require('mongoose'),
     Schema = mongoose.Schema,
 
 
-SalesAgentSchema = new Schema({
+StaffSchema = new Schema({
   userId: {type: Schema.ObjectId, ref: 'User'},
   name : {type: String},
   coverage: {type: String},
   position: {type: String},
-  employer: [{type: Schema.ObjectId}],
+  employer: [{
+    employerId :{type: Schema.ObjectId},
+    dateAdded : {type: Date, default: Date.now}
+  }],  
   summary: {type: String},
   twitter: {type: String},
   facebook: {type: String},
   address: {type: String},
   phone: {type: String},
-  image: {type: String}
+  image: {type: String, default: 'staff-avatar-400.png'}
   
 });
 
-mongoose.model('SalesAgent', SalesAgentSchema);
+mongoose.model('Staff', StaffSchema);
 
-module.exports = mongoose.model('SalesAgent');
+module.exports = mongoose.model('Staff');

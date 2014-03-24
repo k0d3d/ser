@@ -7,7 +7,7 @@ var resizeToPublic = upload()
     // .gm(function(gm) {
     //     return gm.resize(false, 100);
     // })
-    .to(['public', 'images', 'itemImages']);
+    .to(['public', 'images', 'item-images']);
 
 module.exports = function(app) {
     //File upload handler

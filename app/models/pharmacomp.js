@@ -7,13 +7,12 @@ PharmaCompSchema = new Schema({
   name : {type: String},
   coverage: {type: String},
   position: {type: String},
-  employer: {type: String},
   summary: {type: String},
   twitter: {type: String},
   facebook: {type: String},
   address: {type: String},
   phone: {type: String},
-  image: {type: String}
+  image: {type: String, default: 'pharma-avatar-400.png'}
   
 });
 

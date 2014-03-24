@@ -2,7 +2,7 @@ var User = require('./users').users,
     Q = require('q'),
     utilities = require('../../lib/utils'),
     PreAccount = require('../models/pre-account'),
-    SalesAgent = require('../models/sales_agent.js'),
+    Staff = require('../models/staff.js'),
     Distributor = require('../models/distributor.js'),
     Manager = require('../models/manager.js'),
     PharmaComp = require('../models/pharmacomp.js'),
@@ -15,38 +15,57 @@ var User = require('./users').users,
 
 
     staffFunctions = {
-      getMeMyModel : function (account_type) {
-        if (account_type === 2) {
-          return SalesAgent;
+      getMeMyModel : function getMeMyModel (account_type) {
+        account_type = parseInt(account_type);
+        if (account_type === 4) {
+          return Staff;
         }  
 
         if (account_type === 0) {
           return PharmaComp;
         }
 
-      },
-      findOneAccount : function (doc) {
-        var d = Q.defer;
+        if (account_type === 3) {
+          return Manager;
+        }
+        if (account_type === 1) {
+          return Manager;
+        }
+        if (account_type === 2) {
+          return Distributor;
+        }
 
-        User.findOne({
-          $or: [
-            {"email" : doc.email },
-            {"_id" : doc.id }
-          ]
-        })
-        .exec(function (err, i) {
-          if (err) {
-            return d.reject(err);
-          }
-          if(!i || _.isEmpty(i)) {
-            return d.resolve(false);
-          }
-          return d.resolve(i.toJSON());
+        return Manager;
+
+      },
+      findOneAccount : function findOneAccount (doc) {
+        console.log('Searching for User Account');
+        var d = Q.defer();
+        var user = new User();
+        user.findUserByEmail({email : doc.email})
+        .then(function (i) {
+
+          return d.resolve(i);
+        } , function (err) {
+          return d.reject(err);
         });
 
         return d.promise;
       },
-      addOneStaff : function (doc) {
+      findOrCreateUserAccount : function findOrCreateUserAccount (doc) {
+        console.log('Will find or Create');
+        var findOrCreateUser = Q.defer();
+
+        var user = new User();
+        user.findOrCreate(doc)
+        .then(function (r) {
+          return findOrCreateUser.resolve(r);
+        }, function (err) {
+          return findOrCreateUser.reject(err);
+        })
+        return findOrCreateUser.promise;
+      },
+      addOneStaff : function addOneStaff (doc) {
         console.log('Adding Staff');
         console.log(doc);
         var d = Q.defer();
@@ -66,14 +85,14 @@ var User = require('./users').users,
 
         return d.promise;
       },
-      sendActivationEmail : function (options) {
+      sendActivationEmail : function sendActivationEmail (options) {
         var d = Q.defer();
 
         d.resolve({status :'sent'});
 
         return d.promise;
       },
-      inviteOneStaff : function (doc) {
+      inviteOneStaff : function inviteOneStaff (doc) {
         var d = Q.defer();
         var invite = new PreAccount(doc);
 
@@ -89,7 +108,8 @@ var User = require('./users').users,
 
         return d.promise;
       },
-      findPreAccount: function (options) {
+      findPreAccount: function findPreAccount (options) {
+        console.log('Searching for Pre Account');
         var d = Q.defer();
 
         PreAccount.findOne({
@@ -107,34 +127,38 @@ var User = require('./users').users,
           if (_.isEmpty(i)) {
             return d.reject(new Error('PreAccount not found'));
           } else {
+            console.log('Pre Account found');
             return d.resolve(i);
           }
         });
 
         return d.promise;
       },
-      removePreAccount : function (options) {
+      removePreAccount : function removePreAccount (options) {
+        console.log('Removing Pre Account');
         var d = Q.defer();
 
         PreAccount.remove({
           activationToken: options.activationToken
         })
         .exec(function (err, i) {
+          console.log(err, i);
           if (err) {
             return d.reject(err);
           } 
-          if (_.isEmpty(i)) {
+          if (!i) {
             return d.reject(new Error('PreAccount not removed'));
           } else {
-            return d.resolve(i);
+            return d.resolve(options);
           }          
         });
 
         return d.promise;
       },
-      ammendProfile : function (options) {
+      ammendProfile : function ammendProfile (options) {
+        console.log('Amending Profile');
+        return console.log(options);
 
-        console.log(id, body, account_type);
         var d = Q.defer();
 
 
@@ -156,6 +180,46 @@ var User = require('./users').users,
         });
 
         return d.promise;
+      },
+      addNewEmployer : function addNewEmployer (doc) {
+        console.log('Adding employer');
+        var addingEmpl = Q.defer();
+
+        this.getMeMyModel(doc.account_type).update({
+          userId : doc.userId
+        }, {
+          $push: {
+            employer:  {employerId : doc.employerId}
+          }
+        }, {upsert: true}, function(err, i) {
+
+          if (err) {
+            return addingEmpl.reject(err);
+          }
+          if (i === 1) {
+            return addingEmpl.resolve(doc);
+          } else {
+            return addingEmpl.reject(new Error('update failed'));
+          }
+        });
+
+        return addingEmpl.promise;        
+      },
+      lookUpPeople : function lookUpPeople(doc) {
+        var book = Q.defer();
+
+        this.getMeMyModel(doc.account_type)
+        .find({"employer.employerId" : doc.employerId})
+        .populate('userId', 'email account_type', 'User')
+        .exec(function (err, i) {
+          if (err) {
+            return book.reject(err);
+          }
+          if (i) {
+            return book.resolve(i);
+          }
+        })
+        return book.promise;
       }
     };
 
@@ -228,61 +292,121 @@ Staff.prototype.lookUpPreAccounts = function (options) {
   return d.promise;
 };
 
-Staff.prototype.activateAccount = function (activationToken, email, employer, phone) {
-  var d = Q.defer();
+/**
+ * activates a users account and creates a profile if
+ * once does not already exist.
+ * @param  {String} activationToken [description]
+ * @param  {String} email           [description]
+ * @param  {ObjectId} employer        [description]
+ * @param  {String} phone           [description]
+ * @param  {String} password        [description]
+ * @param  {Number} account_type    [description]
+ * @return {Object}                 [description]
+ */
+Staff.prototype.activateAccount = function (activationToken, email, employer, phone, password, account_type) {
+  var activator = Q.defer();
   var options = {
     activationToken : activationToken,
     email : email,
     phone: phone,
-    employerId: employer
-  } 
+    employerId: employer,
+    password: password,
+    account_type: account_type
+  }
 
   //Find the activation / preaccount record
   staffFunctions.findPreAccount(options)
-  .then(function (user) {
-    console.log(user);
-    //Find Existing Account
-    staffFunctions.findOneAccount(user)
-    .then(function (r) {
-      console.log(r);
-      var d = Q.defer();
-      //If no account is found
-      if (!r) {
-        //Create an account from the record
-        return staffFunctions.addOneStaff(options);
-      
-      } else {
-        //if an account is found
-        //return another promise
-        
-        return d.resolve(user);
+  .then(staffFunctions.findOrCreateUserAccount)
+  .then(function (r) {
+      console.log('Conditional Op');
+      var createOrAmmend = Q.defer();
+
+      //Adds information from the users activation details
+      //into the users account ,
+      //
+      function prepProfileData (opts, usrAccount) {
+        //Remove _id from the result
+        var removeUgly = _.omit(usrAccount, ['_id', '_v', 'hashed_password']);
+        var profileData = _.extend(opts, removeUgly);
+
+        //Add the userId prop to profileData
+        profileData.userId = usrAccount._id; 
+        return profileData;      
       }
 
-      return d.promise;
-    })
-    .then (function (user) {
-        console.log(user);
+      //Attach the profile specific information
+      //to the user profile. 
+      //This will create a profile for the uset if 
+      //one doesnt exist or ammend an existing profile
+      //
+      staffFunctions.addNewEmployer(prepProfileData(options, r.toJSON()))
+      .then(function (profile) {
+        return createOrAmmend.resolve(profile);
+      }, function (err) {
+        return createOrAmmend.reject(err);
+      });
 
-        //staffFunctions.ammendProfile(user.toJSON)
-        //Remove the preaccount / activation record
-        // staffFunctions.removePreAccount(options)
-        // .then(function (status) {
-        //   return d.resolve(status);
-        // }, function (err) {
-        //   return d.reject(err);
-        // });       
-    })
+      return createOrAmmend.promise;          
+  })
+  //Expects the an object containing the 
+  //activation token.
+  .then (function (doc) {
+    console.log('Remove Preaccount');
+    //Remove the preaccount / activation record associateds with this user
+    staffFunctions.removePreAccount(doc)
+    .then(function (r) {
+      return activator.resolve(r);
+    }, function (err) {
+      return activator.reject(err);
+    });       
+  })
+  .catch(function (err) {
+    var errCatcher = Q.defer();
+    console.trace(err);
 
+    activator.reject(err);
+
+    return errCatcher.promise;
   });
 
-  return d.promise;
+  return activator.promise;
 };
 
+/**
+ * this will look up account specific employees or associates 
+ * belonging to a certain employer.
+ * @param  {Number} accountType the account type to look up.
+ * @param  {ObjectId} employerId       the employerId
+ * @return {Object}             promisse Object
+ */
+Staff.prototype.lookUpMyPeople = function lookUpMyPeople (accountType, employerId) {
+  var libr = Q.defer();
+
+  staffFunctions.lookUpPeople({
+    account_type : accountType,
+    employerId : employerId
+  })
+  .then(function (people) {
+    return libr.resolve(people);
+  }, function (err) {
+    return libr.reject(err);
+  });
+
+  return libr.promise;
+}
+
 module.exports.staff = Staff;
+module.exports.staffFunctions = staffFunctions;
 var staff = new Staff();
 
 module.exports.routes = function (app, auth) {
   app.get('/organization',login.ensureLoggedIn('/signin'), function (req, res) {
+
+    res.render('index', {
+      userData: req.user
+    });
+  });
+  app.get('/organization/people/:accountType',login.ensureLoggedIn('/signin'), function (req, res) {
 
     res.render('index', {
       userData: req.user
@@ -294,6 +418,21 @@ module.exports.routes = function (app, auth) {
       userData: req.user
     });
   });
+  app.get('/organization/people/:personId/staff',login.ensureLoggedIn('/signin'), function (req, res) {
+
+    res.render('index', {
+      userData: req.user
+    });
+  });
+  app.get('/organization/profile',login.ensureLoggedIn('/signin'), function (req, res) {
+
+    res.render('organization/profile', {
+      userData: req.user,
+      userProfile : {}
+    });
+  });
+
+
 
   //fetch list of invitations for a company
   app.get('/api/organization/invites', login.ensureLoggedIn(), function (req, res, next) {
@@ -310,14 +449,35 @@ module.exports.routes = function (app, auth) {
     });
   });
 
+  //Fetches list of people employed by the logged in user
+  app.get('/api/organization/people/:accountType', function (req, res, next) {
+    staff.lookUpMyPeople(req.params.accountType, req.user._id)
+    .then(function (r) {
+      res.json(200, r);
+    }, function (err) {
+      next(err);
+    });
+  });
 
+  //Fetches an employee profile 
+  app.get('/api/organization/people/:personId/staff', function (req, res, next) {
+    staff.lookUpMyPeople(req.params.accountType, req.user._id)
+    .then(function (r) {
+      res.json(200, r);
+    }, function (err) {
+      next(err);
+    });
+  });
+
+  //Attempts to activate an account, and add the employer to 
+  //the users profile.
   app.put('/api/organization/invites',login.ensureLoggedIn('/signin'), function (req, res, next) {
     
     if (req.query.activation == 1) {
       var employerId = req.user._id;
-      staff.activateAccount(req.body.activationToken, req.body.email, employerId, req.body.phone)
+      staff.activateAccount(req.body.activationToken, req.body.email, employerId, req.body.phone, 'blahbla', req.body.account_type)
       .then(function (r) {
-        res.json(200, r)
+        res.json(200, true)
       }, function (err) {
         next(err);
       });

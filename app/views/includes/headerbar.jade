@@ -158,7 +158,7 @@
           .btn-group
             button.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown')
               img(src='/images/photos/loggeduser.png', alt='')
-              | #{userData.username}
+              | #{userData.email}
               span.caret
             ul.dropdown-menu.dropdown-menu-usermenu.pull-right
               li
@@ -174,7 +174,7 @@
                   i.glyphicon.glyphicon-question-sign
                   | Help
               li
-                a(href='signin.html')
+                a(href='/signout')
                   i.glyphicon.glyphicon-log-out
                   | Log Out
         li
