@@ -114,6 +114,10 @@ app.directive('typeAhead', [function () {
         // is compatible with the typeahead jQuery plugin
         source: _states.ttAdapter()
       });
+
+      $(element).on('typeahead:selected', function (e, suggestion, data_set) {
+        console.log(suggestion, data_set);
+      });
     }
   }
 }]);

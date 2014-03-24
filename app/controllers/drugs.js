@@ -12,6 +12,7 @@ var mongoose = require('mongoose'),
     DUH = mongoose.model('drugUpdateHistory'),
     Q = require('q'),
     login = require('connect-ensure-login'),
+    ndl = require('nafdacdrug'),
     utils = require("util");
 
 
@@ -242,59 +243,11 @@ module.exports.routes = function(app, auth) {
 
   //run typeahead
   app.get('/api/internal/items/typeahead', function (req, res, next) {
-    var states = [
-  {
-    "year": "1928/1929",
-    "value": "The Broadway Melody",
-    "tokens": [
-      "The",
-      "Broadway",
-      "Melody"
-    ]
-  },
-  {
-    "year": "1935",
-    "value": "Mutiny on the Bounty",
-    "tokens": [
-      "Mutiny",
-      "on",
-      "the",
-      "Bounty"
-    ]
-  },
-  {
-    "year": "1946",
-    "value": "The Best Years of Our Lives",
-    "tokens": [
-      "The",
-      "Best",
-      "Years",
-      "of",
-      "Our",
-      "Lives"
-    ]
-  },
-  {
-    "year": "1957",
-    "value": "The Bridge on the River Kwai",
-    "tokens": [
-      "The",
-      "Bridge",
-      "on",
-      "the",
-      "River",
-      "Kwai"
-    ]
-  },
-  {
-    "year": "1959",
-    "value": "Ben-Hur",
-    "tokens": [
-      "Ben-Hur"
-    ]
-  }
-]
-
+    ndl.autocomplete(req.query.query, function (err, list) {
+      if (err) {
+        next(err);
+      }
+    })
     res.json(200, states);
   });
 
