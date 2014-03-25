@@ -9,7 +9,7 @@ jQuery(window).load(function() {
 });
 
 jQuery(document).ready(function() {
-   
+   Dropzone.autoDiscover = false;   
    // Toggle Left Menu
    jQuery('.nav-parent > a').click(function() {
       

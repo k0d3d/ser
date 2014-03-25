@@ -14,9 +14,15 @@ var DrugSchema = new Schema ({
   nafdacRegNo : {type: String, default: '', required: true},
   category : {type: String, default: '', required: true},
   currentPrice: {type: Number},
-  itemForm: {type: String},
-  itemPackaging: {type: String},
+  itemForm: {type: String, default: ''},
+  itemPackaging: {type: String, default: ''},
   lastUpdated: {type: Date},
+  indications : {type: String, default: ''},
+  contradictions: {type: String, default: ''},
+  warnings: {type: String, default: ''},
+  precautions: {type: String, default: ''},
+  reactions: {type: String, default: ''},
+  dosage: {type: String, default: ''},
   pharmaId: {type: Schema.ObjectId},
   images: [{type: String}]
 });

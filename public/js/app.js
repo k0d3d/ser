@@ -6,7 +6,9 @@ var app = angular.module('stocUser', [
   'services',
   'user',
   'organization',
-  'drug'
+  'drug',
+  'order',
+  'language'
   ]);
 app.config(function ($routeProvider, $locationProvider) {
   $routeProvider
@@ -20,7 +22,9 @@ app.controller('MainController', function ($scope, $http, $location, Notificatio
   $scope.modal = {};
   $scope.notification = {};
   $scope.waiting = '';
-  $scope.headerTitle = 'Dashboard'
+  $scope.headerTitle = 'Dashboard';
+
+  $scope.orderCart = [];
 
   $scope.appName = 'stocCloud';
 
@@ -83,6 +87,12 @@ app.filter('acctype', function () {
     return accounts[index];
   };
 });
+app.filter('showHide', function () {
+  
+  return function (word) {
+    return word ? 'Hide' : 'Show';
+  };
+});
 app.directive('dropzone', [function () {
   return {
     link : function (scope, element, attrs) {
@@ -93,8 +103,8 @@ app.directive('dropzone', [function () {
         //uploadMultiple: true,
         autoProcessQueue: true,
         init : function () {
-          this.on('success', function (file) {
-            scope.ngModel.push(file.name);
+          this.on('success', function (file, name) {
+            scope.ngModel.push(name);
           })
         }
       });

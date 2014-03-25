@@ -10,6 +10,7 @@ var mongoose = require('mongoose'),
   _ = require('underscore'),
   Hospital = mongoose.model('Hospital'),
   Q = require("q"),
+  login = require('connect-ensure-login'),
   utils = require("util");
 
 
@@ -243,6 +244,11 @@ module.exports.routes = function(app, auth){
       res.render('index');
     }
   );
+  app.get('/search/item', login.ensureLoggedIn(), function(req, res){
+    res.render('index', {
+      userData : req.user
+    });
+  });
   //Order  GET routes
   app.get('/api/orders/:pageNo',function(req, res, next){
     order.getOrders(req.params.pageNo, function(r){

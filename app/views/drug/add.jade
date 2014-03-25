@@ -1,9 +1,7 @@
-contentpanel
+.contentpanel
     .panel.panel-default
         .panel-heading
           .panel-btns
-            a.panel-close(href='#') ×
-            a.minimize(href='#') −
           h4.panel-title Add new item
 
         .panel-body.panel-body-nopadding
@@ -34,40 +32,40 @@ contentpanel
               .col-sm-3
                 select.form-control(type='number', placeholder='', ng-model="add_item_form.itemForm", required)
                   option(value='?', selected='selected')
-                  option(value='0') Amples
-                  option(value='1') Caplets
-                  option(value='2') Capsules
-                  option(value='3') Cream
-                  option(value='4') Drops
-                  option(value='5') Emugels
-                  option(value='6') Gels
-                  option(value='7') Lotion
-                  option(value='8') Ointments
-                  option(value='9') Powder
-                  option(value='10') Sheet
-                  option(value='11') Solutions
-                  option(value='12') Sprays
-                  option(value='13') Suppositories
-                  option(value='14') Suspensions
-                  option(value='15') Syrup
-                  option(value='16') Tablets
-                  option(value='17') Vials                  
+                  option Amples
+                  option Caplets
+                  option Capsules
+                  option Cream
+                  option Drops
+                  option Emugels
+                  option Gels
+                  option Lotion
+                  option Ointments
+                  option Powder
+                  option Sheet
+                  option Solutions
+                  option Sprays
+                  option Suppositories
+                  option Suspensions
+                  option Syrup
+                  option Tablets
+                  option Vials                  
             .form-group
               label.col-sm-3.control-label Item Packaging
               .col-sm-3
                 select.form-control(type='number', placeholder='', ng-model="add_item_form.itemPackaging", required)
                   option(value='?', selected='selected')
-                  option(value='0') Bags
-                  option(value='1') Bottles
-                  option(value='2') Box
-                  option(value='3') Carton
-                  option(value='4') Gallon
-                  option(value='5') Packet
-                  option(value='6') Pieces
-                  option(value='7') Roll
-                  option(value='8') Sachet
-                  option(value='9') Tin
-                  option(value='10') Tube
+                  option Bags
+                  option Bottles
+                  option Box
+                  option Carton
+                  option Gallon
+                  option Packet
+                  option Pieces
+                  option Roll
+                  option Sachet
+                  option Tin
+                  option Tube
 
             .form-group
               label.col-sm-3 Upload Image
@@ -80,6 +78,6 @@ contentpanel
                 button.btn.btn-primary(type="submit", ng-disabled="addItemForm.$invalid") Submit
                 button.btn.btn-primary(type="submit", ng-disabled="addItemForm.$invalid") Submit and Add Another
                 button.btn.btn-default(type="reset") Cancel
-  append scripts
+append foot
   script(src="/js/dropzone.min.js")
   

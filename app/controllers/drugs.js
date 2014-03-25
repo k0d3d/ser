@@ -9,12 +9,61 @@ var mongoose = require('mongoose'),
     Supplier = mongoose.model('Supplier'),
     _ = require("underscore"),
     Drug = mongoose.model('drug'),
-    ndl = mongoose.model('nafdacdrug'),
+    NDL = mongoose.model('nafdacdrug'),
     DUH = mongoose.model('drugUpdateHistory'),
     Q = require('q'),
     login = require('connect-ensure-login'),
     utils = require("util");
 
+
+    var drugsFunctions = {
+      searchByRegDrugs : function searchByRegDrugs (query, param, filter, option) {
+        var s = Q.defer();
+
+        Drug.find({},
+          'itemName sciName category currentPrice'
+        )
+        .regex('itemName', new RegExp(query, 'i'))
+        .limit(10)
+        //.skip(page * 10)
+        .exec(function(err, i){
+          if(err){
+            return s.reject(err);
+          } else {
+            return s.resolve(i);
+          }
+        });
+
+        return s.promise;
+      },
+      searchByNDL : function searchByNDL (query, param, filter, option) {
+        var s = Q.defer();
+        
+        if (param === 'sciName') {
+          param = 'composition';
+        }
+
+        if (param === 'itemName') {
+          param = 'productName';
+        }
+
+        NDL.find({},
+          'productName composition'
+        )
+        .regex(param, new RegExp(query, 'i'))
+        .limit(10)
+        //.skip(page * 10)
+        .exec(function(err, i){
+          if(err){
+            return s.reject(err);
+          } else {
+            return s.resolve(i);
+          }
+        });
+
+        return s.promise;
+      }
+    }
 
 function DrugController (){
 
@@ -29,20 +78,32 @@ DrugController.prototype.constructor = DrugController;
  * @param  {Function} callback [description]
  * @return {[type]}            [description]
  */
-DrugController.prototype.search = function(string, page, callback) {
-  Drug.find({},
-    'productName composition category currentPrice'
-  )
-  .regex('productName', new RegExp(string, 'i'))
-  .limit(10)
-  .skip(page * 10)
-  .exec(function(err, i){
-    if(err){
-      callback(err);
-    } else {
-      callback(i);
-    }
+DrugController.prototype.search = function(query, param, filter, option) {
+  var searcher = Q.defer();
+
+  var s = {
+    drug : null,
+    ndl: null
+  };
+
+  drugsFunctions.searchByRegDrugs(query, param, filter, option)
+  .then(function (r) {
+    s.drug = r;
+
+    drugsFunctions.searchByNDL(query, param, filter, option)
+    .then(function (r) {
+      s.ndl = r;
+
+      return searcher.resolve(s);
+    }, function (err) {
+      return searcher.reject(err);
+    });
+  }, function (err) {
+    return searcher.reject(err);
   });
+
+
+  return searcher.promise;
 };
 
 DrugController.prototype.addDrug = function (item, owner) {
@@ -97,6 +158,39 @@ DrugController.prototype.priceUpdate = function (id, price, callback){
       }     
     });
   }
+};
+
+/**
+ * updates an item collection with values
+ * sent from the browser. This is used primarily
+ * with the inline editing feature. It should update
+ * one item per request.
+ * @param  {ObjectId} id   the item ObjectId
+ * @param  {Object} body  contains property
+ * @return {Object}      Promise object
+ */
+DrugController.prototype.updateItem = function (id, body){
+  var b = {}, updater = Q.defer();
+
+  b[body.name] = body.value;
+  console.log(b);
+  Drug.update({ _id : id},{
+    $set : b
+  },
+    function(err, i){
+      console.log(err, i);
+      if(err){
+        return updater.reject(err);
+      } 
+      if (i > 0) {
+        return updater.resolve(i);
+      } else {
+        return updater.reject(new Error('item update failed'));
+      }
+    }
+  );
+
+  return updater.promise;
 };
 
 DrugController.prototype.checkUpdate = function(since, cb){
@@ -156,6 +250,7 @@ module.exports.routes = function(app, auth) {
       userData : req.user
     });
   });
+  //Shows the new / add drug page
   app.get('/drugs/add-new', login.ensureLoggedIn(), function(req, res){
     res.render('index', {
       userData : req.user
@@ -167,20 +262,27 @@ module.exports.routes = function(app, auth) {
   });
 
   //Displays one item page
-  app.get('/drugs/:drugId/item', function (req, res) {
-    res.render('index', {
-      userData : req.user
-    });
+  app.get('/drugs/:drugId/item', function (req, res, next) {
+    drugs.fetchOneById(req.params.drugId)
+    .then(function (r) {
+
+      res.render('drug/one-item', {
+        userData : req.user,
+        item: r
+      });
+
+    }, function (err) {
+      next(err);
+    });    
   });
 
   //Search for nafdac reg drugs by category
-  app.get('/api/drugs/:needle/page/:page', function(req, res, next){
-    drugs.search(req.params.needle, req.params.page, function(r){
-      if(utils.isError(r)){
-        next(r);
-      }else{
-        res.json(200, r);
-      }
+  app.get('/api/internal/item/search', function (req, res, next) {
+    drugs.search(req.query.s, req.query.param, req.query.filter, {})
+    .then(function (r) {
+      res.json(200, r);
+    }, function (err) {
+      next(err);
     });
   });
   //Fetch Drug Item Summary
@@ -217,17 +319,6 @@ module.exports.routes = function(app, auth) {
     });
   });
 
-  app.get('/api/drugs/:drugId', function (req, res, next) {
-    var id = req.params.drugId;
-
-    drugs.fetchOne(id)
-    .then(function (r) {
-      res.json(200, r);
-    }, function (err) {
-      next(err);
-    });
-  });
-
   app.post('/api/drugs', function (req, res, next) {
     var item = req.body;
     var owner = req.user._id;
@@ -243,7 +334,7 @@ module.exports.routes = function(app, auth) {
 
   //run typeahead
   app.get('/api/internal/items/typeahead', function (req, res, next) {
-    ndl.autocomplete(req.query.query, function (err, list) {
+    NDL.autocomplete(req.query.query, function (err, list) {
       if (err) {
         next(err);
       } else {
@@ -253,8 +344,72 @@ module.exports.routes = function(app, auth) {
 
   });
 
+  //get item form, category or packaging
+  app.get('/api/internal/items/props', function (req, res) {
+
+    var props = {};
+      //List of Item forms 
+
+    props.itemForm = [
+      'Tablets',
+      'Capsules',
+      'Vials',
+      'Caplets',
+      'Amples',
+      'Emugels',
+      'Gels',
+      'Ointments',
+      'Suspensions',
+      'Syrup',
+      'Powder',
+      'Cream',
+      'Lotion',
+      'Drops',
+      'Sprays',
+      'Suppositories',
+      'Solutions',
+      'Sheet'
+    ].sort();
+
+    //List of Item Packaging
+    props.itemPackaging = [
+      'Tin',
+      'Carton',
+      'Sachet',
+      'Roll',
+      'Pieces',
+      'Packet',
+      'Gallon',
+      'Bottles',
+      'Bags',
+      'Box',
+      'Tube'
+    ].sort();
+
+
+    props.category = [
+      'Anasthetics', 
+      'Analgesics,Anti Inflammatory & Anti Pyretics', 
+      'Animal Vaccine Products', 
+      'Anti Acids & Ulcer Healer Drugs', 
+      'Anti Diabetics ', 
+      'Anti  Asthmatics', 
+      'Anti Bacterial Agents & Anti Protozal agents', 
+      'Anti Biotics', 
+      'Anti Caner', 
+      'Anti Diarrhoea Drugs & Laxatives', 
+      'Antiemetics & Antispasmodic', 
+      'Anti Fungals', 
+      'Anti Hemorroid Preparations', 
+      'Anti Helminitics', 
+      'Anti Histamines', 'Anti Malrials', 'Anti Migraine Drugs', 'Anti Muscarinic', 'Anti Neoplastic & Immunomodulating Agents', 'Anti Psychotic', 'Antiseptics,Disinfectants & Mouthwashes', 'Anti tussive,Expectorants & Mucolytics', 'Antiviral', 'Cardiovascular System', 'Contraceptives', 'Dermatological Preparations', 'Parkinson Drugs', 'Eye,Ear & Throat Preparations', 'Haematinics', 'Herbal Products', 'Hormones,Synthetics,Substitutes & Thyroid Drugs', 'Human Biologicals', 'Human Vaccine Products', 'Hypnotics,Anxiolities,Anti Convulsants & Anti depressant', 'Insecticides', 'Oxytocics', 'Pesticide Products', 'Rubefacients', 'Skeletal Muscle Relaxants', 'Vaccines & Biologicals', 'Veterinary Drugs/Products', 'Vitamins & Minerals', 'Miscellaneous', 'Others'];
+
+    res.json(200, props[req.query.prop] || {});
+  
+  });
+
   //Updates the price of the drug
-  app.put('/api/drugs/:drugId', function(req, res, next) {
+  app.put('/api/drugs/:drugId/price', function(req, res, next) {
     drugs.priceUpdate( req.params.drugId, req.body.price, function(r){
       if(utils.isError(r)){
         next(r);
@@ -265,12 +420,11 @@ module.exports.routes = function(app, auth) {
   });
   //Updates the drug item
   app.put('/api/drugs/:drugId', function(req, res, next) {
-    drugs.update( req.params.drugId, req.body, function(r){
-      if(utils.isError(r)){
-        next(r);
-      }else{
-        res.json(200, true);
-      }
+    drugs.updateItem( req.params.drugId, req.body)
+    .then(function (r) {
+      res.json(200, { message: 'saved'});
+    }, function (err) {
+      next(err);
     });
   });
 };

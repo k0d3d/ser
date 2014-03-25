@@ -10,7 +10,7 @@ angular.module('drug', [])
 
   .config(['$routeProvider', function ($routeProvider) {
     $routeProvider.when('/drugs', {templateUrl: '/drug/index', controller: 'drugIndexController'})
-    .when('/drugs/:drugId/item', {templateUrl: '/drug/one-item', controller: 'drugPageController'})
+    .when('/drugs/:drugId/item', {controller: 'drugPageController'})
     .when('/drugs/add-new', {templateUrl: '/drug/add', controller: 'drugAddController'});
   }])
   .controller('drugIndexController', ['$scope', 'drugService', function drugIndexController ($scope, ds){
@@ -53,11 +53,11 @@ angular.module('drug', [])
     }
 
     $scope.autoCompleteItemName = function (result) {
-      console.log(result);
+      $scope.add_item_form.itemName = result.productName;
       $scope.add_item_form.sciName = result.composition;
       $scope.add_item_form.nafdacRegNo = result.regNo;
       $scope.$apply();
-    }
+    };
 
     $scope.add_drug = function (data) {
       ds.addDrug(data)
@@ -119,7 +119,7 @@ angular.module('drug', [])
       });
     };
 
-
+    //d.fetchProps = function (query, )
 
     d.search = function (srchstr, page, callback) {
       $http.get('/api/drugs/' + srchstr + '/page/' + page)

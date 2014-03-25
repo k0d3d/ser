@@ -9,7 +9,8 @@ mixin loadItemExtendedInfo()
       .form-group
         label.col-sm-3.control-label Contradictions
         .col-sm-6
-          p.x-editable.form-control-static(type='text', placeholder='', ng-model="add_item_form.sciName", required)
+          p.x-editable.form-control-static(data-type="textarea", data-name="contradictions")
+            | #{item.contradictions}
       .form-group
         label.col-sm-3.control-label Warnings
         .col-sm-6
