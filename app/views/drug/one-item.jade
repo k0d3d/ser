@@ -1,6 +1,8 @@
-.contentpanel
+.contentpanel(data-item-id="#{item._id}")
   .row
       .col-sm-3
+        button.btn.btn-primary.btn-block.start-edit Edit
+        .mb30
         img.thumbnail.img-responsive(src='/images/item-images/item-avatar.jpg' , alt='')
         .mb30
         h5.subtitle Drug Name
@@ -16,7 +18,7 @@
         h5.subtitle Category
         p.x-editable
         h5.subtitle Nafdac Reg No
-        p.x-editable
+        p.x-editable  
 
         .mb20    
         .panel.panel-default
@@ -47,8 +49,8 @@
           li
             a(href='#comments', data-toggle='tab')
               strong Comments  
-              span.label.label-info
-                | 3              
+              span.label.label-default
+                | 0             
         //
            Tab panes 
         .tab-content
@@ -61,4 +63,5 @@
 append scripts
 script(src='/js/jquery.prettyPhoto.js')
 script(src='/js/holder.js')
+script(src="/js/modules/drug/item.js")
 

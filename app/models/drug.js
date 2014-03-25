@@ -14,6 +14,8 @@ var DrugSchema = new Schema ({
   nafdacRegNo : {type: String, default: '', required: true},
   category : {type: String, default: '', required: true},
   currentPrice: {type: Number},
+  itemForm: {type: String},
+  itemPackaging: {type: String},
   lastUpdated: {type: Date},
   pharmaId: {type: Schema.ObjectId},
   images: [{type: String}]

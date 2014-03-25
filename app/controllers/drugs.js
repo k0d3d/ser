@@ -263,4 +263,14 @@ module.exports.routes = function(app, auth) {
       }
     });
   });
+  //Updates the drug item
+  app.put('/api/drugs/:drugId', function(req, res, next) {
+    drugs.update( req.params.drugId, req.body, function(r){
+      if(utils.isError(r)){
+        next(r);
+      }else{
+        res.json(200, true);
+      }
+    });
+  });
 };

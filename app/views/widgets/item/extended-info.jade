@@ -1,30 +1,31 @@
 mixin loadItemExtendedInfo()
   #extended-info.tab-pane.active
-    form.form-horizontal.form-bordered(ng-submit="add_drug(add_item_form)", novalidate, name="addItemForm")
+    form.form-horizontal.form-bordered.extended-info(ng-submit="add_drug(add_item_form)", novalidate, name="addItemForm")
+      input#item-id(type="hidden", value="", ng-model="drug._id")
       .form-group
         label.col-sm-3.control-label Indications and Usage
         .col-sm-6
-          p.form-control-static.item-name(type='text', placeholder='', ng-model="add_item_form.itemName", required, type-ahead="autoCompleteItemName", remote="/ndl/search?query=%QUERY", name="item-name")
+          p.x-editable.form-control-static.item-name(type='text', placeholder='', ng-model="add_item_form.itemName", required, type-ahead="autoCompleteItemName", remote="/ndl/search?query=%QUERY", name="item-name")
       .form-group
         label.col-sm-3.control-label Contradictions
         .col-sm-6
-          p.form-control-static(type='text', placeholder='', ng-model="add_item_form.sciName", required)
+          p.x-editable.form-control-static(type='text', placeholder='', ng-model="add_item_form.sciName", required)
       .form-group
         label.col-sm-3.control-label Warnings
         .col-sm-6
-          p.form-control-static(type='text', placeholder='', ng-model="add_item_form.nafdacRegNo", required)
+          p.x-editable.form-control-static(type='text', placeholder='', ng-model="add_item_form.nafdacRegNo", required)
       .form-group
         label.col-sm-3.control-label Precautions
         .col-sm-6
-          p.form-control-static(type='text', placeholder='', ng-model="add_item_form.category", required)
+          p.x-editable.form-control-static(type='text', placeholder='', ng-model="add_item_form.category", required)
       .form-group
         label.col-sm-3.control-label Adverse Reactions
         .col-sm-6
-          p.form-control-static(type='text', placeholder='', ng-model="add_item_form.category", required)
+          p.x-editable.form-control-static(type='text', placeholder='', ng-model="add_item_form.category", required)
       .form-group
         label.col-sm-3.control-label Dosage and Administration
         .col-sm-6
-          p.form-control-static(type='text', placeholder='', ng-model="add_item_form.category", required)
+          p.x-editable.form-control-static(type='text', placeholder='', ng-model="add_item_form.category", required)
       .form-group
         label.col-sm-3 Upload Image
         .col-sm-6.dropzone(dropzone, ng-model="add_item_form.images")

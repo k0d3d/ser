@@ -52,8 +52,11 @@ angular.module('drug', [])
       images: []
     }
 
-    $scope.autoCompleteItemName = function (query) {
-
+    $scope.autoCompleteItemName = function (result) {
+      console.log(result);
+      $scope.add_item_form.sciName = result.composition;
+      $scope.add_item_form.nafdacRegNo = result.regNo;
+      $scope.$apply();
     }
 
     $scope.add_drug = function (data) {
