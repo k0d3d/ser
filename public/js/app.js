@@ -94,14 +94,14 @@ app.directive('typeAhead', [function () {
     link : function (scope, element, attrs) {
    
       // constructs the suggestion engine
-      var _states = new Bloodhound({
-        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+      var _productName = new Bloodhound({
+        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('productName'),
         queryTokenizer: Bloodhound.tokenizers.whitespace,
         // `states` is an array of state names defined in "The Basics"
         remote: '/api/internal/items/typeahead?query=%QUERY'
       });
 
-      _states.initialize();
+      _productName.initialize();
 
       $(element).typeahead({
         hint: true,
@@ -109,14 +109,11 @@ app.directive('typeAhead', [function () {
         minLength: 1
       },
       {
-        name: 'states',
+        name: 'product-name',
+        displayKey: 'productName',
         // `ttAdapter` wraps the suggestion engine in an adapter that
         // is compatible with the typeahead jQuery plugin
-        source: _states.ttAdapter()
-      });
-
-      $(element).on('typeahead:selected', function (e, suggestion, data_set) {
-        console.log(suggestion, data_set);
+        source: _productName.ttAdapter()
       });
     }
   }

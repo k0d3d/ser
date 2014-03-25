@@ -9,10 +9,10 @@ var mongoose = require('mongoose'),
     Supplier = mongoose.model('Supplier'),
     _ = require("underscore"),
     Drug = mongoose.model('drug'),
+    ndl = mongoose.model('nafdacdrug'),
     DUH = mongoose.model('drugUpdateHistory'),
     Q = require('q'),
     login = require('connect-ensure-login'),
-    ndl = require('nafdacdrug'),
     utils = require("util");
 
 
@@ -246,9 +246,11 @@ module.exports.routes = function(app, auth) {
     ndl.autocomplete(req.query.query, function (err, list) {
       if (err) {
         next(err);
+      } else {
+        res.json(200, list);
       }
-    })
-    res.json(200, states);
+    });
+
   });
 
   //Updates the price of the drug
