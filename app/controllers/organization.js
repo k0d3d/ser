@@ -220,6 +220,31 @@ var User = require('./users').users,
           }
         })
         return book.promise;
+      },
+      addDrugToProfile : function addDrugToProfile (doc) {
+        var added = Q.defer();
+
+        this.getMeMyModel(doc.account_type)
+        .update({
+          userId : doc.owner
+        }, {
+          $push : {
+            drugs: {
+              drug : doc.drugId
+            }
+          }
+        }, function (err, i) {
+          if (err) {
+            return added.reject(err);
+          }
+          if (i === 1) {
+            return added.resolve(doc);
+          } else {
+            return added.reject(new Error('update drugs to profile failed'));
+          }          
+        });
+
+        return added.promise;
       }
     };
 
@@ -393,6 +418,32 @@ Staff.prototype.lookUpMyPeople = function lookUpMyPeople (accountType, employerI
   });
 
   return libr.promise;
+};
+
+/**
+ * allows a distributor, manager or staff to add drugs
+ * @param  {ObjectId} drug_id the ObjectId of the drug he wishes to
+ * add to his/her profile.
+ * @param  {ObjectId} owner   the logged in user attempting to add
+ * this drug item to his profile.
+ * @param  {Number} account_type   the account type for the logged in user.
+ * @return {Object}         Promise Object
+ */
+Staff.prototype.stateYourDrugs = function stateYourDrugs (drug_id, owner,account_type) {
+  var stater = Q.defer();
+
+  staffFunctions.addDrugToProfile({
+    drugId : drug_id,
+    owner: owner,
+    account_type: account_type
+  })
+  .then(function(r) {
+    return stater.resolve(r);
+  }, function (err) {
+    return stater.reject(err);
+  });
+
+  return stater.promise;
 }
 
 module.exports.staff = Staff;
@@ -406,25 +457,25 @@ module.exports.routes = function (app, auth) {
       userData: req.user
     });
   });
-  app.get('/organization/people/:accountType',login.ensureLoggedIn('/signin'), function (req, res) {
+  app.get('/a/organization/people/:accountType',login.ensureLoggedIn('/signin'), function (req, res) {
 
     res.render('index', {
       userData: req.user
     });
   });
-  app.get('/organization/invitations',login.ensureLoggedIn('/signin'), function (req, res) {
+  app.get('/a/organization/invitations',login.ensureLoggedIn('/signin'), function (req, res) {
 
     res.render('index', {
       userData: req.user
     });
   });
-  app.get('/organization/people/:personId/staff',login.ensureLoggedIn('/signin'), function (req, res) {
+  app.get('/a/organization/people/:personId/staff',login.ensureLoggedIn('/signin'), function (req, res) {
 
     res.render('index', {
       userData: req.user
     });
   });
-  app.get('/organization/profile',login.ensureLoggedIn('/signin'), function (req, res) {
+  app.get('/a/organization/profile',login.ensureLoggedIn('/signin'), function (req, res) {
 
     res.render('organization/profile', {
       userData: req.user,
@@ -508,4 +559,16 @@ module.exports.routes = function (app, auth) {
       next(err);
     });
   });
+
+  //Adds a drug item to a staff profile
+  app.post('/api/internal/organization/staff/drugs/', function (req, res, next) {
+    var owner = req.user._id,
+        account_type = req.user.account_type;
+    staff.stateYourDrugs(req.body.drugId, owner, account_type)
+    .then(function () {
+      res.json(200, true);
+    }, function (err) {
+      next(err);
+    })
+  })
 }

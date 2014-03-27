@@ -22,6 +22,14 @@
               label.col-sm-3.control-label Category
               .col-sm-6
                 select.form-control(type='text', placeholder='', ng-model="add_item_form.category", ng-options="c for c in itemCategory", required)
+            .form-group
+              label.col-sm-3.control-label Manufacturer
+              .col-sm-6
+                input.form-control(type='text', placeholder='', ng-model="add_item_form.pharma.pharmaName", required)
+            .form-group
+              label.col-sm-3.control-label Distributor
+              .col-sm-6
+                input.form-control(type='text', placeholder='', ng-model="add_item_form.distributor", required)
 
             .form-group
               label.col-sm-3.control-label Price
@@ -68,7 +76,7 @@
                   option Tube
 
             .form-group
-              label.col-sm-3 Upload Image
+              label.col-sm-3.control-label Upload Image
               .col-sm-6.dropzone(dropzone, ng-model="add_item_form.images")
                   input(name='itemImage', type='file', multiple='multiple', style="display: none")     
                   span.help-text 

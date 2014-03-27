@@ -1,30 +1,17 @@
 .headerbar
     a.menutoggle
       i.fa.fa-bars
-    form.searchform(action='http://themepixels.com/demo/webpage/bracket/index.html', method='post')
+    form.searchform(action='/', method='post')
       input.form-control(type='text', name='keyword', placeholder='Search here...')
     .header-right
       ul.headermenu
         li
           .btn-group
-            button.btn.btn-default.dropdown-toggle.tp-icon(data-toggle='dropdown')
+            a.btn.btn-default.tp-icon(href="/a/orders/cart", ahref)
               | Order Cart
               i.fa.fa-shopping-cart
               span.badge {{orderCart.length}}
-            .dropdown-menu.dropdown-menu-head.pull-right
-              h5.title You have 1 item in the cart
-              ul.dropdown-list.gen-list
-                li.new
-                  a(href='#')
-                    span.thumb
-                      img(src='images/photos/user4.png', alt='')
-                    span.desc
-                      span.name
-                        | Zaham Sindilmaca
-                        span.badge.badge-success new
-                      span.msg is now following you
-                li.new
-                  a(href='#') Go to Cart
+
         li
           .btn-group
             button.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown')
@@ -33,7 +20,7 @@
               span.caret
             ul.dropdown-menu.dropdown-menu-usermenu.pull-right
               li
-                a(ng-click="commons.href('/profile')", href="")
+                a(href='/a/profile')
                   i.glyphicon.glyphicon-user
                   | My Profile
               li

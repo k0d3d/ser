@@ -10,19 +10,39 @@ var mongoose = require('mongoose'),
  * Orders Schema
  */
 var OrderSchema = new Schema({
-  orderType: {type: String, default: 'Medical Equipment'},
   nafdacRegNo: {type: String},
   nafdacRegName: {type: String},
   orderAmount: {type: Number, default: '0'},
   orderDate: {type: Date},
-  orderSupplier: [{
-    supplierID: {type: String, default: ''},
-    supplierName: {type: String, default: ''}
-  }],
-  orderStatus: {type: String, default: 'pending order'},
+  itemId: {type: Schema.ObjectId},
+  perItemPrice: {type: Number},
+  finalPrice: {type: Number},
+  /**
+   * the account / user objectId of the distributor / manager / pharma who received 
+   * the order
+   * @type {Object}
+   */
+  orderSupplier: {type: Schema.ObjectId},
+  /**
+   * the staff or manager who is responsible for delivering this order
+   * @type {Object}
+   */
+  orderCharge: {type: Schema.ObjectId},
+  /**
+   * orderStatus values 
+   * 0 : in cart
+   * 1: order placed
+   * 2: order received
+   * 3: order confirmed
+   * 4: order in transit
+   * 5: order supplied
+   * 6: order paid
+   * @type {Object}
+   */
+  orderStatus: {type: Number, default: 0},
   orderVisibility: {type: Boolean, default: true},
-  hospitalId: {type: Number},
-  h_order_Id: {type: String, unique: true},
+  hospitalId: {type: Schema.ObjectId},
+  orderId: {type: String, unique: true},
   amountSupplied: {type: Number}
 });
 
@@ -75,3 +95,5 @@ OrderSchema.statics = {
 
 mongoose.model('Order', OrderSchema);
 mongoose.model('OrderStatus', OrderStatusSchema);
+
+module.exports = mongoose.model('Order');

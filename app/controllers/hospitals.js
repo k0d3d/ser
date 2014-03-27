@@ -95,22 +95,22 @@ var hospital = new HospitalController();
 module.exports.routes = function (app, auth) {
   
   //Load the hospital index / list page
-  app.get('/hospitals', auth.requiresLogin, function (req, res) {
+  app.get('/a/facilities', auth.requiresLogin, function (req, res) {
+    res.render('index', {});
+  });
+
+  //loads page to add a new hospital account
+  app.get('/a/facilities/add', auth.requiresLogin, function (req, res) {
     res.render('index', {});
   });
 
   //loads page to add a new hospital account\
-  app.get('/hospitals/add', auth.requiresLogin, function (req, res) {
+  app.get('/a/facilities/:facilityId', auth.requiresLogin, function (req, res) {
     res.render('index', {});
   });
 
-  //loads page to add a new hospital account\
-  app.get('/hospitals/:hospitalId', auth.requiresLogin, function (req, res) {
-    res.render('index', {});
-  });
-
-  //fetches list of registered hospitals
-  app.get('/api/hospitals/pages/:page', auth.requiresLogin, function (req, res, next) {
+  //fetches list of registered facilities
+  app.get('/api/facilities/pages/:page', auth.requiresLogin, function (req, res, next) {
     hospital.list(req.params.page, function (r) {
       if (util.isError(r)) {
         next(r);
@@ -120,8 +120,8 @@ module.exports.routes = function (app, auth) {
     });
   });
 
-  app.get('/api/hospitals/:hospitalId', function (req, res, next) {
-    hospital.fetchOne(req.params.hospitalId, function (r) {
+  app.get('/api/facilities/:facilityId', function (req, res, next) {
+    hospital.fetchOne(req.params.facilityId, function (r) {
       if (util.isError(r)) {
         next(r);
       } else {
@@ -131,7 +131,7 @@ module.exports.routes = function (app, auth) {
   });
 
   //Creates a new hospital
-  app.post('/api/hospitals', function (req, res, next) {
+  app.post('/api/facilities', function (req, res, next) {
     hospital.create(req.body, function (r) {
       if (util.isError(r)) {
         next(r);
@@ -142,8 +142,8 @@ module.exports.routes = function (app, auth) {
   });
 
   //Remove hospital record and user
-  app.del('/api/hospitals/:hospitalId', function(req, res, next){
-    hospital.delete(req.params.hospitalId, req.params.userid, function(r){
+  app.del('/api/facilities/:facilityId', function(req, res, next){
+    hospital.delete(req.params.facilityId, req.params.userid, function(r){
       if (util.isError(r)) {
         next(r);
       } else {

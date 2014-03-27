@@ -50,7 +50,8 @@
     "q": "^1.0.1",
     "nodemailer": "^0.6.1",
     "connect-ensure-login": "^0.1.1",
-    "express-upload": "^0.1.0"
+    "express-upload": "^0.1.0",
+    "acl": "^0.2.6"
   },
   "devDependencies": {
     "supertest": "latest",

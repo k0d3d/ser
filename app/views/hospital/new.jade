@@ -1,40 +1,41 @@
-.page-header
-  h1
-    i.icon-office
-    | Hospital Registration
-    small  Register a new Hospital
-.row
-    .col-md-10.widget-module
-      .square-widget.widget-collapsible
-        .widget-container
-          form.form-horizontal(novalidate, ng-submit="regnew()", name="newreg")
-            .form-group
-              label.col-lg-2.control-label Hospital Name
-              .col-lg-10
-                input.form-control(type='text', name="name", ng-model="form.name", required)
-            .form-group
-              label.col-lg-2.control-label Email
-              .col-lg-10
-                input.form-control(type='email', name="email", ng-model="form.email", required)                  
-            .form-group
-              label.col-lg-2.control-label Password
-              .col-lg-10
-                input.form-control(type='password', placeholder="Leave blank to generate a password", name="password", ng-model="form.password")
-            .form-group
-              label.col-lg-2.control-label Contact Personel
-              .col-lg-10
-                input.form-control(type='text', ng-model="form.personel", name="personel")
-            .form-group
-              label.col-lg-2.control-label Hospital Address
-              .col-lg-10
-                textarea.form-control(type='text', ng-model="form.address", name="address")   
-            .form-group
-              label.col-lg-2.control-label Hospital Phone Number
-              .col-lg-10
-                textarea.form-control(type='tel', ng-model="form.phonenumber", name="phonenumber")            
-            .form-group
-              label.col-lg-2.control-label  
-              .col-lg-10
-                .form-actions
-                  button.btn.btn-primary(type='submit', ng-disabled="newreg.$invalid") Save changes
-                  button.btn(type='button') Cancel
+.contentpanel
+    .panel.panel-default
+        .panel-heading
+          .panel-btns
+          h4.panel-title Add new facility
+        .panel-body
+          .row
+              .col-md-10.widget-module
+                .square-widget.widget-collapsible
+                  .widget-container
+                    form.form-horizontal(novalidate, ng-submit="regnew()", name="newreg")
+                      .form-group
+                        label.col-lg-2.control-label Hospital Name
+                        .col-lg-5
+                          input.form-control(type='text', name="name", ng-model="form.name", required)
+                      .form-group
+                        label.col-lg-2.control-label Email
+                        .col-sm-5
+                          input.form-control(type='email', name="email", ng-model="form.email", required)                  
+                      .form-group
+                        label.col-lg-2.control-label Password
+                        .col-lg-5
+                          input.form-control(type='password', placeholder="Leave blank to generate a password", name="password", ng-model="form.password")
+                      .form-group
+                        label.col-lg-2.control-label Contact Personel
+                        .col-lg-5
+                          input.form-control(type='text', ng-model="form.personel", name="personel")
+                      .form-group
+                        label.col-lg-2.control-label Hospital Address
+                        .col-lg-5
+                          textarea.form-control(type='text', ng-model="form.address", name="address")   
+                      .form-group
+                        label.col-lg-2.control-label Hospital Phone Number
+                        .col-sm-5
+                          input.form-control(type='tel', ng-model="form.phonenumber", name="phonenumber")            
+                      .form-group
+                        label.col-lg-2.control-label  
+                        .col-lg-10
+                          .form-actions
+                            button.btn.btn-primary(type='submit', ng-disabled="newreg.$invalid") Save changes
+                            button.btn(type='button', ng-click="commons.backBtn()") Cancel

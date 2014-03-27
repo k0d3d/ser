@@ -1,34 +1,40 @@
-.page-header
-    h1
-      i.icon-table-2
-      | Hospital List
-      small All registered hospitals
-.row
-  .col-md-12
-    .box-widget
-      table.table.paper-tbl-theme.table-bordered.responsive.table-paper
-        thead
-          tr
-            th
-              | Hospital Name
-            th
-              | Contact Person
-            th
-              | Phone Number
-            th
-              | Location
-            th
-              | Action
-        tbody
-          tr.h_row(ng-repeat="h in hospitals", ng-click="commons.href('hospitals/' + h.user)")
-            td
-              | {{h.name}}
-            td
-              | {{h.personel}}
-            td
-              | {{h.phonenumber}}
-            td
-              | {{h.location}}
-            td
-              button.btn.btn-xs.btn-primary Edit
-              button.btn.btn-xs.btn-danger(ng-click="removeh($index)") Remove
+.contentpanel
+    .btn-group
+      a.btn.btn-small(href='/a/facilities/add') Add a Facility  
+    .panel.panel-default(ng-show="true")
+        .panel-body
+            | No Hospitals listed
+    .panel.panel-default(ng-show="false")
+        .panel-heading
+          .panel-btns
+          h4.panel-title Hospitals
+        .panel-body
+          .row
+            .col-md-12
+              .box-widget
+                table.table.paper-tbl-theme.table-bordered.responsive.table-paper
+                  thead
+                    tr
+                      th
+                        | Hospital Name
+                      th
+                        | Contact Person
+                      th
+                        | Phone Number
+                      th
+                        | Location
+                      th
+                        | Action
+                  tbody
+                    tr.h_row(ng-repeat="h in hospitals", ng-click="commons.href('hospitals/' + h.user)")
+                      td
+                        | {{h.name}}
+                      td
+                        | {{h.personel}}
+                      td
+                        | {{h.phonenumber}}
+                      td
+                        | {{h.location}}
+                      td
+                        button.btn.btn-xs.btn-primary Edit
+                        button.btn.btn-xs.btn-danger(ng-click="removeh($index)") Remove

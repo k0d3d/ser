@@ -16,7 +16,11 @@ DistrubutorSchema = new Schema({
   facebook: {type: String},
   address: {type: String},
   phone: {type: String},
-  image: {type: String, default: 'distributor-avatar-400.jpg'}
+  image: {type: String, default: 'distributor-avatar-400.jpg'},
+  drugs: [{
+    drug: {type: Schema.ObjectId},
+    notes: {type: String, default: ''}
+  }]
 });
 
 mongoose.model('Distributor', DistrubutorSchema);

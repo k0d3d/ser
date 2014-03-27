@@ -9,9 +9,65 @@ var mongoose = require('mongoose'),
   Supplier = mongoose.model('Supplier'),
   _ = require('underscore'),
   Hospital = mongoose.model('Hospital'),
+  Notification = require('../models/notification.js'),
   Q = require("q"),
   login = require('connect-ensure-login'),
+  utilz = require('../../lib/utils.js'),
+  EventRegister = require('../../lib/event_register').register,
   utils = require("util");
+
+
+
+var orderManager = {
+  cartOrder : function cartOrder (orderData) {
+    console.log(orderData);
+    console.log('cartOrder is working....');
+    var order = new Order(orderData), or = Q.defer();
+    order.orderDate = orderData.orderDate || Date.now();
+    order.save(function (err, i) {
+      console.log(err, i);
+      if (err) {
+        return or.reject(err);
+      } else {
+        return or.resolve(i); 
+      }
+    })
+
+    return or.promise;
+  },
+  /**
+   * records alerts for certain account types
+   * @param  {[type]} alertDoc   [description]
+   * @param  {[type]} owner the hospital placing the order.
+   * @return {[type]}          [description]
+   */
+  alertNewOrder : function (alertDoc, owner) {
+    var alert = new Notification(),
+        people = [2];
+    alert.alertType = 'order';
+    alert.alertDescription = 'New order has been placed';
+    alert.hospitalId = owner;
+    alert.ownerId = alertDoc.orderSupplier;
+
+    alert.save(function (err, i) {
+      console.log(err, i);
+    });
+    
+    // function postToPeerson () {
+    //   alert.alertPeople(person, alertDoc, function (err, i) {
+    //     if (err) {
+    //       console.log(err);
+    //     }
+    //     if (i) {
+
+    //     }
+    //   })
+
+    // } 
+
+
+  }
+}
 
 
 function OrderController () {
@@ -25,6 +81,7 @@ OrderController.prototype.constructor = OrderController;
  * Create an order
  */
 OrderController.prototype.pushOrders = function (body, cb) {
+  return cb(200);
 
   var data = JSON.parse(body.data);
   var hid = JSON.parse(body.hid);
@@ -62,60 +119,122 @@ OrderController.prototype.pushOrders = function (body, cb) {
   });  
 };
 
+OrderController.prototype.placeCart = function(cartObj, cb){
+  if(_.isEmpty(cartObj)) return cb(new Error('Empty Request'));
+
+  var doneIds = [];
+
+  function _create(){
+    var item = cartObj.pop();
+    var l = cartObj.length;
+
+
+    var itemName = item.itemName;
+    var supplier = item.supplier;
+    var id = item.itemId;
+
+    var order = new Order(item);
+    var itemObj = {itemName: itemName, id: id};
+    order.orderSupplier =  supplier;
+
+    order.itemData = itemObj;
+    
+    order.save(function (r) {
+      //Check if the object returned is an error
+      if(utils.isError(r)){
+        //if we have some processed results
+        //return that
+        if(doneIds.length > 0){ 
+          return cb(doneIds);
+        }else{
+          return cb(r);
+        }
+
+      }else{
+        //Add another done/placed order
+        doneIds.push(id);
+        if(l--){
+          _create();
+        }else{
+          postOrders();
+          cb(doneIds);
+        }
+      }
+    });    
+  }
+
+  _create();
+};
+
 
 
 
 /**
- * List All Orders
+ * queries for orders by the order status order
+ * @param  {[type]} orderStatus [description]
+ * @param  {[type]} displayType [description]
+ * @return {[type]}             [description]
  */
+OrderController.prototype.getOrders = function(orderStatus, displayType){
+  console.log(orderStatus, displayType);
+  var fields,
+      gt = Q.defer();
 
-OrderController.prototype.getOrders = function(page, cb){
-  var perPage = 20;
-  var orders;
-  var r = [];
+  if (displayType === 'full') {
+    fields = 'itemId orderAmount perItemPrice orderDate orderSupplier orderStatus hospitalId orderId amountSupplied';
+  }
+  if (displayType === 'short') {
+    fields = 'itemId orderAmount perItemPrice orderDate orderSupplier orderStatus hospitalId orderId amountSupplied';
+  }
 
-  Order.find({orderVisibility: true})
-  .limit(perPage)
-  .skip(perPage * page)
+  Order.find({
+    orderVisibility: true,
+    orderStatus: orderStatus
+  }, fields)
+  .populate('itemId', 'itemName images pharma', 'drug')
+  //.limit(perPage)
+  //.skip(perPage * page)
   .exec(function(err, o) {
+    console.log(err, o);
     if (err){
-      cb(err);
+      return gt.reject(err);
     }else{
-      orders  = o;
-      populate();
+      return gt.resolve(o);
     }
   });
 
-  function populate () {
-    var l = orders.length;
-    var p = orders.pop();
+  // function populate () {
+  //   var l = orders.length;
+  //   var p = orders.pop();
 
-    Hospital.findOne({hospitalId : p.hospitalId},'name address phonenumber')
-    .exec(function(err, i){
-      if(err){
-        cb(err);
-      }else{
-        r.push({
-          name: i.name,
-          address: i.address,
-          phonenumber: i.phonenumber,
-          hospitalId: p.hospitalId,
-          orderDate: p.orderDate,
-          _id: p._id,
-          orderStatus: p.orderStatus,
-          orderSupplier:p.orderSupplier[0],
-          orderAmount: p.orderAmount,
-          nafdacRegName:p.nafdacRegName,
-          nafdacRegNo: p.nafdacRegNo
-        });
-        if(--l){
-          populate();
-        }else{
-          cb(r);
-        }
-      }
-    });
-  }
+  //   Hospital.findOne({hospitalId : p.hospitalId},'name address phonenumber')
+  //   .exec(function(err, i){
+  //     if(err){
+  //       cb(err);
+  //     }else{
+  //       r.push({
+  //         name: i.name,
+  //         address: i.address,
+  //         phonenumber: i.phonenumber,
+  //         hospitalId: p.hospitalId,
+  //         orderDate: p.orderDate,
+  //         _id: p._id,
+  //         orderStatus: p.orderStatus,
+  //         orderSupplier:p.orderSupplier[0],
+  //         orderAmount: p.orderAmount,
+  //         nafdacRegName:p.nafdacRegName,
+  //         nafdacRegNo: p.nafdacRegNo
+  //       });
+  //       if(--l){
+  //         populate();
+  //       }else{
+  //         cb(r);
+  //       }
+  //     }
+  //   });
+  // }
+  
+  return gt.promise;
 
 };
 
@@ -214,7 +333,63 @@ OrderController.prototype.orderUpdates = function(hospitalId, dayte, cb){
     if(err) return cb(err);
     cb(i);
   });
+};
+
+OrderController.prototype.placeItemInCart = function (orderData, orderOwner) {
+  console.log('Placing Items in Cart');
+  var procs = Q.defer();
+
+  orderData.itemId = orderData._id;
+  orderData.perItemPrice = orderData.currentPrice;
+  orderData.orderSupplier = orderData.owner;
+  orderData.hospitalId = orderOwner;
+  orderData.orderId = utilz.uid(32);
+  var order = _.omit(orderData, '_id');
+  orderManager.cartOrder(order)
+  .then(function (d) {
+    return procs.resolve(d);
+  }, function (err) {
+    return procs.reject(err);
+  })
+
+  return procs.promise;
+};
+
+/**
+ * places an order from an item on the cart.
+ * This changes the order status to 1 from 0. 
+ * 1 means order placed.
+ * @param  {Object} object containing data sent from 
+ * the browser. 
+ * @return {[type]}       [description]
+ */
+OrderController.prototype.placeOrder = function (order, orderOwner) {
+  console.log('Placing order');
+  var ot = Q.defer();
+
+  Order.update({
+    orderId : order.orderId
+  }, {
+    $set : {
+      orderStatus: 1
+    }
+  }, function (err, i) {
+    if (err) {
+      return ot.reject(err);
+    }
+    if (i > 0) {
+      orderManager.alertNewOrder(order, orderOwner);
+      return ot.resolve(i);
+    }
+    if (i === 0) {
+      return ot.reject(new Error('order update failed'));
+    }
+  })
+
+  return ot.promise;
 }
+
+
 
 module.exports.order = OrderController;
 var order = new OrderController();
@@ -233,70 +408,91 @@ module.exports.routes = function(app, auth){
     }
   );
 
-  app.get('/orders', auth.requiresLogin, function(req, res){
+  app.get('/a/orders', login.ensureLoggedIn('/signin'), function(req, res){
       res.render('index',{
         title: 'All orders'
       });
     }
   );
-
-  app.get('/orders/new', auth.requiresLogin, function(req, res){
-      res.render('index');
-    }
-  );
-  app.get('/search/item', login.ensureLoggedIn(), function(req, res){
-    res.render('index', {
-      userData : req.user
-    });
+  //Show place new order page
+  app.get('/a/orders/new', login.ensureLoggedIn('/signin'), function(req, res){
+    console.log(res.locals.user);
+    res.render('index');
   });
+  //Show Order Cart page
+  app.get('/a/orders/cart', login.ensureLoggedIn('/signin'), function(req, res){
+    res.render('index');
+  });
+
   //Order  GET routes
-  app.get('/api/orders/:pageNo',function(req, res, next){
-    order.getOrders(req.params.pageNo, function(r){
-      if(utils.isError(r)){
-        next(r);
-      }else{
+  //@orderStatus the orderStatus parameter queries for the
+  //right order statuses to be sent as a response.
+  //it expects a numbers between 0 and 6.
+  //any number over 6 will request all orders.
+  //
+  //@displayType is a string which specifies what fields of the result
+  //get sent back as a response. The available options are full or short.
+  //
+  //
+  app.get('/api/orders/:orderStatus/display/:displayType',function(req, res){
+
+    order.getOrders(req.params.orderStatus, req.params.displayType)
+    .then(function(r){
         res.json(200, r);
-      }
+    }, function (err) {
+      res.json(400, err);
     });
   });
-  app.get('/api/orders/count',count);
 
-  app.get('/api/orders/supplier/typeahead/:query', suppliersTypeahead);
+  //app.get('/api/orders/count',count);
 
-  app.get('/api/orders/hospital/:hospitalId/updates/:since', function(req, res, next){
-    order.orderUpdates(req.params.hospitalId, req.params.since, function(r){
-      if(utils.isError(r)){
-        next(r);
-      }else{
-        res.json(200, r);
-      }
-    });
-  });
+  //app.get('/api/orders/supplier/typeahead/:query', suppliersTypeahead);
+
+  // app.get('/api/orders/hospital/:hospitalId/updates/:since', function(req, res, next){
+  //   order.orderUpdates(req.params.hospitalId, req.params.since, function(r){
+  //     if(utils.isError(r)){
+  //       next(r);
+  //     }else{
+  //       res.json(200, r);
+  //     }
+  //   });
+  // });
 
   // Order POST Routes
-  app.post('/api/orders',function(req, res, next){
-    order.pushOrders(req.body, function(r){
-      if(utils.isError(r)){
-        next(r);
-      }else{
-        res.json(200, r);
-      }
+  app.post('/api/orders',function(req, res){
+    order.placeItemInCart(req.body, req.user._id)
+    .then(function(r){
+      res.json(200, true);
+    }, function (err) {
+      res.json(400, err);
     });
   });
 
 
   //Order PUT Routes
-  app.put('/api/orders/:orderId/hospital/:hospitalId/status/:status/',function(req, res, next) {
-    order.updateOrder({
-      _id: req.params.orderId,
-      amountSupplied: req.body.amountSupplied
-    }, req.params.status, req.params.hospitalId, function(r){
-      if(utils.isError(r)){
-        next(r);
-      }else{
+  // app.put('/api/orders/:orderId/hospital/:hospitalId/status/:status/',function(req, res, next) {
+  //   order.updateOrder({
+  //     _id: req.params.orderId,
+  //     amountSupplied: req.body.amountSupplied
+  //   }, req.params.status, req.params.hospitalId, function(r){
+  //     if(utils.isError(r)){
+  //       next(r);
+  //     }else{
+  //       res.json(200, r);
+  //     }
+  //   });
+  // });
+
+  //Progresses an order from the cart to being placed
+  app.put('/api/orders/:orderId/status/:orderStatus', function (req, res) {
+    if (req.params.orderStatus == 1) {
+      order.placeOrder(req.body, req.user._id)
+      .then(function (r) {
         res.json(200, r);
-      }
-    });
+      }, function (err) {
+        res.json(400, r);
+      });
+    }
   });
 
   //Delete Order (logically)

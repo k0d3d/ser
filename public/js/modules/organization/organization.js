@@ -7,9 +7,9 @@ angular.module('organization', [])
 
 .config(['$routeProvider', function ($routeProvider){
   $routeProvider.when('/organization', {templateUrl: '/organization/all-staff', controller: 'staffController'});
-  $routeProvider.when('/organization/people/:accountType', {templateUrl: '/organization/all-staff', controller: 'staffController'});
-  $routeProvider.when('/organization/people/:personId/staff', {templateUrl: '/organization/profile', controller: 'personController'});
-  $routeProvider.when('/organization/invitations', {templateUrl: '/organization/invites', controller: 'invitesController'});
+  $routeProvider.when('/a/organization/people/:accountType', {templateUrl: '/organization/all-staff', controller: 'staffController'});
+  $routeProvider.when('/a/organization/people/:personId/staff', {templateUrl: '/organization/profile', controller: 'personController'});
+  $routeProvider.when('/a/organization/invitations', {templateUrl: '/organization/invites', controller: 'invitesController'});
 }])
 .controller('staffController', ['$scope', 'organizeStaffService', '$routeParams', function userController($scope, oss, $routeParams) {
   $scope.$parent.headerTitle = 'Staff';

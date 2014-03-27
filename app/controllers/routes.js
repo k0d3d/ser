@@ -1,6 +1,145 @@
-var login = require('connect-ensure-login');
+var login = require('connect-ensure-login'),
+    _ = require("underscore");
 
+/**
+ * all API routes must respond to errors with a res.json 400 http status code.
+ * @param  {[type]} app      [description]
+ * @param  {[type]} passport [description]
+ * @param  {[type]} auth     [description]
+ * @return {[type]}          [description]
+ */
 module.exports = function(app, passport, auth) {
+
+    //Minimal middleware that adds 
+    //logged in user details to view
+    app.get('/a/*', function (req, res, next) {
+      if (req.user) {
+        res.locals.userData = req.user;
+      }
+      next();
+    });
+    //Sets roles and permissions to be used on 
+    //the view templates and widgets
+    app.get('/a/*', function (req, res, next) {
+      var people = [
+        {
+          name: "Pharmaceutical Company",
+          permissions: []
+        },
+        {
+          name: 'Manager',
+          permissions: []
+        },
+        {
+          name: 'Distributor',
+          permissions: ['place-order']
+        },
+        {
+          name: 'Manager',
+          permissions: []
+        },
+        {
+          name: 'Staff',
+          permissions: []
+        },
+        {
+          name: 'Hospitals',
+          permissions: []
+        }
+      ];
+      var nav = [
+        {
+          name : "Dashboard",
+          roles : ['all'],
+          icon: '',
+          url: '/'
+        },
+        {
+          name: "Orders",
+          roles: ['all'],
+          icon: '',
+          url: '/a/orders'
+        },
+        {
+          name: 'Suppliers',
+          roles: [5],
+          icon: '',
+          url: '/a/suppliers',
+        },
+        {
+          name: "Drug Pages",
+          roles: [0,1,2],
+          icon: '',
+          url: '/a/drugs'
+        },
+        {
+          name: 'Med. Facilities',
+          roles: [0,1,2,3,4],
+          icon:'',
+          url: '/a/facilities'
+        },
+        {
+          name: 'Organization',
+          roles: [0,1,2,3],
+          icon: '',
+          child: [
+            {
+              name: 'Distributors',
+              roles: [0,1],
+              url: '/a/organization/people/2'
+            },
+            {
+              name: 'Managers',
+              roles: [0],
+              url: '/a/organization/people/1'
+            },
+            {
+              name: 'Managers',
+              roles: [0,1,2],
+              url: '/a/organization/people/3'
+
+            },
+            {
+              name: 'Staff',
+              roles: [0,1,2,3],
+              url: '/a/organization/people/4'              
+            }
+          ]
+        },
+        {
+          name: 'Invitations',
+          roles: [0,1,2,3,4,5],
+          url: '/a/organization/invitations'
+        }
+      ];
+
+      res.locals.hasRole = function (index) {
+        var account_type = req.user.account_type;
+        var this_nav = nav[index];
+
+        if (_.indexOf(this_nav.roles, account_type) > -1) {
+          return true;
+        } else {
+          return false;
+        }
+      };
+
+      res.locals.isPermitted = function (permission) {
+        var permits = _.intersection(permission, people[req.user.account_type].permissions);
+        console.log(permits);
+        if (permits.length > 0) {
+          return true;
+        }
+      }
+
+      console.log(req.originalUrl);
+
+      res.locals.navs = nav;
+
+      next();
+
+    });
+
     //User Routes
     var users = require('./users');
     users.routes(app, passport, auth);
@@ -24,15 +163,6 @@ module.exports = function(app, passport, auth) {
     var fileupload = require('./upload');
     fileupload(app);
 
-    //Minimal middleware that adds 
-    //logged in user details to view
-    // app.get('/*', function (req, res, next) {
-    //   if (req.user) {
-    //     console.log(req.user);
-    //     res.locals.userData = req.user;
-    //   }
-    //   next();
-    // })
 
     //Home route
     app.get('/', login.ensureLoggedIn('/signin'),  function(req, res){

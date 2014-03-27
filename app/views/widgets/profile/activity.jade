@@ -1,17 +1,17 @@
 mixin loadActivities
-  #activities.tab-pane.active
-    .activity-list
-      .media.act-media
-        a.pull-left(href='#')
-          img.media-object.act-thumb(src='images/photos/user1.png', alt='')
-        .media-body.act-media-body
-          strong New Ikeja Hospital 
-          |  
-          strong updated drugs list
-          | .
-          br
-          small.text-muted Yesterday at 3:30pm
+    #activities.tab-pane.active
+      .activity-list(ng-repeat="act in activity")
+        .media.act-media
+          a.pull-left(href='#')
+            img.media-object.act-thumb(src='images/photos/user1.png', alt='')
+          .media-body.act-media-body
+            strong {{act.alertDescription}}
+            |  
+            strong by <a href="#">Hospital</a>
+            | .
+            br
+            small.text-muted  {{act.created | date: 'medium'}}
 
-    //
-       activity-list 
-    button.btn.btn-white.btn-block Show More
+      //
+         activity-list 
+      button.btn.btn-white.btn-block Show More

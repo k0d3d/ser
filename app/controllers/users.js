@@ -10,6 +10,7 @@
  _ = require("underscore"),
  login = require('connect-ensure-login'),
  passport = require('passport'),
+ Notification = require('../models/notification.js'),
  Organization = require('./organization.js');
 
 
@@ -245,6 +246,7 @@ UserController.prototype.getProfile = function (userId, account_type) {
   Organization.staffFunctions.getMeMyModel(account_type).findOne({
     userId: userId
   })
+  .populate('drugs.drug', null, 'drug')
   .exec(function (err, i) {
     if (err) {
       return d.reject(err);
@@ -260,6 +262,21 @@ UserController.prototype.getProfile = function (userId, account_type) {
   return d.promise;
 };
 
+UserController.prototype.pullActivity = function (owner) {
+  var not = Q.defer();
+  Notification.find({
+    ownerId: owner
+  })
+  //.populate('hospitalId', )
+  .exec(function (err, i) {
+    if (err) {
+      return not.reject(err);
+    }
+    return not.resolve(i);
+  })
+  return not.promise;
+}
+
 module.exports.users  = UserController;
 var users = new UserController();
 
@@ -270,7 +287,7 @@ module.exports.routes = function(app, passport, auth){
   app.get('/user-registered', function(req, res) {
     res.render('user/user-registered');
   });
-  app.get('/profile', login.ensureLoggedIn('/signin'), function (req, res) {
+  app.get('/a/profile', login.ensureLoggedIn('/signin'), function (req, res) {
     console.log(req.user);
     res.render('index', {
       userData : req.user
@@ -316,6 +333,15 @@ module.exports.routes = function(app, passport, auth){
     .fail(function (err) {
       console.log(err);
       next(err);
+    });
+  });
+
+  app.get('/api/activities', function (req, res) {
+    users.pullActivity(req.user._id)
+    .then(function(r){
+      res.json(200, r);
+    }, function (err) {
+      res.json(400, err);
     });
   });
 

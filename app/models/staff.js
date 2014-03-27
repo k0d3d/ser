@@ -16,8 +16,11 @@ StaffSchema = new Schema({
   facebook: {type: String},
   address: {type: String},
   phone: {type: String},
-  image: {type: String, default: 'staff-avatar-400.png'}
-  
+  image: {type: String, default: 'staff-avatar-400.png'},
+  drugs: [{
+    drug: {type: Schema.ObjectId},
+    notes: {type: String, default: ''}
+  }]  
 });
 
 mongoose.model('Staff', StaffSchema);

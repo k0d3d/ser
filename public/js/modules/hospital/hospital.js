@@ -3,24 +3,26 @@
 *
 * Description
 */
-var hospital = angular.module('hospital', []);
+var hospital = angular.module('facility', []);
 hospital.config(['$routeProvider', function ($routeProvider){
   $routeProvider
-  .when('/hospitals', {
+  .when('/a/facilities', {
     templateUrl: '/hospital/index', 
     controller: 'hospitalIndexController'
   })
-  .when('/hospitals/add',{
+  .when('/a/facilities/add',{
     templateUrl: '/hospital/new',
     controller: 'hospitalAddController'
   })
-  .when('/hospitals/:hospitalId',{
+  .when('/a/facilities/:facilityId',{
     templateUrl: '/hospital/details',
     controller: 'hospitalDeetsController'
   });
 }]);
 
 hospital.controller('hospitalIndexController', ['$scope', 'hospitalService', function indexController($scope, hs){
+  $scope.$parent.headerTitle = 'Hospitals';
+
   //Request hospitals
   hs.all({page: 0}, function(r){
     $scope.hospitals = r;
@@ -95,7 +97,7 @@ hospital.factory('hospitalService',['$http', 'Notification', 'Language',  functi
 
   //Send a new registration request
   h.register = function(post, callback){
-    $http.post('/api/hospitals', post)
+    $http.post('/api/facilities', post)
     .success(function(d, r){
       N.notifier({
         message: Lang[Lang.set].hospital.register.success,

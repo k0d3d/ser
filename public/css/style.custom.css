@@ -187,3 +187,8 @@ p + p {
 #rtl-support .tt-dropdown-menu {
   text-align: right;
 }
+
+
+.cart-table .item-image{
+  width: 50px;
+}

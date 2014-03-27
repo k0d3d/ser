@@ -14,7 +14,6 @@ module.exports = function(app) {
     app.post('/upload-doc', function (req, res) {
 
       resizeToPublic.exec(req.files.itemImage, function(err, file) {
-        console.log(file);
           if (err) {
               console.log(err);
               res.json(400, false);

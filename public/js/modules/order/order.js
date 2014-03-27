@@ -7,86 +7,70 @@ angular.module('order', []).
 
 config(['$routeProvider',function($routeProvider){
   $routeProvider.when('/orders', {templateUrl: '/orders/all', controller: 'ordersIndexController'})
-  .when('/orders/pending/:type', {templateUrl: '/orders/all', controller: 'ordersIndexController'})
-  .when('/dashboard/orders/cart', {templateUrl: '/orders/cart', controller: 'orderCartController'})
-  .when('/search/item', {templateUrl: '/drug/drug-search', controller: 'orderAddController'})
-  .when('/dashboard/order/by/:by', {templateUrl: '/orders/add', controller: 'orderAddController'})
-  .when('/dashboard/order/:itemId', {templateUrl: '/orders/add', controller: 'orderAddController'});
+  .when('/a/orders/new', {templateUrl: '/order/new-order-search-item', controller: 'orderAddController'})
+  .when('/a/orders/cart', {templateUrl: '/order/cart', controller: 'orderCartController'});
 }])
-.controller('orderCartController', ['$scope', '$http', 'ordersService', '$localStorage', function($scope, $http, oS, $localStorage){
-  
-  $scope.placeOrder = function (cb) {
-    if (!confirm('Confirm you want to place an order for these items!')) {
-      cb(false); 
-      return false;
-    } 
-
-    $scope.printScope = null;
-    $scope.printScope = angular.copy($scope.basket);
-
-    // var doc = new jsPDF('p','in', 'letter');
-
-    // // We'll make our own renderer to skip this editor
-    // var specialElementHandlers = {
-    //   '#frontpage': function(element, renderer){
-    //     return true;
-    //   },
-    //   '.search-bar': function(element, renderer){
-    //     return true;
-    //   }
-    // };
-
-    // // All units are in the set measurement for the document
-    // // This can be changed to "pt" (points), "mm" (Default), "cm", "in"
-    // doc.fromHTML($('.table-content').get(0), 0.5, 0.5, {
-    //   'width': 800,
-    //   'elementHandlers': specialElementHandlers
-    // });
-
-    // doc.save('Order Cart'+ Date.now());
-
-    oS.postCart($scope.basket, function (list) {
-      var cartIds = _.map($scope.orderCart, function (a) {
-        return a.itemId;
-      });
+.controller('orderCartController', ['$scope', '$http', 'ordersService', function($scope, $http, ordersService){
 
 
-      var l = list.length;
+  $scope.order_this = function(order, index){
+    console.log(order);
+    ordersService.postCartItem(order)
+    .then(function () {
+      $scope.$parent.orderCart.splice(index, 1);
+    });
+  };
 
-      function __pop() {
-        var t = list.pop();
-        var o = _.indexOf(cartIds, t);
+  // $scope.placeOrder = function (cb) {
+  //   if (!confirm('Confirm you want to place an order for these items!')) {
+  //     cb(false); 
+  //     return false;
+  //   } 
 
-        if (o > -1) {
-          $scope.orderCart.splice(o, 1);
-        }
+  //   $scope.printScope = null;
+  //   $scope.printScope = angular.copy($scope.basket);
+
+  //   oS.postCart($scope.basket, function (list) {
+  //     var cartIds = _.map($scope.orderCart, function (a) {
+  //       return a.itemId;
+  //     });
+
+
+  //     var l = list.length;
+
+  //     function __pop() {
+  //       var t = list.pop();
+  //       var o = _.indexOf(cartIds, t);
+
+  //       if (o > -1) {
+  //         $scope.orderCart.splice(o, 1);
+  //       }
         
-        if (l--) {
-          __pop();
-        } else {
-          $localStorage.orderCart = angular.toJson($scope.orderCart);
-          cb(true);
-        }
+  //       if (l--) {
+  //         __pop();
+  //       } else {
+  //         cb(true);
+  //       }
 
-      }
+  //     }
 
-      __pop();
-    });
-  };
+  //     __pop();
+  //   });
+  // };
 
-  $scope.send_sms = function(){
-    var allSuppliers = _.map($scope.basket, function(v, i){
-      return v.supplier.supplierID;
-    });
-    var uniqSupId = _.uniq(allSuppliers);
-    if(uniqSupId.length > 1){
-      return alert('Cannot send SMS to '+ uniqSupId.length +' suppliers at once');
-    }else{
-      oS.notifySupplier(uniqSupId, 'sms', function(d){
+  // $scope.send_sms = function(){
+  //   var allSuppliers = _.map($scope.basket, function(v, i){
+  //     return v.supplier.supplierID;
+  //   });
+  //   var uniqSupId = _.uniq(allSuppliers);
+  //   if(uniqSupId.length > 1){
+  //     return alert('Cannot send SMS to '+ uniqSupId.length +' suppliers at once');
+  //   }else{
+  //     oS.notifySupplier(uniqSupId, 'sms', function(d){
 
-      });
-    }
-  };
+  //     });
+  //   }
+  // };
 
 }])
 .controller('ordersIndexController', function($scope, $http, $location, $routeParams, ordersService){
@@ -193,11 +177,6 @@ config(['$routeProvider',function($routeProvider){
     $scope.searchndl = true;
   }
 
-  $scope.toggle = function(){
-    $scope.plcordr = !$scope.plcordr;
-    $scope.searchndl = !$scope.searchndl;
-  };
-
   $scope.search = function(queryObj){
     // $scope.ds = '';
     // var page = p || 0;
@@ -221,22 +200,6 @@ config(['$routeProvider',function($routeProvider){
     });
   };
 
-  $scope.orderthis = function(){
-    if($scope.ds.length === 0) return false;
-    $scope.form = {
-      orderType: 'Medication',
-      itemData : {
-        itemName: $scope.ds.productName,
-        sciName: $scope.ds.composition
-      },
-      suppliers:{
-        supplierName: $scope.ds.man_imp_supp
-      },
-      nafdacRegNo: $scope.ds.regNo,
-      nafdacRegName: $scope.ds.productName
-    };
-    $scope.toggle();
-  };
 
   $scope.saveButtonClass = 'btn-primary';
   $scope.submitOrder = function(){
@@ -246,23 +209,16 @@ config(['$routeProvider',function($routeProvider){
   };
 
 
-  $scope.addToCart = function (item){
-    var summary = $scope.summary;
-    var toOrder = {
-      itemId: item._id,
-      itemName: item.itemName,
-      sciName: item.sciName,
-      orderAmount: item.amount,
-      orderPrice: item.amount * item.currentPrice,
-      supplier: item.pharmaId,
-      orderDate: Date.now()
-    };
+  $scope.add_to_cart = function (item){
+    if (!item.orderAmount) return false;
+
+    ordersService.addToCart(item, function(data){
+      $scope.form = '';
+    });
 
     $scope.orderCart.push(toOrder);
-    $scope.sdqty = $scope.sdprice = $scope.toOrderSupplier = '';
-    //Store Cart Locally
-    $scope.$storage.orderCart = __cleanJSON($scope.orderCart);
   };
+
 })
 .factory('ordersService',['$http', 'Notification','Language', function($http, Notification, Lang){
     var f = {};
@@ -295,46 +251,46 @@ config(['$routeProvider',function($routeProvider){
           callback(results);
       });
     };
-    f.orders = function(callback){
+    //Gets orders by status and display
+    f.orders = function(status, displayType){
       var res = [];
-      $http.get('/api/orders').success(function(data){
-        var r = data;
-        angular.copy(r,res);
-        return callback(res);
+      return $http.get('/api/orders/' + status + '/display/' + displayType)
+      .then(function (d){
+        return d.data;
+      }, function (err) {
+        return err;
       });
     };
-    f.postCart = function(form, callback){
-      $http.post('/api/orders/cart', form).
-        success(function(data) {
-          Notification.notifier({
-            message : Lang.eng.order.place.success,
-            type: 'success'
-          });
-            callback(data);
-        }).
-        error(function(err){
-          Notification.notifier({
-            message : Lang.eng.order.place.error,
-            type: 'error'
-          });          
-        });
+
+    //Post one item to be sent as an order
+    f.postCartItem = function(form){
+      return $http.put('/api/orders/' + form.orderId + '/status/1', form)
+      .then(function (r) {
+        return r.data;
+      }, function (err) {
+        return err;
+      });
     };
-    f.save = function(form, callback){
-      $http.post('/api/orders', form).
-        success(function(data) {
-          Notification.notifier({
-            message : Lang.eng.order.place.success,
-            type: 'success'
-          });
-            callback(data);
-        }).
-        error(function(err){
-          Notification.notifier({
-            message : Lang.eng.order.place.error,
-            type: 'error'
-          });          
-        });
+
+    //post one item to be added to the cart    
+    f.addToCart = function(form){
+      return $http.post('/api/orders', form)
+      .then(function (r) {
+        return r.data;
+      }, function (err) {
+        return err;
+      });
     };
+
+    f.fetchActivities = function () {
+      return $http.get('/api/activities')
+      .then(function (r) {
+        return r.data;
+      }, function (err) {
+        return err;
+      })
+    }
+
     f.updateOrder = function(o,callback){
       $http.put('/api/orders/'+escape(o.order_id), {
           "status": o.status,

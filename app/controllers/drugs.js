@@ -21,7 +21,7 @@ var mongoose = require('mongoose'),
         var s = Q.defer();
 
         Drug.find({},
-          'itemName sciName category currentPrice'
+          'itemName sciName category currentPrice pharma owner'
         )
         .regex('itemName', new RegExp(query, 'i'))
         .limit(10)
@@ -48,7 +48,7 @@ var mongoose = require('mongoose'),
         }
 
         NDL.find({},
-          'productName composition'
+          'productName composition man_imp_supp'
         )
         .regex(param, new RegExp(query, 'i'))
         .limit(10)
@@ -109,7 +109,7 @@ DrugController.prototype.search = function(query, param, filter, option) {
 DrugController.prototype.addDrug = function (item, owner) {
   var d = Q.defer();
   var drug = new Drug(item);
-  drug.pharmaId = owner;
+  drug.owner = owner;
   drug.save(function (err, i) {
     if (err) {
       return d.reject(err);
@@ -206,7 +206,7 @@ DrugController.prototype.checkUpdate = function(since, cb){
 
 DrugController.prototype.fetchAllMyDrugs = function (options, owner) {
   var d = Q.defer();
-  Drug.find({pharmaId: owner})
+  Drug.find({owner: owner})
   //.sort()
   .limit(options.limit)
   .skip(options.limit * options.page)
@@ -245,13 +245,13 @@ var drugs = new DrugController();
 
 module.exports.routes = function(app, auth) {
 
-  app.get('/drugs', login.ensureLoggedIn(), function(req, res){
+  app.get('/a/drugs', login.ensureLoggedIn(), function(req, res){
     res.render('index', {
       userData : req.user
     });
   });
   //Shows the new / add drug page
-  app.get('/drugs/add-new', login.ensureLoggedIn(), function(req, res){
+  app.get('/a/drugs/add-new', login.ensureLoggedIn(), function(req, res){
     res.render('index', {
       userData : req.user
     });
@@ -262,12 +262,11 @@ module.exports.routes = function(app, auth) {
   });
 
   //Displays one item page
-  app.get('/drugs/:drugId/item', function (req, res, next) {
+  app.get('/a/drugs/:drugId/item', function (req, res, next) {
     drugs.fetchOneById(req.params.drugId)
     .then(function (r) {
 
       res.render('drug/one-item', {
-        userData : req.user,
         item: r
       });
 

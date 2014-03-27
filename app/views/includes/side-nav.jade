@@ -1,7 +1,7 @@
 .leftpanel
     .logopanel
         h1
-          a(href='', ng-click="commons.href('/')")
+          a(href='/')
             span [
             | StocCloud
             span ]
@@ -12,83 +12,28 @@
            This is only visible to small devices 
         .visible-xs.hidden-sm.hidden-md.hidden-lg
           .media.userlogged
-            img.media-object(alt='', src='images/photos/loggeduser.png')
+            img.media-object(alt='', src='/images/photos/loggeduser.png')
             .media-body
-              h4 John Doe
-              span "Life is so..."
+              h4 #{userData.email}
           h5.sidebartitle.actitle Account
           ul.nav.nav-pills.nav-stacked.nav-bracket.mb30
             li
-              a(href='profile.html')
+              a(href='/a/profile')
                 i.fa.fa-user
                 span Profile
             li
-              a(href='#')
-                i.fa.fa-cog
-                span Account Settings
-            li
-              a(href='#')
-                i.fa.fa-question-circle
-                span Help
-            li
-              a(href='signout.html')
+              a(href='/signout')
                 i.fa.fa-sign-out
                 span Sign Out
         h5.sidebartitle Navigation
-        button.btn.btn-success-alt.btn-block(style="margin-bottom: 5px", ng-click="commons.href('/drugs/search-item')") 
-          i.fa.fa-shopping-cart
-          | Place Order
-        button.btn.btn-success-alt.btn-block(style="margin-bottom: 5px", href='#', ng-click="commons.href('/drugs/add-new')") 
-          i.fa.fa-shopping-cart
-          | Add Item    
+        -if (isPermitted(['place-order']))
+          a.btn.btn-success-alt.btn-block(style="margin-bottom: 5px",  href="/a/orders/new") 
+            i.fa.fa-shopping-cart
+            | New Order
+        -if (isPermitted(['add-item']))
+          a.btn.btn-success-alt.btn-block(style="margin-bottom: 5px", href='/a/drugs/add-new') 
+            i.fa.fa-shopping-cart
+            | Add Item    
         hr     
-        ul.nav.nav-pills.nav-stacked.nav-bracket
-          li.active
-            a(href='')
-              i.fa.fa-home
-              span Dashboard
-          li
-            a(href='email.html')
-              i.fa.fa-envelope-o
-              span Orders
-          li
-            a(href='#')
-              i.fa.fa-edit
-              span Suppliers 
-          li
-            a(href='#', ng-click="commons.href('/drugs')")
-              i.fa.fa-edit
-              span Drug Pages 
-          li
-            a(href='#')
-              i.fa.fa-suitcase
-              span Hospitals
-          li.nav-parent
-            a(href='#')
-              i.fa.fa-file-text
-              span Organization
-            ul.children
-              li
-                a(href='#', ng-click="commons.href('/organization/people/4')")
-                  i.fa.fa-caret-right
-                  | Staff
-              li
-                a(href='#', ng-click="commons.href('/organization/people/3')")
-                  i.fa.fa-caret-right
-                  | Managers
-              li
-                a(href='#', ng-click="commons.href('/organization/people/2')")
-                  i.fa.fa-caret-right
-                  | Distributors
-              li
-                a(href='#', ng-click="commons.href('/organization/people/0')")
-                  i.fa.fa-caret-right
-                  | Pharmaceutical Companies
-              li
-                a(href='#', ng-click="commons.href('/organization')")
-                  i.fa.fa-caret-right
-                  | StocCloud Admins
-              li
-                a(href='#', ng-click="commons.href('/organization/invitations')")
-                  i.fa.fa-caret-right
-                  | Invitations
+        include ../widgets/side-menu.jade
+        +sidemenu(navs)

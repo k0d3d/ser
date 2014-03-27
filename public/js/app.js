@@ -8,7 +8,8 @@ var app = angular.module('stocUser', [
   'organization',
   'drug',
   'order',
-  'language'
+  'language',
+  'facility'
   ]);
 app.config(function ($routeProvider, $locationProvider) {
   $routeProvider
@@ -18,52 +19,72 @@ app.config(function ($routeProvider, $locationProvider) {
   $locationProvider.html5Mode(true);
 });
 
-app.controller('MainController', function ($scope, $http, $location, Notification) {
-  $scope.modal = {};
-  $scope.notification = {};
-  $scope.waiting = '';
-  $scope.headerTitle = 'Dashboard';
+app.controller('MainController', [
+  '$scope', 
+  '$http', 
+  '$location', 
+  'Notification', 
+  'ordersService', 
+  function ($scope, $http, $location, Notification, OS) {
 
-  $scope.orderCart = [];
+    $scope.orderCart = [];
 
-  $scope.appName = 'stocCloud';
+    //Fetch All Orders
+    OS.orders(0, 'short')
+    .then(function (i) {
+      $scope.orderCart = i;
+    });
+    //Fetch Activities
+    OS.fetchActivities()
+    .then(function (i) {
+      $scope.activity = i;
+    });
 
-  $scope.commons = {
-    href : function href (target) {
-      //clear any modal-overlay displayed
-      $scope.modal = {};
-      $location.path(target);
-    },
-    backBtn: function backBtn() {
-      history.back();
-    }
+    $scope.modal = {};
+    $scope.notification = {};
+    $scope.waiting = '';
+    $scope.headerTitle = 'Dashboard';
 
-  };
+    $scope.appName = 'stocCloud';
 
-  $scope.itemCategory = [
-  'Anasthetics', 
-  'Analgesics,Anti Inflammatory & Anti Pyretics', 
-  'Animal Vaccine Products', 
-  'Anti Acids & Ulcer Healer Drugs', 
-  'Anti Diabetics ', 
-  'Anti  Asthmatics', 
-  'Anti Bacterial Agents & Anti Protozal agents', 
-  'Anti Biotics', 
-  'Anti Caner', 
-  'Anti Diarrhoea Drugs & Laxatives', 
-  'Antiemetics & Antispasmodic', 
-  'Anti Fungals', 
-  'Anti Hemorroid Preparations', 
-  'Anti Helminitics', 
-  'Anti Histamines', 'Anti Malrials', 'Anti Migraine Drugs', 'Anti Muscarinic', 'Anti Neoplastic & Immunomodulating Agents', 'Anti Psychotic', 'Antiseptics,Disinfectants & Mouthwashes', 'Anti tussive,Expectorants & Mucolytics', 'Antiviral', 'Cardiovascular System', 'Contraceptives', 'Dermatological Preparations', 'Parkinson Drugs', 'Eye,Ear & Throat Preparations', 'Haematinics', 'Herbal Products', 'Hormones,Synthetics,Substitutes & Thyroid Drugs', 'Human Biologicals', 'Human Vaccine Products', 'Hypnotics,Anxiolities,Anti Convulsants & Anti depressant', 'Insecticides', 'Oxytocics', 'Pesticide Products', 'Rubefacients', 'Skeletal Muscle Relaxants', 'Vaccines & Biologicals', 'Veterinary Drugs/Products', 'Vitamins & Minerals', 'Miscellaneous', 'Others'];
+    $scope.commons = {
+      href : function href (target) {
+        //clear any modal-overlay displayed
+        $scope.modal = {};
+        $location.path(target);
+      },
+      backBtn: function backBtn() {
+        history.back();
+      }
 
-  $scope.$on('newNotification', function(){
-    $scope.notification = Notification.notice;
-  });
-  $scope.$on('newEvent', function(){
-    $scope.modal = Notification.message;
-  });
-});
+    };
+
+    $scope.itemCategory = [
+    'Anasthetics', 
+    'Analgesics,Anti Inflammatory & Anti Pyretics', 
+    'Animal Vaccine Products', 
+    'Anti Acids & Ulcer Healer Drugs', 
+    'Anti Diabetics ', 
+    'Anti  Asthmatics', 
+    'Anti Bacterial Agents & Anti Protozal agents', 
+    'Anti Biotics', 
+    'Anti Caner', 
+    'Anti Diarrhoea Drugs & Laxatives', 
+    'Antiemetics & Antispasmodic', 
+    'Anti Fungals', 
+    'Anti Hemorroid Preparations', 
+    'Anti Helminitics', 
+    'Anti Histamines', 'Anti Malrials', 'Anti Migraine Drugs', 'Anti Muscarinic', 'Anti Neoplastic & Immunomodulating Agents', 'Anti Psychotic', 'Antiseptics,Disinfectants & Mouthwashes', 'Anti tussive,Expectorants & Mucolytics', 'Antiviral', 'Cardiovascular System', 'Contraceptives', 'Dermatological Preparations', 'Parkinson Drugs', 'Eye,Ear & Throat Preparations', 'Haematinics', 'Herbal Products', 'Hormones,Synthetics,Substitutes & Thyroid Drugs', 'Human Biologicals', 'Human Vaccine Products', 'Hypnotics,Anxiolities,Anti Convulsants & Anti depressant', 'Insecticides', 'Oxytocics', 'Pesticide Products', 'Rubefacients', 'Skeletal Muscle Relaxants', 'Vaccines & Biologicals', 'Veterinary Drugs/Products', 'Vitamins & Minerals', 'Miscellaneous', 'Others'];
+
+    $scope.$on('newNotification', function(){
+      $scope.notification = Notification.notice;
+    });
+    $scope.$on('newEvent', function(){
+      $scope.modal = Notification.message;
+    });
+
+
+}]);
 app.filter('moment', function(){
     return function(time){
         var m = moment(time);

@@ -8,10 +8,10 @@
   */
 angular.module('drug', [])
 
-  .config(['$routeProvider', function ($routeProvider) {
-    $routeProvider.when('/drugs', {templateUrl: '/drug/index', controller: 'drugIndexController'})
-    .when('/drugs/:drugId/item', {controller: 'drugPageController'})
-    .when('/drugs/add-new', {templateUrl: '/drug/add', controller: 'drugAddController'});
+  .config(['$routeProvider', '$locationProvider', function ($routeProvider, $locationProvider) {
+    $routeProvider.when('/a/drugs', {templateUrl: '/drug/index', controller: 'drugIndexController'})
+    .when('/a/drugs/:drugId/item', {controller: 'drugPageController'})
+    .when('/a/drugs/add-new', {templateUrl: '/drug/add', controller: 'drugAddController'});
   }])
   .controller('drugIndexController', ['$scope', 'drugService', function drugIndexController ($scope, ds){
     //Change header title
@@ -44,27 +44,39 @@ angular.module('drug', [])
         $scope.newprice = '';
       });
     };
+
+
+    $scope.add_to_list = function (item) {
+      ds.addToMyList({drugId: item._id})
+      .then(function (r) {
+        
+      });      
+    };    
   }])
   .controller('drugAddController', ['$scope', 'drugService', function ($scope, ds) {
     //Init the add item form model and 
     //the images field array
     $scope.add_item_form = {
-      images: []
+      images: [],
+      pharma: {},
+      distributor: []
     }
 
     $scope.autoCompleteItemName = function (result) {
       $scope.add_item_form.itemName = result.productName;
       $scope.add_item_form.sciName = result.composition;
       $scope.add_item_form.nafdacRegNo = result.regNo;
+      $scope.add_item_form.pharma.pharmaName = result.man_imp_supp;
       $scope.$apply();
     };
 
     $scope.add_drug = function (data) {
-      ds.addDrug(data)
+      ds.addNewDrug(data)
       .then(function (r) {
         $scope.commons.href('/drugs');
       });
     };
+
 
   }])
   .controller('drugPageController', ['$scope', 'drugService', function ($scope, ds) {
@@ -73,7 +85,7 @@ angular.module('drug', [])
   .factory('drugService', ['$http', function ($http) {
     var d = {};
 
-    d.addDrug = function (data) {
+    d.addNewDrug = function (data) {
       return $http.post('/api/drugs', data)
       .then(function (r) {
         return r.data;
@@ -81,7 +93,17 @@ angular.module('drug', [])
         console.log(err);
         return err;
       });
-    }
+    };
+
+    d.addToMyList = function (data) {
+      return $http.post('/api/internal/organization/staff/drugs/', data)
+      .then(function (r) {
+        return r.data;
+      }, function (err) {
+        console.log(err);
+        return err;
+      });
+    };
 
     d.fetchAll = function (options)  {
       options = options || {};

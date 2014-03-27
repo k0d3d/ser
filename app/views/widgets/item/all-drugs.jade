@@ -11,14 +11,13 @@ mixin allDrugs()
       tbody
         tr(ng-repeat="d in _drugs")
           td 
-            a(href="", ng-click="commons.href('/drugs/' + d._id  + '/item')") {{d.itemName}}
+            a(ng-href='/a/drugs/{{d._id}}/item') {{d.itemName}}
           td {{d.sciName}}
           td {{d.nafdacRegNo}}
           td {{d.currentPrice}}
           td
             .pull-right
-              button.btn.btn-xs.btn-info(href="", ng-click="commons.href('/drugs/' + d._id )") More
-                
+              button.btn.btn-xs.btn-white(ng-click="add_to_list(d)") Add to My List                
               button.btn.btn-xs.btn-danger
                 i.fa.fa-times
   //

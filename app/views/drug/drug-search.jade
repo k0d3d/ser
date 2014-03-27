@@ -60,8 +60,8 @@
                         br
                     .col-sm-2
                       .form-group
-                        input.form-control(type='number', placeholder="Amount")
-                      button.btn.btn-primary(ng-click="addToCart(drugItem)") Order this
+                        input.form-control(type='number', placeholder="Amount", ng-model="drugItem.amount", required)
+                      button.btn.btn-primary(ng-click="addToCart(drugItem)", ng-disabled="drugItem.amount == 0 || !drugItem.amount") Order this
                 .ndl-list(ng-show="show_ndl")
                   .media(ng-repeat="drugItem in searchedItems.ndl")
                     a.pull-left(href='#')
