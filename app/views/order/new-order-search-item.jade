@@ -1,0 +1,80 @@
+.contentpanel
+    .row
+        .col-sm-4.col-md-3
+          form.form(ng-submit="search(item_query)", name="searchItemForm")
+            .form-group
+              input.form-control(type='text', placeholder='Search for Drugs...', ng-model="item_query.s")
+            .mb20
+            .form-group
+              label.control-label Search by:
+              select.form-control(ng-model="item_query.param", required)
+                option(value="itemName") Brand Name
+                option(value="sciName") Composition
+              label.control-label Filter by:
+              select.form-control(ng-model="item_query.filter", ng-init="item_query.filter = 'Price'")
+                option Proximity
+                option Price
+            .form-group
+              button.btn.btn-primary.btn-sm(type="submit", ng-disabled="searchItemForm.$invalid") Search
+          br
+        //
+           col-sm-4 
+        .col-sm-8.col-md-9
+          .panel.panel-default
+            .panel-heading
+              ul.pagination.nomargin.pull-right(ng-show="false")
+                li.disabled
+                  a(href='#')
+                    i.fa.fa-angle-left
+                li
+                  a(href='#') 1
+                li.active
+                  a(href='#') 2
+                li
+                  a(href='#') 3
+                li
+                  a(href='#') 4
+                li
+                  a(href='#') 5
+                li
+                  a(href='#')
+                    i.fa.fa-angle-right
+              h4.panel-title Search results for {{searchedItems.s}}
+              p About {{searchedItems.drug.length + searchedItems.ndl.length}} results 
+                a(href="#", ng-click="show_ndl = !show_ndl", ng-init="show_ndl == false")
+                  | {{show_ndl | showHide}} remaining {{searchedItems.ndl.length}}
+            //
+               panel-heading 
+            .panel-body
+              .results-list
+                .media(ng-repeat="drugItem in searchedItems.drug")
+                  .row
+                    .col-sm-9
+                      a.pull-left(href='#')
+                        img.media-object(alt='', src='images/photos/media1.jpg')
+                      .media-body
+                        h4.filename.text-primary {{drugItem.itemName}}
+                        small.text-muted <strong> Composition: </strong> {{drugItem.sciName}}
+                        br
+                        small.text-muted <strong>Current Price: </strong>  N{{drugItem.currentPrice}}
+                        br
+                        small.text-muted  <strong>Manufacturer: </strong> {{drugItem.pharma.pharmaName}}                          
+                    .col-sm-2
+                      .form-group
+                        input.form-control(type='number', placeholder="Amount", ng-model="drugItem.orderAmount", required)
+                      .btn-group
+                        button.btn.btn-default.btn-primary-alt(disabled) N{{drugItem.orderAmount * drugItem.currentPrice}}
+                        button.btn.btn-primary(ng-click="add_to_cart(drugItem)", ng-disabled="drugItem.orderAmount == 0 || !drugItem.orderAmount") Order this
+
+                .ndl-list(ng-show="show_ndl")
+                  .media(ng-repeat="drugItem in searchedItems.ndl")
+                    a.pull-left(href='#')
+                      img.media-object(alt='', src='images/photos/media1.jpg')
+                    .media-body
+                      h4.filename.text-primary {{drugItem.productName}}
+                      small.text-muted Composition: {{drugItem.composition}}
+                      br
+                    .col-sm-8.col-sm-offset-5
+                      input(type='number')
+                      button.btn.btn-primary(ng-click="add_to_cart(drugItem)") Order this
+

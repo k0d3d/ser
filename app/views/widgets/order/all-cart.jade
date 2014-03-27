@@ -1,0 +1,28 @@
+mixin allCart()
+  .table-responsive
+    table.table.table-bordered.mb30.cart-table
+      thead
+        tr
+          th Item
+          th Quantity
+          th Price (N)
+          th.noprint Order Date
+          th.noprint Supplier
+          th.noprint Action
+      tbody
+        tr(ng-repeat="or in $parent.orderCart")
+          td 
+            img.item-image(ng-src="/images/item-images/{{or.itemId.images[0]}}")
+            | {{or.itemId.itemName}}
+          td {{or.orderAmount}}
+          td {{or.perItemPrice * or.orderAmount}}
+          td.noprint {{or.orderDate | moment}}
+          td.noprint {{or.itemId.pharma.pharmaName}}
+          td.noprint
+            button.btn.btn-small.btn-info.btn-bell(ng-click="order_this(or, $index)") 
+              i.fa.fa-check
+              |  Place this
+            button.btn.btn-small.btn-danger.btn-bell(ng-click="removeFromCart($index)") 
+              i.fa.fa-times
+  //
+     table-responsive 
