@@ -32,7 +32,7 @@ var OrderSchema = new Schema({
    * orderStatus values 
    * 0 : in cart
    * 1: order placed
-   * 2: order received
+   * 2: order received // at this point, disputes about who takes charge of the order is settled
    * 3: order confirmed
    * 4: order in transit
    * 5: order supplied

@@ -280,9 +280,9 @@ UserController.prototype.pullActivity = function (owner) {
 module.exports.users  = UserController;
 var users = new UserController();
 
-module.exports.routes = function(app, passport, auth){
-  app.get('/signin', users.signin);
-  app.get('/signup', users.signup);
+module.exports.routes = function(app, passport, people){
+  app.get('/signin', function (req, res, next){res.locals.people = people; next(); }, users.signin);
+  app.get('/signup', function (req, res, next){res.locals.people = people; next(); }, users.signup);
   app.get('/signout', users.signout);
   app.get('/user-registered', function(req, res) {
     res.render('user/user-registered');
@@ -299,7 +299,7 @@ module.exports.routes = function(app, passport, auth){
     var account_type = req.user.account_type;
     users.getProfile(userId, account_type).then(function (r) {
       res.render('user/profile', {
-        userProfile: r,
+        userProfile: r || {},
         userData: req.user
       });
     }, function (err) {

@@ -23,6 +23,7 @@ var mongoose = require('mongoose'),
         Drug.find({},
           'itemName sciName category currentPrice pharma owner'
         )
+        .populate('owner', null, '')
         .regex('itemName', new RegExp(query, 'i'))
         .limit(10)
         //.skip(page * 10)
@@ -62,6 +63,29 @@ var mongoose = require('mongoose'),
         });
 
         return s.promise;
+      },
+      /**
+       * adds a drug item, expect an object containing
+       * the item properties, the user adding the item,
+       * the account level of the user. It returns a promise
+       * @param {Object} doc object containing item props and user info
+       */
+      addDrug : function addDrug (doc) {
+        var d = Q.defer();
+        var drug = new Drug(doc.item);
+        drug.owner = {
+          owner: doc.owner,
+          account_type: doc.account_type
+        };
+        drug.save(function (err, i) {
+          if (err) {
+            return d.reject(err);
+          } else {
+            return d.resolve(i);
+          }
+        });
+
+        return d.promise;        
       }
     }
 
@@ -106,20 +130,38 @@ DrugController.prototype.search = function(query, param, filter, option) {
   return searcher.promise;
 };
 
-DrugController.prototype.addDrug = function (item, owner) {
+/**
+ * adds a health / medical item to the database
+ * @param {Object} item         an object containing name, desciption,
+ * item form, packaging, images ,...etc 
+ * @param {ObjectId} owner        the objectId of the user uploading
+ * adding this drug item
+ * @param {Number} account_type the account type of the user.
+ * only levels 0 - 2 are allowed
+ */
+DrugController.prototype.addDrug = function (item, owner, account_type) {
   var d = Q.defer();
-  var drug = new Drug(item);
-  drug.owner = owner;
-  drug.save(function (err, i) {
-    if (err) {
-      return d.reject(err);
-    } else {
-      return d.resolve(i);
-    }
+
+  if (account_type > 2) {
+    d.reject(new Error('operation not permitted'));
+    return d.promise;
+  };
+  
+  var doc = {
+    item: item,
+    owner: owner,
+    account_type: account_type
+  };
+
+  drugsFunctions.addDrug(doc)
+  .then(function (done) {
+    return d.resolve(done);
+  }, function (err) {
+    return d.reject(err);
   });
 
   return d.promise;
-}
+};
 
 DrugController.prototype.summary = function (id, callback) {
   Drug.findOne({ _id : id})

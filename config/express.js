@@ -99,7 +99,11 @@ module.exports = function (app, config, passport) {
 
       // error page
       //res.status(500).json({ error: err.stack });
-      res.json(500, err.message);
+      //res.json(500, err.message);
+      res.status(500).render('500', {
+        url: req.originalUrl,
+        error: err.message
+      });      
     });
 
     // assume 404 since no middleware responded

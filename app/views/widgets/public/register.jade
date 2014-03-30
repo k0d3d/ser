@@ -20,11 +20,9 @@ mixin register()
       .mb10
         label.control-label Account Type
         select.form-control.chosen-select(data-placeholder='Facility, Distributor, Sales Agent..', required, ng-model="form.account_type")
-          option(value='')
-          option(value="3") Medical Facility
-          option(value="0") Pharmaceutical Company
-          option(value="1") Distributor
-          option(value="2") Sales Agent
+          each p, index in people
+            option(value=index) #{p.name}
+
       br
       button.btn.btn-success.btn-block(type="submit", ng-disabled="register_new_account.$invalid") Sign Up
   //

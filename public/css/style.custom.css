@@ -192,3 +192,15 @@ p + p {
 .cart-table .item-image{
   width: 50px;
 }
+.profile-img {
+  height: 200px;
+  width: 200px; 
+  display: inline-block;
+  background-image: url('../images/default-avatar.jpg');
+}
+.drug-search-img {
+  height: 100px;
+  width: 100px; 
+  display: inline-block;
+  background-image: url('../images/item-images/default/item-avatar-small.jpg');
+}

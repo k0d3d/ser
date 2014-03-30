@@ -1,10 +1,12 @@
 mixin loadDrugPages()
+  -if (isPermitted(['view-drug-pages']))
     #drug-pages.tab-pane
       .follower-list
         .panel-heading
-          h4 Found #{userProfile.drugs.length} Drugs / Medical Items
+          -var drugs = userProfile.drugs || [], count = drugs.length
+          h4 Found #{count} Drugs / Medical Items
         .panel-body
-          each drug in userProfile.drugs
+          each drug in drugs
             .media
               .row
                 .col-sm-8.col-md-8

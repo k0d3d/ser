@@ -1,156 +1,157 @@
 mixin loadProspects
-  #prospects.tab-pane
-    .events
-      h5.subtitle Upcoming Events
-      .row
-        .col-sm-6
-          .media
-            a.pull-left(href='#')
-              img.media-object(src='holder.js/100x120.html', alt='')
-            .media-body.event-body
-              h4.event-title
-                a(href='#') Free Living Trust Seminar
-              small.text-muted
-                i.fa.fa-map-marker
-                | Silicon Valley, San Francisco, CA
-              small.text-muted
-                i.fa.fa-calendar
-                | Sunday, January 15, 2014 at 11:00am
-              p
-                | Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor...
+  -if (isPermitted(['view-prospects']))
+    #prospects.tab-pane
+      .events
+        h5.subtitle Upcoming Events
+        .row
+          .col-sm-6
+            .media
+              a.pull-left(href='#')
+                img.media-object(src='holder.js/100x120.html', alt='')
+              .media-body.event-body
+                h4.event-title
+                  a(href='#') Free Living Trust Seminar
+                small.text-muted
+                  i.fa.fa-map-marker
+                  | Silicon Valley, San Francisco, CA
+                small.text-muted
+                  i.fa.fa-calendar
+                  | Sunday, January 15, 2014 at 11:00am
+                p
+                  | Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor...
+            //
+               media 
           //
-             media 
-        //
-           col-sm-6 
-        .col-sm-6
-          .media
-            a.pull-left(href='#')
-              img.media-object(src='holder.js/100x120.html', alt='')
-            .media-body.event-body
-              h4.event-title
-                a(href='#') Serious Games Seminar
-              small.text-muted
-                i.fa.fa-map-marker
-                | New York City
-              small.text-muted
-                i.fa.fa-calendar
-                | Monday, January 14, 2014 at 8:00am
-              p
-                | Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor...
+             col-sm-6 
+          .col-sm-6
+            .media
+              a.pull-left(href='#')
+                img.media-object(src='holder.js/100x120.html', alt='')
+              .media-body.event-body
+                h4.event-title
+                  a(href='#') Serious Games Seminar
+                small.text-muted
+                  i.fa.fa-map-marker
+                  | New York City
+                small.text-muted
+                  i.fa.fa-calendar
+                  | Monday, January 14, 2014 at 8:00am
+                p
+                  | Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor...
+            //
+               media 
           //
-             media 
-        //
-           col-sm-6 
-        .col-sm-6
-          .media
-            a.pull-left(href='#')
-              img.media-object(src='holder.js/100x120.html', alt='')
-            .media-body.event-body
-              h4.event-title
-                a(href='#') Travel & Adventure Show
-              small.text-muted
-                i.fa.fa-map-marker
-                | Los Angeles, CA
-              small.text-muted
-                i.fa.fa-calendar
-                | Friday, January 12, 2014 at 8:00am
-              p
-                | Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor...
+             col-sm-6 
+          .col-sm-6
+            .media
+              a.pull-left(href='#')
+                img.media-object(src='holder.js/100x120.html', alt='')
+              .media-body.event-body
+                h4.event-title
+                  a(href='#') Travel & Adventure Show
+                small.text-muted
+                  i.fa.fa-map-marker
+                  | Los Angeles, CA
+                small.text-muted
+                  i.fa.fa-calendar
+                  | Friday, January 12, 2014 at 8:00am
+                p
+                  | Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor...
+            //
+               media 
           //
-             media 
-        //
-           col-sm-6 
-        .col-sm-6
-          .media
-            a.pull-left(href='#')
-              img.media-object(src='holder.js/100x120.html', alt='')
-            .media-body.event-body
-              h4.event-title
-                a(href='#') Mobile Games Summit
-              small.text-muted
-                i.fa.fa-map-marker
-                | Bay Area, San Francisco
-              small.text-muted
-                i.fa.fa-calendar
-                | Saturday, January 10, 2014 at 8:00am
-              p
-                | Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor...
+             col-sm-6 
+          .col-sm-6
+            .media
+              a.pull-left(href='#')
+                img.media-object(src='holder.js/100x120.html', alt='')
+              .media-body.event-body
+                h4.event-title
+                  a(href='#') Mobile Games Summit
+                small.text-muted
+                  i.fa.fa-map-marker
+                  | Bay Area, San Francisco
+                small.text-muted
+                  i.fa.fa-calendar
+                  | Saturday, January 10, 2014 at 8:00am
+                p
+                  | Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor...
+            //
+               media 
           //
-             media 
-        //
-           col-sm-6 
-      br
-      h5.subtitle Past Events
-      .row
-        .col-sm-6
-          .media
-            a.pull-left(href='#')
-              img.media-object(src='holder.js/100x120.html', alt='')
-            .media-body.event-body
-              h4.event-title
-                a(href='#') Free Living Trust Seminar
-              small.text-muted
-                i.fa.fa-map-marker
-                | Silicon Valley, San Francisco, CA
-              small.text-muted
-                i.fa.fa-calendar
-                | Sunday, January 15, 2014 at 11:00am
-              p
-                | Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor...
+             col-sm-6 
+        br
+        h5.subtitle Past Events
+        .row
+          .col-sm-6
+            .media
+              a.pull-left(href='#')
+                img.media-object(src='holder.js/100x120.html', alt='')
+              .media-body.event-body
+                h4.event-title
+                  a(href='#') Free Living Trust Seminar
+                small.text-muted
+                  i.fa.fa-map-marker
+                  | Silicon Valley, San Francisco, CA
+                small.text-muted
+                  i.fa.fa-calendar
+                  | Sunday, January 15, 2014 at 11:00am
+                p
+                  | Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor...
+            //
+               media 
           //
-             media 
-        //
-           col-sm-6 
-        .col-sm-6
-          .media
-            a.pull-left(href='#')
-              img.media-object(src='holder.js/100x120.html', alt='')
-            .media-body.event-body
-              h4.event-title
-                a(href='#') Serious Games Seminar
-              small.text-muted
-                i.fa.fa-map-marker
-                | New York City
-              small.text-muted
-                i.fa.fa-calendar
-                | Monday, January 14, 2014 at 8:00am
-              p
-                | Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor...
+             col-sm-6 
+          .col-sm-6
+            .media
+              a.pull-left(href='#')
+                img.media-object(src='holder.js/100x120.html', alt='')
+              .media-body.event-body
+                h4.event-title
+                  a(href='#') Serious Games Seminar
+                small.text-muted
+                  i.fa.fa-map-marker
+                  | New York City
+                small.text-muted
+                  i.fa.fa-calendar
+                  | Monday, January 14, 2014 at 8:00am
+                p
+                  | Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor...
+            //
+               media 
           //
-             media 
-        //
-           col-sm-6 
-        .col-sm-6
-          .media
-            a.pull-left(href='#')
-              img.media-object(src='holder.js/100x120.html', alt='')
-            .media-body.event-body
-              h4.event-title
-                a(href='#') Travel & Adventure Show
-              small.text-muted
-                i.fa.fa-map-marker
-                | Los Angeles, CA
-              small.text-muted
-                i.fa.fa-calendar
-                | Friday, January 12, 2014 at 8:00am
-              p
-                | Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor...
+             col-sm-6 
+          .col-sm-6
+            .media
+              a.pull-left(href='#')
+                img.media-object(src='holder.js/100x120.html', alt='')
+              .media-body.event-body
+                h4.event-title
+                  a(href='#') Travel & Adventure Show
+                small.text-muted
+                  i.fa.fa-map-marker
+                  | Los Angeles, CA
+                small.text-muted
+                  i.fa.fa-calendar
+                  | Friday, January 12, 2014 at 8:00am
+                p
+                  | Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor...
+            //
+               media 
           //
-             media 
-        //
-           col-sm-6 
-        .col-sm-6
-          .media
-            a.pull-left(href='#')
-              img.media-object(src='holder.js/100x120.html', alt='')
-            .media-body.event-body
-              h4.event-title
-                a(href='#') Mobile Games Summit
-              small.text-muted
-                i.fa.fa-map-marker
-                | Bay Area, San Francisco
-              small.text-muted
-                i.fa.fa-calendar
-                | Saturday, January 10, 2014 at 8:00am
-              p
-                | Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor...
+             col-sm-6 
+          .col-sm-6
+            .media
+              a.pull-left(href='#')
+                img.media-object(src='holder.js/100x120.html', alt='')
+              .media-body.event-body
+                h4.event-title
+                  a(href='#') Mobile Games Summit
+                small.text-muted
+                  i.fa.fa-map-marker
+                  | Bay Area, San Francisco
+                small.text-muted
+                  i.fa.fa-calendar
+                  | Saturday, January 10, 2014 at 8:00am
+                p
+                  | Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor...

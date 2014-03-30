@@ -2,59 +2,9 @@ var config = require("config");
 var jade = require('jade');
 var Q = require("q");
 
-/**
- * Uses SendGrid to send emails. We need to make more robust.
- * Sends an HTML message.
- **/
- function sendMessage(to, from, subject, text) {
-    // setup our promise
-    var deferred = Q.defer();
-    var sendgrid = require('sendgrid')(
-    config.sendgrid.user,
-    config.sendgrid.password);
-    if (from === undefined) {
-        from = config.sendgrid.defaultFrom;
-    }
-    sendgrid.send({
-        to: to,
-        from: from,
-        subject: subject,
-        html: text
-    },
-
-    function(error, message) {
-
-        if (error) {
-            console.log(error);
-            deferred.reject(error);
-        }
-        else {
-            console.log(message);
-            deferred.resolve(true);
-        }
-    });
-
-    return deferred.promise;
+function sendMessage() {
+    this.fromEmail = 
 }
 
-
-/**
- * Uses SendGrid to send emails. We need to make more robust.
- * Sends a message using jade template.
- **/
-function sendTemplateEmail(to, from, subject, templatePath, templateData) {
-
-    // coompile our jade template
-    var html = jade.renderFile(templatePath, templateData);
-
-    return sendMessage(
-        to,
-        from,
-        subject,
-        html
-    );
-
-}
-
-module.exports.sendTemplateEmail = sendTemplateEmail;
 module.exports.sendMessage = sendMessage;
+//http://www.smslive247.com/http/index.aspx?cmd=sendquickmsg&owneremail=koded730@yahoo.com&subacct=EMAIL2SMS&subacctpwd=login60&message=testmessage&sender=DrugStoc&sendto=08126488944&msgtype=0

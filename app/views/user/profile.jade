@@ -1,100 +1,106 @@
 .contentpanel(data-user-id="#{userData._id}")
-  .row
-      .col-sm-3
-        img.thumbnail.img-responsive(src='/images/#{userProfile.image}' , alt='')
-        .mb30
-        h5.subtitle About
-        p.mb10.x-editable(data-type="textarea", data-name="summary")
-          | #{userProfile.summary}
-        a(href='#') Show More
-        .mb10        
-        h5.subtitle Connect
-        ul.profile-social-list
-          li
-            i.fa.fa-twitter
-            a.x-editable(href='#', data-type="text", data-name="twitter") twitter.com/#{userData.twitter}
-          li
-            i.fa.fa-facebook
-            a.x-editable(href='#', data-type="text", data-name="facebook") facebook.com/#{userData.facebook}
+    .row
+        .col-sm-3
+          img.thumbnail.img-responsive.profile-img(src='/images/#{userProfile.image}' , alt='')
+          .mb30
+          h5.subtitle About
+          p.mb10.x-editable(data-type="textarea", data-name="summary")
+            | #{userProfile.summary}
+          a(href='#') Show More
+          .mb10        
+          h5.subtitle Connect
+          ul.profile-social-list
+            li
+              i.fa.fa-twitter
+              a.x-editable(href='#', data-type="text", data-name="twitter") twitter.com/#{userData.twitter}
+            li
+              i.fa.fa-facebook
+              a.x-editable(href='#', data-type="text", data-name="facebook") facebook.com/#{userData.facebook}
 
-        .mb20    
-        .panel.panel-default
-            .panel-body
-              a(href="#")
-                | 0 Distributors 
-        .mb20    
-        .panel.panel-default
-            .panel-body
-              a(href="#")
-                | 0 Sales Agent
+          .mb20    
+          .panel.panel-default
+              .panel-body
+                a(href="#")
+                  | 0 Distributors 
+          .mb20    
+          .panel.panel-default
+              .panel-body
+                a(href="#")
+                  | 0 Sales Agent
 
-        .mb30
-        h5.subtitle Office Address
-        address.x-editable(data-type="textarea", data-name="address", data-defaultValue="Address")
-          | #{userProfile.address}
-        h5.subtitle Telephone
-        p.x-editable(title='Phone', data-type="text", data-name="phone", data-default-value="Your Phone Number")
-          | #{userProfile.phone}
-      //
-         col-sm-3 
-      .col-sm-9
-        .profile-header
-          h2.profile-name.x-editable(data-name="name", data-type="text", data-default-value="Full Name or Company Name") #{userProfile.name}
-          .profile-location
-            span(style="display: block", title="Your Coverage / Territory") 
-              i.fa.fa-map-marker
-              | Coverage
-            span.x-editable(data-type="text", data-name="coverage", data-default-value="Territory")
-              | #{userProfile.coverage}
-          .profile-position
-            i.fa.fa-briefcase
-            span.x-editable(data-name="position", data-type="text", title="Position", data-default-value="Position") #{userProfile.position} 
-            span(style="margin: 0 2px;") at 
-            a.x-editable(href='#', data-type="text", data-name="employer", title="Employer", data-default-value="Employer") 
-          .mb20
-          button.btn.btn-success.mr5.start-edit
-            i.fa.fa-user
-            | Edit Profile
-          button.btn.btn-white
-            i.fa.fa-envelope-o
-            | Message
+          .mb30
+          h5.subtitle Office Address
+          address.x-editable(data-type="textarea", data-name="address", data-defaultValue="Address")
+            | #{userProfile.address}
+          h5.subtitle Telephone
+          p.x-editable(title='Phone', data-type="text", data-name="phone", data-default-value="Your Phone Number")
+            | #{userProfile.phone}
         //
-           profile-header 
-        //
-           Nav tabs 
-        ul.nav.nav-tabs.nav-justified.nav-profile
-          li.active
-            a(href='#activities', data-toggle='tab')
-              strong Activities
-          li
-            a(href='#drug-pages', data-toggle='tab')
-              strong Drug Pages
-          li
-            a(href='#calendar', data-toggle='tab')
-              strong Calendar
-          li
-            a(href='#prospects', data-toggle='tab')
-              strong Prospects
-          li
-            a(href='#prospects', data-toggle='tab')
-              strong Map
-        //
-           Tab panes 
-        .tab-content
-          include ../widgets/profile/activity
-          +loadActivities()
+           col-sm-3 
+        .col-sm-9
+          .profile-header
+            h2.profile-name.x-editable(data-name="name", data-type="text", data-default-value="Full Name or Company Name") #{userProfile.name}
+            - if (isPermitted(['coverage']))
+              .profile-location
+                span(style="display: block", title="Your Coverage / Territory") 
+                  i.fa.fa-map-marker
+                  | Coverage
+                span.x-editable(data-type="text", data-name="coverage", data-default-value="Territory")
+                  | #{userProfile.coverage}
+            - if (isPermitted(['employer']))
+              .profile-position
+                i.fa.fa-briefcase
+                span.x-editable(data-name="position", data-type="text", title="Position", data-default-value="Position") #{userProfile.position} 
+                span(style="margin: 0 2px;") at 
+                a.x-editable(href='#', data-type="text", data-name="employer", title="Employer", data-default-value="Employer") 
+            .mb20
+            button.btn.btn-success.mr5.start-edit
+              i.fa.fa-user
+              | Edit Profile
+            - if (isPermitted(['messaging']))
+              button.btn.btn-white
+                i.fa.fa-envelope-o
+                | Message
+          //
+             profile-header 
+          //
+             Nav tabs 
+          ul.nav.nav-tabs.nav-justified.nav-profile
+            -if (isPermitted(['view-activity']))
+              li.active
+                a(href="#", data-target='#activities', data-toggle='tab')
+                  strong Activities
+            -if (isPermitted(['view-drug-pages']))
+              li
+                a(href="#", data-target='#drug-pages', data-toggle='tab')
+                  strong Drug Pages
+            -if (isPermitted(['view-calendar']))
+              li
+                a(href="#", data-target='#calendar', data-toggle='tab')
+                  strong Calendar
+            -if (isPermitted(['view-prospects']))
+              li
+                a(href="#", data-target='#prospects', data-toggle='tab')
+                  strong Prospects
+            -if (isPermitted(['view-map']))
+              li
+                a(href="#", data-target='#prospects', data-toggle='tab')
+                  strong Map
+          //
+             Tab panes 
+          .tab-content
+            include ../widgets/profile/activity
+            +loadActivities()
 
-          include ../widgets/profile/drug-pages
-          +loadDrugPages()
+            include ../widgets/profile/drug-pages
+            +loadDrugPages()
 
-          include ../widgets/profile/calendar
-          +loadCalendar()
+            include ../widgets/profile/calendar
+            +loadCalendar()
 
-          include ../widgets/profile/prospects
-          +loadProspects()
-          
-          include ../widgets/profile/prospects
-          +loadProspects()
+            include ../widgets/profile/prospects
+            +loadProspects()
+            
 
 append scripts
 script(src='/js/jquery.prettyPhoto.js')

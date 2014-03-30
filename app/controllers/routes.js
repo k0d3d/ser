@@ -5,163 +5,163 @@ var login = require('connect-ensure-login'),
  * all API routes must respond to errors with a res.json 400 http status code.
  * @param  {[type]} app      [description]
  * @param  {[type]} passport [description]
- * @param  {[type]} auth     [description]
  * @return {[type]}          [description]
  */
 module.exports = function(app, passport, auth) {
+  var people = [
+    {
+      name: "Pharmaceutical Company",
+      permissions: []
+    },
+    {
+      name: 'Manager',
+      permissions: []
+    },
+    {
+      name: 'Distributor',
+      permissions: ['place-order', 'view-activity', 'view-drug-pages']
+    },
+    {
+      name: 'Manager',
+      permissions: []
+    },
+    {
+      name: 'Staff',
+      permissions: []
+    },
+    {
+      name: 'Hospitals',
+      permissions: ['place-order', 'view-activity']
+    }
+  ];
+  var nav = [
+    {
+      name : "Dashboard",
+      roles : ['*'],
+      icon: '',
+      url: '/'
+    },
+    {
+      name: "Orders",
+      roles: ['*'],
+      icon: '',
+      url: '/a/orders'
+    },
+    {
+      name: 'Suppliers',
+      roles: [5],
+      icon: '',
+      url: '/a/suppliers',
+    },
+    {
+      name: "Drug Pages",
+      roles: [0,1,2],
+      icon: '',
+      url: '/a/drugs'
+    },
+    {
+      name: 'Med. Facilities',
+      roles: [0,1,2,3,4],
+      icon:'',
+      url: '/a/facilities'
+    },
+    {
+      name: 'Organization',
+      roles: [0,1,2,3],
+      icon: '',
+      child: [
+        {
+          name: 'Distributors',
+          roles: [0,1],
+          url: '/a/organization/people/2'
+        },
+        {
+          name: 'Managers',
+          roles: [0],
+          url: '/a/organization/people/1'
+        },
+        {
+          name: 'Managers',
+          roles: [0,1,2],
+          url: '/a/organization/people/3'
 
-    //Minimal middleware that adds 
-    //logged in user details to view
-    app.get('/a/*', function (req, res, next) {
-      if (req.user) {
-        res.locals.userData = req.user;
-      }
-      next();
-    });
-    //Sets roles and permissions to be used on 
-    //the view templates and widgets
-    app.get('/a/*', function (req, res, next) {
-      var people = [
-        {
-          name: "Pharmaceutical Company",
-          permissions: []
-        },
-        {
-          name: 'Manager',
-          permissions: []
-        },
-        {
-          name: 'Distributor',
-          permissions: ['place-order']
-        },
-        {
-          name: 'Manager',
-          permissions: []
         },
         {
           name: 'Staff',
-          permissions: []
-        },
-        {
-          name: 'Hospitals',
-          permissions: []
-        }
-      ];
-      var nav = [
-        {
-          name : "Dashboard",
-          roles : ['all'],
-          icon: '',
-          url: '/'
-        },
-        {
-          name: "Orders",
-          roles: ['all'],
-          icon: '',
-          url: '/a/orders'
-        },
-        {
-          name: 'Suppliers',
-          roles: [5],
-          icon: '',
-          url: '/a/suppliers',
-        },
-        {
-          name: "Drug Pages",
-          roles: [0,1,2],
-          icon: '',
-          url: '/a/drugs'
-        },
-        {
-          name: 'Med. Facilities',
-          roles: [0,1,2,3,4],
-          icon:'',
-          url: '/a/facilities'
-        },
-        {
-          name: 'Organization',
           roles: [0,1,2,3],
-          icon: '',
-          child: [
-            {
-              name: 'Distributors',
-              roles: [0,1],
-              url: '/a/organization/people/2'
-            },
-            {
-              name: 'Managers',
-              roles: [0],
-              url: '/a/organization/people/1'
-            },
-            {
-              name: 'Managers',
-              roles: [0,1,2],
-              url: '/a/organization/people/3'
-
-            },
-            {
-              name: 'Staff',
-              roles: [0,1,2,3],
-              url: '/a/organization/people/4'              
-            }
-          ]
-        },
-        {
-          name: 'Invitations',
-          roles: [0,1,2,3,4,5],
-          url: '/a/organization/invitations'
+          url: '/a/organization/people/4'              
         }
-      ];
+      ]
+    },
+    {
+      name: 'Invitations',
+      roles: [0,1,2,3,4],
+      url: '/a/organization/invitations'
+    }
+  ];
 
-      res.locals.hasRole = function (index) {
-        var account_type = req.user.account_type;
-        var this_nav = nav[index];
+  //Minimal middleware that adds 
+  //logged in user details to view
+  app.get('*', function (req, res, next) {
+    if (req.user) {
+      res.locals.userData = req.user;
+    }
+    next();
+  });
+  //Sets roles and permissions to be used on 
+  //the view templates and widgets
+  app.get('*', function (req, res, next) {
 
-        if (_.indexOf(this_nav.roles, account_type) > -1) {
-          return true;
-        } else {
-          return false;
-        }
-      };
+    res.locals.hasRole = function (index) {
+      var account_type = req.user.account_type;
+      var this_nav = nav[index];
 
-      res.locals.isPermitted = function (permission) {
-        var permits = _.intersection(permission, people[req.user.account_type].permissions);
-        console.log(permits);
-        if (permits.length > 0) {
-          return true;
-        }
+      if (_.indexOf(this_nav.roles, account_type) > -1 || this_nav.roles[0] === '*') {
+        return true;
+      } else {
+        return false;
       }
+    };
 
-      console.log(req.originalUrl);
+    res.locals.isPermitted = function (permission) {
+      var permits = _.intersection(permission, people[req.user.account_type].permissions);
+      console.log(permits);
+      if (permits.length > 0) {
+        return true;
+      }
+    }
 
-      res.locals.navs = nav;
+    console.log(req.originalUrl);
 
-      next();
+    res.locals.navs = nav;
+    res.locals.people = people;
 
-    });
+    next();
 
-    //User Routes
-    var users = require('./users');
-    users.routes(app, passport, auth);
-    //Hospital Routes
-    var hospital = require('./hospitals');
-    hospital.routes(app, auth);
-    //Supplier Routes
-    var supplier = require('./suppliers');
-    supplier.routes(app, auth);
-    //Drug Routes
-    var drug = require('./drugs');
-    drug.routes(app, auth);
-    //Orders Routes
-    var order = require('./orders');
-    order.routes(app, auth);
-    //Organization
-    var organization = require('./organization');
-    organization.routes(app, auth);
+  });
 
-    //File upload handler/controller
-    var fileupload = require('./upload');
-    fileupload(app);
+  //User Routes
+  var users = require('./users');
+  users.routes(app, passport, people);
+  //Hospital Routes
+  var hospital = require('./hospitals');
+  hospital.routes(app, auth);
+  //Supplier Routes
+  var supplier = require('./suppliers');
+  supplier.routes(app, auth);
+  //Drug Routes
+  var drug = require('./drugs');
+  drug.routes(app, auth);
+  //Orders Routes
+  var order = require('./orders');
+  order.routes(app, auth);
+  //Organization
+  var organization = require('./organization');
+  organization.routes(app, auth);
+
+  //File upload handler/controller
+  var fileupload = require('./upload');
+  fileupload(app);
 
 
     //Home route

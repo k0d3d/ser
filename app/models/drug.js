@@ -23,7 +23,10 @@ var DrugSchema = new Schema ({
   precautions: {type: String, default: ''},
   reactions: {type: String, default: ''},
   dosage: {type: String, default: ''},
-  owner: {type: Schema.ObjectId},
+  owner: {
+    owner: {type: Schema.ObjectId},
+    account_type: {type: Number, required: true}
+  },
   pharma: {
     pharmaId: {type: Schema.ObjectId},
     pharmaName: {type: String}

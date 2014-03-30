@@ -245,6 +245,14 @@ var User = require('./users').users,
         });
 
         return added.promise;
+      },
+      getPeopleRelations : function getPeopleRelations (owner, account_type) {
+        var relate = Q.defer(),
+            peepsBelowThis = _.range(account_type, 6);
+
+
+
+        return relate.promise;
       }
     };
 

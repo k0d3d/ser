@@ -1,4 +1,5 @@
 mixin loadActivities
+  -if (isPermitted(['view-activity']))
     #activities.tab-pane.active
       .activity-list(ng-repeat="act in activity")
         .media.act-media

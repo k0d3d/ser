@@ -492,7 +492,9 @@ module.exports.routes = function(app, auth){
       }, function (err) {
         res.json(400, r);
       });
-    }
+    };
+
+    //if(req.params.orderStatus == )
   });
 
   //Delete Order (logically)

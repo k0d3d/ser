@@ -51,7 +51,7 @@
                   .row
                     .col-sm-9
                       a.pull-left(href='#')
-                        img.media-object(alt='', src='images/photos/media1.jpg')
+                        img.media-object.drug-search-img(alt='', src='images/photos/media1.jpg')
                       .media-body
                         h4.filename.text-primary {{drugItem.itemName}}
                         small.text-muted Composition: {{drugItem.sciName}}
@@ -65,7 +65,7 @@
                 .ndl-list(ng-show="show_ndl")
                   .media(ng-repeat="drugItem in searchedItems.ndl")
                     a.pull-left(href='#')
-                      img.media-object(alt='', src='images/photos/media1.jpg')
+                      img.media-object.drug-search-img(alt='', src='images/photos/media1.jpg')
                     .media-body
                       h4.filename.text-primary {{drugItem.productName}}
                       small.text-muted Composition: {{drugItem.composition}}
