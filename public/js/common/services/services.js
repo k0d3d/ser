@@ -18,9 +18,18 @@ angular.module('services', [])
 	};
 
 	s.notice = {
-		message: '',
-		icon: '',
-		type: ''
+
+		// (string | mandatory) the heading of the notification
+		title: '',
+		// (string | mandatory) the text inside the notification
+		text: '',
+		// (string | optional) the image to display on the left
+		image: null,
+		// (bool | optional) if you want it to fade out on its own or just sit there
+		sticky: true,
+		// (int | optional) the time you want it to be alive for before fading out
+		time: ''
+
 	};
 
 	s.resetNotification = function(){
@@ -32,20 +41,9 @@ angular.module('services', [])
 	
 	//Opens a modal box
 	s.notifier = function(m){
-		var self =this;
-		var icon = {
-			"error" : "fa-exclamation-triangle", 
-			"success": "fa-check",
-			"info":"fa-info"
-		}
-		this.notice.message = m.message;
-		this.notice.type = m.type;
-		this.notice.icon = icon[m.type];
+		console.log(m);
+		this.notice = m;
 		this.broadcastNotification();
-		//$timeout(self.resetNotification(),5000 );
-		$timeout(function(){
-			self.resetNotification();
-		},5000 );
 	};
 
 	//Subtle notifications esp when connections

@@ -76,9 +76,11 @@ app.controller('MainController', [
     'Anti Helminitics', 
     'Anti Histamines', 'Anti Malrials', 'Anti Migraine Drugs', 'Anti Muscarinic', 'Anti Neoplastic & Immunomodulating Agents', 'Anti Psychotic', 'Antiseptics,Disinfectants & Mouthwashes', 'Anti tussive,Expectorants & Mucolytics', 'Antiviral', 'Cardiovascular System', 'Contraceptives', 'Dermatological Preparations', 'Parkinson Drugs', 'Eye,Ear & Throat Preparations', 'Haematinics', 'Herbal Products', 'Hormones,Synthetics,Substitutes & Thyroid Drugs', 'Human Biologicals', 'Human Vaccine Products', 'Hypnotics,Anxiolities,Anti Convulsants & Anti depressant', 'Insecticides', 'Oxytocics', 'Pesticide Products', 'Rubefacients', 'Skeletal Muscle Relaxants', 'Vaccines & Biologicals', 'Veterinary Drugs/Products', 'Vitamins & Minerals', 'Miscellaneous', 'Others'];
 
-    $scope.$on('newNotification', function(){
-      $scope.notification = Notification.notice;
+    $scope.$on('newNotification', function (){
+      console.log(Notification.notice);
+      jQuery.gritter.add(Notification.notice);      
     });
+
     $scope.$on('newEvent', function(){
       $scope.modal = Notification.message;
     });

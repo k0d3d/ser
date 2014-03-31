@@ -13,21 +13,24 @@ var mongoose = require('mongoose'),
     DUH = mongoose.model('drugUpdateHistory'),
     Q = require('q'),
     login = require('connect-ensure-login'),
+    organization = require('./organization.js'),
     utils = require("util");
 
 
     var drugsFunctions = {
       searchByRegDrugs : function searchByRegDrugs (query, param, filter, option) {
-        var s = Q.defer();
+        var s = Q.defer(), modelName = organization.staffFunctions.getMeMyModel()
 
         Drug.find({},
           'itemName sciName category currentPrice pharma owner'
         )
-        .populate('owner', null, '')
+        //.populate('owner', null, '')
         .regex('itemName', new RegExp(query, 'i'))
         .limit(10)
+        .lean()
         //.skip(page * 10)
         .exec(function(err, i){
+          console.log(err, i);
           if(err){
             return s.reject(err);
           } else {
@@ -106,13 +109,47 @@ DrugController.prototype.search = function(query, param, filter, option) {
   var searcher = Q.defer();
 
   var s = {
-    drug : null,
+    drug : [],
     ndl: null
   };
 
   drugsFunctions.searchByRegDrugs(query, param, filter, option)
+  .then(function (found_drugs) {
+    var populate = Q.defer();
+
+    function __recurseOwner () {
+      var oneDrug = found_drugs.pop();
+      var Model = organization.staffFunctions.getMeMyModel(oneDrug.owner.account_type);
+
+      Model.findOne({
+        userId: oneDrug.owner.owner
+      }, 'name coverage')
+      .exec(function (err, i) {
+        if (err) {
+          return populate.reject(err);
+        }
+        if (!i) {
+          return populate.reject(new Error('cannot find owner profile'))
+        }
+
+        oneDrug.owner = i;
+        s.drug.push(oneDrug);
+
+        if (found_drugs.lenght) {
+          __recurseOwner();
+        } else {
+          return populate.resolve();
+        }
+        ;
+      });        
+    }
+
+    __recurseOwner();
+
+    return populate.promise;
+
+  })
   .then(function (r) {
-    s.drug = r;
 
     drugsFunctions.searchByNDL(query, param, filter, option)
     .then(function (r) {
@@ -122,7 +159,9 @@ DrugController.prototype.search = function(query, param, filter, option) {
     }, function (err) {
       return searcher.reject(err);
     });
-  }, function (err) {
+
+  })
+  .catch(function (err) {
     return searcher.reject(err);
   });
 
@@ -146,7 +185,7 @@ DrugController.prototype.addDrug = function (item, owner, account_type) {
     d.reject(new Error('operation not permitted'));
     return d.promise;
   };
-  
+
   var doc = {
     item: item,
     owner: owner,
@@ -248,7 +287,7 @@ DrugController.prototype.checkUpdate = function(since, cb){
 
 DrugController.prototype.fetchAllMyDrugs = function (options, owner) {
   var d = Q.defer();
-  Drug.find({owner: owner})
+  Drug.find({"owner.owner": owner})
   //.sort()
   .limit(options.limit)
   .skip(options.limit * options.page)
@@ -318,12 +357,13 @@ module.exports.routes = function(app, auth) {
   });
 
   //Search for nafdac reg drugs by category
-  app.get('/api/internal/item/search', function (req, res, next) {
+  app.get('/api/internal/item/search', function (req, res) {
     drugs.search(req.query.s, req.query.param, req.query.filter, {})
     .then(function (r) {
       res.json(200, r);
     }, function (err) {
-      next(err);
+      console.log(err);
+      res.json(400, err);
     });
   });
   //Fetch Drug Item Summary
@@ -363,11 +403,12 @@ module.exports.routes = function(app, auth) {
   app.post('/api/drugs', function (req, res, next) {
     var item = req.body;
     var owner = req.user._id;
-    drugs.addDrug(item, owner)
+    var account_type = req.user.account_type;
+    drugs.addDrug(item, owner, account_type)
     .then(function (r) {
       res.json(200, true);
     }, function (err) {
-      next(err);
+      res.json(400, err);
     });
   });
 

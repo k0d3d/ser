@@ -204,3 +204,16 @@ p + p {
   display: inline-block;
   background-image: url('../images/item-images/default/item-avatar-small.jpg');
 }
+
+.item-result-list .label {
+  padding: 10px 25px;
+  font-size: 14px
+}
+.item-result-list .table {
+  margin-bottom: 5px
+}
+
+.item-result-list .media-body {
+  line-height: 35px;
+  padding-left: 5px
+}

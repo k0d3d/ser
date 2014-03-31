@@ -5,24 +5,19 @@
  util = require('util'),
  User = mongoose.model('User'),
  Q = require('q'),
- Staff = require('../models/staff.js'),
- PharmaComp = require('../models/pharmacomp'),
+ //Staff = require('../models/staff.js'),
+ //PharmaComp = require('../models/pharmacomp'),
  _ = require("underscore"),
  login = require('connect-ensure-login'),
  passport = require('passport'),
  Notification = require('../models/notification.js'),
- Organization = require('./organization.js');
+ //Organization = require('./organization.js');
 
+UserController = function (){
+  console.log('Calling User Controller');
+}
 
-
- function UserController(){
-
- }
-
- UserController.prototype.constructor = UserController;
-
-
-
+UserController.prototype.constructor = UserController;
 
 UserController.prototype.findUserByEmail = function (doc) {
   var d = Q.defer();
@@ -277,10 +272,13 @@ UserController.prototype.pullActivity = function (owner) {
   return not.promise;
 }
 
-module.exports.users  = UserController;
-var users = new UserController();
+console.log(UserController);
+
+module.exports.users = UserController;
 
 module.exports.routes = function(app, passport, people){
+  var users = new UserController();
+
   app.get('/signin', function (req, res, next){res.locals.people = people; next(); }, users.signin);
   app.get('/signup', function (req, res, next){res.locals.people = people; next(); }, users.signup);
   app.get('/signout', users.signout);
@@ -298,6 +296,7 @@ module.exports.routes = function(app, passport, people){
     var userId = req.user._id;
     var account_type = req.user.account_type;
     users.getProfile(userId, account_type).then(function (r) {
+      console.log(r);
       res.render('user/profile', {
         userProfile: r || {},
         userData: req.user
@@ -361,3 +360,4 @@ module.exports.routes = function(app, passport, people){
   //Finish with setting up the userId param
   app.param('userId', users.user);     
 }
+

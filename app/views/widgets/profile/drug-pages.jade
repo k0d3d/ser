@@ -6,24 +6,25 @@ mixin loadDrugPages()
           -var drugs = userProfile.drugs || [], count = drugs.length
           h4 Found #{count} Drugs / Medical Items
         .panel-body
-          each drug in drugs
-            .media
-              .row
-                .col-sm-8.col-md-8
-                  a.pull-left(href='#')
-                    img.media-object(src='holder.js/100x125.html', alt='')
-                  .media-body
-                    h3.follower-name #{drug.drug.itemName}
-                    .profile-location
-                      | #{drug.drug.sciName}
-                    .profile-position
-                      | #{drug.drug.category}
-                    .mb20
-                .col-sm-4.col-md-4
-                  .pull-right
-                    button.btn.btn-sm.btn-success.mr5
-                      i.fa.fa-user
-                      | View
-                    button.btn.btn-sm.btn-danger
-                      i.fa.fa-times
-                .clearfix
+            each drug in drugs
+              if (drug.drug)
+                .media
+                  .row
+                    .col-sm-8.col-md-8
+                      a.pull-left(href='#')
+                        img.media-object(src='holder.js/100x125.html', alt='')
+                      .media-body
+                        h3.follower-name #{drug.drug.itemName}
+                        .profile-location
+                          | #{drug.drug.sciName}
+                        .profile-position
+                          | #{drug.drug.category}
+                        .mb20
+                    .col-sm-4.col-md-4
+                      .pull-right
+                        button.btn.btn-sm.btn-success.mr5
+                          i.fa.fa-user
+                          | View
+                        button.btn.btn-sm.btn-danger
+                          i.fa.fa-times
+                    .clearfix

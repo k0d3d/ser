@@ -19,7 +19,7 @@ module.exports = function(app, passport, auth) {
     },
     {
       name: 'Distributor',
-      permissions: ['place-order', 'view-activity', 'view-drug-pages']
+      permissions: ['view-activity', 'view-drug-pages', 'add-item']
     },
     {
       name: 'Manager',
@@ -142,6 +142,7 @@ module.exports = function(app, passport, auth) {
 
   //User Routes
   var users = require('./users');
+  console.log(users);
   users.routes(app, passport, people);
   //Hospital Routes
   var hospital = require('./hospitals');
@@ -159,38 +160,38 @@ module.exports = function(app, passport, auth) {
   var organization = require('./organization');
   organization.routes(app, auth);
 
-  //File upload handler/controller
+  // //File upload handler/controller
   var fileupload = require('./upload');
   fileupload(app);
 
 
-    //Home route
-    app.get('/', login.ensureLoggedIn('/signin'),  function(req, res){
-      res.render('index',{
-        title: 'Dashboard',
-        userData: req.user
-      });
+  //Home route
+  app.get('/', login.ensureLoggedIn('/signin'),  function(req, res){
+    res.render('index',{
+      title: 'Dashboard',
+      userData: req.user
     });
+  });
 
-    app.get('/home/index', login.ensureLoggedIn(), function(req, res){
-      res.render('home/index',{
-        title: 'Dashboard'
-      });
+  app.get('/home/index', login.ensureLoggedIn(), function(req, res){
+    res.render('home/index',{
+      title: 'Dashboard'
     });
+  });
 
-    app.get('/partials/:name', function (req, res) {
-      var name = req.params.name;
-      res.render('partials/' + name);
+  app.get('/partials/:name', function (req, res) {
+    var name = req.params.name;
+    res.render('partials/' + name);
+  });
+
+  // home route
+  app.get('/:parent/:child', function(req, res){
+    var parent = req.params.parent;
+    var child = req.params.child;
+    res.render(parent+'/'+child, {
+      userData: req.user
     });
-
-    // home route
-    app.get('/:parent/:child', function(req, res){
-      var parent = req.params.parent;
-      var child = req.params.child;
-      res.render(parent+'/'+child, {
-        userData: req.user
-      });
-      //res.render('/');
-    });    
+    //res.render('/');
+  });    
 
 };

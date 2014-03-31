@@ -1,5 +1,4 @@
-var User = require('./users').users,
-    Q = require('q'),
+var Q = require('q'),
     utilities = require('../../lib/utils'),
     PreAccount = require('../models/pre-account'),
     Staff = require('../models/staff.js'),
@@ -10,11 +9,17 @@ var User = require('./users').users,
     _ = require("underscore"),
     //sendMail = require('../../lib/sendmail'),
     util = require('util'),
+    User = require('./users.js'),
 
     userInfo,
 
 
     staffFunctions = {
+      /**
+       * fetches the model to be queried using the related account level / type.
+       * @param  {[type]} account_type [description]
+       * @return {[type]}              [description]
+       */
       getMeMyModel : function getMeMyModel (account_type) {
         account_type = parseInt(account_type);
         if (account_type === 4) {
@@ -55,7 +60,7 @@ var User = require('./users').users,
       findOrCreateUserAccount : function findOrCreateUserAccount (doc) {
         console.log('Will find or Create');
         var findOrCreateUser = Q.defer();
-
+        console.log(User);
         var user = new User();
         user.findOrCreate(doc)
         .then(function (r) {
@@ -253,12 +258,24 @@ var User = require('./users').users,
 
 
         return relate.promise;
-      }
+      },
+      ownerProfile : function ownerProfile (ownerId, account_type) {
+        var d = Q.defer();
+
+        
+
+        return d.promise;
+      }      
     };
 
 function Staff () {
-
 }
+
+//var user = new User.users();
+  console.log(User.users);
+
+
+Staff.prototype.constructor = Staff;
 
 
 Staff.prototype.createStaff =  function (email, account_type, password) {
@@ -454,6 +471,22 @@ Staff.prototype.stateYourDrugs = function stateYourDrugs (drug_id, owner,account
   return stater.promise;
 }
 
+
+Staff.prototype.cancelActivation = function cancelActivation (activationToken) {
+  var act = Q.defer();
+
+  staffFunctions.removePreAccount({
+    activationToken : activationToken
+  })
+  .then(function (r) {
+    return act.resolve(true);
+  }, function (err) {
+    return act.reject(err);
+  });
+
+  return act.promise;
+}
+
 module.exports.staff = Staff;
 module.exports.staffFunctions = staffFunctions;
 var staff = new Staff();
@@ -578,5 +611,22 @@ module.exports.routes = function (app, auth) {
     }, function (err) {
       next(err);
     })
-  })
+  });
+
+
+  //Attempts to activate an account, and add the employer to 
+  //the users profile.
+  app.del('/api/organization/invites/:activationToken',login.ensureLoggedIn('/signin'), function (req, res, next) {
+    
+    if (req.query.activation == 1) {
+      var employerId = req.user._id;
+      staff.cancelActivation(req.params.activationToken)
+      .then(function (r) {
+        res.json(200, true)
+      }, function (err) {
+        next(err);
+      });
+    }
+
+  });
 }

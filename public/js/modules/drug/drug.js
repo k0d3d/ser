@@ -73,7 +73,11 @@ angular.module('drug', [])
     $scope.add_drug = function (data) {
       ds.addNewDrug(data)
       .then(function (r) {
-        $scope.commons.href('/drugs');
+        if (r instanceof Error) {
+          console.log(r);
+        } else {
+          $scope.commons.href('/drugs');
+        }
       });
     };
 
@@ -82,15 +86,24 @@ angular.module('drug', [])
   .controller('drugPageController', ['$scope', 'drugService', function ($scope, ds) {
       
   }])
-  .factory('drugService', ['$http', function ($http) {
+  .factory('drugService', ['$http', 'Notification', 'Language', function ($http, N, L) {
     var d = {};
 
     d.addNewDrug = function (data) {
       return $http.post('/api/drugs', data)
       .then(function (r) {
+        N.notifier({
+          title : 'Yippie!',
+          text: L[L.set].items.save.success,
+          class_name: 'growl-success'
+        });
         return r.data;
       }, function (err) {
-        console.log(err);
+        N.notifier({
+          title : 'Oops!',
+          text: L[L.set].items.save.error,
+          class_name: 'growl-danger'
+        });        
         return err;
       });
     };

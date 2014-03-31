@@ -6,6 +6,10 @@ angular.module('language', [])
 .constant('Language', {
 	"set":"eng",
 	"eng":{
+		"titles": {
+			"success": "Well done!",
+			"error": "Ooops!"
+		},
 		"items": {
 			"save": {
 				"success":"You've succesfully added an order. Note: Items placed with invoice numbers and stock amounts will have their current stock updated. To add another item, close this dialog or return to the dashboard",
@@ -102,30 +106,6 @@ angular.module('language', [])
 				}
 			}
 		},
-		"bills":{
-			"rule":{
-				"add":{
-					"success": "New billing rule successfully added",
-					"error": "Error saving a new billing rule"
-				},
-				"fetch":{
-					"error": "Could not fetch the list of rules"
-				}
-			},
-			"profiles":{
-				"create":{
-					"success": "Created a new billing profile successfully",
-					"error": "Error trying to create a new billing profile"
-				},
-				"save" : {
-					"success": "Updated billing profile",
-					"error": "Error updating billing profile"
-				},
-				"fetch": {
-					"error": "I can't fetch the list of saved profiles"
-				}
-			}
-		},
 		"stock":{
 			"down":{
 				"success": "Stock down request sent",
@@ -133,7 +113,7 @@ angular.module('language', [])
 			},
 			"location":{
 				"create": {
-					"success": "Created a new stock down loaction",
+					"success": "Created a new stock down location",
 					"error": "Could not create a new stock down location"
 				}
 			}
@@ -162,6 +142,12 @@ angular.module('language', [])
 			},
 			"summary":{
 				"error": "Can not fetch more information now."
+			}
+		},
+		"organization": {
+			"invite": {
+				"success" : "Invitation successfully sent",
+				"error": "We could not send this invitation right now. Please try again."
 			}
 		}
 	}

@@ -46,7 +46,7 @@
             //
                panel-heading 
             .panel-body
-              .results-list
+              .item-result-list
                 .media(ng-repeat="drugItem in searchedItems.drug")
                   .row
                     .col-sm-9
@@ -54,17 +54,24 @@
                         img.media-object.drug-search-img(alt='', ng-src='/images/photos/{{drugItem.images[0]}}')
                       .media-body
                         h4.filename.text-primary {{drugItem.itemName}}
-                        small.text-muted <strong> Composition: </strong> {{drugItem.sciName}}
-                        br
-                        small.text-muted <strong>Current Price: </strong>  N{{drugItem.currentPrice}}
-                        br
-                        small.text-muted  <strong>Manufacturer: </strong> {{drugItem.pharma.pharmaName}}                          
+                        table.table
+                          thead
+                            tr 
+                              th Composition
+                              th Current Price
+                              th Manufacturer                          
+                          tbody
+                            tr
+                              td {{drugItem.sciName}}
+                              td N{{drugItem.currentPrice}}
+                              td {{drugItem.pharma.pharmaName}}                        
+                        span.label.label-info  <strong>Supplier: </strong> {{drugItem.owner.name}}                          
                     .col-sm-3
                       .form-group
                         input.form-control(type='number', placeholder="Amount", ng-model="drugItem.orderAmount", required, ng-init="drugItem.orderAmount = 0")
                       .btn-group
                         button.btn.btn-default.btn-primary-alt(disabled) N{{drugItem.orderAmount * drugItem.currentPrice}}
-                        button.btn.btn-primary(ng-click="add_to_cart(drugItem)", ng-disabled="drugItem.orderAmount == 0 || !drugItem.orderAmount") Order this
+                        button.btn.btn-primary(ng-click="add_to_cart(drugItem)", ng-disabled="drugItem.orderAmount == 0 || !drugItem.orderAmount") Order
 
               .ndl-list(ng-show="show_ndl", style="border-top: solid 1px #1489A0;padding-top: 20px;")
                 .media(ng-repeat="drugItem in searchedItems.ndl")

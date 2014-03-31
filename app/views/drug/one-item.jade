@@ -8,7 +8,7 @@ block contentpanel
           //input.start-edit(type="checkbox", checked, data-label-text="Edit item")
           .mb30
           - var img = item.images[0] || 'item-avatar.jpg'
-          img.thumbnail.img-responsive(src='/images/item-images/#{img}' , alt='')
+          img.thumbnail.img-responsive(src='/images/item-images/default/#{img}' , alt='')
           .mb30
           h5.subtitle Drug Name
           p.mb10.x-editable(data-type="text", data-name="itemName")

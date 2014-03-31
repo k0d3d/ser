@@ -12,7 +12,7 @@ angular.module('organization', [])
   $routeProvider.when('/a/organization/invitations', {templateUrl: '/organization/invites', controller: 'invitesController'});
 }])
 .controller('staffController', ['$scope', 'organizeStaffService', '$routeParams', function userController($scope, oss, $routeParams) {
-  $scope.$parent.headerTitle = 'Staff';
+  $scope.$parent.headerTitle = 'Organization';
   //Creates new staff.
   $scope.create_new_staff = function () {
     oss.inviteStaff($scope.new_staff).then(function (r) {
@@ -52,13 +52,23 @@ angular.module('organization', [])
 //     templateUrl: 
 //   }
 // }])
-.factory('organizeStaffService', ['$http', function ($http) {
+.factory('organizeStaffService', ['$http', 'Notification', 'Language', function ($http, N, L) {
   return {
     inviteStaff : function (form) {
       return $http.post('/api/organization/invites', form)
       .then(function (r) {
+        N.notifier({
+          title: L[L.set].titles.success,
+          text: L[L.set].organization.invite.success ,
+          class_name: 'growl-success'
+        });
         return r;
       }, function (err) {
+        N.notifier({
+          title: L[L.set].titles.error,
+          text: L[L.set].organization.invite.error ,
+          class_name: 'growl-danger'
+        });
         return err;
       });
     },
