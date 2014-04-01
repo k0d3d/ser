@@ -27,7 +27,7 @@ module.exports = function(app, passport) {
     },
     {
       name: 'Staff',
-      permissions: []
+      permissions: ['view-activity', 'view-drug-pages', 'employer', 'coverage']
     },
     {
       name: 'Hospitals',
@@ -55,7 +55,7 @@ module.exports = function(app, passport) {
     },
     {
       name: "Drug Pages",
-      roles: [0,1,2],
+      roles: [0,1,2,4],
       icon: '',
       url: '/a/drugs'
     },

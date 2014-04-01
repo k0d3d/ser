@@ -5,7 +5,8 @@ mixin register()
         | Already a member?
         a(href='/signin')
           strong Sign In
-
+      .alert.alert-danger(ng-show="auth_message.length > 0")
+        | {{auth_message}}
       .mb10
         label.control-label Email Address
         input.form-control(type='email', required, ng-model="form.email")
@@ -21,7 +22,7 @@ mixin register()
         label.control-label Account Type
         select.form-control.chosen-select(data-placeholder='Facility, Distributor, Sales Agent..', required, ng-model="form.account_type")
           each p, index in people
-            option(value=index) #{p.name}
+            option(value=index + 1) #{p.name}
 
       br
       button.btn.btn-success.btn-block(type="submit", ng-disabled="register_new_account.$invalid") Sign Up

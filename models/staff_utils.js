@@ -1,6 +1,7 @@
 var Staff = require('./organization/staff.js'),
     Distributor = require('./organization/distributor.js'),
     Manager = require('./organization/manager.js'),
+    Hospital = require('./organization/hospital.js'),
     PharmaComp = require('./organization/pharmacomp.js');
 
 module.exports = {
@@ -27,6 +28,9 @@ module.exports = {
       }
       if (account_type === 2) {
         return Distributor;
+      }
+      if (account_type === 5) {
+        return Hospital;
       }
 
       return Manager;

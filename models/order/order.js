@@ -2,7 +2,6 @@
 /**
  * Module dependencies.
  */
-var db = require("../../lib/db.js");
 var mongoose = require('mongoose'),
     Schema = mongoose.Schema;
 
@@ -22,9 +21,12 @@ var OrderSchema = new Schema({
    * the order
    * @type {Object}
    */
-  orderSupplier: {type: Schema.ObjectId},
+  orderSupplier: {
+    ownerId: {type: Schema.ObjectId},
+    account_type: Number
+  },
   /**
-   * the staff or manager who is responsible for delivering this order
+   * the staff who is responsible for delivering this order
    * @type {Object}
    */
   orderCharge: {type: Schema.ObjectId},

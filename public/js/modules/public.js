@@ -21,7 +21,12 @@ publicModule.controller('userController', [
     };
     $scope.send_registration = function() {
       userServices.register($scope.form).then(function (r) {
-        $window.location.href = r.data.nextUrl;
+        console.log(r);
+        if (r.status !== 200) {
+          $scope.auth_message = r.data.message;
+        } else {
+          $window.location.href = r.data.nextUrl;
+        }
       });
     };
   }

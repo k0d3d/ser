@@ -7,7 +7,7 @@
  Q = require('q'),
  _ = require("underscore"),
  passport = require('passport'),
- Notification = require('../models/notification.js'),
+ Notification = require('./activity.js'),
  //Organization = require('./organization.js').Staff,
  staffUtils = require('./staff_utils.js'),
 
@@ -258,16 +258,16 @@ UserController.prototype.getProfile = function (userId, account_type) {
 };
 
 UserController.prototype.pullActivity = function (owner) {
-  var not = Q.defer();
-  Notification.find({
-    ownerId: owner
+  var not = Q.defer(),
+
+  notice = new Notification();
+  notice.pullActivity({
+    ownerId : owner
   })
-  //.populate('hospitalId', )
-  .exec(function (err, i) {
-    if (err) {
-      return not.reject(err);
-    }
+  .then( function(i) {
     return not.resolve(i);
+  }, function (err) {
+    return not.reject(err);
   });
   return not.promise;
 };

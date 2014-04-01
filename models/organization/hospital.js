@@ -2,8 +2,7 @@
  * Module dependencies.
  */
 var mongoose = require('mongoose'),
-    Schema = mongoose.Schema,
-    pureautoinc  = require('mongoose-pureautoinc');
+    Schema = mongoose.Schema;
 
 var HospitalSchema =  new Schema({
   hospitalId: {type: Number},
@@ -17,11 +16,6 @@ var HospitalSchema =  new Schema({
   favicon: {type: String}
 });
 
-HospitalSchema.plugin(pureautoinc.plugin, {
-  model: 'Hospital',
-  field: 'hospitalId',
-  start: 1000
-});
 
 mongoose.model('Hospital', HospitalSchema);
 

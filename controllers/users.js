@@ -1,4 +1,5 @@
-var user = require('../models/user.js');
+var user = require('../models/user.js'),
+    util = require('util');
 
 module.exports.routes = function(app, passport, login, people){
   var users = new user.User();
@@ -43,10 +44,10 @@ module.exports.routes = function(app, passport, login, people){
 
   //Handle Public user registration
   app.route('/users')
-  .post(function (req, res, next){
+  .post(function (req, res){
     users.create(req.body, function (r){
       if (util.isError(r)) {
-        next(r);
+        res.json(400, {message: r.message});
       } else {
         res.json(200, {nextUrl: '/user-registered'});
       }
