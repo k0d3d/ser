@@ -95,22 +95,26 @@ var hospital = new HospitalController();
 module.exports.routes = function (app, login) {
   
   //Load the hospital index / list page
-  app.get('/a/facilities', login.ensureLoggedIn('/signin'), function (req, res) {
+  app.route('/a/facilities')
+  .get(login.ensureLoggedIn('/signin'), function (req, res) {
     res.render('index', {});
   });
 
   //loads page to add a new hospital account
-  app.get('/a/facilities/add', login.ensureLoggedIn('/signin'), function (req, res) {
+  app.route('/a/facilities/add')
+  .get(login.ensureLoggedIn('/signin'), function (req, res) {
     res.render('index', {});
   });
 
   //loads page to add a new hospital account\
-  app.get('/a/facilities/:facilityId', login.ensureLoggedIn('/signin'), function (req, res) {
+  app.route('/a/facilities/:facilityId')
+  .get(login.ensureLoggedIn('/signin'), function (req, res) {
     res.render('index', {});
   });
 
   //fetches list of registered facilities
-  app.get('/api/facilities/pages/:page', login.ensureLoggedIn('/signin'), function (req, res, next) {
+  app.route('/api/facilities/pages/:page')
+  .get(login.ensureLoggedIn('/signin'), function (req, res, next) {
     hospital.list(req.params.page, function (r) {
       if (util.isError(r)) {
         next(r);
@@ -120,7 +124,8 @@ module.exports.routes = function (app, login) {
     });
   });
 
-  app.get('/api/facilities/:facilityId', function (req, res, next) {
+  app.route('/api/facilities/:facilityId')
+  .get(function (req, res, next) {
     hospital.fetchOne(req.params.facilityId, function (r) {
       if (util.isError(r)) {
         next(r);
@@ -131,7 +136,8 @@ module.exports.routes = function (app, login) {
   });
 
   //Creates a new hospital
-  app.post('/api/facilities', function (req, res, next) {
+  app.route('/api/facilities')
+  .post(function (req, res, next) {
     hospital.create(req.body, function (r) {
       if (util.isError(r)) {
         next(r);
@@ -142,7 +148,8 @@ module.exports.routes = function (app, login) {
   });
 
   //Remove hospital record and user
-  app.del('/api/facilities/:facilityId', function(req, res, next){
+  app.route('/api/facilities/:facilityId')
+  .delete(function(req, res, next){
     hospital.delete(req.params.facilityId, req.params.userid, function(r){
       if (util.isError(r)) {
         next(r);

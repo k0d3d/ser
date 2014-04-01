@@ -1,13 +1,13 @@
  var Drug = require('./item/drug.js').drug,
     //drugUpdateHistory = require('./item/drug.js').drugUpdateHistory,
     NDL = require('./item/ndl.js'),
-  _ = require('underscore'),
-  Q = require('q');
-  //organization = require('./organization.js');
+    staffUtils = require('./staff_utils.js'),
+    _ = require('underscore'),
+    Q = require('q');
 
     var drugsFunctions = {
       searchByRegDrugs : function searchByRegDrugs (query, param, filter, option) {
-        var s = Q.defer(), modelName = organization.staffFunctions.getMeMyModel()
+        var s = Q.defer(), modelName = staffUtils.getMeMyModel()
 
         Drug.find({},
           'itemName sciName category currentPrice pharma owner'
@@ -107,7 +107,7 @@ DrugController.prototype.search = function(query, param, filter, option) {
 
     function __recurseOwner () {
       var oneDrug = found_drugs.pop();
-      var Model = organization.staffFunctions.getMeMyModel(oneDrug.owner.account_type);
+      var Model = staffUtils.getMeMyModel(oneDrug.owner.account_type);
 
       Model.findOne({
         userId: oneDrug.owner.owner

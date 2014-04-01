@@ -147,24 +147,25 @@ module.exports = function(app, passport) {
     users.routes(app, passport, login, people);
     
     //Hospital Routes
-    //var hospital = require('./hospitals');
-    //hospital.routes(app, login);
-    // //Drug Routes
-    // var drug = require('./drugs');
-    // drug.routes(app, login);
-    // //Orders Routes
-    // var order = require('./orders');
-    // order.routes(app, login);
-    // //Organization
-    // var organization = require('./organization');
-    // organization.routes(app, login);
+    var hospital = require('./hospitals');
+    hospital.routes(app, login);
 
-    // //File upload handler/controller
-    //var fileupload = require('./upload');
-    //fileupload(app, login);
+    //Drug Routes
+    var drug = require('./drugs');
+    drug.routes(app, login);
+    //Orders Routes
+    var order = require('./orders');
+    order.routes(app, login);
+    //Organization
+    var organization = require('./organization');
+    organization.routes(app, login);
+
+    //File upload handler/controller
+    var fileupload = require('./upload');
+    fileupload(app, login);
     
   } catch (e) {
-    console.log(e);
+    console.log(e.stack);
   }
 
 

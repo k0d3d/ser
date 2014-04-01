@@ -31,6 +31,7 @@ app.set('version', pjson.version);
 // port
 var port = process.env.PORT || 3001;
 
+
 function afterResourceFilesLoad() {
 
     console.log('configuring application, please wait...');

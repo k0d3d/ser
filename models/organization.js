@@ -1,278 +1,238 @@
 var Q = require('q'),
     utilities = require('../lib/utils'),
     PreAccount = require('./user/pre-account'),
-    Staff = require('./organization/staff.js'),
-    Distributor = require('./organization/distributor.js'),
-    Manager = require('./organization/manager.js'),
-    PharmaComp = require('./organization/pharmacomp.js'),
-    login = require('connect-ensure-login'),
-    _ = require("underscore"),
+    staffUtils = require('./staff_utils.js'),
+    _ = require('underscore'),
     //sendMail = require('../../lib/sendmail'),
     util = require('util'),
-    User = require('./user/user.js'),
-
-    userInfo,
+    User = require('./user.js').User,
 
 
-    staffFunctions = {
-      /**
-       * fetches the model to be queried using the related account level / type.
-       * @param  {[type]} account_type [description]
-       * @return {[type]}              [description]
-       */
-      getMeMyModel : function getMeMyModel (account_type) {
-        account_type = parseInt(account_type);
-        if (account_type === 4) {
-          return Staff;
-        }  
+staffFunctions = {
+  findOneAccount : function findOneAccount (doc) {
+    console.log('Searching for User Account');
+    var d = Q.defer();
+    var user = new User();
+    user.findUserByEmail({email : doc.email})
+    .then(function (i) {
 
-        if (account_type === 0) {
-          return PharmaComp;
+      return d.resolve(i);
+    } , function (err) {
+      return d.reject(err);
+    });
+
+    return d.promise;
+  },
+  findOrCreateUserAccount : function findOrCreateUserAccount (doc) {
+    console.log('Will find or Create');
+    var findOrCreateUser = Q.defer();
+    var user = new User();
+
+    user.findOrCreate(doc)
+    .then(function (r) {
+      return findOrCreateUser.resolve(r);
+    }, function (err) {
+      return findOrCreateUser.reject(err);
+    })
+    return findOrCreateUser.promise;
+  },
+  addOneStaff : function addOneStaff (doc) {
+    console.log('Adding Staff');
+    console.log(doc);
+    var d = Q.defer();
+
+    var user = new User();
+    user.create({
+      email: doc.email,
+      account_type: doc.account_type,
+      password: doc.password
+    }, function (r) {
+      if (util.isError(r)) {
+        return d.reject(r);
+      } else {
+        return d.resolve(r);
+      }
+    });
+
+    return d.promise;
+  },
+  sendActivationEmail : function sendActivationEmail (options) {
+    var d = Q.defer();
+
+    d.resolve({status :'sent'});
+
+    return d.promise;
+  },
+  inviteOneStaff : function inviteOneStaff (doc) {
+    var d = Q.defer();
+    var invite = new PreAccount(doc);
+
+    invite.activationToken = utilities.uid(64);
+
+    invite.save(function (err, i) {
+      if (err) {
+        return d.reject(err);
+      } else {
+        return d.resolve(i);
+      }
+    });
+
+    return d.promise;
+  },
+  findPreAccount: function findPreAccount (options) {
+    console.log('Searching for Pre Account');
+    var d = Q.defer();
+
+    PreAccount.findOne({
+      activationToken: options.activationToken,
+      employerId: options.employerId,
+      $or : [
+        {email: options.email},
+        {phone: options.phone}
+      ]
+    })
+    .exec(function (err, i) {
+      if (err) {
+        return d.reject(err);
+      } 
+      if (_.isEmpty(i)) {
+        return d.reject(new Error('PreAccount not found'));
+      } else {
+        console.log('Pre Account found');
+        return d.resolve(i);
+      }
+    });
+
+    return d.promise;
+  },
+  removePreAccount : function removePreAccount (options) {
+    console.log('Removing Pre Account');
+    var d = Q.defer();
+
+    PreAccount.remove({
+      activationToken: options.activationToken
+    })
+    .exec(function (err, i) {
+      console.log(err, i);
+      if (err) {
+        return d.reject(err);
+      } 
+      if (!i) {
+        return d.reject(new Error('PreAccount not removed'));
+      } else {
+        return d.resolve(options);
+      }          
+    });
+
+    return d.promise;
+  },
+  ammendProfile : function ammendProfile (options) {
+    console.log('Amending Profile');
+
+    var d = Q.defer();
+
+    staffUtils.getMeMyModel(options.account_type).update({
+      userId : options.id
+    }, {
+      $set: options.body
+    }, {upsert: true}, function(err, i) {
+
+      if (err) {
+        return d.reject(err);
+      }
+      if (i === 1) {
+        return d.resolve(true);
+      } else {
+        return d.reject(new Error('update failed'));
+      }
+    });
+
+    return d.promise;
+  },
+  addNewEmployer : function addNewEmployer (doc) {
+    console.log('Adding employer');
+    var addingEmpl = Q.defer();
+
+    staffUtils.getMeMyModel(doc.account_type).update({
+      userId : doc.userId
+    }, {
+      $push: {
+        employer:  {employerId : doc.employerId}
+      }
+    }, {upsert: true}, function(err, i) {
+
+      if (err) {
+        return addingEmpl.reject(err);
+      }
+      if (i === 1) {
+        return addingEmpl.resolve(doc);
+      } else {
+        return addingEmpl.reject(new Error('update failed'));
+      }
+    });
+
+    return addingEmpl.promise;        
+  },
+  lookUpPeople : function lookUpPeople(doc) {
+    var book = Q.defer();
+
+    staffUtils.getMeMyModel(doc.account_type)
+    .find({'employer.employerId' : doc.employerId})
+    .populate('userId', 'email account_type', 'User')
+    .exec(function (err, i) {
+      if (err) {
+        return book.reject(err);
+      }
+      if (i) {
+        return book.resolve(i);
+      }
+    });
+    return book.promise;
+  },
+  addDrugToProfile : function addDrugToProfile (doc) {
+    var added = Q.defer();
+
+    staffUtils.getMeMyModel(doc.account_type)
+    .update({
+      userId : doc.owner
+    }, {
+      $push : {
+        drugs: {
+          drug : doc.drugId
         }
+      }
+    }, function (err, i) {
+      if (err) {
+        return added.reject(err);
+      }
+      if (i === 1) {
+        return added.resolve(doc);
+      } else {
+        return added.reject(new Error('update drugs to profile failed'));
+      }          
+    });
 
-        if (account_type === 3) {
-          return Manager;
-        }
-        if (account_type === 1) {
-          return Manager;
-        }
-        if (account_type === 2) {
-          return Distributor;
-        }
-
-        return Manager;
-
-      },
-      findOneAccount : function findOneAccount (doc) {
-        console.log('Searching for User Account');
-        var d = Q.defer();
-        var user = new User();
-        user.findUserByEmail({email : doc.email})
-        .then(function (i) {
-
-          return d.resolve(i);
-        } , function (err) {
-          return d.reject(err);
-        });
-
-        return d.promise;
-      },
-      findOrCreateUserAccount : function findOrCreateUserAccount (doc) {
-        console.log('Will find or Create');
-        var findOrCreateUser = Q.defer();
-        console.log(User);
-        var user = new User();
-        user.findOrCreate(doc)
-        .then(function (r) {
-          return findOrCreateUser.resolve(r);
-        }, function (err) {
-          return findOrCreateUser.reject(err);
-        })
-        return findOrCreateUser.promise;
-      },
-      addOneStaff : function addOneStaff (doc) {
-        console.log('Adding Staff');
-        console.log(doc);
-        var d = Q.defer();
-
-        var user = new User();
-        user.create({
-          email: doc.email,
-          account_type: doc.account_type,
-          password: doc.password
-        }, function (r) {
-          if (util.isError(r)) {
-            return d.reject(r);
-          } else {
-            return d.resolve(r);
-          }
-        });
-
-        return d.promise;
-      },
-      sendActivationEmail : function sendActivationEmail (options) {
-        var d = Q.defer();
-
-        d.resolve({status :'sent'});
-
-        return d.promise;
-      },
-      inviteOneStaff : function inviteOneStaff (doc) {
-        var d = Q.defer();
-        var invite = new PreAccount(doc);
-
-        invite.activationToken = utilities.uid(64);
-
-        invite.save(function (err, i) {
-          if (err) {
-            return d.reject(err);
-          } else {
-            return d.resolve(i);
-          }
-        });
-
-        return d.promise;
-      },
-      findPreAccount: function findPreAccount (options) {
-        console.log('Searching for Pre Account');
-        var d = Q.defer();
-
-        PreAccount.findOne({
-          activationToken: options.activationToken,
-          employerId: options.employerId,
-          $or : [
-            {email: options.email},
-            {phone: options.phone}
-          ]
-        })
-        .exec(function (err, i) {
-          if (err) {
-            return d.reject(err);
-          } 
-          if (_.isEmpty(i)) {
-            return d.reject(new Error('PreAccount not found'));
-          } else {
-            console.log('Pre Account found');
-            return d.resolve(i);
-          }
-        });
-
-        return d.promise;
-      },
-      removePreAccount : function removePreAccount (options) {
-        console.log('Removing Pre Account');
-        var d = Q.defer();
-
-        PreAccount.remove({
-          activationToken: options.activationToken
-        })
-        .exec(function (err, i) {
-          console.log(err, i);
-          if (err) {
-            return d.reject(err);
-          } 
-          if (!i) {
-            return d.reject(new Error('PreAccount not removed'));
-          } else {
-            return d.resolve(options);
-          }          
-        });
-
-        return d.promise;
-      },
-      ammendProfile : function ammendProfile (options) {
-        console.log('Amending Profile');
-        return console.log(options);
-
-        var d = Q.defer();
+    return added.promise;
+  },
+  getPeopleRelations : function getPeopleRelations (owner, account_type) {
+    var relate = Q.defer(),
+        peepsBelowThis = _.range(account_type, 6);
 
 
 
-        this.getMeMyModel(options.account_type).update({
-          userId : id
-        }, {
-          $set: body
-        }, {upsert: true}, function(err, i) {
+    return relate.promise;
+  },
+  ownerProfile : function ownerProfile (ownerId, account_type) {
+    var d = Q.defer();
 
-          if (err) {
-            return d.reject(err);
-          }
-          if (i === 1) {
-            return d.resolve(true);
-          } else {
-            return d.reject(new Error('update failed'));
-          }
-        });
+    
 
-        return d.promise;
-      },
-      addNewEmployer : function addNewEmployer (doc) {
-        console.log('Adding employer');
-        var addingEmpl = Q.defer();
-
-        this.getMeMyModel(doc.account_type).update({
-          userId : doc.userId
-        }, {
-          $push: {
-            employer:  {employerId : doc.employerId}
-          }
-        }, {upsert: true}, function(err, i) {
-
-          if (err) {
-            return addingEmpl.reject(err);
-          }
-          if (i === 1) {
-            return addingEmpl.resolve(doc);
-          } else {
-            return addingEmpl.reject(new Error('update failed'));
-          }
-        });
-
-        return addingEmpl.promise;        
-      },
-      lookUpPeople : function lookUpPeople(doc) {
-        var book = Q.defer();
-
-        this.getMeMyModel(doc.account_type)
-        .find({"employer.employerId" : doc.employerId})
-        .populate('userId', 'email account_type', 'User')
-        .exec(function (err, i) {
-          if (err) {
-            return book.reject(err);
-          }
-          if (i) {
-            return book.resolve(i);
-          }
-        })
-        return book.promise;
-      },
-      addDrugToProfile : function addDrugToProfile (doc) {
-        var added = Q.defer();
-
-        this.getMeMyModel(doc.account_type)
-        .update({
-          userId : doc.owner
-        }, {
-          $push : {
-            drugs: {
-              drug : doc.drugId
-            }
-          }
-        }, function (err, i) {
-          if (err) {
-            return added.reject(err);
-          }
-          if (i === 1) {
-            return added.resolve(doc);
-          } else {
-            return added.reject(new Error('update drugs to profile failed'));
-          }          
-        });
-
-        return added.promise;
-      },
-      getPeopleRelations : function getPeopleRelations (owner, account_type) {
-        var relate = Q.defer(),
-            peepsBelowThis = _.range(account_type, 6);
-
-
-
-        return relate.promise;
-      },
-      ownerProfile : function ownerProfile (ownerId, account_type) {
-        var d = Q.defer();
-
-        
-
-        return d.promise;
-      }      
-    };
+    return d.promise;
+  }      
+};
 
 function Staff () {
 }
-
-//var user = new User.users();
-  console.log(User.users);
 
 
 Staff.prototype.constructor = Staff;
@@ -315,7 +275,7 @@ Staff.prototype.inviteStaff =  function (email, phone, account_type, password, e
     return d.resolve(r);
   }, function (err) {
     return d.reject(err);
-  })
+  });
 
   return d.promise;
 };
@@ -362,7 +322,7 @@ Staff.prototype.activateAccount = function (activationToken, email, employer, ph
     employerId: employer,
     password: password,
     account_type: account_type
-  }
+  };
 
   //Find the activation / preaccount record
   staffFunctions.findPreAccount(options)
@@ -469,7 +429,7 @@ Staff.prototype.stateYourDrugs = function stateYourDrugs (drug_id, owner,account
   });
 
   return stater.promise;
-}
+};
 
 
 Staff.prototype.cancelActivation = function cancelActivation (activationToken) {
@@ -478,14 +438,14 @@ Staff.prototype.cancelActivation = function cancelActivation (activationToken) {
   staffFunctions.removePreAccount({
     activationToken : activationToken
   })
-  .then(function (r) {
+  .then(function () {
     return act.resolve(true);
   }, function (err) {
     return act.reject(err);
   });
 
   return act.promise;
-}
+};
 
 module.exports.Staff = Staff;
 module.exports.staffFunctions = staffFunctions;
