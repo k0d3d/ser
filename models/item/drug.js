@@ -57,4 +57,6 @@ var updateHistorySchema = new Schema({
 
 mongoose.model('drug', DrugSchema);
 mongoose.model('drugUpdateHistory', updateHistorySchema);
-module.exports = mongoose.model('drug');
+
+module.exports.drug = mongoose.model('drug');
+module.exports.drugUpdateHistory = mongoose.model('drugUpdateHistory');

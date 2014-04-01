@@ -1,5 +1,12 @@
 {
-    "db": "mongodb://localhost/stoccloud",
+    "db": {
+        "server": "localhost",
+        "database": "stoccloud",
+        "port": 27017
+    },
+    "express":{
+        "secret": "yfhgU&^%@N>YS!!~HJS&JDHGDbvjhg7509"
+    },
     "app": {
         "name": "Integra Supplier Order Server"
     },

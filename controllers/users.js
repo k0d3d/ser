@@ -3,26 +3,25 @@
  */
  var mongoose = require('mongoose'),
  util = require('util'),
- User = mongoose.model('User'),
+ User = require('../models/user/user.js') ,
  Q = require('q'),
- //Staff = require('../models/staff.js'),
- //PharmaComp = require('../models/pharmacomp'),
  _ = require("underscore"),
- login = require('connect-ensure-login'),
  passport = require('passport'),
  Notification = require('../models/notification.js'),
- //Organization = require('./organization.js');
+ Organization = require('./organization.js').Staff,
+ staffFunctions = require('./organization.js').staffFunctions,
+
 
 UserController = function (){
   console.log('Calling User Controller');
-}
+};
 
 UserController.prototype.constructor = UserController;
 
 UserController.prototype.findUserByEmail = function (doc) {
   var d = Q.defer();
 
-  User.findOne({"email" : doc.email })
+  User.findOne({'email' : doc.email })
   .exec(function (err, i) {
     if (err) {
       return d.reject(err);
@@ -35,11 +34,12 @@ UserController.prototype.findUserByEmail = function (doc) {
   });
 
   return d.promise;
-}
+};
+
 /**
  * Auth callback
  */
- UserController.prototype.authCallback = function(req, res, next) {
+UserController.prototype.authCallback = function(req, res) {
   res.redirect('/');
 };
 
@@ -84,7 +84,7 @@ UserController.prototype.signout = function(req, res) {
  * @return {[type]}     [description]
  */
 UserController.prototype.session = function(req, res, next) {
-  passport.authenticate('local', function (err, user, info) {
+  passport.authenticate('local', function (err, user) {
     if (err) {
       return next(err);
     }
@@ -161,9 +161,9 @@ UserController.prototype.findOrCreate = function (doc) {
       return findOrCreateUser.resolve(i);
     }
 
-  })
+  });
   return findOrCreateUser.promise;
-}
+};
 
 /**
  * Updates User Profile
@@ -181,7 +181,7 @@ UserController.prototype.update = function(id, body, account_type) {
   var d = Q.defer();
 
 
-  Organization.staffFunctions.getMeMyModel(account_type).update({
+  staffFunctions.getMeMyModel(account_type).update({
     userId : id
   }, {
     $set: body
@@ -233,7 +233,7 @@ UserController.prototype.user = function(req, res, next, id) {
     req.profile = user;
     next();
   });
-}
+};
 
 UserController.prototype.getProfile = function (userId, account_type) {
   var d = Q.defer();
@@ -268,30 +268,41 @@ UserController.prototype.pullActivity = function (owner) {
       return not.reject(err);
     }
     return not.resolve(i);
-  })
+  });
   return not.promise;
-}
+};
 
 console.log(UserController);
 
 module.exports.users = UserController;
 
-module.exports.routes = function(app, passport, people){
+module.exports.routes = function(app, passport, login, people){
   var users = new UserController();
 
-  app.get('/signin', function (req, res, next){res.locals.people = people; next(); }, users.signin);
-  app.get('/signup', function (req, res, next){res.locals.people = people; next(); }, users.signup);
-  app.get('/signout', users.signout);
-  app.get('/user-registered', function(req, res) {
+  app.route('/signin')
+  .get(function (req, res, next){res.locals.people = people; next(); }, users.signin);
+  
+  app.route('/signup')
+  .get(function (req, res, next){res.locals.people = people; next(); }, users.signup);
+  
+  app.route('/signout')
+  .get(users.signout);
+
+  app.route('/user-registered')
+  .get(function(req, res) {
     res.render('user/user-registered');
   });
-  app.get('/a/profile', login.ensureLoggedIn('/signin'), function (req, res) {
+
+  app.route('/a/profile')
+  .get(login.ensureLoggedIn('/signin'), function (req, res) {
     console.log(req.user);
     res.render('index', {
       userData : req.user
     });
   });
-  app.get('/user/profile', login.ensureLoggedIn('/signin'), function (req, res, next) {
+
+  app.route('/user/profile')
+  .get(login.ensureLoggedIn('/signin'), function (req, res, next) {
     console.log(req.user);
     var userId = req.user._id;
     var account_type = req.user.account_type;
@@ -307,7 +318,8 @@ module.exports.routes = function(app, passport, people){
   });
 
   //Handle Public user registration
-  app.post('/users', function (req, res, next){
+  app.route('/users')
+  .post(function (req, res, next){
     users.create(req.body, function (r){
       if (util.isError(r)) {
         next(r);
@@ -317,7 +329,8 @@ module.exports.routes = function(app, passport, people){
     });
   });
   //Handle Public user registration
-  app.put('/api/users/profile', function (req, res, next){
+  app.route('/api/users/profile')
+  .put(function (req, res, next){
     var id = req.body.pk;
     var body = {},
         account_type = req.user.account_type;
@@ -326,7 +339,7 @@ module.exports.routes = function(app, passport, people){
 
 
     users.update(id, body, account_type)
-    .then(function (r) {
+    .then(function () {
       res.json(200, {message: 'Saved'});
     })
     .fail(function (err) {
@@ -335,7 +348,8 @@ module.exports.routes = function(app, passport, people){
     });
   });
 
-  app.get('/api/activities', function (req, res) {
+  app.route('/api/activities')
+  .get(function (req, res) {
     users.pullActivity(req.user._id)
     .then(function(r){
       res.json(200, r);
@@ -345,19 +359,17 @@ module.exports.routes = function(app, passport, people){
   });
 
   //Handle Public User Login
-  app.post('/users/session', users.session);
+  app.route('/users/session').post(users.session);
 
 
-  app.post('/api/users/session', passport.authenticate('local', {
+  app.route('/api/users/session').get(passport.authenticate('local', {
     failureRedirect: '/signin',
     failureFlash: 'Invalid email or password.'
   }), users.session);
-  app.post('/api/session', passport.authenticate('basic', {session: false}), users.apiSession);
+  app.route('/api/session').get(passport.authenticate('basic', {session: false}), users.apiSession);
 
-  app.get('/users/me', users.me);
-  app.get('/users/:userId', users.show);
 
   //Finish with setting up the userId param
-  app.param('userId', users.user);     
-}
+  app.param('userId', users.user);
+};
 

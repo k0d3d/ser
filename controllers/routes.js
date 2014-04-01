@@ -7,7 +7,7 @@ var login = require('connect-ensure-login'),
  * @param  {[type]} passport [description]
  * @return {[type]}          [description]
  */
-module.exports = function(app, passport, auth) {
+module.exports = function(app, passport) {
   var people = [
     {
       name: "Pharmaceutical Company",
@@ -100,17 +100,18 @@ module.exports = function(app, passport, auth) {
     }
   ];
 
-  //Minimal middleware that adds 
-  //logged in user details to view
-  app.get('*', function (req, res, next) {
-    if (req.user) {
-      res.locals.userData = req.user;
-    }
-    next();
-  });
+
+
   //Sets roles and permissions to be used on 
   //the view templates and widgets
-  app.get('*', function (req, res, next) {
+  app.route('*')
+  .get(function (req, res, next) {
+
+    //Minimal middleware that adds 
+    //logged in user details to view
+    if (req.user) {
+      res.locals.userData = req.user;
+    }    
 
     res.locals.hasRole = function (index) {
       var account_type = req.user.account_type;
@@ -141,57 +142,62 @@ module.exports = function(app, passport, auth) {
   });
 
   //User Routes
-  var users = require('./users');
-  console.log(users);
-  users.routes(app, passport, people);
-  //Hospital Routes
-  var hospital = require('./hospitals');
-  hospital.routes(app, auth);
-  //Supplier Routes
-  var supplier = require('./suppliers');
-  supplier.routes(app, auth);
-  //Drug Routes
-  var drug = require('./drugs');
-  drug.routes(app, auth);
-  //Orders Routes
-  var order = require('./orders');
-  order.routes(app, auth);
-  //Organization
-  var organization = require('./organization');
-  organization.routes(app, auth);
+  try {
+    var users = require('./users'); 
+    users.routes(app, passport, login, people);
+    
+    //Hospital Routes
+    //var hospital = require('./hospitals');
+    //hospital.routes(app, login);
+    // //Drug Routes
+    // var drug = require('./drugs');
+    // drug.routes(app, login);
+    // //Orders Routes
+    // var order = require('./orders');
+    // order.routes(app, login);
+    // //Organization
+    // var organization = require('./organization');
+    // organization.routes(app, login);
 
-  // //File upload handler/controller
-  var fileupload = require('./upload');
-  fileupload(app);
+    // //File upload handler/controller
+    //var fileupload = require('./upload');
+    //fileupload(app, login);
+    
+  } catch (e) {
+    console.log(e);
+  }
 
 
   //Home route
-  app.get('/', login.ensureLoggedIn('/signin'),  function(req, res){
+  app.route('/')
+  .get(login.ensureLoggedIn('/signin'), function(req, res){
     res.render('index',{
       title: 'Dashboard',
       userData: req.user
     });
   });
 
-  app.get('/home/index', login.ensureLoggedIn(), function(req, res){
+  app.route('/home/index')
+  .get(login.ensureLoggedIn('/signin'), function(req, res){
     res.render('home/index',{
       title: 'Dashboard'
     });
   });
 
-  app.get('/partials/:name', function (req, res) {
+  app.route('/partials/:name')
+  .get(function (req, res) {
     var name = req.params.name;
     res.render('partials/' + name);
   });
 
   // home route
-  app.get('/:parent/:child', function(req, res){
+  app.route('/:parent/:child')
+  .get(function(req, res){
     var parent = req.params.parent;
     var child = req.params.child;
     res.render(parent+'/'+child, {
       userData: req.user
     });
-    //res.render('/');
-  });    
+  });
 
 };

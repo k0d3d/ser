@@ -4,7 +4,7 @@
  */
 
 var mongoose = require('mongoose'),
-    Order = mongoose.model('Order'),
+    Order = require('../models/order/order.js') ,
     OrderStatus = mongoose.model('OrderStatus'),
     Supplier = mongoose.model('Supplier'),
     _ = require("underscore"),

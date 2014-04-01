@@ -6,7 +6,7 @@ var mongoose = require("mongoose"),
     util = require('util'),
     User = mongoose.model('User'),
     _ = require('underscore'),
-    Hospital = mongoose.model('Hospital');
+    Hospital = require('../models/organization.js');
 
 function HospitalController (){
 
@@ -92,25 +92,25 @@ HospitalController.prototype.fetchOne = function (userId, cb) {
 module.exports.hospital = HospitalController;
 var hospital = new HospitalController();
 
-module.exports.routes = function (app, auth) {
+module.exports.routes = function (app, login) {
   
   //Load the hospital index / list page
-  app.get('/a/facilities', auth.requiresLogin, function (req, res) {
+  app.get('/a/facilities', login.ensureLoggedIn('/signin'), function (req, res) {
     res.render('index', {});
   });
 
   //loads page to add a new hospital account
-  app.get('/a/facilities/add', auth.requiresLogin, function (req, res) {
+  app.get('/a/facilities/add', login.ensureLoggedIn('/signin'), function (req, res) {
     res.render('index', {});
   });
 
   //loads page to add a new hospital account\
-  app.get('/a/facilities/:facilityId', auth.requiresLogin, function (req, res) {
+  app.get('/a/facilities/:facilityId', login.ensureLoggedIn('/signin'), function (req, res) {
     res.render('index', {});
   });
 
   //fetches list of registered facilities
-  app.get('/api/facilities/pages/:page', auth.requiresLogin, function (req, res, next) {
+  app.get('/api/facilities/pages/:page', login.ensureLoggedIn('/signin'), function (req, res, next) {
     hospital.list(req.params.page, function (r) {
       if (util.isError(r)) {
         next(r);

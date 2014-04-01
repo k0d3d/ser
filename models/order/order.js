@@ -96,4 +96,5 @@ OrderSchema.statics = {
 mongoose.model('Order', OrderSchema);
 mongoose.model('OrderStatus', OrderStatusSchema);
 
-module.exports = mongoose.model('Order');
+module.exports.Order = mongoose.model('Order');
+module.exports.OrderStatus = mongoose.model('OrderStatus');

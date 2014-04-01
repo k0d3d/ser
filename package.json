@@ -18,7 +18,7 @@
     "postinstall": "bower install"
   },
   "dependencies": {
-    "express": "latest",
+    "express": "~4.0.0",
     "jade": "latest",
     "mongoose": "latest",
     "connect-mongo": "latest",
@@ -51,7 +51,16 @@
     "nodemailer": "^0.6.1",
     "connect-ensure-login": "^0.1.1",
     "express-upload": "^0.1.0",
-    "acl": "^0.2.6"
+    "acl": "^0.2.6",
+    "config": "^0.4.35",
+    "body-parser": "^1.0.1",
+    "method-override": "^1.0.0",
+    "compression": "^1.0.1",
+    "express-session": "^1.0.2",
+    "cookie-session": "^1.0.1",
+    "static-favicon": "^1.0.2",
+    "cookie-parser": "^1.0.1",
+    "morgan": "^1.0.0"
   },
   "devDependencies": {
     "supertest": "latest",

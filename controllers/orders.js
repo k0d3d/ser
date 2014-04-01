@@ -4,16 +4,14 @@
  */
 
 var mongoose = require('mongoose'),
-  Order = mongoose.model('Order'),
-  OrderStatus = mongoose.model('OrderStatus'),
-  Supplier = mongoose.model('Supplier'),
+  Order = require('../models/order/order.js').Order,
+  OrderStatus = require('../models/order/order.js').OrderStatus,
   _ = require('underscore'),
-  Hospital = mongoose.model('Hospital'),
+  Hospital = require('../models/organization/hospital.js') ,
   Notification = require('../models/notification.js'),
   Q = require("q"),
-  login = require('connect-ensure-login'),
-  utilz = require('../../lib/utils.js'),
-  EventRegister = require('../../lib/event_register').register,
+  utilz = require('../lib/utils.js'),
+  EventRegister = require('../lib/event_register').register,
   utils = require("util");
 
 
@@ -394,16 +392,16 @@ OrderController.prototype.placeOrder = function (order, orderOwner) {
 module.exports.order = OrderController;
 var order = new OrderController();
 
-module.exports.routes = function(app, auth){
+module.exports.routes = function(app, login){
 
-  app.get('/dashboard/order', auth.requiresLogin, function(req, res){
+  app.get('/dashboard/order', login.ensureLoggedIn('/signin'), function(req, res){
       res.render('index',{
         title: 'Place new order'
       });
     }
   );
 
-  app.get('/dashboard/order/:id', auth.requiresLogin, function(req, res){
+  app.get('/dashboard/order/:id', login.ensureLoggedIn('/signin'), function(req, res){
       res.render('index',{});
     }
   );
