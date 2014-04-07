@@ -63,14 +63,14 @@
                           tbody
                             tr
                               td {{drugItem.sciName}}
-                              td N{{drugItem.currentPrice}}
+                              td N{{drugItem.currentPrice.retail}}
                               td {{drugItem.pharma.pharmaName}}                        
                         span.label.label-info  <strong>Supplier: </strong> {{drugItem.owner.name}}                          
                     .col-sm-3
                       .form-group
                         input.form-control(type='number', placeholder="Amount", ng-model="drugItem.orderAmount", required, ng-init="drugItem.orderAmount = 0")
                       .btn-group
-                        button.btn.btn-default.btn-primary-alt(disabled) N{{drugItem.orderAmount * drugItem.currentPrice}}
+                        button.btn.btn-default.btn-primary-alt(disabled) N{{drugItem.orderAmount * drugItem.currentPrice.retail}}
                         button.btn.btn-primary(ng-click="add_to_cart(drugItem)", ng-disabled="drugItem.orderAmount == 0 || !drugItem.orderAmount") Order
 
               .ndl-list(ng-show="show_ndl", style="border-top: solid 1px #1489A0;padding-top: 20px;")

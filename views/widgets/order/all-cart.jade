@@ -7,6 +7,7 @@ mixin allCart()
           th Quantity
           th Price (N)
           th.noprint Order Date
+          th.noprint Manufacturer
           th.noprint Supplier
           th.noprint Action
       tbody
@@ -18,11 +19,13 @@ mixin allCart()
           td {{or.perItemPrice * or.orderAmount}}
           td.noprint {{or.orderDate | moment}}
           td.noprint {{or.itemId.pharma.pharmaName}}
+          td.noprint {{or.orderSupplier.name}}
           td.noprint
-            button.btn.btn-small.btn-info.btn-bell(ng-click="order_this(or, $index)") 
+            button.btn.btn-xs.btn-info.btn-bell(ng-click="order_this(or, $index)") 
               i.fa.fa-check
               |  Place this
-            button.btn.btn-small.btn-danger.btn-bell(ng-click="removeFromCart($index)") 
+            button.btn.btn-xs.btn-danger.btn-bell(ng-click="removeFromCart($index)") 
               i.fa.fa-times
+              | Cancel Order
   //
      table-responsive 

@@ -128,15 +128,15 @@ config(['$routeProvider',function($routeProvider){
 
   }());
 
-  $scope.removeOrder = function(event, order_id){
-    var currentItem = event.currentTarget;
-    console.log(currentItem);
-    ordersService.remove(order_id, function(o){
-      if(o.state === 1){
-        $(currentItem).parents('tr').remove();
-      }
+  $scope.removeOrder = function(index){
+    var orderId = $scope.$parent.orderCart[index].order_id;
+    
+    ordersService.remove(orderId)
+    .then(function(o){
+      $scope.$parent.orderCart.splice(index, i);
     });
   };
+
   $scope.changeStatus = function(){
     var o = {
       status : $scope.uo.status,
@@ -211,16 +211,20 @@ config(['$routeProvider',function($routeProvider){
 
   $scope.add_to_cart = function (item){
     if (!item.orderAmount) return false;
-
-    ordersService.addToCart(item, function(data){
-      $scope.form = '';
+    
+    //return console.log(item);
+    ordersService.addToCart(item)
+    .then(function(data){
+        console.log(data);
+        $scope.$parent.orderCart.push(data);
+        $scope.form = '';
     });
 
-    $scope.orderCart.push(toOrder);
+    
   };
 
 })
-.factory('ordersService',['$http', 'Notification','Language', function($http, Notification, Lang){
+.factory('ordersService',['$http', 'Notification','Language', function($http, N, L){
     var f = {};
 
     f.searchCmp = function(queryCmp){
@@ -266,9 +270,19 @@ config(['$routeProvider',function($routeProvider){
     f.postCartItem = function(form){
       return $http.put('/api/orders/' + form.orderId + '/status/1', form)
       .then(function (r) {
+        N.notifier({
+          title: L[L.set].titles.success,
+          text: L[L.set].order.cart.place.success,
+          class_name: 'growl-success'
+        });
         return r.data;
       }, function (err) {
-        return err;
+        // N.notifier({
+        //   title:  L[L.set].titles.error,
+        //   text:  err,
+        //   class_name: 'growl-danger'
+        // });
+        //return err;
       });
     };
 
@@ -276,9 +290,19 @@ config(['$routeProvider',function($routeProvider){
     f.addToCart = function(form){
       return $http.post('/api/orders', form)
       .then(function (r) {
+        N.notifier({
+          title: L[L.set].titles.success,
+          text: L[L.set].order.cart.place.success,
+          class_name: 'growl-success'
+        });
         return r.data;
       }, function (err) {
-        return err;
+        N.notifier({
+          title:  L[L.set].titles.error,
+          text:  err,
+          class_name: 'growl-danger'
+        });
+        //return err;
       });
     };
 
@@ -302,14 +326,14 @@ config(['$routeProvider',function($routeProvider){
           "paymentReferenceID": o.paymentReferenceID
         })
       .success(function(data){
-        Notification.notifier({
+        N.notifier({
           message: Lang.eng.order.update.success,
           type: 'success'
         });
         callback(data);
       })
       .error(function(data){
-        Notification.notifier({
+        N.notifier({
           message: Lang.eng.order.update.error,
           type: 'error'
         });        
@@ -322,9 +346,14 @@ config(['$routeProvider',function($routeProvider){
           callback(d);
         });
     };
-    f.remove = function(order_id, callback){
-      $http.delete('/api/orders/'+order_id)
-      .success(callback);
+    //remove or cancel an order
+    f.remove = function(order_id){
+      return $http.delete('/api/orders/'+order_id)
+      .then(function (r) {
+        return r.data
+      }, function(err) {
+
+      });
     };
     f.moreInfo = function (id, callback) {
       $http.get('/api/orders/ndl/' + id + '/summary')

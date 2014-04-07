@@ -9,14 +9,16 @@ var app = angular.module('stocUser', [
   'drug',
   'order',
   'language',
-  'facility'
+  'facility',
+  'ngTagsInput'
   ]);
-app.config(function ($routeProvider, $locationProvider) {
+app.config(function ($routeProvider, $locationProvider, $httpProvider) {
   $routeProvider
   .otherwise({
       redirectTo: '/'
     });
   $locationProvider.html5Mode(true);
+  $httpProvider.interceptors.push('errorNotifier');
 });
 
 app.controller('MainController', [
@@ -24,8 +26,9 @@ app.controller('MainController', [
   '$http', 
   '$location', 
   'Notification', 
-  'ordersService', 
-  function ($scope, $http, $location, Notification, OS) {
+  'ordersService',
+  'organizeStaffService',
+  function ($scope, $http, $location, Notification, OS, OSS) {
 
     $scope.orderCart = [];
 
@@ -34,10 +37,13 @@ app.controller('MainController', [
     .then(function (i) {
       $scope.orderCart = i;
     });
-    //Fetch Activities
-    OS.fetchActivities()
+
+    $scope.workForce = {};
+
+    //Fetch All Orders
+    OSS.getMyWorkForce()
     .then(function (i) {
-      $scope.activity = i;
+      $scope.workForce = i;
     });
 
     $scope.modal = {};
@@ -77,8 +83,7 @@ app.controller('MainController', [
     'Anti Histamines', 'Anti Malrials', 'Anti Migraine Drugs', 'Anti Muscarinic', 'Anti Neoplastic & Immunomodulating Agents', 'Anti Psychotic', 'Antiseptics,Disinfectants & Mouthwashes', 'Anti tussive,Expectorants & Mucolytics', 'Antiviral', 'Cardiovascular System', 'Contraceptives', 'Dermatological Preparations', 'Parkinson Drugs', 'Eye,Ear & Throat Preparations', 'Haematinics', 'Herbal Products', 'Hormones,Synthetics,Substitutes & Thyroid Drugs', 'Human Biologicals', 'Human Vaccine Products', 'Hypnotics,Anxiolities,Anti Convulsants & Anti depressant', 'Insecticides', 'Oxytocics', 'Pesticide Products', 'Rubefacients', 'Skeletal Muscle Relaxants', 'Vaccines & Biologicals', 'Veterinary Drugs/Products', 'Vitamins & Minerals', 'Miscellaneous', 'Others'];
 
     $scope.$on('newNotification', function (){
-      console.log(Notification.notice);
-      jQuery.gritter.add(Notification.notice);      
+      $.gritter.add(Notification.notice);      
     });
 
     $scope.$on('newEvent', function(){
@@ -123,6 +128,7 @@ app.directive('dropzone', [function () {
         url: '/upload-doc',
         paramName: 'itemImage',
         maxFiles : 5,
+        clickable: true,
         //uploadMultiple: true,
         autoProcessQueue: true,
         init : function () {
@@ -177,3 +183,16 @@ app.directive('typeAhead', [function () {
     }
   }
 }]);
+app.factory('errorNotifier', ['$q', 'Notification', 'Language', function($q, N, L) {
+  return {
+    responseError: function (response) {
+      console.log(response);
+      N.notifier({
+        title: L[L.set].titles.error ,
+        text: response.data.message || response.data,
+        class_name: 'growl-danger'
+      });
+      return $q.reject(response);
+    }
+  }
+}])

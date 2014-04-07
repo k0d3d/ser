@@ -8,7 +8,7 @@ angular.module('organization', [])
 .config(['$routeProvider', function ($routeProvider){
   $routeProvider.when('/organization', {templateUrl: '/organization/all-staff', controller: 'staffController'});
   $routeProvider.when('/a/organization/people/:accountType', {templateUrl: '/organization/all-staff', controller: 'staffController'});
-  $routeProvider.when('/a/organization/people/:personId/staff', {templateUrl: '/organization/profile', controller: 'personController'});
+  $routeProvider.when('/a/organization/people/:personId/staff/:accountType', {templateUrl: '/organization/profile', controller: 'personController'});
   $routeProvider.when('/a/organization/invitations', {templateUrl: '/organization/invites', controller: 'invitesController'});
 }])
 .controller('staffController', ['$scope', 'organizeStaffService', '$routeParams', function userController($scope, oss, $routeParams) {
@@ -27,8 +27,18 @@ angular.module('organization', [])
     $scope.people = data;
   });
 }])
-.controller('personController', ['$scope', 'organizeStaffService', function () {
+.controller('personController', ['$scope', 'organizeStaffService', '$routeParams', function ($scope, oss, $routeParams) {
   $scope.$parent.headerTitle = 'Profile';
+
+  oss.getPersonProfile({
+    account_type: $routeParams.accountType,
+    userId: $routeParams.personId
+
+  })
+  .then(function (data) {
+    $scope.person = data;
+  });
+
 }])
 .controller('invitesController', ['$scope', 'organizeStaffService', function ($scope, oss) {
   //Load all invites
@@ -46,12 +56,6 @@ angular.module('organization', [])
   }
 
 }])
-// .directive('invites', [function () {
-//   return {
-//     link : link,
-//     templateUrl: 
-//   }
-// }])
 .factory('organizeStaffService', ['$http', 'Notification', 'Language', function ($http, N, L) {
   return {
     inviteStaff : function (form) {
@@ -84,6 +88,11 @@ angular.module('organization', [])
       console.log(data);
       return $http.put('/api/organization/invites?activation=1', data)
       .then(function (r) {
+        N.notifier({
+          title: L[L.set].titles.success,
+          text: L[L.set].organization.activate.success ,
+          class_name: 'growl-success'
+        });        
         return r.data;
       }, function (err) {
         return err;
@@ -91,6 +100,22 @@ angular.module('organization', [])
     },
     getMyPeople : function (options) {
       return $http.get('/api/organization/people/' + options.account_type)
+      .then(function (r) {
+        return r.data;
+      }, function (err) {
+        return err;
+      })
+    },
+    getPersonProfile : function (options) {
+      return $http.get('/api/organization/people/' + options.userId + '/staff/' + options.account_type)
+      .then(function (r) {
+        return r.data;
+      }, function (err) {
+        return err;
+      })
+    },
+    getMyWorkForce : function () {
+      return $http.get('/api/organization/workforce')
       .then(function (r) {
         return r.data;
       }, function (err) {

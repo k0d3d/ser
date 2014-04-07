@@ -79,6 +79,11 @@ angular.module('language', [])
 			},
 			"fetch":{
 				"error":"Can not fetch the list of recent orders"
+			},
+			"cart":{
+				"place": {
+					"success": "You have added one more item to your cart"
+				}
 			}
 		},
 		"dispense":{
@@ -147,6 +152,10 @@ angular.module('language', [])
 		"organization": {
 			"invite": {
 				"success" : "Invitation successfully sent",
+				"error": "We could not send this invitation right now. Please try again."
+			},
+			"activate": {
+				"success" : "User successfully activated",
 				"error": "We could not send this invitation right now. Please try again."
 			}
 		}

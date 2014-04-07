@@ -41,7 +41,6 @@ angular.module('services', [])
 	
 	//Opens a modal box
 	s.notifier = function(m){
-		console.log(m);
 		this.notice = m;
 		this.broadcastNotification();
 	};

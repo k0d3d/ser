@@ -8,10 +8,10 @@ mixin loadActivities
           .media-body.act-media-body
             strong {{act.alertDescription}}
             |  
-            strong by <a href="#">Hospital</a>
+            strong by <a ng-href="/a/organization/people/{{act.hospitalId}}/staff/5">{{act.hospital.name}}</a>
             | .
             br
-            small.text-muted  {{act.created | date: 'medium'}}
+            small.text-muted  {{act.created | moment}}
 
       //
          activity-list 

@@ -9,8 +9,6 @@ var mongoose = require('mongoose'),
  * Orders Schema
  */
 var OrderSchema = new Schema({
-  nafdacRegNo: {type: String},
-  nafdacRegName: {type: String},
   orderAmount: {type: Number, default: '0'},
   orderDate: {type: Date},
   itemId: {type: Schema.ObjectId},
@@ -22,8 +20,8 @@ var OrderSchema = new Schema({
    * @type {Object}
    */
   orderSupplier: {
-    ownerId: {type: Schema.ObjectId},
-    account_type: Number
+    supplierId: {type: Schema.ObjectId},
+    supplier_type: Number
   },
   /**
    * the staff who is responsible for delivering this order
@@ -32,6 +30,7 @@ var OrderSchema = new Schema({
   orderCharge: {type: Schema.ObjectId},
   /**
    * orderStatus values 
+   * -1: order canceld
    * 0 : in cart
    * 1: order placed
    * 2: order received // at this point, disputes about who takes charge of the order is settled
@@ -43,9 +42,10 @@ var OrderSchema = new Schema({
    */
   orderStatus: {type: Number, default: 0},
   orderVisibility: {type: Boolean, default: true},
+  //This is the id of the hospital placing the order, order author..blah
   hospitalId: {type: Schema.ObjectId},
   orderId: {type: String, unique: true},
-  amountSupplied: {type: Number}
+  amountSupplied: {type: Number},
 });
 
 var OrderStatusSchema = new Schema({

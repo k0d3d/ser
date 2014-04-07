@@ -1,4 +1,5 @@
 var staff_model = require('../models/organization.js'),
+  utilities = require('../lib/utils.js'),
   utils = require('util');
 
 module.exports.routes = function (app, login) {
@@ -22,7 +23,7 @@ module.exports.routes = function (app, login) {
       userData: req.user
     });
   });
-  app.get('/a/organization/people/:personId/staff',login.ensureLoggedIn('/signin'), function (req, res) {
+  app.get('/a/organization/people/:personId/staff/:accountType',login.ensureLoggedIn('/signin'), function (req, res) {
 
     res.render('index', {
       userData: req.user
@@ -36,7 +37,15 @@ module.exports.routes = function (app, login) {
     });
   });
 
-
+  app.route('/api/internal/profile/activities')
+  .get(function (req, res) {
+    staff.pullActivity(req.user._id)
+    .then(function(r){
+      res.json(200, r);
+    }, function (err) {
+      res.json(400, err);
+    });
+  });
 
   //fetch list of invitations for a company
   app.get('/api/organization/invites', login.ensureLoggedIn(), function (req, res, next) {
@@ -49,96 +58,112 @@ module.exports.routes = function (app, login) {
     .then(function(r){
       res.json(200, r);
     }, function (err) {
-      next(err);
+      res.json(400, err);
+    });
+  });
+
+  //Fetches list of people employed by the logged in user per account type
+  app.get('/api/organization/people/:accountType', function (req, res) {
+    staff.lookUpMyPeople(req.params.accountType, req.user._id)
+    .then(function (r) {
+      res.json(200, r);
+    }, function (err) {
+      res.json(400, err);
     });
   });
 
   //Fetches list of people employed by the logged in user
-  app.get('/api/organization/people/:accountType', function (req, res, next) {
-    staff.lookUpMyPeople(req.params.accountType, req.user._id)
+  app.get('/api/organization/workforce', function (req, res) {
+    staff.lookUpWorkForce(req.user.account_type, req.user._id)
     .then(function (r) {
       res.json(200, r);
     }, function (err) {
-      next(err);
+      res.json(400, err);
     });
   });
 
-  //Fetches an employee profile 
-  app.get('/api/organization/people/:personId/staff', function (req, res, next) {
-    staff.lookUpMyPeople(req.params.accountType, req.user._id)
+  //Fetches a person profile 
+  app.get('/api/organization/people/:personId/staff/:accountType', function (req, res) {
+    //return res.json(200, {});
+    staff.getPersonProfile(req.params.personId, req.params.accountType)
     .then(function (r) {
       res.json(200, r);
     }, function (err) {
-      next(err);
+      res.json(400, err);
     });
   });
 
   //Attempts to activate an account, and add the employer to 
   //the users profile.
-  app.put('/api/organization/invites',login.ensureLoggedIn('/signin'), function (req, res, next) {
+  app.put('/api/organization/invites',login.ensureLoggedIn('/signin'), function (req, res) {
     
     if (req.query.activation == 1) {
       var employerId = req.user._id;
-      staff.activateAccount(req.body.activationToken, req.body.email, employerId, req.body.phone, 'blahbla', req.body.account_type)
-      .then(function (r) {
-        res.json(200, true)
+      staff.activateAccount(
+        req.body.activationToken,
+        req.body.email, employerId,
+        req.body.phone,
+        'blahbla',
+        req.body.account_type)
+      .then(function () {
+        res.json(200, true);
       }, function (err) {
-        next(err);
+        res.json(400, err);
       });
     }
 
   });
 
-  app.post('/api/organization/invites',login.ensureLoggedIn('/signin'), function (req, res, next) {
+  app.post('/api/organization/invites',login.ensureLoggedIn('/signin'), function (req, res) {
 
     //var password = (!req.body.password) ? utilities.uid(8) : req.body.password;
     var password = req.body.password || utilities.uid(8);
     var employerId = req.user._id;
     staff.inviteStaff(req.body.email, req.body.phone, req.body.account_type, password, employerId)
     .then(function (r) {
-      res.json(200, r)
+      res.json(200, r);
     }, function (err) {
-      next(err);
+      res.json(400, err);
     });
   });
-  app.post('/api/organization/staff',login.ensureLoggedIn('/signin') , function (req, res, next) {
+  app.post('/api/organization/staff',login.ensureLoggedIn('/signin') , function (req, res) {
 
     //var password = (!req.body.password) ? utilities.uid(8) : req.body.password;
     var password = req.body.password || utilities.uid(8);
     staff.createStaff(req.body.email, req.body.account_type, password)
     .then(function (r) {
-      res.json(200, r)
+      res.json(200, r);
     }, function (err) {
-      next(err);
+      res.json(400, err);
     });
   });
 
   //Adds a drug item to a staff profile
-  app.post('/api/internal/organization/staff/drugs/', function (req, res, next) {
+  app.post('/api/internal/organization/staff/drugs/', function (req, res) {
     var owner = req.user._id,
         account_type = req.user.account_type;
     staff.stateYourDrugs(req.body.drugId, owner, account_type)
     .then(function () {
       res.json(200, true);
     }, function (err) {
-      next(err);
-    })
+      res.json(400, err);
+    });
   });
 
 
   //Attempts to activate an account, and add the employer to 
   //the users profile.
-  app.del('/api/organization/invites/:activationToken',login.ensureLoggedIn('/signin'), function (req, res, next) {
+  app.del('/api/organization/invites/:activationToken',login.ensureLoggedIn('/signin'), function (req, res) {
     
     if (req.query.activation == 1) {
-      var employerId = req.user._id;
+      //var employerId = req.user._id;
       staff.cancelActivation(req.params.activationToken)
-      .then(function (r) {
-        res.json(200, true)
+      .then(function () {
+        res.json(200, true);
       }, function (err) {
-        next(err);
+        res.json(400, err);
       });
     }
 
   });
-}
+};

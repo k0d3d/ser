@@ -28,7 +28,6 @@ module.exports.routes = function(app, passport, login, people){
 
   app.route('/user/profile')
   .get(login.ensureLoggedIn('/signin'), function (req, res, next) {
-    console.log(req.user);
     var userId = req.user._id;
     var account_type = req.user.account_type;
     users.getProfile(userId, account_type).then(function (r) {
@@ -70,16 +69,6 @@ module.exports.routes = function(app, passport, login, people){
     .fail(function (err) {
       console.log(err);
       next(err);
-    });
-  });
-
-  app.route('/api/activities')
-  .get(function (req, res) {
-    users.pullActivity(req.user._id)
-    .then(function(r){
-      res.json(200, r);
-    }, function (err) {
-      res.json(400, err);
     });
   });
 

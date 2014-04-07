@@ -49,7 +49,7 @@ module.exports.routes = function(app, login){
   //
   app.get('/api/orders/:orderStatus/display/:displayType',function(req, res){
 
-    order.getOrders(req.params.orderStatus, req.params.displayType)
+    order.getOrders(req.params.orderStatus, req.params.displayType, req.user._id)
     .then(function(r){
         res.json(200, r);
     }, function (err) {
@@ -57,44 +57,15 @@ module.exports.routes = function(app, login){
     });
   });
 
-  //app.get('/api/orders/count',count);
-
-  //app.get('/api/orders/supplier/typeahead/:query', suppliersTypeahead);
-
-  // app.get('/api/orders/hospital/:hospitalId/updates/:since', function(req, res, next){
-  //   order.orderUpdates(req.params.hospitalId, req.params.since, function(r){
-  //     if(utils.isError(r)){
-  //       next(r);
-  //     }else{
-  //       res.json(200, r);
-  //     }
-  //   });
-  // });
-
   // Order POST Routes
   app.post('/api/orders',function(req, res){
     order.placeItemInCart(req.body, req.user._id)
     .then(function(r){
-      res.json(200, true);
+      res.json(200, r);
     }, function (err) {
       res.json(400, err);
     });
   });
-
-
-  //Order PUT Routes
-  // app.put('/api/orders/:orderId/hospital/:hospitalId/status/:status/',function(req, res, next) {
-  //   order.updateOrder({
-  //     _id: req.params.orderId,
-  //     amountSupplied: req.body.amountSupplied
-  //   }, req.params.status, req.params.hospitalId, function(r){
-  //     if(utils.isError(r)){
-  //       next(r);
-  //     }else{
-  //       res.json(200, r);
-  //     }
-  //   });
-  // });
 
   //Progresses an order from the cart to being placed
   app.put('/api/orders/:orderId/status/:orderStatus', function (req, res) {

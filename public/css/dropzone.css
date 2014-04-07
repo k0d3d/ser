@@ -176,10 +176,10 @@
   position: absolute;
   width: 256px;
   height: 256px;
-  margin-left: -128px;
+/*  margin-left: -128px;
   margin-top: -128px;
   top: 50%;
-  left: 50%;
+  left: 50%;*/
 }
 .dropzone .dz-default.dz-message span {
   display: none;

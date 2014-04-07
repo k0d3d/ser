@@ -22,7 +22,7 @@ mixin register()
         label.control-label Account Type
         select.form-control.chosen-select(data-placeholder='Facility, Distributor, Sales Agent..', required, ng-model="form.account_type")
           each p, index in people
-            option(value=index + 1) #{p.name}
+            option(value=index) #{p.name}
 
       br
       button.btn.btn-success.btn-block(type="submit", ng-disabled="register_new_account.$invalid") Sign Up

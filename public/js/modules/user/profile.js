@@ -13,7 +13,7 @@ jQuery(document).ready(function(){
 
     $.fn.editable.defaults.url = '/api/users/profile';
 
-    $('.x-editable').editable('disable');
+    $('.x-editable').editable('enable');
     $(document).on('click', '.start-edit', function (e) {
       $('.x-editable').editable('toggleDisabled');
     });

@@ -3,6 +3,7 @@ var item_model = require('../models/item.js'),
 
 module.exports.routes = function(app, login) {
   var drugs = new item_model.Drug();
+  var NDL = item_model.NDL;
 
   app.get('/a/drugs', login.ensureLoggedIn(), function(req, res){
     res.render('index', {
@@ -70,7 +71,7 @@ module.exports.routes = function(app, login) {
     drugs.fetchAllMyDrugs({
       page: req.query.page || 0,
       limit: req.query.limit || 10
-    }, req.user._id)
+    }, req.user._id, req.user.account_typey)
     .then(function (r) {
       res.json(200, r);
     }, function (err) {
@@ -94,8 +95,8 @@ module.exports.routes = function(app, login) {
 
   //run typeahead
   app.get('/api/internal/items/typeahead', function (req, res, next) {
-    var ndl = item_model.NDL();
-    ndl.autocomplete(req.query.query, function (err, list) {
+    //var ndl = NDL();
+    NDL.autocomplete(req.query.query, function (err, list) {
       if (err) {
         next(err);
       } else {

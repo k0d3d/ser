@@ -23,6 +23,10 @@
               .col-sm-6
                 select.form-control(type='text', placeholder='', ng-model="add_item_form.category", ng-options="c for c in itemCategory", required)
             .form-group
+              label.col-sm-3.control-label Tags
+              .col-sm-6
+                tags-input.form-control(type='text', placeholder='', ng-model="add_item_form.drugTags")
+            .form-group
               label.col-sm-3.control-label Manufacturer
               .col-sm-6
                 input.form-control(type='text', placeholder='', ng-model="add_item_form.pharma.pharmaName", required)
@@ -34,7 +38,9 @@
             .form-group
               label.col-sm-3.control-label Price
               .col-sm-3
-                input.form-control(type='number', placeholder='', ng-model="add_item_form.currentPrice", required)
+                input.form-control(type='number', placeholder='Retail', ng-model="add_item_form.currentPrice.retail", required)
+                input.form-control(type='number', placeholder='Institution', ng-model="add_item_form.currentPrice.institution")
+                input.form-control(type='number', placeholder='Wholesale', ng-model="add_item_form.currentPrice.wholesale")
             .form-group
               label.col-sm-3.control-label Item Form
               .col-sm-3

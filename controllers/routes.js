@@ -19,7 +19,7 @@ module.exports = function(app, passport) {
     },
     {
       name: 'Distributor',
-      permissions: ['view-activity', 'view-drug-pages', 'add-item']
+      permissions: ['view-activity', 'view-drug-pages', 'add-item','view-profile-distributors', 'view-profile-managers', 'view-profile-staff']
     },
     {
       name: 'Manager',
@@ -27,17 +27,17 @@ module.exports = function(app, passport) {
     },
     {
       name: 'Staff',
-      permissions: ['view-activity', 'view-drug-pages', 'employer', 'coverage']
+      permissions: ['view-activity', 'view-drug-pages', 'employer', 'coverage', 'profile-activity']
     },
     {
       name: 'Hospitals',
-      permissions: ['place-order', 'view-activity']
+      permissions: ['place-order', 'view-activity', 'order-cart']
     }
   ];
   var nav = [
     {
       name : "Dashboard",
-      roles : ['*'],
+      roles : [],
       icon: '',
       url: '/'
     },
@@ -95,7 +95,7 @@ module.exports = function(app, passport) {
     },
     {
       name: 'Invitations',
-      roles: [0,1,2,3,4],
+      roles: [0,1,2,3],
       url: '/a/organization/invitations'
     }
   ];
@@ -132,7 +132,7 @@ module.exports = function(app, passport) {
       }
     }
 
-    console.log(req.originalUrl);
+    //console.log(req.originalUrl);
 
     res.locals.navs = nav;
     res.locals.people = people;
@@ -159,6 +159,10 @@ module.exports = function(app, passport) {
     //Organization
     var organization = require('./organization');
     organization.routes(app, login);
+
+    //Organization
+    var activity = require('./activity.js');
+    activity(app, login);
 
     //File upload handler/controller
     var fileupload = require('./upload');

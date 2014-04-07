@@ -17,17 +17,6 @@
               i.fa.fa-facebook
               a.x-editable(href='#', data-type="text", data-name="facebook") #{userProfile.facebook}
 
-          .mb20    
-          .panel.panel-default
-              .panel-body
-                a(href="#")
-                  | 0 Distributors 
-          .mb20    
-          .panel.panel-default
-              .panel-body
-                a(href="#")
-                  | 0 Sales Agent
-
           .mb30
           h5.subtitle Office Address
           address.x-editable(data-type="textarea", data-name="address", data-defaultValue="Address")
@@ -35,6 +24,25 @@
           h5.subtitle Telephone
           p.x-editable(title='Phone', data-type="text", data-name="phone", data-default-value="Your Phone Number")
             | #{userProfile.phone}
+
+          -if (isPermitted(['view-profile-distributors']))
+            .mb20    
+            .panel.panel-default
+                .panel-body
+                  a(href="#")
+                    | {{workForce[2].length}} Distributors 
+          -if (isPermitted(['view-profile-managers']))
+            .mb20    
+            .panel.panel-default
+                .panel-body
+                  a(href="#")
+                    | {{workForce[1].length + workForce[3].length}} Managers
+          -if (isPermitted(['view-profile-staff']))
+            .mb20    
+            .panel.panel-default
+                .panel-body
+                  a(href="#")
+                    | {{workForce[4].length}} Staff
         //
            col-sm-3 
         .col-sm-9
@@ -52,7 +60,7 @@
                 i.fa.fa-briefcase
                 span.x-editable(data-name="position", data-type="text", title="Position", data-default-value="Position") #{userProfile.position} 
                 span(style="margin: 0 2px;") at 
-                a.x-editable(href='#', data-type="text", data-name="employer", title="Employer", data-default-value="Employer") 
+                a(href='/a/organization/people/#{userProfile.employer.userId}/staff/2', data-type="text", data-name="employer", title="Employer", data-default-value="Employer") #{userProfile.employer.name} 
             .mb20
             button.btn.btn-success.mr5.start-edit
               i.fa.fa-user

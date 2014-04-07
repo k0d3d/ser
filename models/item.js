@@ -10,7 +10,7 @@
         var s = Q.defer(), modelName = staffUtils.getMeMyModel()
 
         Drug.find({},
-          'itemName sciName category currentPrice pharma owner'
+          'itemName sciName category currentPrice pharma supplier'
         )
         //.populate('owner', null, '')
         .regex('itemName', new RegExp(query, 'i'))
@@ -18,7 +18,6 @@
         .lean()
         //.skip(page * 10)
         .exec(function(err, i){
-          console.log(err, i);
           if(err){
             return s.reject(err);
           } else {
@@ -64,10 +63,11 @@
       addDrug : function addDrug (doc) {
         var d = Q.defer();
         var drug = new Drug(doc.item);
-        drug.owner = {
-          owner: doc.owner,
-          account_type: doc.account_type
+        drug.supplier = {
+          supplierId: doc.owner,
+          supplier_type: doc.account_type
         };
+
         drug.save(function (err, i) {
           if (err) {
             return d.reject(err);
@@ -103,15 +103,19 @@ DrugController.prototype.search = function(query, param, filter, option) {
 
   drugsFunctions.searchByRegDrugs(query, param, filter, option)
   .then(function (found_drugs) {
+    console.log(found_drugs);
     var populate = Q.defer();
 
     function __recurseOwner () {
       var oneDrug = found_drugs.pop();
-      var Model = staffUtils.getMeMyModel(oneDrug.owner.account_type);
+      console.log(oneDrug);
+      var accountType = oneDrug.supplier.supplier_type;
+      var Model = staffUtils.getMeMyModel(oneDrug.supplier.supplier_type);
 
       Model.findOne({
-        userId: oneDrug.owner.owner
-      }, 'name coverage')
+        userId: oneDrug.supplier.supplierId
+      }, 'name coverage userId')
+      .lean()
       .exec(function (err, i) {
         if (err) {
           return populate.reject(err);
@@ -121,15 +125,20 @@ DrugController.prototype.search = function(query, param, filter, option) {
         }
 
         oneDrug.owner = i;
+        oneDrug.owner.account_type = accountType;
         s.drug.push(oneDrug);
 
-        if (found_drugs.lenght) {
+        if (found_drugs.length) {
           __recurseOwner();
         } else {
           return populate.resolve();
         }
         ;
       });        
+    }
+
+    if (found_drugs.length === 0) {
+      return populate.resolve({})
     }
 
     __recurseOwner();
@@ -150,6 +159,7 @@ DrugController.prototype.search = function(query, param, filter, option) {
 
   })
   .catch(function (err) {
+    console.log(err.stack);
     return searcher.reject(err);
   });
 
@@ -275,7 +285,7 @@ DrugController.prototype.checkUpdate = function(since, cb){
 
 DrugController.prototype.fetchAllMyDrugs = function (options, owner) {
   var d = Q.defer();
-  Drug.find({"owner.owner": owner})
+  Drug.find({"supplier.supplierId": owner})
   //.sort()
   .limit(options.limit)
   .skip(options.limit * options.page)

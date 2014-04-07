@@ -406,6 +406,45 @@ Staff.prototype.lookUpMyPeople = function lookUpMyPeople (accountType, employerI
 };
 
 /**
+ * queries all staff employed by an employer. i.e.
+ * queries all staff, manager, distributor accounts below the current signed in user's
+ * account level. 
+ * @param  {[type]} employerId  [description]
+ * @param  {[type]} accountType [description]
+ * @return {[type]}             [description]
+ */
+Staff.prototype.lookUpWorkForce = function (accountType, employerId) {
+  var libr = Q.defer(),
+      ac_range = _.range(accountType, 5),
+      force = [];
+      console.log(ac_range);
+  function __lookUp () {
+    var task = ac_range.pop();
+
+    staffFunctions.lookUpPeople({
+      account_type : task,
+      employerId : employerId
+    })
+    .then(function (people) {
+      force[task] = people;
+      if (ac_range.length) {
+        __lookUp();
+      } else {
+        return libr.resolve(force);
+      }
+      
+    }, function (err) {
+      return libr.reject(err);
+    });
+
+  }
+
+  __lookUp();
+
+  return libr.promise;
+};
+
+/**
  * allows a distributor, manager or staff to add drugs
  * @param  {ObjectId} drug_id the ObjectId of the drug he wishes to
  * add to his/her profile.
@@ -446,6 +485,46 @@ Staff.prototype.cancelActivation = function cancelActivation (activationToken) {
 
   return act.promise;
 };
+
+/**
+ * gets the profile for the userId
+ * @param  {ObjectId} userId       userId to query a profile for.
+ * @param  {Number} accountType account type or account level for
+ * the user id.
+ * @return {[type]}              Promise Object
+ */
+Staff.prototype.getPersonProfile = function getPersonProfile (userId, accountType) {
+  console.log(arguments);
+  var d = Q.defer();
+  staffUtils.getMeMyModel(accountType).findOne({
+    userId: userId
+  })
+  .populate('drugs', null, 'drug')
+  .lean()
+  .exec(function (err, user_profile) {
+    console.log(err, user_profile);
+    if (err) {
+      return d.reject(err);
+    }
+    if (user_profile) {
+      // if the account is not a distributor account
+      if (parseInt(accountType) !== 2 && parseInt(accountType) < 5) {
+        //lets attach the employer profile
+        staffUtils.getMeMyModel(2).findOne({
+          userId: user_profile.employer[0].employerId
+        })
+        .exec(function (err, employerIsh) {
+          user_profile.employer = employerIsh;
+          return d.resolve(user_profile);
+        });
+      } else {
+        return d.resolve(user_profile);
+      }
+    }
+  });
+
+  return d.promise;
+}
 
 module.exports.Staff = Staff;
 module.exports.staffFunctions = staffFunctions;

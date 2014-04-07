@@ -1,56 +1,56 @@
 .contentpanel
   .row
       .col-sm-3
-        img.thumbnail.img-responsive(src='/images/photos/#{userProfile.image}' , alt='')
+        img.thumbnail.img-responsive.profile-img(src='/images/photos/#{image}' , alt='')
         .mb30
         h5.subtitle About
-        p.mb10.x-editable(data-type="textarea", data-name="summary")
-          | #{userProfile.summary}
+        p.mb10(data-type="textarea", data-name="summary")
+          | {{person.summary}}
         a(href='#') Show More
         .mb10        
         h5.subtitle Connect
         ul.profile-social-list
           li
             i.fa.fa-twitter
-            a.x-editable(href='#', data-type="text", data-name="twitter") twitter.com/eileensideways
+            a(ng-href='http://', data-type="text", data-name="twitter") {{person.twitter}}
           li
             i.fa.fa-facebook
-            a.x-editable(href='#', data-type="text", data-name="facebook") facebook.com/eileen
+            a(ng-href='http://', data-type="text", data-name="facebook") {{person.facebook}}
 
         .mb20    
         .panel.panel-default
             .panel-body
               a(href="#")
-                | 8 Distributors 
+                | 0 Distributors 
         .mb20    
         .panel.panel-default
             .panel-body
               a(href="#")
-                | 10 Sales Agent
+                | 0 Sales Agent
 
         .mb30
         h5.subtitle Office Address
-        address.x-editable(data-type="textarea", data-name="address", data-defaultValue="Address")
-          | #{userProfile.address}
+        address(data-type="textarea", data-name="address", data-defaultValue="Address")
+          | {{person.address}}
         h5.subtitle Telephone
-        p.x-editable(title='Phone', data-type="text", data-name="phone", data-default-value="Your Phone Number")
-          | #{userProfile.phone}
+        p(title='Phone', data-type="text", data-name="phone", data-default-value="Your Phone Number")
+          | {{person.phone}}
       //
          col-sm-3 
       .col-sm-9
         .profile-header
-          h2.profile-name.x-editable(data-name="name", data-type="text", data-default-value="Full Name or Company Name") #{userProfile.name}
+          h2.profile-name(data-name="name", data-type="text") {{person.name}}
           .profile-location
             span(style="display: block", title="Your Coverage / Territory") 
               i.fa.fa-map-marker
               | Coverage
-            span.x-editable(data-type="text", data-name="coverage", data-default-value="Territory")
-              | #{userProfile.coverage}
+            span(data-type="text", data-name="coverage", data-default-value="Territory")
+              | #{coverage}
           .profile-position
             i.fa.fa-briefcase
-            span.x-editable(data-name="position", data-type="text", title="Position", data-default-value="Position") #{userProfile.position} 
+            span(data-name="position", data-type="text", title="Position", data-default-value="Position") #{position} 
             span(style="margin: 0 2px;") at 
-            a.x-editable(href='#', data-type="text", data-name="employer", title="Employer", data-default-value="Employer") #{userProfile.employer}
+            a(href='#', data-type="text", data-name="employer", title="Employer", data-default-value="Employer") #{employer}
           .mb20
           button.btn.btn-white
             i.fa.fa-envelope-o
@@ -60,38 +60,40 @@
         //
            Nav tabs 
         ul.nav.nav-tabs.nav-justified.nav-profile
-          li.active
-            a(href='#activities', data-toggle='tab')
-              strong Activities
-          li
-            a(href='#drug-pages', data-toggle='tab')
-              strong Drug Pages
-          li
-            a(href='#calendar', data-toggle='tab')
-              strong Calendar
-          li
-            a(href='#prospects', data-toggle='tab')
-              strong Prospects
-          li
-            a(href='#prospects', data-toggle='tab')
-              strong Map
+          -if (isPermitted(['profile-activity']))
+            li.active
+              a(href="#", data-target='#activities', data-toggle='tab')
+                strong Activities
+          -if (isPermitted(['profile-drug-pages']))
+            li
+              a(href="#", data-target='#drug-pages', data-toggle='tab')
+                strong Drug Pages
+          -if (isPermitted(['profile-calendar']))
+            li
+              a(href="#", data-target='#calendar', data-toggle='tab')
+                strong Calendar
+          -if (isPermitted(['profile-prospects']))
+            li
+              a(href="#", data-target='#prospects', data-toggle='tab')
+                strong Prospects
+          -if (isPermitted(['profile-map']))
+            li
+              a(href="#", data-target='#prospects', data-toggle='tab')
+                strong Map
         //
-           Tab panes 
-        .tab-content
-          include ../widgets/profile/activity
-          +loadActivities()
+          .tab-content
+            include ../widgets/profile/activity
+            +loadActivities()
 
-          include ../widgets/profile/drug-pages
-          +loadDrugPages()
+            include ../widgets/profile/drug-pages
+            +loadDrugPages()
 
-          include ../widgets/profile/calendar
-          +loadCalendar()
+            include ../widgets/profile/calendar
+            +loadCalendar()
 
-          include ../widgets/profile/prospects
-          +loadProspects()
-          
-          include ../widgets/profile/prospects
-          +loadProspects()
+            include ../widgets/profile/prospects
+            +loadProspects()
+
 
 append scripts
 script(src='/js/jquery.prettyPhoto.js')

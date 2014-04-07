@@ -5,12 +5,13 @@
       input.form-control(type='text', name='keyword', placeholder='Search here...')
     .header-right
       ul.headermenu
-        li
-          .btn-group
-            a.btn.btn-default.tp-icon(href="/a/orders/cart", ahref)
-              | Order Cart
-              i.fa.fa-shopping-cart
-              span.badge {{orderCart.length}}
+        -if (isPermitted(['order-cart'])) 
+          li
+            .btn-group
+              a.btn.btn-default.tp-icon(href="/a/orders/cart", ahref)
+                | Order Cart
+                i.fa.fa-shopping-cart
+                span.badge {{orderCart.length}}
 
         li
           .btn-group

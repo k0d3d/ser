@@ -3,11 +3,10 @@
  */
  var mongoose = require('mongoose'),
  util = require('util'),
- User = require('../models/user/user.js') ,
+ User = require('../models/user/user.js'),
  Q = require('q'),
  _ = require("underscore"),
  passport = require('passport'),
- Notification = require('./activity.js'),
  //Organization = require('./organization.js').Staff,
  staffUtils = require('./staff_utils.js'),
 
@@ -235,42 +234,42 @@ UserController.prototype.user = function(req, res, next, id) {
   });
 };
 
+/**
+ * gets the profile for the userId
+ * @param  {ObjectId} userId       userId to query a profile for.
+ * @param  {Number} account_type account type or account level for
+ * the user id.
+ * @return {[type]}              Promise Object
+ */
 UserController.prototype.getProfile = function (userId, account_type) {
   var d = Q.defer();
-
   staffUtils.getMeMyModel(account_type).findOne({
     userId: userId
   })
-  .populate('drugs.drug', null, 'drug')
-  .exec(function (err, i) {
+  .populate('drugs', null, 'drug')
+  .lean()
+  .exec(function (err, user_profile) {
     if (err) {
       return d.reject(err);
     }
-    if (_.isEmpty(i)) {
-      return d.resolve({
-
-      });
+    if (user_profile) {
+      // if the account is not a distributor account
+      if (parseInt(account_type) !== 2 && parseInt(account_type) < 5) {
+        //lets attach the employer profile
+        staffUtils.getMeMyModel(2).findOne({
+          userId: user_profile.employer[0].employerId
+        })
+        .exec(function (err, employerIsh) {
+          user_profile.employer = employerIsh;
+          return d.resolve(user_profile);
+        });
+      } else {
+        return d.resolve(user_profile);
+      }
     }
-    return d.resolve(i);
   });
 
   return d.promise;
 };
-
-UserController.prototype.pullActivity = function (owner) {
-  var not = Q.defer(),
-
-  notice = new Notification();
-  notice.pullActivity({
-    ownerId : owner
-  })
-  .then( function(i) {
-    return not.resolve(i);
-  }, function (err) {
-    return not.reject(err);
-  });
-  return not.promise;
-};
-
 
 module.exports.User = UserController;

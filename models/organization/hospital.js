@@ -8,11 +8,14 @@ var HospitalSchema =  new Schema({
   hospitalId: {type: Number},
   name: {type: String},
   address: {type: String},
-  phonenumber: {type: String},
+  phone: {type: String},
   location: {type: String},
-  user:{type: Schema.ObjectId, ref: 'User'},
+  userId:{type: Schema.ObjectId, ref: 'User'},
   personel: {type: String},
   personelContactNumber: {type: String},
+  summary: {type: String},
+  twitter: {type: String},
+  facebook: {type: String},
   favicon: {type: String}
 });
 
