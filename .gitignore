@@ -2,4 +2,5 @@
 .nodemonignore
 .sass-cache/
 node_modules/
+!node_modules/connect-mongo
 public/lib
