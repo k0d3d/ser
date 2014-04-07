@@ -1,26 +1,16 @@
 {
-    "db": "mongodb://localhost/mean",
+    "db": {
+        "url": "mongodb://stocCloud:s2Oz7kDTwRuQ@ds063177.mongolab.com:63177/heroku_app23862428",
+        "user": "stocCloud",
+        "password": "s2Oz7kDTwRuQ",
+        "database": "stoccloud",
+        "port": 63177,
+        "server": "ds063177.mongolab.com:63177/heroku_app23862428",
+        },
+    "express":{
+        "secret": "yfhgU&^%@N>YS!!~HJS&JDHGDbvjhg7509"
+    },
     "app": {
-        "name": "MEAN - A Modern Stack - Production"
-    },
-    "facebook": {
-        "clientID": "APP_ID",
-        "clientSecret": "APP_SECRET",
-        "callbackURL": "http://localhost:3000/auth/facebook/callback"
-    },
-    "twitter": {
-        "clientID": "CONSUMER_KEY",
-        "clientSecret": "CONSUMER_SECRET",
-        "callbackURL": "http://localhost:3000/auth/twitter/callback"
-    },
-    "github": {
-        "clientID": "APP_ID",
-        "clientSecret": "APP_SECRET",
-        "callbackURL": "http://localhost:3000/auth/github/callback"
-    },
-    "google": {
-        "clientID": "APP_ID",
-        "clientSecret": "APP_SECRET",
-        "callbackURL": "http://localhost:3000/auth/google/callback"
+        "name": "Integra StocCloud"
     }
 }
