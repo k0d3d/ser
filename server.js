@@ -56,7 +56,7 @@ function afterResourceFilesLoad() {
     }));
 
     // efficient favicon return - will enable when we have a favicon
-    app.use(favicon());
+    app.use(favicon('public/images/favicon.ico'));
 
     // make everything in the public folder publicly accessible - do this high up as possible
     app.use(express.static(__dirname + '/public'));
