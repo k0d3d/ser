@@ -6,12 +6,12 @@
 angular.module('order', []).
 
 config(['$routeProvider',function($routeProvider){
-  $routeProvider.when('/orders', {templateUrl: '/orders/all', controller: 'ordersIndexController'})
+  $routeProvider.when('/a/orders', {templateUrl: '/order/index', controller: 'ordersIndexController'})
   .when('/a/orders/new', {templateUrl: '/order/new-order-search-item', controller: 'orderAddController'})
   .when('/a/orders/cart', {templateUrl: '/order/cart', controller: 'orderCartController'});
 }])
 .controller('orderCartController', ['$scope', '$http', 'ordersService', function($scope, $http, ordersService){
-
+  $scope.$parent.headerTitle = 'Search and Place Order';
 
   $scope.order_this = function(order, index){
     console.log(order);
@@ -74,6 +74,7 @@ config(['$routeProvider',function($routeProvider){
 
 }])
 .controller('ordersIndexController', function($scope, $http, $location, $routeParams, ordersService){
+  $scope.$parent.headerTitle = 'Orders';
   $scope.getStatus = function (status){
     var d;
     switch(status){
@@ -106,7 +107,8 @@ config(['$routeProvider',function($routeProvider){
   (function(){
     $scope.orders = [];
     
-    ordersService.orders(function(r){
+    ordersService.orders(7, 'small')
+    .then(function(r){
       angular.forEach(r, function(v, i){
         v.nextStatus = $scope.getStatus(v.orderStatus.toLowerCase());
         $scope.orders.push(v);

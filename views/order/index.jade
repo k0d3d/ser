@@ -1,11 +1,8 @@
-block body
-  .row-fluid.row-break(ng-init="plcordr= true;searchndl=false")
-    .col-md-12
-      .row  
-        .col-md-11.col-md-offset-1
-          .row
-            .col-md-12
-              h2 Orders
+.contentpanel
+    .panel.panel-default
+      .col-md-12
+        .panel.panel-default()
+            .panel-body
               .form-content(style="margin-bottom: 30px")
                 form.form-inline(name="searchform", novalidate, ng-submit="searchcmp()")
                   .form-group

@@ -42,9 +42,9 @@ var orderManager = {
 
     Order.find({
       orderVisibility: true,
-      orderStatus: doc.orderStatus,
-      hospitalId: doc.hospitalId
+      orderStatus: doc.orderStatus
     }, fields)
+    .where(doc.where, doc.whrVal)
     .populate('itemId', 'itemName images pharma', 'drug')
     .lean()
     //.limit(perPage)
@@ -119,9 +119,10 @@ OrderController.prototype.pushOrders = function (body, cb) {
  * @param  {[type]} orderStatus the order status to return 
  * @param  {[type]} displayType Full or summary results / fields returned
  * @param  {[type]} userId the user id for the logged in user.
+ * @param  {[type]} accountType the user id for the logged in user.
  * @return {[type]}             Promise.
  */
-OrderController.prototype.getOrders = function(orderStatus, displayType, userId){
+OrderController.prototype.getOrders = function(orderStatus, displayType, userId, accountType){
 
   var gt = Q.defer(), __orders, populatedOrderList = [];
 
@@ -154,6 +155,18 @@ OrderController.prototype.getOrders = function(orderStatus, displayType, userId)
       }
     });
   }
+
+  //if account type is a hospital
+  if (accountType === 5) {
+
+  }
+
+
+  //if account type is a staff or manager
+  
+
+
+  //if account type is a distributor
 
   //Fetch orders authored / placed by the 
   //logged in hospital.

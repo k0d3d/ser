@@ -9,14 +9,14 @@ var Order = require('../models/order.js');
 module.exports.routes = function(app, login){
   var order = new Order();
 
-  app.get('/dashboard/order', login.ensureLoggedIn('/signin'), function(req, res){
+  app.get('/a/orders', login.ensureLoggedIn('/signin'), function(req, res){
       res.render('index',{
         title: 'Place new order'
       });
     }
   );
 
-  app.get('/dashboard/order/:id', login.ensureLoggedIn('/signin'), function(req, res){
+  app.get('/a/orders/:id', login.ensureLoggedIn('/signin'), function(req, res){
       res.render('index',{});
     }
   );
@@ -49,7 +49,7 @@ module.exports.routes = function(app, login){
   //
   app.get('/api/orders/:orderStatus/display/:displayType',function(req, res){
 
-    order.getOrders(req.params.orderStatus, req.params.displayType, req.user._id)
+    order.getOrders(req.params.orderStatus, req.params.displayType, req.user._id, req.user.account_type)
     .then(function(r){
         res.json(200, r);
     }, function (err) {

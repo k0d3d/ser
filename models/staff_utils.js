@@ -2,7 +2,9 @@ var Staff = require('./organization/staff.js'),
     Distributor = require('./organization/distributor.js'),
     Manager = require('./organization/manager.js'),
     Hospital = require('./organization/hospital.js'),
-    PharmaComp = require('./organization/pharmacomp.js');
+    PharmaComp = require('./organization/pharmacomp.js'),
+    _ = require('underscore'),
+    Q = require('q');
 
 module.exports = {
     /**
@@ -35,5 +37,90 @@ module.exports = {
 
       return Manager;
 
+    },
+    /**
+     * fetches the employees under a manager or a distributor.
+     * if the userId has an account type 
+     * @param  {[type]} userId      [description]
+     * @param  {[type]} accountType [description]
+     * @return {[type]}             [description]
+     */
+    getMyPeople : function getMyPeople(userId, accountType) {
+      var book = Q.defer(), people = {};
+
+      // private function to find managers. return a promise
+      function __findMyManagers () {
+        var distSearch = Q.defer();
+
+        //Check for managers 
+        Manager.find({
+          'employer.employerId' : userId
+        })
+        .populate('userId', 'email account_type', 'User')
+        .exec(function (err, managedManagers) {
+          if (err) {
+            return distSearch.reject(err);
+          }
+          if (managedManagers) {
+            return distSearch.resolve(managedManagers);
+          }
+        });
+
+        return distSearch.promise;
+      }
+
+      //first of all, lets deny any other account (staff, hospital, pharma) from 
+      //getting employees
+      if (parseInt(accountType) !== 3 || parseInt(accountType) !== 2) {
+        book.resolve([]);
+        return book.promise;
+      }
+
+      //if its a manager account , 3.
+      //since staffs are the only employees below
+      //managers.. lets just use the staff model
+      if (parseInt(accountType) === 3) {
+        Staff.find({
+          'manager.managerId' : userId
+        })
+        .populate('userId', 'email account_type', 'User')
+        .exec(function (err, managedStaff) {
+          if (err) {
+            return book.reject(err);
+          }
+          if (managedStaff) {
+            people.staff = managedStaff || {};
+            return book.resolve(people);
+          }
+        });
+      }
+
+      //if its a distributor account, 2
+      //we have to look for both staffs and managers 
+      //under the distributor.
+      if (parseInt(accountType) === 2) {
+        __findMyManagers()
+        .then(function (myManagers) {
+          people.managers = myManagers || {};
+          console.log(people);
+          //find the staff employed by a distributor
+          Staff.find({
+            'employer.employerId' : userId
+          })
+          .populate('userId', 'email account_type', 'User')
+          .exec(function (err, managedStaff) {
+            if (err) {
+              return book.reject(err);
+            }
+            if (managedStaff) {
+              people.staff = managedStaff || {};
+              return book.resolve(people);
+            }
+          });          
+        });
+      }
+
+      return book.promise;
     }
-  };
+};
+
