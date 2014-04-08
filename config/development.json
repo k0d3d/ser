@@ -2,7 +2,9 @@
     "db": {
         "server": "localhost",
         "database": "stoccloud",
-        "port": 27017
+        "port": 27017,
+        "user": "",
+        "pass": ""
     },
     "express":{
         "secret": "yfhgU&^%@N>YS!!~HJS&JDHGDbvjhg7509"
