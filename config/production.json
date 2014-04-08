@@ -3,9 +3,9 @@
         "url": "mongodb://stocCloud:s2Oz7kDTwRuQ@ds063177.mongolab.com:63177/heroku_app23862428",
         "user": "stocCloud",
         "password": "s2Oz7kDTwRuQ",
-        "database": "stoccloud",
+        "database": "heroku_app23862428",
         "port": 63177,
-        "server": "ds063177.mongolab.com:63177/heroku_app23862428"
+        "server": "ds063177.mongolab.com"
         },
     "express":{
         "secret": "yfhgU&^%@N>YS!!~HJS&JDHGDbvjhg7509"
