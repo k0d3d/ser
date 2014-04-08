@@ -89,7 +89,8 @@ function afterResourceFilesLoad() {
             db: config.db.database,
             host: config.db.server,
             port: config.db.port,
-            auto_reconnect: true
+            auto_reconnect: true,
+            collection: "mongoStoreSessions"
         })
     }));
 
