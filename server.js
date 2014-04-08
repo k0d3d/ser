@@ -88,7 +88,8 @@ function afterResourceFilesLoad() {
         store: new MongoStore({
             db: config.db.database,
             host: config.db.server,
-            port: config.db.port
+            port: config.db.port,
+            auto_reconnect: true
         })
     }));
 
