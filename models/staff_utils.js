@@ -14,6 +14,11 @@ module.exports = {
      */
     getMeMyModel : function getMeMyModel (account_type) {
       account_type = parseInt(account_type);
+
+      if (!account_type) {
+        throw new Error('account type can not be empty');
+      }
+
       if (account_type === 4) {
         return Staff;
       }  
@@ -121,6 +126,49 @@ module.exports = {
       }
 
       return book.promise;
+    },
+    /**
+     * this replaces the field(fieldToPop) on each member / property of 
+     * the doc Object with the actual collection / row 
+     * 
+     * @param  {Object} doc        the document / object / array containing objects
+     * which have a property to be populated.
+     * @param  {String} fieldToPop the field on doc to be populated
+     * @param  {Number} accountType the account level or account type to be
+     * populated.
+     * @return {Object}            Promise Object
+     */
+    populateProfile: function populateProfile (doc, fieldToPop, accountType) {
+      console.log('Populating Hospitals...');
+      var pop = Q.defer(), poppedHospitals = [];
+      var self = this;
+
+      function __pop() {
+        var task = doc.pop();
+        console.log(task);
+        self.getMeMyModel(accountType)
+        .findOne({
+          userId: task[fieldToPop]
+        })
+        .exec(function (err, i) {
+          if (err) {
+            return pop.reject(err);
+          }
+
+          task[fieldToPop] = i;
+          poppedHospitals.push(task);
+          
+          if (doc.length) {
+            __pop();
+          } else {
+            return pop.resolve(poppedHospitals);
+          }
+        });
+      }
+
+      __pop();
+
+      return pop.promise;
     }
 };
 

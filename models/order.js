@@ -43,8 +43,6 @@ var orderManager = {
   getOrders: function getOrders (doc) {
     console.log('Attempting to get orders..');
 
-
-
     var query = {
       orderVisibility: true,
       orderStatus: doc.orderStatus
@@ -65,12 +63,11 @@ var orderManager = {
     Order.find(_.compactObject(query), fields)
     //.where(doc.where, doc.whrVal)
     .populate('itemId', 'itemName images pharma', 'drug')
-    .populate('hospitalId', 'userId name', 'Hospital')
     .lean()
     //.limit(perPage)
     //.skip(perPage * page)
     .exec(function(err, o) {
-      console.log(err, o);
+      //console.log(err, o);
       if (err){
         return gt.reject(err);
       }else{
@@ -108,6 +105,7 @@ var orderManager = {
     return gt.promise;
   },
   getEmployerOrder : function getEmployerOrder (doc) {
+    console.log('Getting employer orders...');
     var g = Q.defer();
 
     orderManager.getOrders({
@@ -237,7 +235,11 @@ OrderController.prototype.getOrders = function(orderStatus, displayType, userId,
         return gt.reject(err);
       }
       if (user) {
-        orderManager.getEmployerOrder(user.employer.employerId)
+        orderManager.getEmployerOrder({
+          displayType: displayType,
+          employerId: user.employer.employerId,
+          orderStatus: orderStatus
+        })
         .then(function (orders) {
           return gt.resolve(orders);
         });
@@ -251,29 +253,21 @@ OrderController.prototype.getOrders = function(orderStatus, displayType, userId,
   //if account type is a distributor
   if (accountType === 2) {
     console.log('Detected distributor account');
-    orderManager.getEmployerOrder(userId)
+    orderManager.getEmployerOrder({
+      displayType: displayType,
+      employerId: userId,
+      orderStatus: orderStatus
+    })
     .then(function (orders) {
-      return gt.resolve(orders);
+      //populate hospital data
+      staffUtils.populateProfile(orders, 'hospitalId', 5)
+      .then(function (populatedWithHospitals) {
+        return gt.resolve(populatedWithHospitals);
+      });
+      
     });
 
-    orderManager.getOrders({
-      //orderStatus:  (orderStatus > 6) ? undefined : orderStatus,
-      displayType: displayType,
-      where: 'orderSupplier.supplierId',
-      whrVal: userId
-    })
-    .then(function (orderList) {
-      if (orderList.length) {
-        __orders = orderList;
-
-        orderManager.getItemSuppliers();      
-      } else {
-
-        return gt.resolve([]);
-      }
-
-      
-    });    
+   
   }
   
   return gt.promise;
