@@ -9,7 +9,7 @@ var DrugSchema = new Schema ({
   itemName : {type: String, default: '', required: true},
   sciName : {type: String, default: '', required: true},
   nafdacRegNo : {type: String, default: '', required: true},
-  category : {type: String, default: '', required: true},
+  category : {type: String, default: ''},
   currentPrice: {
     wholesale: {type: Number},
     retail: {type: Number},

@@ -14,7 +14,7 @@
         )
         //.populate('owner', null, '')
         .regex('itemName', new RegExp(query, 'i'))
-        .limit(10)
+        .limit(50)
         .lean()
         //.skip(page * 10)
         .exec(function(err, i){
@@ -42,7 +42,7 @@
           'productName composition man_imp_supp'
         )
         .regex(param, new RegExp(query, 'i'))
-        .limit(10)
+        .limit(50)
         //.skip(page * 10)
         .exec(function(err, i){
           if(err){

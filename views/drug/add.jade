@@ -21,7 +21,7 @@
             .form-group
               label.col-sm-3.control-label Category
               .col-sm-6
-                select.form-control(type='text', placeholder='', ng-model="add_item_form.category", ng-options="c for c in itemCategory", required)
+                select.form-control(type='text', placeholder='', ng-model="add_item_form.category", ng-options="c for c in itemCategory")
             .form-group
               label.col-sm-3.control-label Tags
               .col-sm-6
@@ -38,13 +38,13 @@
             .form-group
               label.col-sm-3.control-label Price
               .col-sm-3
-                input.form-control(type='number', placeholder='Retail', ng-model="add_item_form.currentPrice.retail", required)
+                input.form-control(type='number', placeholder='Retail', ng-model="add_item_form.currentPrice.retail")
                 input.form-control(type='number', placeholder='Institution', ng-model="add_item_form.currentPrice.institution")
                 input.form-control(type='number', placeholder='Wholesale', ng-model="add_item_form.currentPrice.wholesale")
             .form-group
               label.col-sm-3.control-label Item Form
               .col-sm-3
-                select.form-control(type='number', placeholder='', ng-model="add_item_form.itemForm", required)
+                select.form-control(type='number', placeholder='', ng-model="add_item_form.itemForm")
                   option(value='?', selected='selected')
                   option Amples
                   option Caplets
@@ -67,7 +67,7 @@
             .form-group
               label.col-sm-3.control-label Item Packaging
               .col-sm-3
-                select.form-control(type='number', placeholder='', ng-model="add_item_form.itemPackaging", required)
+                select.form-control(type='number', placeholder='', ng-model="add_item_form.itemPackaging")
                   option(value='?', selected='selected')
                   option Bags
                   option Bottles
@@ -89,8 +89,8 @@
                     | Add an image for this item. You can click here or drag and drop file right here, easy!                           
             .form-group
               .col-sm-6.col-sm-offset-3
-                button.btn.btn-primary(type="submit", ng-disabled="addItemForm.$invalid") Submit
-                button.btn.btn-primary(type="submit", ng-disabled="addItemForm.$invalid") Submit and Add Another
+                button.btn.btn-primary(type="submit", ng-disabled="addItemForm.$invalid", ng-click="nextAction = 'listPage'") Submit
+                button.btn.btn-primary(type="submit", ng-disabled="addItemForm.$invalid", ng-click="nextAction = 'newAddition'") Submit and Add Another
                 button.btn.btn-default(type="reset") Cancel
 append foot
   script(src="/js/dropzone.min.js")

@@ -6,6 +6,9 @@ module.exports.routes = function(app, passport, login, people){
 
   app.route('/signin')
   .get(function (req, res, next){res.locals.people = people; next(); }, users.signin);
+
+  app.route('/login')
+  .get(function (req, res, next){res.locals.people = people; next(); }, users.signin);
   
   app.route('/signup')
   .get(function (req, res, next){res.locals.people = people; next(); }, users.signup);

@@ -110,7 +110,7 @@ config(['$routeProvider',function($routeProvider){
     ordersService.orders(7, 'small')
     .then(function(r){
       angular.forEach(r, function(v, i){
-        v.nextStatus = $scope.getStatus(v.orderStatus.toLowerCase());
+        v.nextStatus = v.orderStatus + 1;
         $scope.orders.push(v);
       });
       switch($routeParams.type){
@@ -130,12 +130,12 @@ config(['$routeProvider',function($routeProvider){
 
   }());
 
-  $scope.removeOrder = function(index){
-    var orderId = $scope.$parent.orderCart[index].order_id;
+  $scope.hide_order = function(index){
+    var orderId = $scope.orders[index].orderId;
     
-    ordersService.remove(orderId)
+    ordersService.hideOrderItem(orderId)
     .then(function(o){
-      $scope.$parent.orderCart.splice(index, i);
+      $scope.orders.splice(index, 1);
     });
   };
 
@@ -348,6 +348,17 @@ config(['$routeProvider',function($routeProvider){
           callback(d);
         });
     };
+
+    //remove or cancel an order
+    f.hideOrderItem = function(orderId){
+      return $http.delete('/api/orders/' + orderId)
+      .then(function (r) {
+        return r.data;
+      }, function(err) {
+
+      });
+    };
+
     //remove or cancel an order
     f.remove = function(order_id){
       return $http.delete('/api/orders/'+order_id)
@@ -357,6 +368,7 @@ config(['$routeProvider',function($routeProvider){
 
       });
     };
+
     f.moreInfo = function (id, callback) {
       $http.get('/api/orders/ndl/' + id + '/summary')
       .success(function (d) {

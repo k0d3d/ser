@@ -3,7 +3,8 @@
  * Module dependencies.
  */
 
-var Order = require('../models/order.js');
+var Order = require('../models/order.js'),
+    util = require('util');
 
 
 module.exports.routes = function(app, login){
@@ -69,22 +70,23 @@ module.exports.routes = function(app, login){
 
   //Progresses an order from the cart to being placed
   app.put('/api/orders/:orderId/status/:orderStatus', function (req, res) {
-    if (req.params.orderStatus == 1) {
-      order.placeOrder(req.body, req.user._id)
+    if (req.params.orderStatus === parseInt(1)) {
+      order.redressOrder(req.body, req.user._id, req.params.orderStatus)
       .then(function (r) {
         res.json(200, r);
       }, function (err) {
-        res.json(400, r);
+        res.json(400, err);
       });
-    };
+    }
 
     //if(req.params.orderStatus == )
   });
 
   //Delete Order (logically)
   app.delete('/api/orders/:order_id', function(req, res, next){
-    removeOrder(req.param('order_id'), function(err, i){
-      if(utils.isError(err)){
+    order.hideOrderItem(req.param('order_id'))
+    .then(function(err){
+      if(util.isError(err)){
         next(err);
       }else{
         res.json(200, {state: 1});

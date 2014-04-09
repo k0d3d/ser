@@ -52,7 +52,7 @@ var OrderStatusSchema = new Schema({
   order_id: {type: Schema.ObjectId},
   date: {type: Date, default: Date.now},
   hospitalId: {type: String},
-  status: String,
+  status: {type: Number, default: 0},
   check: {type:String, unique: true}
 });
 

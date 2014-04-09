@@ -9,7 +9,19 @@ var mongoose = require('mongoose'),
   staffUtils = require('./staff_utils.js'),
   utils = require("util");
 
-
+//Underscore mixin to remove 
+//false values from an object
+_.mixin({
+  compactObject: function (o) {
+    var clone = _.clone(o);
+    _.each(clone, function (v, k) {
+      if (!v) {
+        delete clone[k];
+      }
+    });
+    return clone;
+  }
+});
 
 var orderManager = {
   cartOrder : function cartOrder (orderData) {
@@ -29,9 +41,19 @@ var orderManager = {
     return or.promise;
   },
   getOrders: function getOrders (doc) {
+    console.log('Attempting to get orders..');
+
+
+
+    var query = {
+      orderVisibility: true,
+      orderStatus: doc.orderStatus
+    };
+
+    query[doc.where] = doc.whrVal;
+
     var fields = doc.fields,
         gt = Q.defer();
-    console.log(doc);
 
     if (doc.displayType === 'full') {
       fields = 'itemId orderAmount perItemPrice orderDate orderSupplier orderStatus hospitalId orderId amountSupplied';
@@ -40,12 +62,10 @@ var orderManager = {
       fields = 'itemId orderAmount perItemPrice orderDate orderSupplier orderStatus hospitalId orderId amountSupplied';
     }
 
-    Order.find({
-      orderVisibility: true,
-      orderStatus: doc.orderStatus
-    }, fields)
-    .where(doc.where, doc.whrVal)
+    Order.find(_.compactObject(query), fields)
+    //.where(doc.where, doc.whrVal)
     .populate('itemId', 'itemName images pharma', 'drug')
+    .populate('hospitalId', 'userId name', 'Hospital')
     .lean()
     //.limit(perPage)
     //.skip(perPage * page)
@@ -59,8 +79,50 @@ var orderManager = {
     });
     
     return gt.promise;
-  }
-}
+  },
+  getItemSuppliers : function getItemSuppliers (__orders) {
+    console.log('Getting Item Suppliers');
+    var task = __orders.pop(), gt = Q.defer(), populatedOrderList = [];
+    staffUtils.getMeMyModel(task.orderSupplier.supplier_type)
+    .findOne({
+      userId: task.orderSupplier.supplierId
+    }, 'name ')
+    .exec(function (err, supplierResult) {
+      console.log(err, supplierResult);
+      if (err) {
+        return gt.reject(err);
+      }
+      if (!supplierResult) {
+        return gt.reject(new Error('supplier not found'));
+      }
+      task.orderSupplier = supplierResult;
+
+      populatedOrderList.push(task);
+      if (__orders.length) {
+        orderManager.getItemSuppliers();
+      } else {
+        return gt.resolve(populatedOrderList);
+      }
+    });
+
+    return gt.promise;
+  },
+  getEmployerOrder : function getEmployerOrder (doc) {
+    var g = Q.defer();
+
+    orderManager.getOrders({
+      orderStatus: (doc.orderStatus > 6) ? undefined : doc.orderStatus,
+      displayType: doc.displayType,
+      where: 'orderSupplier.supplierId',
+      whrVal: doc.employerId
+    })
+    .then(function (orderList) {
+        return g.resolve(orderList); 
+    }); 
+
+    return g.promise;      
+  }  
+};
 
 
 function OrderController () {
@@ -123,69 +185,96 @@ OrderController.prototype.pushOrders = function (body, cb) {
  * @return {[type]}             Promise.
  */
 OrderController.prototype.getOrders = function(orderStatus, displayType, userId, accountType){
+  console.log('Checking Orders....');
+  var gt = Q.defer(), __orders;
 
-  var gt = Q.defer(), __orders, populatedOrderList = [];
 
-
-
-  function __getItemSuppliers () {
-    console.log('Getting Item Suppliers');
-    var task = __orders.pop();
-    console.log(task);
-    console.log(task.orderSupplier);
-    staffUtils.getMeMyModel(task.orderSupplier.supplier_type)
-    .findOne({
-      userId: task.orderSupplier.supplierId
-    }, 'name ')
-    .exec(function (err, supplierResult) {
-      console.log(err, supplierResult);
-      if (err) {
-        return gt.reject(err);
-      }
-      if (!supplierResult) {
-        return gt.reject(new Error('supplier not found'))
-      }
-      task.orderSupplier = supplierResult;
-      console.log(task);
-      populatedOrderList.push(task);
-      if (__orders.length) {
-        __getItemSuppliers();
-      } else {
-        return gt.resolve(populatedOrderList);
-      }
-    });
-  }
 
   //if account type is a hospital
   if (accountType === 5) {
+    console.log('Detected hospital account');
+    //Fetch orders authored / placed by the 
+    //logged in hospital.
+    orderManager.getOrders({
+      orderStatus: (orderStatus > 6) ? undefined : orderStatus,
+      displayType: displayType,
+      where: 'hospitalId',
+      whrVal: userId
+    })
+    .then(function (orderList) {
+      if (orderList.length) {
+        __orders = orderList;
 
+        orderManager.getItemSuppliers(__orders).
+        then(function (populatedOrderList) {
+          return gt.resolve(populatedOrderList);
+        });      
+      } else {
+        return gt.resolve([]);
+      }
+
+      
+    });
   }
 
 
   //if account type is a staff or manager
-  
+  if (accountType === 4 || accountType === 3) {
+    console.log('Detected staff or manager account');
+    //Fetch orders authored / placed by the 
+    //logged in hospital.
+    //what we are actually looking for is all orders
+    //placed to distributor employing the currently 
+    //logged in user.
+    
+    //first of all, lets get the employerId.
+    staffUtils.getMeMyModel(accountType)
+    .findOne({
+      userId: userId
+    }, 'employer')
+    .exec(function (err, user) {
+      if (err) {
+        return gt.reject(err);
+      }
+      if (user) {
+        orderManager.getEmployerOrder(user.employer.employerId)
+        .then(function (orders) {
+          return gt.resolve(orders);
+        });
+      }
+    });
+    
+ 
+  }
 
 
   //if account type is a distributor
+  if (accountType === 2) {
+    console.log('Detected distributor account');
+    orderManager.getEmployerOrder(userId)
+    .then(function (orders) {
+      return gt.resolve(orders);
+    });
 
-  //Fetch orders authored / placed by the 
-  //logged in hospital.
-  orderManager.getOrders({
-    orderStatus: orderStatus,
-    displayType: displayType,
-    hospitalId: userId
-  })
-  .then(function (orderList) {
-    if (orderList.length) {
-      __orders = orderList;
+    orderManager.getOrders({
+      //orderStatus:  (orderStatus > 6) ? undefined : orderStatus,
+      displayType: displayType,
+      where: 'orderSupplier.supplierId',
+      whrVal: userId
+    })
+    .then(function (orderList) {
+      if (orderList.length) {
+        __orders = orderList;
 
-      __getItemSuppliers();      
-    } else {
-      return gt.resolve([]);
-    }
+        orderManager.getItemSuppliers();      
+      } else {
 
-    
-  });
+        return gt.resolve([]);
+      }
+
+      
+    });    
+  }
   
   return gt.promise;
 
@@ -316,14 +405,14 @@ OrderController.prototype.placeItemInCart = function (orderData, orderOwner) {
 };
 
 /**
- * places an order from an item on the cart.
- * This changes the order status to 1 from 0. 
- * 1 means order placed.
+ * changes the status of an order. An order state can only
+ * be increased. An order status cannot reduce or move backwards.
+ * meaning newState > oldState. The only excuse would be a cancelled order.
  * @param  {Object} object containing data sent from 
  * the browser. 
  * @return {[type]}       [description]
  */
-OrderController.prototype.placeOrder = function (order, orderOwner) {
+OrderController.prototype.redressOrder = function (order, orderOwner, status) {
   console.log('Placing order');
   var ot = Q.defer();
 
@@ -331,7 +420,7 @@ OrderController.prototype.placeOrder = function (order, orderOwner) {
     orderId : order.orderId
   }, {
     $set : {
-      orderStatus: 1
+      orderStatus: status
     }
   }, function (err, i) {
     if (err) {
@@ -344,9 +433,36 @@ OrderController.prototype.placeOrder = function (order, orderOwner) {
     if (i === 0) {
       return ot.reject(new Error('order update failed'));
     }
-  })
+  });
 
   return ot.promise;
-}
+};
+
+
+OrderController.prototype.hideOrderItem = function (orderId) {
+  var aladin = Q.defer();
+
+  Order.update({
+    orderId : orderId
+  },
+  {
+    $set: {
+      orderVisibility: false
+    }
+  }, function (err, i) {
+    if (err) {
+      return aladin.reject(err);
+    }
+    if (i > 0) {
+      
+      return aladin.resolve(i);
+    }
+    if (i === 0) {
+      return aladin.reject(new Error('order update failed'));
+    }
+  });
+
+  return aladin.promise;
+};
 
 module.exports = OrderController;

@@ -76,7 +76,12 @@ angular.module('drug', [])
         if (r instanceof Error) {
           console.log(r);
         } else {
-          $scope.commons.href('/drugs');
+          if ($scope.nextAction === 'newAddition') {
+            $scope.add_item_form = '';
+          } else if ($scope.nextAction === 'listPage') {
+            $scope.commons.href('/a/drugs');
+          }
+          
         }
       });
     };

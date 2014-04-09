@@ -17,10 +17,24 @@
                     th Drug Name
                     th Amount
                     th Date / Time
-                    th Supplier
+                    -if (userData.account_type > 2)
+                      th Supplier
                     th Status
                     th Hospital
                     th 
-                tbody(judge="orders")
+                tbody
+                  tr(ng-repeat="cmp in orders")
+                    td {{cmp.itemId.itemName}}
+                    td {{cmp.orderAmount}}
+                    td {{cmp.orderDate | date:medium}}
+                    -if (userData.account_type > 2)
+                      td {{cmp.orderSupplier.supplierName}}
+                    td {{cmp.orderStatus}}
+                    td 
+                      a(href="", ng-click="commons.href('hospital/'+cmp.hospitalId)") {{cmp.hospitalId.name}}
+                    td
+                      button.btn.btn-warning.btn-xs(ng-click="changeStatus($index)", ng-disabled="cmp.orderStatus == 'supplied'") Supply this      
+                      button.btn.btn-danger.btn-xs(ng-click="hide_order($index)")
+                        i.fa.fa-times
               .x-pagination(pagination="orders", page-to="page(pageNo, limit, cb)")
     
