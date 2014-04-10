@@ -1,13 +1,12 @@
-var mongoose = require('mongoose'),
-  Order = require('./order/order.js').Order,
+var Order = require('./order/order.js').Order,
   OrderStatus = require('./order/order.js').OrderStatus,
   _ = require('underscore'),
-  Hospital = require('./organization/hospital.js') ,
-  Q = require("q"),
+  //Hospital = require('./organization/hospital.js') ,
+  Q = require('q'),
   utilz = require('../lib/utils.js'),
-  EventRegister = require('../lib/event_register').register,
+  //EventRegister = require('../lib/event_register').register,
   staffUtils = require('./staff_utils.js'),
-  utils = require("util");
+  utils = require('util');
 
 //Underscore mixin to remove 
 //false values from an object
@@ -36,7 +35,7 @@ var orderManager = {
       } else {
         return or.resolve(i); 
       }
-    })
+    });
 
     return or.promise;
   },
@@ -119,7 +118,25 @@ var orderManager = {
     }); 
 
     return g.promise;      
-  }  
+  },
+  createOrderStatus: function createOrderStatus (doc) {
+    var upd = Q.defer();
+
+    //Creates a new record to show when this order was
+    //updated and what action was taken.
+    var orderstatus = new OrderStatus(doc);
+    orderstatus.check = doc.orderCharge + '-' + doc.orderId + '-' + doc.orderStatus;
+    orderstatus.save(function(err){
+      if (err) {
+        return upd.reject(err);
+      } else {
+        return upd.resolve(true);
+      }
+      
+    });    
+
+    return upd.promise; 
+  }
 };
 
 
@@ -274,38 +291,98 @@ OrderController.prototype.getOrders = function(orderStatus, displayType, userId,
 
 };
 
-
 /**
- * Updates an order status and creates a stock record 
+ * updates changes to an order. it also updates the 
+ * order status entries to record when the order was 
+ * updated. this uses the account type to restrict 
+ * different user levels from performing certain updates
+ * @param  {Object} orderData   the order object containing the 
+ * changed, to-be-updated order information. Including the orderId
+ * @param  {ObjectId} userId      the userId of the currently logged
+ * in user.
+ * @param  {Number} accountType the account level of the currently logged in user
+ * @return {Object}             Promise Object
  */
-
-OrderController.prototype.updateOrder = function(orderData, status, hospitalId, cb){
+OrderController.prototype.updateOrder = function(orderData, userId, accountType){
+  console.log('Updating order...');
   //Updates the order statuses, these are useful for order history
   //queries, etc
   //Updates the order status 
-  var rsr = { 'orderStatus':status};
-  if(orderData.amountSupplied){
-    rsr.amountSupplied = orderData.amountSupplied;
+  var law = Q.defer(),
+      __body = _.omit(orderData, ['_id', 'hospitalId', 'itemId']);
+
+  try {
+    Order.update({
+      'orderId': orderData.orderId
+    },{
+      $set: __body
+    })
+    .exec(function (err, i) {
+      console.log(err, i);
+      if (err) {
+        return law.reject(err);
+      }
+
+      if (i > 0) {
+        orderManager.createOrderStatus(__body)
+        .then(function (state) {
+          return law.resolve(state);
+        }, function (err) {
+          return law.reject(err);
+        });
+      }
+
+      if (i === 0) {
+        return law.reject(new Error('updating order failed'));
+      }
+    });
+  }catch (e) {
+    console.log(e);
+    law.reject(e);
+    return law.promise;
   }
-  Order.update({'_id':orderData._id},{
-    $set: rsr
-  }).exec(function(err){
-    if(err)utils.puts(err);
+
+
+  return law.promise;
+};
+
+/**
+ * get the status updates and other changes made to 
+ * a specific order.
+ * we add the userId and account type to protect certain
+ * account levels and users from making certain queries.
+ * @param  {[type]} orderId     [description]
+ * @param  {[type]} userId      [description]
+ * @param  {[type]} accountType [description]
+ * @return {[type]}             [description]
+ */
+//OrderController.prototype.getOrderStatuses = function getOrderStatuses (orderId, userId, accountType) {
+OrderController.prototype.getOrderStatuses = function getOrderStatuses (orderId) {
+  var d = Q.defer();
+
+  OrderStatus.find({
+    orderId : orderId
+  })
+  .lean()
+  .exec(function (err, i) {
+    if (err) {
+      return d.reject(err);
+    }
+    if (i.length) {
+      staffUtils.populateProfile(i, 'orderCharge', 4)
+      .then(function (popped) {
+        //console.log(popped);
+        return d.resolve(popped);
+      }, function (err) {
+        return d.reject(err);
+      });
+    } else {
+      return d.resolve(i);
+    }
+    
   });
 
-  //Creates a new record to show when this order was
-  //updated and what action was taken.
-  var orderstatus = new OrderStatus();
-  orderstatus.status = status;
-  orderstatus.order_id = orderData._id;
-  orderstatus.check = hospitalId + '-' + orderData._id + '-' + status;
-  orderstatus.hospitalId = hospitalId;
-  orderstatus.save(function(err){
-    if(err)return cb(err);
-    return cb(true);
-  });
-
-
+  return d.promise;
 };
 
 /**

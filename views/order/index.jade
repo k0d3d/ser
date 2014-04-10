@@ -7,10 +7,9 @@
                 form.form-inline(name="searchform", novalidate, ng-submit="searchcmp()")
                   .form-group
                     .col-md-5
-                      input.input-large.form-control(type="search", ng-model="drugname")
+                      input.input-large.form-control(type="search", ng-model="drugname", placeholder="Search your orders...")
                     .col-md-7
-                    button.btn.btn-primary.btn-sm(type="submit") Search Hospital 
-                    button.btn.btn-primary.btn-sm(type="submit") Search Supplier 
+
               table.table.table-hover.table-bordered(style="margin-top: 30px")
                 thead
                   tr
@@ -29,12 +28,47 @@
                     td {{cmp.orderDate | date:medium}}
                     -if (userData.account_type > 2)
                       td {{cmp.orderSupplier.supplierName}}
-                    td {{cmp.orderStatus}}
+                    td {{cmp.orderStatus | orderState}}
                     td 
                       a(href="", ng-click="commons.href('hospital/'+cmp.hospitalId)") {{cmp.hospitalId.name}}
                     td
-                      button.btn.btn-warning.btn-xs(ng-click="changeStatus($index)", ng-disabled="cmp.orderStatus == 'supplied'") Supply this      
+                      button.btn.btn-warning.btn-xs(ng-click="toggleModal('manage-order-modal'); $parent.__temp = cmp") Manage this      
                       button.btn.btn-danger.btn-xs(ng-click="hide_order($index)")
                         i.fa.fa-times
               .x-pagination(pagination="orders", page-to="page(pageNo, limit, cb)")
-    
+
+#manage-order-modal.modal.fade.in(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
+  .modal-dialog
+      .modal-content
+        .modal-header
+          span.label(ng-class="", ng-show="modal.statusText") {{modal.statusText}}
+          button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+          h4#myModalLabel.modal-title Order Details
+        .modal-body
+          .or-ch
+            form.form-horizontal(ng-submit="update_order(__temp)")
+              .form-group
+                label.control-label.col-sm-3.col-md-3 Staff in charge
+                .col-sm-5.col-md-5
+                  select.form-control(ng-click="check_people()", ng-model="__temp.orderCharge", ng-options="c.userId._id as c.name for c in employer_peeps")
+                .col-sm-2.col-md-2
+                  button.btn.btn-primary-alt(type="submit") Re-assign Order
+            hr
+            .status-row.row(ng-repeat="status in __temp.orderStatusList")
+              .col-md-3
+                strong.status-title Status 
+                | {{status.orderStatus | orderState}}
+              .col-md-3
+                strong.status-title Time
+                p.tooltips(data-placement="left", data-toggle="tooltip", data-title="{{status.date | moment}}") {{status.date | date: 'medium'}}
+              .col-md-3
+                strong.status-title Staff in charge
+                | {{status.orderCharge.name}}
+              
+
+        .modal-footer
+          button.btn.btn-default(type='button', data-dismiss='modal', ng-click="__temp = ''") Close
+      //
+         modal-content 
+    //
+       modal-dialog     

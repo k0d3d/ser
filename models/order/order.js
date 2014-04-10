@@ -49,10 +49,11 @@ var OrderSchema = new Schema({
 });
 
 var OrderStatusSchema = new Schema({
-  order_id: {type: Schema.ObjectId},
+  orderId: {type: String},
   date: {type: Date, default: Date.now},
-  hospitalId: {type: String},
-  status: {type: Number, default: 0},
+  //shospitalId: {type: String},
+  orderStatus: {type: Number, required: true},
+  orderCharge: {type: Schema.ObjectId},
   check: {type:String, unique: true}
 });
 

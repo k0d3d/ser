@@ -98,13 +98,15 @@ angular.module('organization', [])
         return err;
       })
     },
+    //fetch the list of people having a 
+    //specific account type
     getMyPeople : function (options) {
       return $http.get('/api/organization/people/' + options.account_type)
       .then(function (r) {
         return r.data;
       }, function (err) {
         return err;
-      })
+      });
     },
     getPersonProfile : function (options) {
       return $http.get('/api/organization/people/' + options.userId + '/staff/' + options.account_type)
@@ -112,15 +114,17 @@ angular.module('organization', [])
         return r.data;
       }, function (err) {
         return err;
-      })
+      });
     },
+    //get the list of people employed under the currently 
+    //logged in user. 
     getMyWorkForce : function () {
       return $http.get('/api/organization/workforce')
       .then(function (r) {
         return r.data;
       }, function (err) {
         return err;
-      })
+      });
     }
   };
 }]);

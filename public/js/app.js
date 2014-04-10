@@ -86,9 +86,13 @@ app.controller('MainController', [
       $.gritter.add(Notification.notice);      
     });
 
-    $scope.$on('newEvent', function(){
+    $scope.$on('newEvent', function () {
       $scope.modal = Notification.message;
     });
+
+    $scope.toggleModal = function (modalId) {
+      $('#' + modalId).modal('toggle');
+    };
 
 
 }]);
@@ -183,6 +187,14 @@ app.directive('typeAhead', [function () {
     }
   }
 }]);
+// app.directive('tooltips', function () {
+//   return {
+//     restrict: 'C',
+//     link: function (scope, element, attrs) {
+//       $(element).tooltip();
+//     }
+//   }
+// });
 app.factory('errorNotifier', ['$q', 'Notification', 'Language', function($q, N, L) {
   return {
     responseError: function (response) {

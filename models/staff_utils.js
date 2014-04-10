@@ -139,29 +139,29 @@ module.exports = {
      * @return {Object}            Promise Object
      */
     populateProfile: function populateProfile (doc, fieldToPop, accountType) {
-      console.log('Populating Hospitals...');
-      var pop = Q.defer(), poppedHospitals = [];
+      console.log('Populating...');
+      var pop = Q.defer(), poppedObject = [];
       var self = this;
 
       function __pop() {
         var task = doc.pop();
-        console.log(task);
+
         self.getMeMyModel(accountType)
         .findOne({
           userId: task[fieldToPop]
-        })
+        }, 'name userId')
         .exec(function (err, i) {
           if (err) {
             return pop.reject(err);
           }
 
           task[fieldToPop] = i;
-          poppedHospitals.push(task);
+          poppedObject.push(task);
           
           if (doc.length) {
             __pop();
           } else {
-            return pop.resolve(poppedHospitals);
+            return pop.resolve(poppedObject);
           }
         });
       }

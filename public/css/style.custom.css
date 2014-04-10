@@ -217,3 +217,17 @@ p + p {
   line-height: 35px;
   padding-left: 5px
 }
+
+.status-row {
+  border-bottom: solid 2px #72C2F0;
+  box-shadow: 0px 1px 4px #C5C5C5;
+  margin-bottom: 3px;  
+}
+
+.status-row .status-title {
+  display: block;
+}
+.status-row p {
+  font-size: 12px;
+  margin: 0;
+}

@@ -73,7 +73,7 @@ config(['$routeProvider',function($routeProvider){
   // };
 
 }])
-.controller('ordersIndexController', function($scope, $http, $location, $routeParams, ordersService){
+.controller('ordersIndexController', ['$scope', '$http', '$location', '$routeParams', 'ordersService', 'organizeStaffService', function ($scope, $http, $location, $routeParams, ordersService, organizeStaffService) {
   $scope.$parent.headerTitle = 'Orders';
   $scope.getStatus = function (status){
     var d;
@@ -104,13 +104,15 @@ config(['$routeProvider',function($routeProvider){
   $scope.ordersfilter = {
     orderStatus : ''
   };
+  //
   (function(){
     $scope.orders = [];
+    $scope.__temp = {};
     
-    ordersService.orders(7, 'small')
+    ordersService.orders(7, 'short')
     .then(function(r){
       angular.forEach(r, function(v, i){
-        v.nextStatus = v.orderStatus + 1;
+        //v.nextStatus = v.orderStatus + 1;
         $scope.orders.push(v);
       });
       switch($routeParams.type){
@@ -130,6 +132,7 @@ config(['$routeProvider',function($routeProvider){
 
   }());
 
+  //hides an order from being visible on the table
   $scope.hide_order = function(index){
     var orderId = $scope.orders[index].orderId;
     
@@ -139,19 +142,43 @@ config(['$routeProvider',function($routeProvider){
     });
   };
 
-  $scope.changeStatus = function(){
-    var o = {
-      status : $scope.uo.status,
-      itemData : $scope.uo.itemData,
-      amount : $scope.uo.amount,
-      order_id : $scope.uo.order_id,
-      invoiceno : $scope.uo.invoiceno
-    };
-    ordersService.updateOrder(o,function(r){
+  //populates the drop down list of staff
+  $scope.check_people = function () {
+    if (_.isEmpty($scope.employer_peeps)) {
+      organizeStaffService.getMyPeople({account_type: 4})
+      .then(function (dp) {
+        $scope.employer_peeps = dp;
+      });
+    }
+  };
+
+  //watch the __temp scope for changes.
+  //make calls for order updates when the scope 
+  //changes
+  $scope.$watch('__temp', function (n) {
+    console.log(n);
+    if (!_.isEmpty(n)) {
+      var orderId = n.orderId;
+      ordersService.getOrderStatusUpdates(orderId)
+      .then(function (data) {
+        $scope.__temp.orderStatusList = data;
+        //qucik hack for tooltips.
+        //please remove. it is very embarassing
+        //.Oh mighty koded
+        setTimeout(function () {
+          $('.tooltips').tooltip();
+        }, 1000);
+      });
+    }
+  });
+
+  $scope.update_order = function (order) {
+    ordersService.updateOrder(order)
+    .then(function () {
 
     });
   };
-})
+}])
 .controller('orderAddController',function($scope, $http, $location, ordersService,drugService, $routeParams){
   $scope.form = {
     itemData: {},
@@ -257,6 +284,7 @@ config(['$routeProvider',function($routeProvider){
           callback(results);
       });
     };
+
     //Gets orders by status and display
     f.orders = function(status, displayType){
       var res = [];
@@ -314,34 +342,23 @@ config(['$routeProvider',function($routeProvider){
         return r.data;
       }, function (err) {
         return err;
-      })
-    }
-
-    f.updateOrder = function(o,callback){
-      $http.put('/api/orders/'+escape(o.order_id), {
-          "status": o.status,
-          "itemData":o.itemData,
-          "amount":o.amount,
-          "orderInvoiceNumber": o.invoiceno,
-          "amountSupplied": o.amountSupplied || undefined,
-          "paymentReferenceType": o.paymentReferenceType,
-          "paymentReferenceID": o.paymentReferenceID
-        })
-      .success(function(data){
-        N.notifier({
-          message: Lang.eng.order.update.success,
-          type: 'success'
-        });
-        callback(data);
-      })
-      .error(function(data){
-        N.notifier({
-          message: Lang.eng.order.update.error,
-          type: 'error'
-        });        
       });
-
     };
+
+    //makes an order update request.
+    f.updateOrder = function (o) {
+      return $http.put('/api/orders/'+escape(o.orderId), o)
+      .then(function (data) {
+        return data.data;
+      }, function (err) {
+        N.notifier({
+          title: L[L.set].titles.error,
+          text: err,
+          class_name: 'growl-danger'
+        });          
+      });
+    };
+
     f.count = function(callback){
       $http.get('api/orders/count').
         success(function(d){
@@ -392,8 +409,24 @@ config(['$routeProvider',function($routeProvider){
       });
     };
 
+    //Request for order statuses and updates for a 
+    //particular order
+    f.getOrderStatusUpdates = function getOrderStatusUpdates (orderId) {
+      return $http.get('/api/orders/' + orderId + '/statuses')
+      .then(function (data) {
+        return data.data;
+      }, function (err) {
+        N.notifier({
+          title:  L[L.set].titles.error,
+          text:  err,
+          class_name: 'growl-danger'
+        });
+      });
+    };
+
     return f;
-}]).directive('orderSupplierTypeAhead', ['itemsService', function(itemsService){
+}])
+.directive('orderSupplierTypeAhead', ['itemsService', function(itemsService){
   var linker = function(scope, element, attrs){
     var nx;
       element.typeahead({
@@ -517,4 +550,31 @@ config(['$routeProvider',function($routeProvider){
     },
     templateUrl: '/templates/order-list'
   };
-}]);
+}])
+.filter('orderState', function () {
+  return function (num) {
+    switch (parseInt(num)) {
+      case 1:
+      return 'placed';
+      break;
+      case 2:
+      return 'received';
+      break;
+      case 3:
+      return 'confirmed';
+      break;
+      case 4:
+      return 'in transit';
+      break;
+      case 5:
+      return 'supplied';
+      break;
+      case 6:
+      return 'paid';
+      break;
+      default:
+      return 'unknown';
+      break;
+    }
+  }
+});

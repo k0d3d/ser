@@ -58,6 +58,15 @@ module.exports.routes = function(app, login){
     });
   });
 
+  app.get('/api/orders/:orderId/statuses', function (req, res) {
+    order.getOrderStatuses(req.params.orderId, req.user._id, req.user.account_type)
+    .then(function (r) {
+      res.json(200, r);
+    }, function (err) {
+      res.json(400, err);
+    });
+  });
+
   // Order POST Routes
   app.post('/api/orders',function(req, res){
     order.placeItemInCart(req.body, req.user._id)
@@ -80,6 +89,21 @@ module.exports.routes = function(app, login){
     }
 
     //if(req.params.orderStatus == )
+  });
+
+  //updates an order
+  app.put('/api/orders/:orderId', function (req, res) {
+    console.log('In the put route');
+    order.updateOrder(req.body, req.user._id, req.user.account_type)
+    .then(function (data) {
+      console.log('dta');
+      console.log(data);
+      res.json(200, data);
+    }, function (err) {
+      console.log('err');
+      console.log(err);
+      res.json(400, err);
+    });
   });
 
   //Delete Order (logically)
