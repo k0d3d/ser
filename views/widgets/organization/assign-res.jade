@@ -1,0 +1,15 @@
+
+mixin assignRes (account_type) 
+  .col-sm-4.col-md-3
+    h4.subtitle.mb5 Facilities / Coverage
+    form(name="search_wards_teritory")
+      label.control-label LGA Wards
+      input.form-control(type='text', placeholder='', ng-model="new_staff.email", required)
+      .mb20
+      label.control-label() Medical Facilities
+      input.form-control(type='text', placeholder='', ng-model="new_staff.email", required)
+
+    .container.form-inline(style='text-align: center;')
+        .btn.btn-info.btn-draggable(ng-repeat='item in list5', data-drag='{{item.drag}}', data-jqyoui-options="{revert: 'invalid'}", jqyoui-draggable='{index: {{$index}},placeholder:true,animate:false}', ng-hide='!item.title', ng-model='list5') {{item.title}}
+
+
