@@ -96,6 +96,7 @@ function afterResourceFilesLoad() {
     // setup session management
     console.log('setting up session management, please wait...');
     console.log(config.db.server);
+    console.log(config.db.password);
     app.use(session({
         secret: config.express.secret,
         store: new MongoStore({
@@ -103,6 +104,8 @@ function afterResourceFilesLoad() {
             host: config.db.server,
             port: config.db.port,
             auto_reconnect: true,
+            username: config.db.user,
+            password: config.db.password,
             collection: "mongoStoreSessions"
         })
     }));
