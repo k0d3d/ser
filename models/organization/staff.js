@@ -5,7 +5,8 @@ var mongoose = require('mongoose'),
 StaffSchema = new Schema({
   userId: {type: Schema.ObjectId, ref: 'User'},
   name : {type: String},
-  coverage: {type: String},
+  coverage: [{type: String}],
+  facility: [{type: String}],
   position: {type: String},
   employer: {
     employerId :{type: Schema.ObjectId},

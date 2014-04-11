@@ -23,7 +23,7 @@ module.exports.routes = function (app, login) {
       userData: req.user
     });
   });
-  app.get('/a/organization/people/:personId/staff/:accountType',login.ensureLoggedIn('/signin'), function (req, res) {
+  app.get('/a/organization/people/:personId/person/:accountType',login.ensureLoggedIn('/signin'), function (req, res) {
 
     res.render('index', {
       userData: req.user

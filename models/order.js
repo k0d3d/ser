@@ -122,10 +122,14 @@ var orderManager = {
   createOrderStatus: function createOrderStatus (doc) {
     var upd = Q.defer();
 
+    //quick hack for demo purpose
+    doc.orderSupplier = doc.orderSupplier || {};
+
     //Creates a new record to show when this order was
     //updated and what action was taken.
     var orderstatus = new OrderStatus(doc);
-    orderstatus.check = doc.orderCharge + '-' + doc.orderId + '-' + doc.orderStatus;
+    orderstatus.check = doc.orderCharge + '-' + doc.orderId + '-' + doc.orderStatus + '-' + doc.orderSupplier.supplierId;
+    orderstatus.orderSupplier = doc.orderSupplier.supplierId;
     orderstatus.save(function(err){
       if (err) {
         return upd.reject(err);
@@ -324,6 +328,7 @@ OrderController.prototype.updateOrder = function(orderData, userId, accountType)
       }
 
       if (i > 0) {
+        __body.hospitalId = orderData.hospitalId.userId;
         orderManager.createOrderStatus(__body)
         .then(function (state) {
           return law.resolve(state);

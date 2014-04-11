@@ -1,12 +1,12 @@
 
 mixin staffOptions(account, index, account_type)
-  if (index > account_type)
-    option(value='#{index}') #{account}
+  if (index > account_type && index < 5)
+    option(value='#{index}') #{account.name}
 
 
 
 mixin addStaff (account_type) 
-  -accounts = ['Pharmaceutical Company', 'Pharma Manager', 'Distributor', 'Dist. Manager', 'Sales Agent'] 
+  -var accounts = people
   .col-sm-4.col-md-3
     h4.subtitle.mb5 Add a staff
     form(name="new_staff_form", ng-submit="create_new_staff()")

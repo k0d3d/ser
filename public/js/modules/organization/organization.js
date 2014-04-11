@@ -8,7 +8,7 @@ angular.module('organization', [])
 .config(['$routeProvider', function ($routeProvider){
   $routeProvider.when('/organization', {templateUrl: '/organization/all-staff', controller: 'staffController'});
   $routeProvider.when('/a/organization/people/:accountType', {templateUrl: '/organization/all-staff', controller: 'staffController'});
-  $routeProvider.when('/a/organization/people/:personId/staff/:accountType', {templateUrl: '/organization/profile', controller: 'personController'});
+  $routeProvider.when('/a/organization/people/:personId/person/:accountType', {templateUrl: '/organization/profile', controller: 'personController'});
   $routeProvider.when('/a/organization/invitations', {templateUrl: '/organization/invites', controller: 'invitesController'});
 }])
 .controller('staffController', ['$scope', 'organizeStaffService', '$routeParams', function userController($scope, oss, $routeParams) {
@@ -26,6 +26,36 @@ angular.module('organization', [])
   .then(function (data) {
     $scope.people = data;
   });
+  $scope.list1 = [];
+  $scope.list2 = [];
+  $scope.list3 = [];
+  $scope.list4 = [];
+  $scope.list5 = [
+    { 'title': 'Hospital 1', 'drag': true },
+    { 'title': 'Hospital 2', 'drag': true },
+    { 'title': 'Hospital 3', 'drag': true },
+    { 'title': 'Hospital 4', 'drag': true },
+    { 'title': 'Hospital 5', 'drag': true },
+    { 'title': 'Hospital 6', 'drag': true },
+    { 'title': 'Hospital 7', 'drag': true },
+    { 'title': 'Hospital 8', 'drag': true }
+  ];  
+
+  $scope.onDropAssignWard = function (e, ui, peeps, index) {
+    console.log('Dropped Ward');
+    console.log(e);
+    console.log(index);
+    console.log(peeps);
+  };
+
+  //When dragged in evet
+  $scope.onOver = function (e) {
+    console.log(e.currentTarget);
+  };
+  //When dragged out event
+  $scope.onOut = function (e) {
+    console.log(e.currentTarget);
+  };
 }])
 .controller('personController', ['$scope', 'organizeStaffService', '$routeParams', function ($scope, oss, $routeParams) {
   $scope.$parent.headerTitle = 'Profile';

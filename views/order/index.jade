@@ -46,14 +46,15 @@
           h4#myModalLabel.modal-title Order Details
         .modal-body
           .or-ch
-            form.form-horizontal(ng-submit="update_order(__temp)")
-              .form-group
-                label.control-label.col-sm-3.col-md-3 Staff in charge
-                .col-sm-5.col-md-5
-                  select.form-control(ng-click="check_people()", ng-model="__temp.orderCharge", ng-options="c.userId._id as c.name for c in employer_peeps")
-                .col-sm-2.col-md-2
-                  button.btn.btn-primary-alt(type="submit") Re-assign Order
-            hr
+            -if (userData.account_type < 3)
+              form.form-horizontal(ng-submit="update_order(__temp)")
+                .form-group
+                  label.control-label.col-sm-3.col-md-3 Staff in charge
+                  .col-sm-5.col-md-5
+                    select.form-control(ng-click="check_people()", ng-model="__temp.orderCharge", ng-options="c.userId._id as c.name for c in employer_peeps")
+                  .col-sm-2.col-md-2
+                    button.btn.btn-primary-alt(type="submit") Re-assign Order
+              hr
             .status-row.row(ng-repeat="status in __temp.orderStatusList")
               .col-md-3
                 strong.status-title Status 

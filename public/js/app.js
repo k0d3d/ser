@@ -10,7 +10,8 @@ var app = angular.module('stocUser', [
   'order',
   'language',
   'facility',
-  'ngTagsInput'
+  'ngTagsInput',
+  'ngDragDrop'
   ]);
 app.config(function ($routeProvider, $locationProvider, $httpProvider) {
   $routeProvider
@@ -187,14 +188,16 @@ app.directive('typeAhead', [function () {
     }
   }
 }]);
-// app.directive('tooltips', function () {
-//   return {
-//     restrict: 'C',
-//     link: function (scope, element, attrs) {
-//       $(element).tooltip();
-//     }
-//   }
-// });
+app.directive('tooltips', function () {
+  return {
+    restrict: 'C',
+    link: function (element, attrs) {
+      $(element).tooltip({
+        title : attrs.title
+      });
+    }
+  }
+});
 app.factory('errorNotifier', ['$q', 'Notification', 'Language', function($q, N, L) {
   return {
     responseError: function (response) {

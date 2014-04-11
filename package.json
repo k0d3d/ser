@@ -58,7 +58,8 @@
     "static-favicon": "^1.0.2",
     "cookie-parser": "^1.0.1",
     "morgan": "^1.0.0",
-    "gm" : "latest"
+    "gm": "latest",
+    "lingua": "^0.4.0"
   },
   "devDependencies": {
     "supertest": "latest",

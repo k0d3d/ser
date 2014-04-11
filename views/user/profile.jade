@@ -1,7 +1,8 @@
 .contentpanel(data-user-id="#{userData._id}")
     .row
         .col-sm-3
-          img.thumbnail.img-responsive.profile-img(src='/images/#{userProfile.image}' , alt='')
+          -var proImg = userProfile.image || 'default-avatar.jpg'
+          img.thumbnail.img-responsive.profile-img(src='/images/#{proImg}' , alt='')
           .mb30
           h5.subtitle About
           p.mb10.x-editable(data-type="textarea", data-name="summary")
@@ -53,7 +54,7 @@
                 span(style="display: block", title="Your Coverage / Territory") 
                   i.fa.fa-map-marker
                   | Coverage
-                span.x-editable(data-type="text", data-name="coverage", data-default-value="Territory")
+                span(data-type="text", data-name="coverage", data-default-value="Territory")
                   | #{userProfile.coverage}
             - if (isPermitted(['employer']))
               .profile-position

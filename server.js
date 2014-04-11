@@ -8,6 +8,7 @@ console.log('drugstoc version: ' + pjson.version);
 
 // REQUIRE SECTION
 var express = require('express'),
+    lingua = require('lingua'),
     router = express.Router(),
     config = require('config'),
     app = express(),
@@ -47,6 +48,10 @@ function afterResourceFilesLoad() {
 
     app.set('showStackError', true);
 
+
+    // make everything in the public folder publicly accessible - do this high up as possible
+    app.use(express.static(__dirname + '/public'));
+
     // set compression on responses
     app.use(compress({
       filter: function (req, res) {
@@ -58,12 +63,19 @@ function afterResourceFilesLoad() {
     // efficient favicon return - will enable when we have a favicon
     app.use(favicon('public/images/favicon.ico'));
 
-    // make everything in the public folder publicly accessible - do this high up as possible
-    app.use(express.static(__dirname + '/public'));
 
     app.locals.layout = false;
     app.set('views', __dirname + '/views');
     app.set('view engine', 'jade');
+
+    // Lingua configuration
+    console.log('Configuring language resources...');
+
+    app.use(lingua(app, {
+      defaultLocale: 'en',
+      path: __dirname + '/config/i18n'
+    }));
+
 
     // set logging level - dev for now, later change for production
     app.use(logger('dev'));
@@ -83,6 +95,7 @@ function afterResourceFilesLoad() {
 
     // setup session management
     console.log('setting up session management, please wait...');
+    console.log(config.db.server);
     app.use(session({
         secret: config.express.secret,
         store: new MongoStore({
@@ -206,6 +219,9 @@ require('./lib/db').open()
     
   });
 
+})
+.catch(function (e) {
+  console.log(e);
 });
 
 

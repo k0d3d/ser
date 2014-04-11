@@ -1,7 +1,7 @@
 .contentpanel
     .row
+        include ../widgets/organization/assign-res
+        +assignRes(userData.account_type)
+
         include ../widgets/organization/show-staff
         +showStaff()
-
-        include ../widgets/organization/add-staff
-        +addStaff(userData.account_type)

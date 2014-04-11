@@ -44,6 +44,7 @@ var OrderSchema = new Schema({
   orderVisibility: {type: Boolean, default: true},
   //This is the id of the hospital placing the order, order author..blah
   hospitalId: {type: Schema.ObjectId},
+  originWard: {type: String},
   orderId: {type: String, unique: true},
   amountSupplied: {type: Number},
 });
@@ -51,8 +52,9 @@ var OrderSchema = new Schema({
 var OrderStatusSchema = new Schema({
   orderId: {type: String},
   date: {type: Date, default: Date.now},
-  //shospitalId: {type: String},
+  hospitalId: {type: Schema.ObjectId},
   orderStatus: {type: Number, required: true},
+  orderSupplier: {type: Schema.ObjectId},
   orderCharge: {type: Schema.ObjectId},
   check: {type:String, unique: true}
 });

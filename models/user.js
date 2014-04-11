@@ -257,7 +257,7 @@ UserController.prototype.getProfile = function (userId, account_type) {
       if (parseInt(account_type) !== 2 && parseInt(account_type) < 5) {
         //lets attach the employer profile
         staffUtils.getMeMyModel(2).findOne({
-          userId: user_profile.employer[0].employerId
+          userId: user_profile.employer.employerId
         })
         .exec(function (err, employerIsh) {
           user_profile.employer = employerIsh;

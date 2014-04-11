@@ -7,8 +7,8 @@ var mongoose = require('mongoose'),
 
 var DrugSchema = new Schema ({
   itemName : {type: String, default: '', required: true},
-  sciName : {type: String, default: '', required: true},
-  nafdacRegNo : {type: String, default: '', required: true},
+  sciName : {type: String, default: '', required: false},
+  nafdacRegNo : {type: String, default: '', required: false},
   category : {type: String, default: ''},
   currentPrice: {
     wholesale: {type: Number},

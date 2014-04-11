@@ -511,7 +511,7 @@ Staff.prototype.getPersonProfile = function getPersonProfile (userId, accountTyp
       if (parseInt(accountType) !== 2 && parseInt(accountType) < 5) {
         //lets attach the employer profile
         staffUtils.getMeMyModel(2).findOne({
-          userId: user_profile.employer[0].employerId
+          userId: user_profile.employer.employerId
         })
         .exec(function (err, employerIsh) {
           user_profile.employer = employerIsh;

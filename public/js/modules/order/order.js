@@ -75,32 +75,7 @@ config(['$routeProvider',function($routeProvider){
 }])
 .controller('ordersIndexController', ['$scope', '$http', '$location', '$routeParams', 'ordersService', 'organizeStaffService', function ($scope, $http, $location, $routeParams, ordersService, organizeStaffService) {
   $scope.$parent.headerTitle = 'Orders';
-  $scope.getStatus = function (status){
-    var d;
-    switch(status){
-      case 'pending order':
-        d = 'supplied';
-        //scope.orders[attrs.thisIndex].next ="Supplied";
-      break;
-      case 'supplied':
-        d = 'paid';
-        //scope.orders[attrs.thisIndex].next ="Paid";
-      break;
-      case 'paid':
-       d = 'Complete';
-      break;
-      case 'received':
-        d = 'supplied';
-      break;
-      case 'dispatched':
-        d = 'supplied';
-      break;
-      default:
-      d = null;
-      break;
-    }
-    return d;
-  };  
+ 
   $scope.ordersfilter = {
     orderStatus : ''
   };
@@ -173,6 +148,14 @@ config(['$routeProvider',function($routeProvider){
   });
 
   $scope.update_order = function (order) {
+    ordersService.updateOrder(order)
+    .then(function () {
+
+    });
+  };
+
+  $scope.confirm_order = function (order) {
+    order.orderStatus = 3;
     ordersService.updateOrder(order)
     .then(function () {
 
