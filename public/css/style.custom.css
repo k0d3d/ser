@@ -231,3 +231,29 @@ p + p {
   font-size: 12px;
   margin: 0;
 }
+.people-item i.fa-arrows {
+  position: absolute;
+  top: 5px;
+  left: 4px;
+  color: #ddd;  
+}
+.people-item i.fa-arrows:hover {
+  color: #000;
+  cursor: move;
+}
+.collection-li li {
+  text-transform: capitalize;
+  list-style: none;
+  margin: 2px 5px;
+}
+.collection-li {
+  margin-top: 10px;
+  background-color: #ddd;
+  padding: 2px 5px;
+  border: solid 1px #BEBEBE;  
+}
+.collection-li-over {
+  height: 225px;
+  border: solid 2px #2DC539 !important;
+  box-sizing: border-box;
+}

@@ -200,6 +200,42 @@ module.exports = function(app, passport) {
   .get(function(req, res){
     var parent = req.params.parent;
     var child = req.params.child;
+    res.locals.states = ['Anambra',
+                'Enugu',
+                'Akwa Ibom',
+                'Adamawa',
+                'Abia',
+                'Bauchi',
+                'Bayelsa',
+                'Benue',
+                'Borno',
+                'Cross River',
+                'Delta',
+                'Ebonyi',
+                'Edo',
+                'Ekiti',
+                'Gombe',
+                'Imo',
+                'Jigawa',
+                'Kaduna',
+                'Kano',
+                'Katsina',
+                'Kebbi',
+                'Kogi',
+                'Kwara',
+                'Lagos',
+                'Nasarawa',
+                'Niger',
+                'Ogun',
+                'Ondo',
+                'Osun',
+                'Oyo',
+                'Plateau',
+                'Rivers',
+                'Sokoto',
+                'Taraba',
+                'Yobe',
+                'Zamfara'];    
     res.render(parent+'/'+child, {
       userData: req.user
     });

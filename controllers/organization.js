@@ -1,6 +1,8 @@
 var staff_model = require('../models/organization.js'),
+    Facility = require('../models/item/govt-facility.js'),
+    _ = require('underscore'),
   utilities = require('../lib/utils.js'),
-  utils = require('util');
+  util = require('util');
 
 module.exports.routes = function (app, login) {
   var staff = new staff_model.Staff();
@@ -93,6 +95,20 @@ module.exports.routes = function (app, login) {
     });
   });
 
+  app.get('/api/organization/resource/facility/state/:stateId/lga', function (req, res) {
+
+    Facility.getStateLGA(req.params.stateId, function (lgas) {
+      if (util.isError(lgas)) {
+        res.json(400, lgas.message);
+      } else {
+        var loweredCase = _.map(lgas, function (val) {
+          return {name: val.toLowerCase(), content: []};
+        });
+        res.json(200, loweredCase);
+      }
+    });
+  });
+
   //Attempts to activate an account, and add the employer to 
   //the users profile.
   app.put('/api/organization/invites',login.ensureLoggedIn('/signin'), function (req, res) {
@@ -112,6 +128,17 @@ module.exports.routes = function (app, login) {
       });
     }
 
+  });
+
+  //Attempts to add a tag:  territory (lga) or med. fac to 
+  //staff
+  app.put('/api/organization/people/:personId/tag', login.ensureLoggedIn('/signin'), function (req, res) {
+    staff.tagStaff(req.params.personId, req.query.tagType, req.query.tag)
+    .then(function (done) {
+      res.json(200, done);
+    }, function (err) {
+      res.json(400, err);
+    });
   });
 
   app.post('/api/organization/invites',login.ensureLoggedIn('/signin'), function (req, res) {
@@ -139,7 +166,7 @@ module.exports.routes = function (app, login) {
   });
 
   //Adds a drug item to a staff profile
-  app.post('/api/internal/organization/staff/drugs/', function (req, res) {
+  app.post('/api/internal/organization/staff/drugs/',login.ensureLoggedIn('/signin'), function (req, res) {
     var owner = req.user._id,
         account_type = req.user.account_type;
     staff.stateYourDrugs(req.body.drugId, owner, account_type)
@@ -165,5 +192,20 @@ module.exports.routes = function (app, login) {
       });
     }
 
+  });
+
+  //removes a tag; med fac. or lga from a staff
+  app.delete('/api/organization/people/:personId/tag', login.ensureLoggedIn('/signin'), function (req, res) {
+    if (req.user.account_type < 4) {
+      staff.unTagStaff(req.params.personId, req.query.tagType, req.query.tag)
+      .then(function (done) {
+        res.json(200, true);
+      }, function (err) {
+        res.json(400, err);
+      });
+    } else {
+      res.json(401, false);
+    }
+    
   });
 };

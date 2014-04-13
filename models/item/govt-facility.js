@@ -30,6 +30,19 @@ GovtFacSchema.statics = {
     .regex('productName',new RegExp(name, 'i'))
     .exec(cb);
     //wit.exec(cb);
+  },
+
+  getStateLGA: function getStateLGA (stateId, cb) {
+    this.distinct('lga', {stateCode: stateId},
+    //this.find({lga: "AGEGE"},
+    function (err, i) {
+      console.log(err, i);
+      if (err) {
+        cb(err);
+      } else {
+        cb(i);
+      }
+    });
   }
 };
 

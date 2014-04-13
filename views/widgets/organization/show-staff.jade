@@ -22,11 +22,12 @@ mixin showStaff()
         h4.panel-title Found {{people.length}} people.
       //
          panel-heading 
-      .panel-body
+      .panel-body(style="min-height: 500px")
         .results-list
           .col-md-6(ng-repeat="peeps in people")
-              .people-item(data-drop='true', ng-model="peeps.coverage", data-jqyoui-options="{accept:'.btn-draggable'}", jqyoui-droppable="{multiple:true, onDrop: 'onDropAssignWard(e, ui, peeps, $index)', onOver: 'onOver(e)', onOut: 'onOut(e)'}")
+              .people-item(data-drag="true", data-jqyoui-options="{revert: 'invalid'}", jqyoui-draggable="{index: {{$index}},placeholder:'keep',animate:false}", ng-model="people")
                   .media
+                    i.fa.fa-arrows
                     a.pull-left(href='/organization/people/{{peeps._id}}/staff')
                       img.thumbnail.media-object(alt='', src='/images/default-avatar.png')
                     .media-body
@@ -43,10 +44,3 @@ mixin showStaff()
                           a.btn.btn-white.btn-xs(href='#', data-toggle='tooltip', data-placement='top', title='')
                             | Facilities
 
-                    .pop-hospital-list(data-drop='true', ng-model='list4', data-jqyoui-options='{accept:\'.btn-draggable:not([ng-model=list4])\'}', jqyoui-droppable='{multiple:true}')
-                        .caption
-                            .btn.btn-info.btn-draggable(ng-repeat='item in list4', ng-show='item.title', data-drag='{{item.drag}}', data-jqyoui-options='{revert: \'invalid\'}', ng-model='list4', jqyoui-draggable='{index: {{$index}},animate:true}') {{item.title}}
-
-                    .pop-coverage-list(data-drop='true', ng-model='list4', data-jqyoui-options='{accept:\'.btn-draggable:not([ng-model=list4])\'}', jqyoui-droppable='{multiple:true}')
-                        .caption
-                            .btn.btn-info.btn-draggable(ng-repeat='item in list4', ng-show='item.title', data-drag='{{item.drag}}', data-jqyoui-options='{revert: \'invalid\'}', ng-model='list4', jqyoui-draggable='{index: {{$index}},animate:true}') {{item.title}}

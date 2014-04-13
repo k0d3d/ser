@@ -26,36 +26,37 @@ angular.module('organization', [])
   .then(function (data) {
     $scope.people = data;
   });
-  $scope.list1 = [];
-  $scope.list2 = [];
-  $scope.list3 = [];
-  $scope.list4 = [];
-  $scope.list5 = [
-    { 'title': 'Hospital 1', 'drag': true },
-    { 'title': 'Hospital 2', 'drag': true },
-    { 'title': 'Hospital 3', 'drag': true },
-    { 'title': 'Hospital 4', 'drag': true },
-    { 'title': 'Hospital 5', 'drag': true },
-    { 'title': 'Hospital 6', 'drag': true },
-    { 'title': 'Hospital 7', 'drag': true },
-    { 'title': 'Hospital 8', 'drag': true }
-  ];  
 
-  $scope.onDropAssignWard = function (e, ui, peeps, index) {
-    console.log('Dropped Ward');
-    console.log(e);
-    console.log(index);
-    console.log(peeps);
+
+  $scope.onDropAssignWard = function (e) {
+    //console.log($(e.target).text());
+    angular.element(e.target).removeClass('collection-li-over');
+    var lgaName = angular.element(e.target).scope().col.name;
+    var staffId = angular.element(e.target).scope().dndDragItem._id;
+    oss.addLgaToStaff(lgaName, staffId)
+    .then(function () {
+      angular.element(e.target).scope().dndDragItem.coverage.push(lgaName);
+    });
   };
 
   //When dragged in evet
   $scope.onOver = function (e) {
-    console.log(e.currentTarget);
+    $(e.target).addClass('collection-li-over');
   };
   //When dragged out event
   $scope.onOut = function (e) {
-    console.log(e.currentTarget);
+    $(e.target).removeClass('collection-li-over');
   };
+
+  $scope.$watch('current_state', function (n) {
+    if (n) {
+      oss.getLGA(n)
+      .then(function (lga) {
+        $scope.lgas = _.compact(lga.sort());
+      });
+    }
+  });
+
 }])
 .controller('personController', ['$scope', 'organizeStaffService', '$routeParams', function ($scope, oss, $routeParams) {
   $scope.$parent.headerTitle = 'Profile';
@@ -155,6 +156,20 @@ angular.module('organization', [])
       }, function (err) {
         return err;
       });
+    },
+
+    //fetches the list of lga for the selected
+    //state
+    getLGA : function getLGA (stateId) {
+      return $http.get('/api/organization/resource/facility/state/' + stateId + '/lga')
+      .then(function (lgas) {
+        return lgas.data;
+      }, function () {
+
+      });
+    },
+    addLgaToStaff: function addLgaToStaff () {
+      
     }
   };
 }]);

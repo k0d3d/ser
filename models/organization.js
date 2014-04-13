@@ -228,7 +228,99 @@ staffFunctions = {
     
 
     return d.promise;
-  }      
+  },
+  addLgaToStaff: function addLgaToStaff (doc) {
+    var op = Q.defer();
+
+    staffUtils.getMeMyModel(4)
+    .update({
+      userId: doc.userId
+    }, {
+      $push: {
+        coverage: doc.tag
+      }
+    }, function (err, i) {
+      if (err) {
+        return op.reject(err);
+      }
+      if (i) {
+        return op.resolve(i);
+      }
+      if (!i) {
+        return op.reject(new Error('cannot update staff tags'));
+      }
+    });
+    return op.promise;
+  },
+  removeLgasFromStaff: function removeLgasFromStaff (doc) {
+    var op = Q.defer();
+    staffUtils.getMeMyModel(4)
+    .update({
+      userId: doc.userId
+    }, {
+      $pull: {
+        coverage: doc.tag
+      }
+    }, function (err, i) {
+      if (err) {
+        return op.reject(err);
+      }
+      if (i) {
+        return op.resolve(i);
+      }
+      if (!i) {
+        return op.reject(new Error('cannot update staff tags'));
+      }
+    });
+
+    return op.promise;
+  },
+  addFacToStaff: function addFacToStaff (doc) {
+    var op = Q.defer();
+    staffUtils.getMeMyModel(4)
+    .update({
+      userId: doc.userId
+    }, {
+      $pull: {
+        facility: doc.tag
+      }
+    }, function (err, i) {
+      if (err) {
+        return op.reject(err);
+      }
+      if (i) {
+        return op.resolve(i);
+      }
+      if (!i) {
+        return op.reject(new Error('cannot update staff tags'));
+      }
+    });
+
+    return op.promise;
+  },
+  removeFacFromStaff: function removeFacFromStaff (doc) {
+    var op = Q.defer();
+    staffUtils.getMeMyModel(4)
+    .update({
+      userId: doc.userId
+    }, {
+      $pull: {
+        facility: doc.tag
+      }
+    }, function (err, i) {
+      if (err) {
+        return op.reject(err);
+      }
+      if (i) {
+        return op.resolve(i);
+      }
+      if (!i) {
+        return op.reject(new Error('cannot update staff tags'));
+      }
+    });
+
+    return op.promise;
+  }
 };
 
 function Staff () {
@@ -524,7 +616,93 @@ Staff.prototype.getPersonProfile = function getPersonProfile (userId, accountTyp
   });
 
   return d.promise;
-}
+};
+
+/**
+ * tags a staff by adding a local govt name or facility 
+ * to the staffs profile. This is useful to query what staff is 
+ * responsible for order originating from a specific location 
+ * or a specific facility.
+ * @param  {[type]} staffId [description]
+ * @param  {[type]} tagType [description]
+ * @param  {[type]} tag     [description]
+ * @return {[type]}         [description]
+ */
+Staff.prototype.tagStaff = function (staffId, tagType, tag) {
+  var t = Q.defer();
+
+  //tag type 1 represents lgas
+  if (tagType === '1') {
+    staffFunctions.addLgaToStaff({
+      userId: staffId,
+      tag: tag
+    })
+    .then(function (done) {
+      return t.resolve(done);
+    }, function (err) {
+      return t.reject(err);
+    });    
+  }
+
+
+  //tag type 2 represents med fac
+  if (tagType === '2') {
+    staffFunctions.addFacToStaff({
+      userId: staffId,
+      tag: tag
+    })
+    .then(function (done) {
+      return t.resolve(done);
+    }, function (err) {
+      return t.reject(err);
+    }); 
+  }
+
+  return t.promise;
+};
+
+/**
+ * untags a staff by removing a local govt name or facility 
+ * to the staffs profile. This is useful to query what staff is 
+ * responsible for order originating from a specific location 
+ * or a specific facility.
+ * @param  {[type]} staffId [description]
+ * @param  {[type]} tagType [description]
+ * @param  {[type]} tag     [description]
+ * @return {[type]}         [description]
+ */
+Staff.prototype.unTagStaff = function (staffId, tagType, tag) {
+  var t = Q.defer();
+
+  //tag type 1 represents lgas
+  if (tagType === '1') {
+    staffFunctions.removeLgaToStaff({
+      userId: staffId,
+      tag: tag
+    })
+    .then(function (done) {
+      return t.resolve(done);
+    }, function (err) {
+      return t.reject(err);
+    });    
+  }
+
+
+  //tag type 2 represents med fac
+  if (tagType === '2') {
+    staffFunctions.removeFacToStaff({
+      userId: staffId,
+      tag: tag
+    })
+    .then(function (done) {
+      return t.resolve(done);
+    }, function (err) {
+      return t.reject(err);
+    }); 
+  }
+
+  return t.promise;
+};
 
 module.exports.Staff = Staff;
 module.exports.staffFunctions = staffFunctions;

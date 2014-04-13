@@ -4,7 +4,7 @@ mixin signin()
       | {{auth_message}}
     h4.nomargin Sign In
     p.mt5.mb20 Login to access your account.
-    input.form-control.uname(type='text', placeholder='Username or email', ng-model="form.email", ng-keyup="auth_message =''")
+    input.form-control.uname(type='text', placeholder='Username or email', ng-model="form.email", ng-keyup="auth_message =''", autofocus)
     input.form-control.pword(type='password', placeholder='Password', ng-model="form.password")
     a(href='#')
       small Forgot Your Password?
