@@ -36,7 +36,6 @@ GovtFacSchema.statics = {
     this.distinct('lga', {stateCode: stateId},
     //this.find({lga: "AGEGE"},
     function (err, i) {
-      console.log(err, i);
       if (err) {
         cb(err);
       } else {

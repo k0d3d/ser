@@ -101,7 +101,8 @@ module.exports.routes = function (app, login) {
       if (util.isError(lgas)) {
         res.json(400, lgas.message);
       } else {
-        var loweredCase = _.map(lgas, function (val) {
+        var sortAndCompact = _.compact(lgas).sort();
+        var loweredCase = _.map(sortAndCompact, function (val) {
           return {name: val.toLowerCase(), content: []};
         });
         res.json(200, loweredCase);
@@ -134,9 +135,10 @@ module.exports.routes = function (app, login) {
   //staff
   app.put('/api/organization/people/:personId/tag', login.ensureLoggedIn('/signin'), function (req, res) {
     staff.tagStaff(req.params.personId, req.query.tagType, req.query.tag)
-    .then(function (done) {
-      res.json(200, done);
+    .then(function () {
+      res.json(200, req.query.tag);
     }, function (err) {
+      console.log(err);
       res.json(400, err);
     });
   });

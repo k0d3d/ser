@@ -231,7 +231,7 @@ staffFunctions = {
   },
   addLgaToStaff: function addLgaToStaff (doc) {
     var op = Q.defer();
-
+    console.log(doc);
     staffUtils.getMeMyModel(4)
     .update({
       userId: doc.userId

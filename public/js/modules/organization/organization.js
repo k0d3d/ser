@@ -11,7 +11,7 @@ angular.module('organization', [])
   $routeProvider.when('/a/organization/people/:personId/person/:accountType', {templateUrl: '/organization/profile', controller: 'personController'});
   $routeProvider.when('/a/organization/invitations', {templateUrl: '/organization/invites', controller: 'invitesController'});
 }])
-.controller('staffController', ['$scope', 'organizeStaffService', '$routeParams', function userController($scope, oss, $routeParams) {
+.controller('staffController', ['$scope', 'organizeStaffService', '$routeParams', '$timeout', function userController($scope, oss, $routeParams, $timeout) {
   $scope.$parent.headerTitle = 'Organization';
   //Creates new staff.
   $scope.create_new_staff = function () {
@@ -32,10 +32,14 @@ angular.module('organization', [])
     //console.log($(e.target).text());
     angular.element(e.target).removeClass('collection-li-over');
     var lgaName = angular.element(e.target).scope().col.name;
-    var staffId = angular.element(e.target).scope().dndDragItem._id;
+    var staffId = angular.element(e.target).scope().dndDragItem.userId._id;
     oss.addLgaToStaff(lgaName, staffId)
     .then(function () {
-      angular.element(e.target).scope().dndDragItem.coverage.push(lgaName);
+      var indx = angular.element(e.target).scope().dndDragItem.ndx;
+      console.log(indx);
+      $timeout(function () {
+        $scope.people[indx].coverage.push(lgaName);
+      });      
     });
   };
 
@@ -52,7 +56,7 @@ angular.module('organization', [])
     if (n) {
       oss.getLGA(n)
       .then(function (lga) {
-        $scope.lgas = _.compact(lga.sort());
+        $scope.lgas = lga;
       });
     }
   });
@@ -123,11 +127,11 @@ angular.module('organization', [])
           title: L[L.set].titles.success,
           text: L[L.set].organization.activate.success ,
           class_name: 'growl-success'
-        });        
+        });
         return r.data;
       }, function (err) {
         return err;
-      })
+      });
     },
     //fetch the list of people having a 
     //specific account type
@@ -168,8 +172,11 @@ angular.module('organization', [])
 
       });
     },
-    addLgaToStaff: function addLgaToStaff () {
-      
+    addLgaToStaff: function addLgaToStaff (tag, staffId) {
+      return $http.put('/api/organization/people/' + staffId + '/tag?' +  $.param({tagType: 1, tag: tag}))
+      .then(function (done) {
+        return done.data;
+      });
     }
   };
 }]);
