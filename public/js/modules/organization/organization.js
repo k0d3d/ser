@@ -36,7 +36,6 @@ angular.module('organization', [])
     oss.addLgaToStaff(lgaName, staffId)
     .then(function () {
       var indx = angular.element(e.target).scope().dndDragItem.ndx;
-      console.log(indx);
       $timeout(function () {
         $scope.people[indx].coverage.push(lgaName);
       });      
@@ -165,7 +164,7 @@ angular.module('organization', [])
     //fetches the list of lga for the selected
     //state
     getLGA : function getLGA (stateId) {
-      return $http.get('/api/organization/resource/facility/state/' + stateId + '/lga')
+      return $http.get('/api/organization/states/' + stateId + '/lga')
       .then(function (lgas) {
         return lgas.data;
       }, function () {

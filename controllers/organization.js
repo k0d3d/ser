@@ -76,6 +76,7 @@ module.exports.routes = function (app, login) {
 
   //Fetches list of people employed by the logged in user
   app.get('/api/organization/workforce', function (req, res) {
+    if (req.user.account_type === 5) return res.json(200, []);
     staff.lookUpWorkForce(req.user.account_type, req.user._id)
     .then(function (r) {
       res.json(200, r);
@@ -95,7 +96,23 @@ module.exports.routes = function (app, login) {
     });
   });
 
-  app.get('/api/organization/resource/facility/state/:stateId/lga', function (req, res) {
+  //gets all the lga's in selected state
+  app.get('/api/organization/states/:stateId/lga', function (req, res) {
+
+    Facility.getStateLGA(req.params.stateId, function (lgas) {
+      if (util.isError(lgas)) {
+        res.json(400, lgas.message);
+      } else {
+        var sortAndCompact = _.compact(lgas).sort();
+        var loweredCase = _.map(sortAndCompact, function (val) {
+          return {name: val.toLowerCase(), content: []};
+        });
+        res.json(200, loweredCase);
+      }
+    });
+  });
+
+  app.get('/api/organization/states/:stateId/facility', function (req, res) {
 
     Facility.getStateLGA(req.params.stateId, function (lgas) {
       if (util.isError(lgas)) {

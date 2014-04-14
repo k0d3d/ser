@@ -22,6 +22,13 @@
           h5.subtitle Office Address
           address.x-editable(data-type="textarea", data-name="address", data-defaultValue="Address")
             | #{userProfile.address}
+          -if (userData.account_type === 5)
+            h5.subtitle State
+            p.states-select(data-type="select", data-name="state")
+              | #{userProfile.state}
+            h5.subtitle Local Govt Area
+            p.lga-select(data-type="select", data-name="lga")
+              | #{userProfile.lga}
           h5.subtitle Telephone
           p.x-editable(title='Phone', data-type="text", data-name="phone", data-default-value="Your Phone Number")
             | #{userProfile.phone}

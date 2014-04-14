@@ -154,13 +154,6 @@ config(['$routeProvider',function($routeProvider){
     });
   };
 
-  $scope.confirm_order = function (order) {
-    order.orderStatus = 3;
-    ordersService.updateOrder(order)
-    .then(function () {
-
-    });
-  };
 }])
 .controller('orderAddController',function($scope, $http, $location, ordersService,drugService, $routeParams){
   $scope.form = {

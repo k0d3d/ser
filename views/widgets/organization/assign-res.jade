@@ -2,25 +2,34 @@
 mixin assignRes (account_type) 
   .col-sm-4.col-md-3
     h4.subtitle.mb5 Tag to staff
-    .btn-group
-      button.btn.btn-white(ng-click="toggleTagView = !toggleTagView") Facilities
-      button.btn.btn-white(ng-click="toggleTagView = !toggleTagView") Coverage
-    .search-wards-teritory(ng-show="!toggleTagView")
-      form(name="search_wards_teritory")
-        label.control-label Select a state
-        select.form-control(type='text', placeholder='States', ng-model="current_state", required)
-          each s , index in states
-            option(value=index + 1) #{s}
+    .btn-group(ng-init="lgaView = true")
+      button.btn.btn-white(ng-click="lgaView = !lgaView; medView = !medView") Facilities
+      button.btn.btn-white(ng-click="medView = !medView; lgaView = !lgaView") Coverage
+    
+    form(name="search_wards_teritory")
+      label.control-label Select a state
+      select.form-control(type='text', placeholder='States', ng-model="current_state", required)
+        each s , index in states
+          option(value=index + 1) #{s}
+      .mb5
+   
+    .search-wards-teritory(ng-show="lgaView")
+      h4.subtitle LGAs   
       .collection-li
         ul(style="padding: 0")
           li(ng-repeat="col in lgas")
             button.btn.btn-black.btn-block(data-drop='true', ng-model="col.content", data-jqyoui-options="{accept:'.people-item'}", jqyoui-droppable="{multiple:true, onDrop: 'onDropAssignWard(e, ui)', onOver: 'onOver(e, ui)', onOut: 'onOut(e, ui)'}") {{col.name}}
               span.label.pull-right(ng-class="{'label-danger': col.content.length == 0, 'label-info': col.content.length > 0}") {{col.content.length}}
       .mb20
-    .search-wards-facility(ng-show="toggleTagView")
+    .search-wards-facility(ng-show="medView")
       form(name="search_wards_facility")
         label.control-label() Medical Facilities
-        input.form-control(type='text', placeholder='', ng-model="new_staff.email", required)
-      .collection-li
+        .row
+          .col-md-8
+            input.form-control(type='search', placeholder='', ng-model="new_staff.email", required)
+          .col-md-3
+            button.btn.btn-info(type="submit") Search
+      h4.subtitle Medical Facility
+      .collection-li   
         ul
           li(ng-repeat="col in medfac", data-drop='true', ng-model="peeps.coverage", data-jqyoui-options="{accept:'.btn-draggable'}", jqyoui-droppable="{multiple:true, onDrop: 'onDropAssignWard(e, ui, peeps, $index)', onOver: 'onOver(e)', onOut: 'onOut(e)'}")

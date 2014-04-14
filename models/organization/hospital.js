@@ -8,6 +8,8 @@ var HospitalSchema =  new Schema({
   hospitalId: {type: Number},
   name: {type: String},
   address: {type: String},
+  state: {type: String},
+  lga: {type: String},
   phone: {type: String},
   location: {type: String},
   userId:{type: Schema.ObjectId, ref: 'User'},
