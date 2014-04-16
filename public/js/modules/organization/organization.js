@@ -6,7 +6,7 @@
 angular.module('organization', [])
 
 .config(['$routeProvider', function ($routeProvider){
-  $routeProvider.when('/organization', {templateUrl: '/organization/all-staff', controller: 'staffController'});
+  $routeProvider.when('/a/organization', {templateUrl: '/organization/all-staff', controller: 'staffController'});
   $routeProvider.when('/a/organization/people/:accountType', {templateUrl: '/organization/all-staff', controller: 'staffController'});
   $routeProvider.when('/a/organization/people/:personId/person/:accountType', {templateUrl: '/organization/profile', controller: 'personController'});
   $routeProvider.when('/a/organization/invitations', {templateUrl: '/organization/invites', controller: 'invitesController'});
@@ -38,7 +38,7 @@ angular.module('organization', [])
       var indx = angular.element(e.target).scope().dndDragItem.ndx;
       $timeout(function () {
         $scope.people[indx].coverage.push(lgaName);
-      });      
+      });
     });
   };
 
@@ -56,6 +56,11 @@ angular.module('organization', [])
       oss.getLGA(n)
       .then(function (lga) {
         $scope.lgas = lga;
+      });
+
+      oss.getMedFac(n)
+      .then(function (med) {
+        $scope.meds = med;
       });
     }
   });
@@ -89,6 +94,33 @@ angular.module('organization', [])
     });
   }
 
+}])
+.directive('staffSelect', ['organizeStaffService', function (oss) {
+  return {
+    link: function (scope, element, attrs) {
+      var kind = attrs.kind;
+
+      oss.getMyWorkForce(kind)
+      .then(function (wf) {
+        scope.pplWf = [];
+
+        angular.forEach(_.compact(wf), function(v) {
+          if (_.isArray(v)) {
+            angular.forEach(_.compact(v), function (vSub) {
+              scope.pplWf.push(vSub);
+            });
+          } else {
+            scope.pplWf.push(v);
+          }
+          
+        });
+      });      
+    },
+    scope: {
+      staffSelect: '='
+    },
+    template: '<select class="form-control" ng-model="staffSelect.staff" placeholder="name or email address" ng-options="c.name for c in pplWf " required></select>'
+  };
 }])
 .factory('organizeStaffService', ['$http', 'Notification', 'Language', function ($http, N, L) {
   return {
@@ -152,8 +184,9 @@ angular.module('organization', [])
     },
     //get the list of people employed under the currently 
     //logged in user. 
-    getMyWorkForce : function () {
-      return $http.get('/api/organization/workforce')
+    getMyWorkForce : function (kind) {
+      kind = kind || 'employees';
+      return $http.get('/api/organization/workforce?direction=' + kind)
       .then(function (r) {
         return r.data;
       }, function (err) {
@@ -167,6 +200,16 @@ angular.module('organization', [])
       return $http.get('/api/organization/states/' + stateId + '/lga')
       .then(function (lgas) {
         return lgas.data;
+      }, function () {
+
+      });
+    },
+    //fetches the list of lga for the selected
+    //state
+    getMedFac : function getMedFac (stateId) {
+      return $http.get('/api/organization/states/' + stateId + '/facility')
+      .then(function (f) {
+        return f.data;
       }, function () {
 
       });

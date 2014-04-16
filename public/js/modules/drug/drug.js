@@ -12,14 +12,26 @@ angular.module('drug', [])
     $routeProvider.when('/a/drugs', {templateUrl: '/drug/index', controller: 'drugIndexController'})
     .when('/a/drugs/:drugId/item', {controller: 'drugPageController'})
     .when('/a/drugs/add-new', {templateUrl: '/drug/add', controller: 'drugAddController'});
+    $locationProvider.html5Mode(true);
   }])
-  .controller('drugIndexController', ['$scope', 'drugService', function drugIndexController ($scope, ds){
+  .controller('drugIndexController', ['$scope', 'drugService', 'organizeStaffService', function drugIndexController ($scope, ds, oss){
     //Change header title
     $scope.$parent.headerTitle = 'All Drug Items';
 
     ds.fetchAll()
     .then(function (r) {
       $scope._drugs = r;
+    });
+
+    ds.getStockDownRequest()
+    .then(function (r) {
+      $scope._request = r;
+      ds.getStockUpRequest()
+      .then(function (u) {
+        angular.forEach(u, function (v) {
+          $scope._request.push(v);
+        });
+      });
     });
 
     //ds.search
@@ -51,7 +63,47 @@ angular.module('drug', [])
       .then(function (r) {
         
       });      
-    };    
+    };
+    //requests the availbale staff and managers or employers
+    $scope.item_stock = function (item) {
+      $scope.current_item = item;
+    };
+
+    //add to stock request
+    $scope.stock_from = function (stockUp) {
+      var current_item = $scope.current_item;
+      //stockUp.staff = stockUp.staff || {};
+      ds.postStockUp(stockUp, current_item._id)
+      .then(function (done) {
+
+      });
+    };
+
+    //send stock to employee
+    $scope.stock_to = function (stockTo) {
+      var current_item = $scope.current_item;
+      ds.postStockTo(stockTo, current_item._id)
+      .then(function (done) {
+
+      });
+    };
+
+    //view all stock up transaction
+    $scope.view_stock_up = function (current_item) {
+      ds.getStockUpHistory(current_item._id)
+      .then(function (done) {
+        $scope.stockLog = done;
+
+      });
+    };
+
+    //view all stock down transaction
+    $scope.view_stock_down = function (current_item) {
+      ds.getStockDownHistory(current_item._id)
+      .then(function (done) {
+        $scope.stockLog = done;
+      });
+    };
   }])
   .controller('drugAddController', ['$scope', 'drugService', function ($scope, ds) {
     //Init the add item form model and 
@@ -91,8 +143,47 @@ angular.module('drug', [])
   .controller('drugPageController', ['$scope', 'drugService', function ($scope, ds) {
       
   }])
+  .filter('stockRequestState', function () {
+    var states = {
+      '-2': 'request cancelled.',
+      '-1': 'cancelling request',
+      '0': 'request sent',
+      '1': 'request received',
+      '2': 'request confirmed and verified'
+    };
+    return function (num) {
+      return states[num];
+    };
+  })
   .factory('drugService', ['$http', 'Notification', 'Language', function ($http, N, L) {
     var d = {};
+
+    d.getStockUpHistory = function (itemId) {
+      return $http.get('/api/drugs/' + itemId + '/history?action=stockUp')
+      .then(function (r) {
+        return r.data;
+      });
+    };
+    d.getStockUpRequest = function () {
+      return $http.get('/api/drugs/requests?action=stockUp')
+      .then(function (r) {
+        return r.data;
+      });
+    };
+
+    d.getStockDownHistory = function (itemId) {
+      return $http.get('/api/drugs/' + itemId + '/history?action=stockDown')
+      .then(function (r) {
+        return r.data;
+      });      
+    };
+
+    d.getStockDownRequest = function () {
+      return $http.get('/api/drugs/requests?action=stockDown')
+      .then(function (r) {
+        return r.data;
+      });      
+    };
 
     d.addNewDrug = function (data) {
       return $http.post('/api/drugs', data)
@@ -208,6 +299,20 @@ angular.module('drug', [])
           type: 'error'
         });
       });
+    };
+
+    d.postStockTo = function postStockTo (stockToData, itemId) {
+      return $http.post('/api/drugs/' + itemId + '/stockto', stockToData)
+      .then(function (done) {
+        return done.data;
+      });
+    };
+
+    d.postStockUp = function postStockUp (stockUpData, itemId) {
+      return $http.post('/api/drugs/' + itemId + '/stockup', stockUpData)
+      .then(function (done) {
+        return done.data;
+      });      
     };
 
     return d;

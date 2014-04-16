@@ -17,8 +17,45 @@ mixin allDrugs()
           td {{d.currentPrice.retail}}
           td
             .pull-right
-              button.btn.btn-xs.btn-white(ng-click="add_to_list(d)") Add to My List                
-              button.btn.btn-xs.btn-danger
-                i.fa.fa-times
-  //
-     table-responsive 
+              .btn-group.mr5
+                  button.btn.btn-default.btn-sm(type='button') Manage
+                    button.btn.btn-default.dropdown-toggle.btn-sm(type='button', data-toggle='dropdown')
+                      span.caret
+                      span.sr-only Click
+                    ul.dropdown-menu(role='menu')
+                      li
+                        a(href='#', ng-click="view_stock_down(d); toggleModal('stock-history-modal')") Stock Down History
+                      li
+                        a(href='#', ng-click="view_stock_up(d); toggleModal('stock-history-modal')") Stock Up History
+                      li
+                        a(href='#', ng-click="item_stock(d); toggleModal('manage-item-modal');") Stock
+                      li
+                        a(href='#', ng-click="add_to_list(d)") Add to My List
+           
+                  button.btn.btn-sm.btn-danger
+                    i.fa.fa-times
+
+mixin allRequest()
+  .table-responsive
+    table.table.table-stripped
+      thead
+        tr
+          th Item Name
+          th Amount
+          th Date 
+          th Last Update
+          th Current Status
+          th Reference
+          th
+      tbody
+        tr(ng-repeat="tr in _request")
+          td {{tr.itemId.itemName}}
+          td {{tr.amount}}
+          td {{tr.amount}}
+          td <strong>Status: </strong>{{tr.statusLog[0].code | stockRequestState}}, <em> {{tr.statusLog[0].dateStated | date: 'medium'}} </em>
+             
+          td {{tr.status | stockRequestState}}
+          td {{tr.referenceId}}
+          td
+            button.btn.btn-sm.btn-primary Approve
+            button.btn.btn-sm.btn-danger Reject

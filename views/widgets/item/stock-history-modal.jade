@@ -1,0 +1,32 @@
+#stock-history-modal.modal.fade.in(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
+  .modal-dialog(style="width: 90%")
+      .modal-content
+        .modal-header
+          span.label(ng-class="", ng-show="modal.statusText") {{modal.statusText}}
+          button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+          h4#myModalLabel.modal-title Item Stock History
+        .modal-body
+          .or-ch.row
+            table.table.table-stripped
+              thead
+                tr
+                  th Source
+                  th Amount
+                  th Date 
+                  th Last Update
+                  th Current Status
+                  th Reference
+              tbody
+                tr(ng-repeat="tr in stockLog")
+                  td {{tr.itemId.itemName}}
+                  td {{tr.amount}}
+                  td {{tr.dateInitiated | date: 'short'}}
+                  td <strong>Status: </strong>{{tr.statusLog[0].code | stockRequestState}}, <em> {{tr.statusLog[0].dateStated | date: 'medium'}} </em>
+                     
+
+
+                  td {{tr.status | stockRequestState}}
+                  td {{tr.referenceId}}
+
+        .modal-footer
+          button.btn.btn-default(type='button', data-dismiss='modal', ng-click="__temp = ''") Close          

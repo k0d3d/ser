@@ -31,5 +31,7 @@ mixin assignRes (account_type)
             button.btn.btn-info(type="submit") Search
       h4.subtitle Medical Facility
       .collection-li   
-        ul
-          li(ng-repeat="col in medfac", data-drop='true', ng-model="peeps.coverage", data-jqyoui-options="{accept:'.btn-draggable'}", jqyoui-droppable="{multiple:true, onDrop: 'onDropAssignWard(e, ui, peeps, $index)', onOver: 'onOver(e)', onOut: 'onOut(e)'}")
+        ul(style="padding: 0")
+          li(ng-repeat="med in meds")
+            button.btn.btn-black.btn-block(data-drop='true', ng-model="med.content", data-jqyoui-options="{accept:'.people-item'}", jqyoui-droppable="{multiple:true, onDrop: 'onDropAssignWard(e, ui)', onOver: 'onOver(e, ui)', onOut: 'onOut(e, ui)'}") {{med.name}}
+              span.label.pull-right(ng-class="{'label-danger': col.content.length == 0, 'label-info': col.content.length > 0}") {{med.content.length}}

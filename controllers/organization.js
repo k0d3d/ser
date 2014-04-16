@@ -1,4 +1,5 @@
 var staff_model = require('../models/organization.js'),
+    staffUtils = require('../models/staff_utils.js'),
     Facility = require('../models/item/govt-facility.js'),
     _ = require('underscore'),
   utilities = require('../lib/utils.js'),
@@ -7,7 +8,7 @@ var staff_model = require('../models/organization.js'),
 module.exports.routes = function (app, login) {
   var staff = new staff_model.Staff();
 
-  app.get('/organization',login.ensureLoggedIn('/signin'), function (req, res) {
+  app.get('/a/organization',login.ensureLoggedIn('/signin'), function (req, res) {
 
     res.render('index', {
       userData: req.user
@@ -77,12 +78,42 @@ module.exports.routes = function (app, login) {
   //Fetches list of people employed by the logged in user
   app.get('/api/organization/workforce', function (req, res) {
     if (req.user.account_type === 5) return res.json(200, []);
-    staff.lookUpWorkForce(req.user.account_type, req.user._id)
-    .then(function (r) {
-      res.json(200, r);
-    }, function (err) {
-      res.json(400, err);
-    });
+    var direction = req.query.direction;
+
+    if (direction === 'employers') {
+      staff.getPersonProfile(req.user._id, req.user.account_type)
+      .then(function (r) {
+        var rs = [];
+        if (r.manager) {
+          rs[3] = r.manager;
+        }
+
+        if (r.employer) {
+          rs[2] = r.employer;
+        }
+        //console.log(r);
+        res.json(200, rs);
+      }, function (err) {
+        res.json(400, err);
+      });
+
+    }else if (direction === 'employees') {
+      staff.lookUpWorkForce(req.user.account_type, req.user._id, req.query.direction)
+      .then(function (r) {
+        var rs = [];
+
+        if (r[3]) {
+          rs[3] = r[3];
+        }
+        if (r[4]) {
+          rs[4] = r[4];
+        }
+
+        res.json(200, rs);
+      }, function (err) {
+        res.json(400, err);
+      });
+    }    
   });
 
   //Fetches a person profile 
@@ -114,17 +145,25 @@ module.exports.routes = function (app, login) {
 
   app.get('/api/organization/states/:stateId/facility', function (req, res) {
 
-    Facility.getStateLGA(req.params.stateId, function (lgas) {
-      if (util.isError(lgas)) {
-        res.json(400, lgas.message);
-      } else {
-        var sortAndCompact = _.compact(lgas).sort();
-        var loweredCase = _.map(sortAndCompact, function (val) {
-          return {name: val.toLowerCase(), content: []};
-        });
-        res.json(200, loweredCase);
-      }
+    staff.getStateFacility(req.params.stateId)
+    .then(function (f) {
+      res.json(200, f);
+    }, function (err) {
+      res.json(400, err);
     });
+
+    // 
+    // Facility.getStateFacility(req.params.stateId, function (lgas) {
+    //   if (util.isError(lgas)) {
+    //     res.json(400, lgas.message);
+    //   } else {
+    //     var sortAndCompact = _.compact(lgas).sort();
+    //     var loweredCase = _.map(sortAndCompact, function (val) {
+    //       return {name: val.toLowerCase(), content: []};
+    //     });
+    //     res.json(200, loweredCase);
+    //   }
+    // });
   });
 
   //Attempts to activate an account, and add the employer to 

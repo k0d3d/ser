@@ -320,6 +320,22 @@ staffFunctions = {
     });
 
     return op.promise;
+  },
+  findFacilities: function findFacilities (doc) {
+    var find = Q.defer();
+
+    staffUtils.getMeMyModel(5)
+    .find({
+      state: 'Lagos'
+    })
+    .exec(function (err, i) {
+      if (err) {
+        return find.reject(err);
+      }
+      return find.resolve(i);
+    });
+
+    return find.promise;
   }
 };
 
@@ -503,13 +519,14 @@ Staff.prototype.lookUpMyPeople = function lookUpMyPeople (accountType, employerI
  * account level. 
  * @param  {[type]} employerId  [description]
  * @param  {[type]} accountType [description]
+ * @param  {[type]} direction [description]
  * @return {[type]}             [description]
  */
-Staff.prototype.lookUpWorkForce = function (accountType, employerId) {
+Staff.prototype.lookUpWorkForce = function lookUpWorkForce (accountType, employerId, direction) {
   var libr = Q.defer(),
       ac_range = _.range(accountType, 5),
       force = [];
-      console.log(ac_range);
+
   function __lookUp () {
     var task = ac_range.pop();
 
@@ -535,6 +552,7 @@ Staff.prototype.lookUpWorkForce = function (accountType, employerId) {
 
   return libr.promise;
 };
+
 
 /**
  * allows a distributor, manager or staff to add drugs
@@ -586,7 +604,6 @@ Staff.prototype.cancelActivation = function cancelActivation (activationToken) {
  * @return {[type]}              Promise Object
  */
 Staff.prototype.getPersonProfile = function getPersonProfile (userId, accountType) {
-  console.log(arguments);
   var d = Q.defer();
   staffUtils.getMeMyModel(accountType).findOne({
     userId: userId
@@ -594,7 +611,6 @@ Staff.prototype.getPersonProfile = function getPersonProfile (userId, accountTyp
   .populate('drugs', null, 'drug')
   .lean()
   .exec(function (err, user_profile) {
-    console.log(err, user_profile);
     if (err) {
       return d.reject(err);
     }
@@ -628,7 +644,7 @@ Staff.prototype.getPersonProfile = function getPersonProfile (userId, accountTyp
  * @param  {[type]} tag     [description]
  * @return {[type]}         [description]
  */
-Staff.prototype.tagStaff = function (staffId, tagType, tag) {
+Staff.prototype.tagStaff = function tagStaff (staffId, tagType, tag) {
   var t = Q.defer();
 
   //tag type 1 represents lgas
@@ -671,7 +687,7 @@ Staff.prototype.tagStaff = function (staffId, tagType, tag) {
  * @param  {[type]} tag     [description]
  * @return {[type]}         [description]
  */
-Staff.prototype.unTagStaff = function (staffId, tagType, tag) {
+Staff.prototype.unTagStaff = function unTagStaff (staffId, tagType, tag) {
   var t = Q.defer();
 
   //tag type 1 represents lgas
@@ -703,6 +719,23 @@ Staff.prototype.unTagStaff = function (staffId, tagType, tag) {
 
   return t.promise;
 };
+
+
+Staff.prototype.getStateFacility = function getStateFacility (stateId) {
+  var gsf = Q.defer();
+
+  staffFunctions.findFacilities({
+    userId: stateId
+  })
+  .then(function (f) {
+    return gsf.resolve(f);
+  }, function (err) {
+    return gsf.reject(err);
+  });
+
+  return gsf.promise;
+}
+
 
 module.exports.Staff = Staff;
 module.exports.staffFunctions = staffFunctions;

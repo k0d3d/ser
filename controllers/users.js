@@ -23,7 +23,7 @@ module.exports.routes = function(app, passport, login, people){
 
   app.route('/a/profile')
   .get(login.ensureLoggedIn('/signin'), function (req, res) {
-    console.log(req.user);
+    //console.log(req.user);
     res.render('index', {
       userData : req.user
     });
@@ -31,6 +31,7 @@ module.exports.routes = function(app, passport, login, people){
 
   app.route('/user/profile')
   .get(login.ensureLoggedIn('/signin'), function (req, res, next) {
+    //return console.log(req.user);
     var userId = req.user._id;
     var account_type = req.user.account_type;
     users.getProfile(userId, account_type).then(function (r) {

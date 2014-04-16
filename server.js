@@ -182,10 +182,15 @@ function afterResourceFilesLoad() {
 
     // assume 404 since no middleware responded
     app.use(function(req, res){
-      res.status(404).render('404', {
-        url: req.originalUrl,
-        error: 'Not found'
-      });
+      if (req.xhr) {
+        res.json(404, {message: 'resource not found'});
+      } else {
+        res.status(404).render('404', {
+          url: req.originalUrl,
+          error: 'Not found'
+        });        
+      }
+
     });      
 
 

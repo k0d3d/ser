@@ -19,7 +19,7 @@ app.config(function ($routeProvider, $locationProvider, $httpProvider) {
       redirectTo: '/'
     });
   $locationProvider.html5Mode(true);
-  $httpProvider.interceptors.push('errorNotifier');
+  //$httpProvider.interceptors.push('errorNotifier');
 });
 
 app.controller('MainController', [
@@ -33,19 +33,14 @@ app.controller('MainController', [
 
     $scope.orderCart = [];
 
-    //Fetch All Orders
-    OS.orders(0, 'short')
-    .then(function (i) {
-      $scope.orderCart = i;
-    });
 
     $scope.workForce = {};
 
     //Fetch All Orders
-    OSS.getMyWorkForce()
-    .then(function (i) {
-      $scope.workForce = i;
-    });
+    // OSS.getMyWorkForce()
+    // .then(function (i) {
+    //   $scope.workForce = i;
+    // });
 
     $scope.modal = {};
     $scope.notification = {};

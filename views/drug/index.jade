@@ -8,3 +8,7 @@
         include ../widgets/item/all-drugs
         .panel.panel-default(ng-show="_drugs.length > 0")
           +allDrugs()
+          hr
+          +allRequest()
+include ../widgets/item/manage-item-modal
+include ../widgets/item/stock-history-modal

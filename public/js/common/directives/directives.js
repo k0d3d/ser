@@ -287,7 +287,6 @@
     };
   }]);
 
-'use strict';
 
 angular.module('directives').directive('equals', function() {
   return {
@@ -317,3 +316,16 @@ angular.module('directives').directive('equals', function() {
     }
   }
 });
+
+angular.module('directives').directive('orderCart', ['orderService', function (os) {
+  return {
+    link: function (scope, element, attrs) {
+      //Fetch All Orders
+      OS.orders(0, 'short')
+      .then(function (i) {
+        $scope.$parent.orderCart = i;
+      });
+
+    }
+  };
+}]);

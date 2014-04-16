@@ -71,7 +71,7 @@ module.exports.routes = function(app, login) {
     drugs.fetchAllMyDrugs({
       page: req.query.page || 0,
       limit: req.query.limit || 50
-    }, req.user._id, req.user.account_typey)
+    }, req.user._id, req.user.account_type)
     .then(function (r) {
       res.json(200, r);
     }, function (err) {
@@ -79,19 +79,19 @@ module.exports.routes = function(app, login) {
     });
   });
 
-  app.post('/api/drugs', function (req, res) {
-    var item = req.body;
+
+  app.get('/api/drugs/requests', function (req, res) {
+    var action = req.query.action;
     var owner = req.user._id;
-    var account_type = req.user.account_type;
-    drugs.addDrug(item, owner, account_type)
-    .then(function () {
-      res.json(200, true);
+    var account_type = req.user.account_type;   
+
+    drugs.stockRequest(owner, account_type, action) 
+    .then(function (done) {
+      res.json(200, done);
     }, function (err) {
       res.json(400, err);
     });
-  });
-
-
+  });  
 
   //run typeahead
   app.get('/api/internal/items/typeahead', function (req, res, next) {
@@ -169,6 +169,78 @@ module.exports.routes = function(app, login) {
     res.json(200, props[req.query.prop] || {});
   
   });
+
+  app.get('/api/drugs/:itemId/history', function (req, res) {
+    var action = req.query.action;
+    var itemId = req.params.itemId;
+    var owner = req.user._id;
+    var account_type = req.user.account_type;   
+
+    drugs.stockLog(itemId, owner, account_type, action) 
+    .then(function (done) {
+      res.json(200, done);
+    }, function (err) {
+      res.json(400, err);
+    });
+  });
+
+
+  app.post('/api/drugs', function (req, res) {
+    var item = req.body;
+    var owner = req.user._id;
+    var account_type = req.user.account_type;
+    drugs.addDrug(item, owner, account_type)
+    .then(function () {
+      res.json(200, true);
+    }, function (err) {
+      res.json(400, err);
+    });
+  });
+
+  //request to stock to 
+  app.post('/api/drugs/:itemId/stockto', function (req, res) {
+    var itemId = req.params.itemId,
+        userId = req.user._id,
+        accountType = req.user.account_type;
+
+
+    drugs.createStockTransaction(itemId, userId, accountType, req.body, false)
+    .then(function (done) {
+      res.json(200, {status: done});
+    }, function (err) {
+      res.json(400, err);
+    });
+
+  });
+
+  app.post('/api/drugs/:itemId/stockup', function (req, res) {
+    var itemId = req.params.itemId,
+        userId = req.user._id,
+        accountType = req.user.account_type;
+
+    drugs.createStockTransaction(itemId, userId, accountType, req.body, true)
+    .then(function (done) {
+      res.json(200, {status: done});
+    }, function (err) {
+      res.json(400, err);
+    });
+
+  });
+
+  app.post('/api/drugs/:itemId/requests/:transactionId', function (req, res) {
+    var itemId = req.params.itemId, 
+        userId = req.user._id, 
+        accountType = req.user.account_type,
+        transactionId = req.params.transactionId;
+    drugs.approveRequest(itemId, userId, accountType, transactionId)
+    .then(function (done) {
+      res.json(200, done);
+    }, function (err) {
+      res.json(400, err);
+    });
+  });
+
+
 
   //Updates the price of the drug
   app.put('/api/drugs/:drugId/price', function(req, res, next) {

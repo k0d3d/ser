@@ -1,0 +1,47 @@
+#manage-item-modal.modal.fade.in(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
+  .modal-dialog
+      .modal-content
+        .modal-header
+          span.label(ng-class="", ng-show="modal.statusText") {{modal.statusText}}
+          button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+          h4#myModalLabel.modal-title Item Properties
+        .modal-body
+          .or-ch.row
+            .col-md-5
+              h4 Add to Stock
+              form(ng-submit="stock_from(stockUp)", name="stock_from_form")
+                if (userData.account_type > 2)
+                  .form-group
+                    label.control-label Employers
+                    .dd(staff-select="stockUp", kind="employers")
+                .form-group
+                  label.control-label Reference Id
+                  input.form-control(ng-model="stockUp.referenceId", placeholder="e.g. 123ABC")
+                .form-group
+                  label.control-label Amount
+                  .row
+                    .col-md-8
+                      input.form-control(ng-model="stockUp.amount", placeholder="Quantity", type="number", required)
+                    .col-md-3            
+                      button.btn.btn-primary.btn-sm(type="submit", ng-disabled="stock_from_form.$invalid") Add stock
+            .col-md-5.col-md-offset-1
+              if (userData.account_type < 4) 
+                h4 Stock down
+                form(ng-submit="stock_to(stockTo)", name="stock_to_form")
+                  .form-group
+                    label.control-label Staff
+                    .dd(staff-select="stockTo", kind="employees")
+                  .form-group
+                    label.control-label Reference Id
+                    input.form-control(ng-model="stockTo.referenceId", placeholder="e.g. 123ABC")                    
+                  .form-group
+                    label.control-label Amount
+                    .row
+                      .col-md-8
+                        input.form-control(ng-model="stockTo.amount", placeholder="Quantity", type="number", required)
+                      .col-md-3            
+                        button.btn.btn-primary.btn-sm(type="submit", ng-disabled="stock_to_form.$invalid") Transfer stock          
+              
+
+        .modal-footer
+          button.btn.btn-default(type='button', data-dismiss='modal', ng-click="__temp = ''") Close          
