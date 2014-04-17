@@ -6,7 +6,8 @@ mixin allDrugs()
           th DrugName
           th Composition
           th RegNo
-          th Current Price
+          th Current Prices (N)
+          th In Stock (~)
           th
       tbody
         tr(ng-repeat="d in _drugs")
@@ -14,8 +15,12 @@ mixin allDrugs()
             a(ng-href='/a/drugs/{{d._id}}/item') {{d.itemName}}
           td {{d.sciName}}
           td {{d.nafdacRegNo}}
-          td {{d.currentPrice.retail}}
-          td
+          td 
+            span.label.label-info(title="Retail Price") {{d.currentPrice.retail}}
+            span.label.label-warning(title="Institution Price") {{d.currentPrice.institution}}
+            span.label.label-success(title="Wholesale Price") {{d.currentPrice.wholesale}}
+          td {{d.stockCount}}
+          td(style="min-width: 150px")
             .pull-right
               .btn-group.mr5
                   button.btn.btn-default.btn-sm(type='button') Manage
@@ -51,11 +56,11 @@ mixin allRequest()
         tr(ng-repeat="tr in _request")
           td {{tr.itemId.itemName}}
           td {{tr.amount}}
-          td {{tr.amount}}
+          td {{tr.dateInitiated | date: 'short'}}
           td <strong>Status: </strong>{{tr.statusLog[0].code | stockRequestState}}, <em> {{tr.statusLog[0].dateStated | date: 'medium'}} </em>
              
           td {{tr.status | stockRequestState}}
           td {{tr.referenceId}}
           td
-            button.btn.btn-sm.btn-primary Approve
-            button.btn.btn-sm.btn-danger Reject
+            button.btn.btn-sm.btn-primary(ng-click="approve_request(tr)") Approve
+            button.btn.btn-sm.btn-danger(ng-click="reject_request(tr)") Reject

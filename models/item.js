@@ -1,5 +1,6 @@
  var Drug = require('./item/drug.js').drug,
     Stock = require('./item/stock-history.js'),
+    StockCount = require('./item/stock-count.js'),
     //drugUpdateHistory = require('./item/drug.js').drugUpdateHistory,
     NDL = require('./item/ndl.js'),
     staffUtils = require('./staff_utils.js'),
@@ -215,7 +216,147 @@
         });
 
         return loot.promise;
-      }      
+      },
+      findStockTransaction: function findStockTransaction (doc) {
+        var trs = Q.defer();
+
+        Stock.find({
+          itemId: doc.itemId,
+          transactionId: doc.transactionId,
+        })
+        .exec(function (err, trdoc) {
+          if (err) {
+            return trs.reject(err);
+          }
+          if (trdoc.length === 2) {
+            return trs.resolve(trdoc);
+          } else {
+            return trs.reject(new Error('abnormal transaction'));
+          }
+
+        });
+
+        return trs.promise;
+      },
+      execPrimaryOperation: function execPrimaryOperation (doc) {
+        console.log('running primary operation');
+        var med = Q.defer();
+
+        StockCount.update({
+          userId: doc.primary.destId,
+          accountType: doc.primary.destType,
+          itemId: doc.primary.itemId
+        }, {
+          $inc: {
+            amount: doc.primary.amount
+          }
+        }, {
+          upsert: true, multi: false
+        }, function(err, i) {
+          console.log(err, i);
+            if (err) {
+              return med.reject(err);
+            }
+            if (i > 0) {
+              return med.resolve(doc);
+            }
+            if (i === 0 ){
+              return med.resolve(new Error('stock operation execution failed'));
+            }
+        });
+
+        return med.promise;
+      },
+      execSecondaryOperation: function execSecondaryOperation (doc) {
+        console.log('running secondary operation ...');
+        var med = Q.defer();
+
+        StockCount.update({
+          userId: doc.secondary.destId,
+          accountType: doc.secondary.destType,
+          itemId: doc.secondary.itemId
+        }, {
+          $inc: {
+            amount: doc.secondary.amount
+          }
+        }, {
+          upsert: true, multi: false
+        }, function(err, i) {
+          console.log(err, i);
+            if (err) {
+              return med.reject(err);
+            }
+            if (i > 0) {
+              return med.resolve(doc);
+            }
+            if (i === 0 ){
+              return med.resolve(new Error('stock operation execution failed'));
+            }
+        });
+
+        return med.promise;
+      },
+      execTransactionUpdate: function execTransactionUpdate (doc) {
+        console.log('running transaction update');
+        var med = Q.defer();
+
+        Stock.update({
+          transactionId: doc.transactionId
+        },{
+          $push : {
+            statusLog: {code: doc.nextStatus}
+          },
+          $set: {
+            status: doc.nextStatus
+          }
+        }, {multi: true}, function (err, count) {
+          console.log(err, count);
+          // docs.statusLog.push({
+          //   code: doc.nextStatus
+          // });
+          // docs.status = doc.nextStatus;
+          
+          if (err) {
+            return med.reject(err);
+          }
+          if (count === 2) {
+            return med.resolve(doc);
+          }
+        });
+
+        return med.promise;
+      },
+      populateUserDrugStoc: function populateUserDrugStoc (drugs, doc) {
+        console.log('Populating drug item stock...');
+        var m = Q.defer(), reOb = [];
+
+        function __popDzDrugs(){
+          var task = drugs.pop();
+          //find users stock
+          StockCount.findOne({
+            userId: doc.userId,
+            itemId: task._id,
+            accountType: doc.accountType
+          })
+          .exec(function (err, i) {
+            if (err) {
+              return m.reject(err);
+            }
+            task.stockCount = (i) ? i.amount : 0;
+            reOb.push(task);
+            if (drugs.length) {
+              __popDzDrugs();
+            } else {
+              return m.resolve(reOb);
+            }
+          });
+        }
+
+        //pop dz fuckin drugs dude...
+        __popDzDrugs();
+
+        return m.promise;
+      }
     };
 
 function DrugController (){
@@ -419,7 +560,7 @@ DrugController.prototype.checkUpdate = function(since, cb){
     if(err) return cb(err);
     cb(i);
   });
-}
+};
 
 DrugController.prototype.fetchAllMyDrugs = function (options, userId, accountType) {
   var d = Q.defer();
@@ -447,7 +588,18 @@ DrugController.prototype.fetchAllMyDrugs = function (options, userId, accountTyp
         if (err) {
           return d.reject(err);
         } else {
-          return d.resolve(i);
+          //add resolve to check current 
+          //stock for every item
+          drugsFunctions.populateUserDrugStoc(i, {
+            userId: userId,
+            accountType: accountType
+          })
+          .then(function (dHigh) {
+            return d.resolve(dHigh);
+          }, function (err) {
+            return d.reject(err);
+          });
+          
         }
       });      
 
@@ -463,7 +615,17 @@ DrugController.prototype.fetchAllMyDrugs = function (options, userId, accountTyp
         if (err) {
           return d.reject(err);
         } else {
-          return d.resolve(i);
+          //add resolve to check current 
+          //stock for every item
+          drugsFunctions.populateUserDrugStoc(i, {
+            userId: userId,
+            accountType: accountType
+          })
+          .then(function (dHigh) {
+            return d.resolve(dHigh);
+          }, function (err) {
+            return d.reject(err);
+          });
         }
       });
   }
@@ -666,22 +828,75 @@ DrugController.prototype.createStockTransaction = function createStockTransactio
 
 };
 
-DrugController.prototype.approveRequest = function (request) {
+DrugController.prototype.attendRequest = function (itemId, userId, accountType, transactionId, nextStatus) {
   var loot = Q.defer();
 
   //find transaction
-  drugsFunctions.findStockTransaction(request.transactionId)
-  .then(function (trans) {
-    //validate request
+  drugsFunctions.findStockTransaction({
+    itemId: itemId,
+    transactionId: transactionId
   })
-  .then(function (ans) {
+  .then(function (trans) {
+    var mid = Q.defer(), doc = {};
+    //validate request
+    doc.primary = _.where(trans, {recordType: 'primary'})[0];
+    doc.secondary = _.where(trans, {recordType: 'secondary'})[0];
+
+    //validate this transaction 
+    if ((0 <= doc.primary.status && doc.primary.status < nextStatus) || nextStatus === -1) {
+      //proceed with operation
+      //
+      //if nextStatus is -1 which is rejecting 
+      //the transaction. 
+      //then lets skip the stockCount update operation
+      //to the next task of updating the transaction
+      if (nextStatus === -1) {
+        mid.resolve(doc);
+      } else {
+
+        drugsFunctions.execPrimaryOperation(doc)
+        .then(drugsFunctions.execSecondaryOperation)
+        .then(function (w) {
+          return mid.resolve(w);
+        }, function (err) {
+          return mid.reject(err);
+        });  
+
+      }
+
+
+    } else {
+      //cancel operation
+      mid.reject(new Error('operation not possible; invalid transaction'));
+    }
+
+    return mid.promise;
+  })
+  .then(function (doc) {
+    console.log('updating transaction');
     //execute request
+    var upd = Q.defer();
+
+    drugsFunctions.execTransactionUpdate({
+      transactionId: transactionId, 
+      nextStatus: nextStatus
+    })
+    .then(function (done) {
+      return upd.resolve(done);
+    }, function (err) {
+      return upd.reject(err);
+    });
+
+    return upd.promise;
   })
   .then(function (done) {
     //send response
+   loot.resolve(done);
   })
   .catch(function (err) {
-
+    console.log('catching errors');
+    console.log(err);
+    loot.reject(err);
   });
   
   //execute request

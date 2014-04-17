@@ -104,6 +104,29 @@ angular.module('drug', [])
         $scope.stockLog = done;
       });
     };
+
+    $scope.approve_request = function (item) {
+      var nextStatus = (item.status < 2) ? item.status + 1 : 2;
+      ds.attendRequest(item.itemId._id, item.transactionId, nextStatus)
+      .then(function (done) {
+        item.status = done.status;
+      });
+    };
+
+    $scope.reject_request = function (item) {
+      var nextStatus = - 1;
+      ds.attendRequest(item.itemId._id, item.transactionId, nextStatus)
+      .then(function (done) {
+        item.status = done.status;
+      });
+    };
+    $scope.cancel_request = function (item) {
+      var nextStatus = - 2;
+      ds.cancelRequest(item.itemId._id, item.transactionId, nextStatus)
+      .then(function (done) {
+        item.status = done.status;
+      });
+    };
   }])
   .controller('drugAddController', ['$scope', 'drugService', function ($scope, ds) {
     //Init the add item form model and 
@@ -157,6 +180,19 @@ angular.module('drug', [])
   })
   .factory('drugService', ['$http', 'Notification', 'Language', function ($http, N, L) {
     var d = {};
+
+    d.attendRequest = function (itemId, transactionId, nextStatus) {
+      return $http.post('/api/drugs/' + itemId + '/requests/' + transactionId + '?nextStatus=' + nextStatus)
+      .then(function (done) {
+        return done.data;
+      });
+    };
+    d.cancelRequest = function (itemId, transactionId, nextStatus) {
+      return $http.delete('/api/drugs/' + itemId + '/requests/' + transactionId + '?nextStatus=' + nextStatus)
+      .then(function (done) {
+        return done.data;
+      });
+    };
 
     d.getStockUpHistory = function (itemId) {
       return $http.get('/api/drugs/' + itemId + '/history?action=stockUp')

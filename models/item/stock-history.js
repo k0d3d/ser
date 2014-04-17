@@ -33,8 +33,8 @@ var StockHistorySchema = new Schema({
    * -2 - request cancelled.
    * -1 - cancelling request
    * 0 - request sent
-   * 1 - request received
-   * 2 - request confirmed and verified
+   * 1 - request verified and approved
+   * 2 - request completed
    * @type {Object}
    */
   status: {type: Number},

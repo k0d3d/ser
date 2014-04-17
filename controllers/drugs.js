@@ -42,7 +42,7 @@ module.exports.routes = function(app, login) {
       res.json(200, r);
     }, function (err) {
       console.log(err);
-      res.json(400, err);
+      res.json(400, err.message);
     });
   });
   //Fetch Drug Item Summary
@@ -89,7 +89,7 @@ module.exports.routes = function(app, login) {
     .then(function (done) {
       res.json(200, done);
     }, function (err) {
-      res.json(400, err);
+      res.json(400, err.message);
     });
   });  
 
@@ -180,7 +180,7 @@ module.exports.routes = function(app, login) {
     .then(function (done) {
       res.json(200, done);
     }, function (err) {
-      res.json(400, err);
+      res.json(400, err.message);
     });
   });
 
@@ -193,7 +193,7 @@ module.exports.routes = function(app, login) {
     .then(function () {
       res.json(200, true);
     }, function (err) {
-      res.json(400, err);
+      res.json(400, err.message);
     });
   });
 
@@ -208,7 +208,7 @@ module.exports.routes = function(app, login) {
     .then(function (done) {
       res.json(200, {status: done});
     }, function (err) {
-      res.json(400, err);
+      res.json(400, err.message);
     });
 
   });
@@ -222,7 +222,7 @@ module.exports.routes = function(app, login) {
     .then(function (done) {
       res.json(200, {status: done});
     }, function (err) {
-      res.json(400, err);
+      res.json(400, err.message);
     });
 
   });
@@ -231,12 +231,13 @@ module.exports.routes = function(app, login) {
     var itemId = req.params.itemId, 
         userId = req.user._id, 
         accountType = req.user.account_type,
-        transactionId = req.params.transactionId;
-    drugs.approveRequest(itemId, userId, accountType, transactionId)
+        transactionId = req.params.transactionId,
+        nextStatus = req.query.nextStatus;
+    drugs.attendRequest(itemId, userId, accountType, transactionId, parseInt(nextStatus))
     .then(function (done) {
       res.json(200, done);
     }, function (err) {
-      res.json(400, err);
+      res.json(400, err.message);
     });
   });
 
@@ -261,4 +262,19 @@ module.exports.routes = function(app, login) {
       next(err);
     });
   });
+
+
+  app.delete('/api/drugs/:itemId/requests/:transactionId', function (req, res) {
+    var itemId = req.params.itemId, 
+        userId = req.user._id, 
+        accountType = req.user.account_type,
+        transactionId = req.params.transactionId,
+        nextStatus = req.query.nextStatus;
+    drugs.deleteRequest(itemId, userId, accountType, transactionId, nextStatus)
+    .then(function (done) {
+      res.json(200, done);
+    }, function (err) {
+      res.json(400, err.message);
+    });
+  });  
 };
