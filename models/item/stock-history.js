@@ -30,11 +30,9 @@ var StockHistorySchema = new Schema({
     dateStated: {type: Date, default: Date.now}
   }],
   /**
-   * -2 - request cancelled.
-   * -1 - cancelling request
+   * -1 - request cancelled.
    * 0 - request sent
    * 1 - request verified and approved
-   * 2 - request completed
    * @type {Object}
    */
   status: {type: Number},

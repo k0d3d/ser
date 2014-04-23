@@ -30,7 +30,7 @@ var MongoStore = require('connect-mongo')(session);
 app.set('version', pjson.version);
 
 // port
-var port = process.env.PORT || 3001;
+var port = process.env.PORT || 3011;
 
 
 function afterResourceFilesLoad() {

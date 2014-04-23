@@ -47,7 +47,7 @@ angular.module('drug', [])
         $scope.summary = r;
         $scope.summary.index = index;
       });
-    }
+    };
 
     $scope.up = function (id, price, index) {
       console.log(price);
@@ -56,6 +56,7 @@ angular.module('drug', [])
         $scope.newprice = '';
       });
     };
+
 
 
     $scope.add_to_list = function (item) {
@@ -74,8 +75,9 @@ angular.module('drug', [])
       var current_item = $scope.current_item;
       //stockUp.staff = stockUp.staff || {};
       ds.postStockUp(stockUp, current_item._id)
-      .then(function (done) {
-
+      .then(function () {
+        $scope.stockUp = {};
+        $('#manage-stock-modal').modal('hide');
       });
     };
 
@@ -84,7 +86,8 @@ angular.module('drug', [])
       var current_item = $scope.current_item;
       ds.postStockTo(stockTo, current_item._id)
       .then(function (done) {
-
+        $scope.stockTo = {};
+        $('#manage-stock-modal').modal('hide');
       });
     };
 
@@ -109,7 +112,7 @@ angular.module('drug', [])
       var nextStatus = (item.status < 2) ? item.status + 1 : 2;
       ds.attendRequest(item.itemId._id, item.transactionId, nextStatus)
       .then(function (done) {
-        item.status = done.status;
+        item.status = done.nextStatus;
       });
     };
 
@@ -117,7 +120,7 @@ angular.module('drug', [])
       var nextStatus = - 1;
       ds.attendRequest(item.itemId._id, item.transactionId, nextStatus)
       .then(function (done) {
-        item.status = done.status;
+        item.status = done.nextStatus;
       });
     };
     $scope.cancel_request = function (item) {
@@ -168,11 +171,9 @@ angular.module('drug', [])
   }])
   .filter('stockRequestState', function () {
     var states = {
-      '-2': 'request cancelled.',
-      '-1': 'cancelling request',
+      '-1': 'request cancelled.',
       '0': 'request sent',
-      '1': 'request received',
-      '2': 'request confirmed and verified'
+      '1': 'request confirmed and verified'
     };
     return function (num) {
       return states[num];
@@ -332,6 +333,8 @@ angular.module('drug', [])
       .error(function () {
         N.notifier({
           message: L[L.set].drug.update.error,
+          title: L[L.set].stock.stockup.success,
+
           type: 'error'
         });
       });
@@ -340,6 +343,12 @@ angular.module('drug', [])
     d.postStockTo = function postStockTo (stockToData, itemId) {
       return $http.post('/api/drugs/' + itemId + '/stockto', stockToData)
       .then(function (done) {
+        N.notifier({
+          title:  L[L.set].titles.success,
+          text: L[L.set].stock.stockto.success,
+          class_name: 'growl-success'
+        });
+       
         return done.data;
       });
     };
@@ -347,6 +356,12 @@ angular.module('drug', [])
     d.postStockUp = function postStockUp (stockUpData, itemId) {
       return $http.post('/api/drugs/' + itemId + '/stockup', stockUpData)
       .then(function (done) {
+        N.notifier({
+          title:  L[L.set].titles.success,
+          text: L[L.set].stock.stockup.success,
+          class_name: 'growl-success'
+        });
+
         return done.data;
       });      
     };

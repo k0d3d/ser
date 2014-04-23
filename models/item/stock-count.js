@@ -4,19 +4,17 @@
  */
 
  var mongoose = require('mongoose'),
- //nconf = require('nconf'),
- Schema = mongoose.Schema,
+ Schema = mongoose.Schema;
 
- pureautoinc  = require('mongoose-pureautoinc');
 
 
  var StockCountSchema = new Schema({
   itemId: {type: Schema.ObjectId},
   userId: {type: Schema.ObjectId},
   accountType: {type: Number},
-  amount: {type:Number, min: 1},
-  timeStamp: {type: Date},
-});
+  amount: {type: Number},
+  lastOperationTimeStamp: {type: Date},
+}, {strict: true});
 
  // StockCountSchema.statics = {
  //    /**

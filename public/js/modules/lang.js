@@ -112,8 +112,12 @@ angular.module('language', [])
 			}
 		},
 		"stock":{
-			"down":{
+			"stockto":{
 				"success": "Stock down request sent",
+				"error": "Error requesting stock down"
+			},
+			"stockup":{
+				"success": "Stock up request sent",
 				"error": "Error requesting stock down"
 			},
 			"location":{

@@ -19,7 +19,7 @@ app.config(function ($routeProvider, $locationProvider, $httpProvider) {
       redirectTo: '/'
     });
   $locationProvider.html5Mode(true);
-  //$httpProvider.interceptors.push('errorNotifier');
+  $httpProvider.interceptors.push('errorNotifier');
 });
 
 app.controller('MainController', [

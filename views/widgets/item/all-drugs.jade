@@ -33,7 +33,7 @@ mixin allDrugs()
                       li
                         a(href='#', ng-click="view_stock_up(d); toggleModal('stock-history-modal')") Stock Up History
                       li
-                        a(href='#', ng-click="item_stock(d); toggleModal('manage-item-modal');") Stock
+                        a(href='#', ng-click="item_stock(d); toggleModal('manage-stock-modal');") Stock
                       li
                         a(href='#', ng-click="add_to_list(d)") Add to My List
            
@@ -55,12 +55,14 @@ mixin allRequest()
       tbody
         tr(ng-repeat="tr in _request")
           td {{tr.itemId.itemName}}
-          td {{tr.amount}}
+          td 
+            | {{tr.amount}} 
+            i.fa.fa-exclamation(style="color: #1CAF9A", tooltips, title="This is an internal deduction being added here")
           td {{tr.dateInitiated | date: 'short'}}
           td <strong>Status: </strong>{{tr.statusLog[0].code | stockRequestState}}, <em> {{tr.statusLog[0].dateStated | date: 'medium'}} </em>
              
           td {{tr.status | stockRequestState}}
           td {{tr.referenceId}}
           td
-            button.btn.btn-sm.btn-primary(ng-click="approve_request(tr)") Approve
-            button.btn.btn-sm.btn-danger(ng-click="reject_request(tr)") Reject
+            button.btn.btn-sm.btn-primary(ng-click="approve_request(tr)", ng-disabled="tr.status != 0") Approve
+            button.btn.btn-sm.btn-danger(ng-click="reject_request(tr)", ng-disabled="tr.status != 0") Reject

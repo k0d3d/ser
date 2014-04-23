@@ -170,11 +170,12 @@
       getUserStockUpRequest: function getUserStockUpRequest (doc) {
         var loot = Q.defer();
 
-        console.log('stockdown request..');
+        console.log('stockup request..');
 
         Stock.find({
           recordType: 'secondary',
           visible: 1,
+          status: 0,
           //itemId: doc.itemId,
           destId: doc.userId,
           destType: doc.accountType,
@@ -200,6 +201,7 @@
         Stock.find({
           recordType: 'secondary',
           visible: 1,
+          status: 0,
           //itemId: doc.itemId,
           originId: doc.userId,
           originType: doc.accountType,
@@ -242,34 +244,94 @@
         console.log('running primary operation');
         var med = Q.defer();
 
-        StockCount.update({
+        StockCount.findOne({
           userId: doc.primary.destId,
           accountType: doc.primary.destType,
-          itemId: doc.primary.itemId
-        }, {
-          $inc: {
-            amount: doc.primary.amount
-          }
-        }, {
-          upsert: true, multi: false
-        }, function(err, i) {
+          itemId: doc.primary.itemId          
+        })
+        .exec(function (err, i) {
+          console.log('Finding one stockcount record..');
           console.log(err, i);
-            if (err) {
-              return med.reject(err);
-            }
-            if (i > 0) {
-              return med.resolve(doc);
-            }
-            if (i === 0 ){
-              return med.resolve(new Error('stock operation execution failed'));
-            }
+          if (err) {
+            return med.reject(err);
+          }
+
+          if (!i) {
+            var sc = new StockCount();
+            sc.userId =  doc.primary.destId;
+            sc.accountType = doc.primary.destType;
+            sc.itemId = doc.primary.itemId;        
+            sc.lastOperationTimeStamp = Date.now();
+            sc.amount = parseInt(doc.primary.amount);
+            sc.save(function (err, savedDoc) {
+              console.log(err, i);
+                if (err) {
+                  return med.reject(err);
+                }
+                if (savedDoc) {
+                  return med.resolve(doc);
+                }
+                // if (i === 0 ){
+                //   return med.resolve(new Error('stock operation execution failed'));
+                // }
+            });            
+          } else {
+            i.lastOperationTimeStamp = Date.now();
+            i.amount = parseInt(i.amount + doc.primary.amount);
+            i.save(function (err, savedDoc) {
+              console.log(err, i);
+                if (err) {
+                  return med.reject(err);
+                }
+                if (savedDoc) {
+                  return med.resolve(doc);
+                }
+                // if (i === 0 ){
+                //   return med.resolve(new Error('stock operation execution failed'));
+                // }
+            });            
+          }
+
         });
+
+        // StockCount.update({
+        //   userId: doc.primary.destId,
+        //   accountType: doc.primary.destType,
+        //   itemId: doc.primary.itemId
+        // }, {
+        //   $inc: {
+        //     amount: 10
+        //   },
+        //   $set: {
+        //     lastOperationTimeStamp: Date.now()
+        //   }
+        // }, {
+        //   //upsert: true, multi: false
+        // }, function(err, i) {
+        //   console.log(err, i);
+        //     if (err) {
+        //       return med.reject(err);
+        //     }
+        //     if (i > 0) {
+        //       return med.resolve(doc);
+        //     }
+        //     if (i === 0 ){
+        //       return med.resolve(new Error('stock operation execution failed'));
+        //     }
+        // });
 
         return med.promise;
       },
       execSecondaryOperation: function execSecondaryOperation (doc) {
         console.log('running secondary operation ...');
         var med = Q.defer();
+
+        if (doc.secondary.destId.toString() === doc.secondary.originId.toString()) {
+          //no subtractions here
+          console.log('Nothing to do here...');
+          med.resolve(doc);
+          return med.promise;
+        }
 
         StockCount.update({
           userId: doc.secondary.destId,
@@ -278,6 +340,9 @@
         }, {
           $inc: {
             amount: doc.secondary.amount
+          },
+          $set: {
+            lastOperationTimeStamp: Date.now()
           }
         }, {
           upsert: true, multi: false
@@ -400,7 +465,7 @@ DrugController.prototype.search = function(query, param, filter, option) {
           return populate.reject(err);
         }
         if (!i) {
-          return populate.reject(new Error('cannot find owner profile'))
+          return populate.reject(new Error('cannot find owner profile'));
         }
 
         oneDrug.owner = i;
@@ -412,12 +477,12 @@ DrugController.prototype.search = function(query, param, filter, option) {
         } else {
           return populate.resolve();
         }
-        ;
+        
       });        
     }
 
     if (found_drugs.length === 0) {
-      return populate.resolve({})
+      return populate.resolve({});
     }
 
     __recurseOwner();
@@ -461,7 +526,7 @@ DrugController.prototype.addDrug = function (item, owner, account_type) {
   if (account_type > 2) {
     d.reject(new Error('operation not permitted'));
     return d.promise;
-  };
+  }
 
   var doc = {
     item: item,
@@ -671,7 +736,6 @@ DrugController.prototype.createStockTransaction = function createStockTransactio
   };
 
 
-  console.log('mesage');
   //stock up
   if (action) {
     //here the form sends the Id and account type 
@@ -760,6 +824,13 @@ DrugController.prototype.createStockTransaction = function createStockTransactio
     if (body.staff) {
       secondary_doc.destId = body.staff.userId._id || body.staff.userId;
       secondary_doc.destType = body.staff.userId.account_type || 2;       
+    } else if (accountType === 2) {
+      //allow this only if the currently 
+      //logged in user is a distributor.
+      //this provides distributor stocking up 
+      //from an external source
+      secondary_doc.destId = userId;
+      secondary_doc.destType = accountType;  
     }
    
 
@@ -791,8 +862,8 @@ DrugController.prototype.createStockTransaction = function createStockTransactio
     secondary_doc.destType = accountType;    
     
 
-    //amount here is a negative int. being that this is 
-    //a primary record and a stockdown operation for originId.
+    //amount here is a positive int. being that this is 
+    //a secondary record and a stockdown operation for originId.
     //i.e. origin is giving his stock to dest
     secondary_doc.amount = parseInt(body.amount); 
      
@@ -817,6 +888,9 @@ DrugController.prototype.createStockTransaction = function createStockTransactio
   drugsFunctions.createPrimaryStockRecord(doc)
   .then(drugsFunctions.createSecondaryStockRecord)
   .then(function (done) {
+    //if this is a distributors stockup
+    //operation, lets auto add the stock
+    //without needing to 
     return op.resolve(done);
   })
   .catch(function (err) {
@@ -831,6 +905,17 @@ DrugController.prototype.createStockTransaction = function createStockTransactio
 DrugController.prototype.attendRequest = function (itemId, userId, accountType, transactionId, nextStatus) {
   var loot = Q.defer();
 
+  var permittedTransitions = function (currentStatus, nextStatus) {
+    //if transaction has been cancelled or completed
+    if (currentStatus === -1 || currentStatus === 1) {
+      return false;
+    }
+    if ((nextStatus === 1 && currentStatus === 0) || (nextStatus === -1 && currentStatus === 0)) {
+      return true;
+    }
+
+    return false;
+  };
   //find transaction
   drugsFunctions.findStockTransaction({
     itemId: itemId,
@@ -843,7 +928,7 @@ DrugController.prototype.attendRequest = function (itemId, userId, accountType, 
     doc.secondary = _.where(trans, {recordType: 'secondary'})[0];
 
     //validate this transaction 
-    if ((0 <= doc.primary.status && doc.primary.status < nextStatus) || nextStatus === -1) {
+    if (permittedTransitions(doc.primary.status, nextStatus)) {
       //proceed with operation
       //
       //if nextStatus is -1 which is rejecting 
