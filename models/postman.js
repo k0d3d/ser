@@ -2,6 +2,7 @@ var ActivityNotification = require('./activity/notification.js'),
     Order = require('./order/order.js').Order,
     OrderStatus = require('./order/order.js').OrderStatus,
     staffUtils = require('./staff_utils.js'),
+    Item = require('./item.js').Drug,
     Distributor = require('./organization/distributor.js'),
     _ = require('underscore'),
 
@@ -398,6 +399,60 @@ NotifyController.prototype.allUserNotices = function (userId, accountType) {
 
 
   return mine.promise;
+};
+
+/**
+ * [userStockNotices description]
+ * @return {[type]} [description]
+ */
+NotifyController.prototype.userStockNotices = function (userId, accountType) {
+
+  //find all stock transactions concerning you..
+  //
+  //lets try and find out what to query for who
+  //
+  //as a distributor
+  if (accountType === 2){
+    //distributors get stockup request (internally)
+    //and stocdown request from managers and staff
+    var item = new Item(), ntx = [];
+    item.getUserStockUpRequest({
+      userId: userId,
+      accountType: accountType
+    })
+    .then(function (done) {
+      console.log(done);
+      ntx.push(done);
+
+      return item.getUserStockDownRequest({
+        userId: userId,
+        accountType: accountType        
+      });
+    })
+    .then(function (done) {
+      console.log(done);
+    });
+  }
+
+  //as a manager
+  if (accountType === 3) {
+    //managers get request to stockup from distributors
+    //and stock down request for staff
+  }
+
+  //as a staff
+  if (accountType === 4) {
+    //staff get request to stock up from distributors and managers
+    //
+  }
+
+
+  //check if you've created notices
+  //generate notices
+  //format notices
+  //send out notices
+  //
+
 };
 
 

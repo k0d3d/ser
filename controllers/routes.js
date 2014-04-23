@@ -126,11 +126,10 @@ module.exports = function(app, passport) {
 
     res.locals.isPermitted = function (permission) {
       var permits = _.intersection(permission, people[req.user.account_type].permissions);
-      console.log(permits);
       if (permits.length > 0) {
         return true;
       }
-    }
+    };
 
     //console.log(req.originalUrl);
 

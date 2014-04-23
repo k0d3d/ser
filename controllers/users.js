@@ -35,7 +35,6 @@ module.exports.routes = function(app, passport, login, people){
     var userId = req.user._id;
     var account_type = req.user.account_type;
     users.getProfile(userId, account_type).then(function (r) {
-      console.log(r);
       res.render('user/profile', {
         userProfile: r || {},
         userData: req.user

@@ -167,17 +167,26 @@ function afterResourceFilesLoad() {
         return next();
       }
 
+
       // log it
       // send emails if you want
       console.error(err.stack);
 
       // error page
       //res.status(500).json({ error: err.stack });
-      //res.json(500, err.message);
-      res.status(500).render('500', {
-        url: req.originalUrl,
-        error: err.message
-      });
+      console.log(req.url);
+
+      var t = /[/api/internal/]/i;
+      if (t.test(req.url)) {
+        res.json(500, err.message);        
+      } else {
+        res.status(500).render('500', {
+          url: req.originalUrl,
+          error: err.message
+        }); 
+      }    
+
+
     });
 
     // assume 404 since no middleware responded

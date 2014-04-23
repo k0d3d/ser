@@ -242,7 +242,6 @@ UserController.prototype.user = function(req, res, next, id) {
  */
 UserController.prototype.getProfile = function (userId, account_type) {
   console.log('Getting profile...');
-  console.log(arguments);
   var d = Q.defer();
   staffUtils.getMeMyModel(account_type).findOne({
     userId: userId
@@ -250,7 +249,6 @@ UserController.prototype.getProfile = function (userId, account_type) {
   .populate('drugs', null, 'drug')
   .lean()
   .exec(function (err, user_profile) {
-    console.log(err, user_profile);
     if (err) {
       return d.reject(err);
     }

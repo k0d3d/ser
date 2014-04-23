@@ -7,7 +7,7 @@ module.exports = function (app) {
   .get(function (req, res) {
     var userId = req.user._id,
         accountType = req.user.account_type;
-    notify.myOrderNotices(userId, accountType)
+    notify.userStockNotices(userId, accountType)
     .then(function (r) {
       res.json(200, r);
     }, function (err) {
