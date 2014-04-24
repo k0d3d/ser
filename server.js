@@ -174,7 +174,6 @@ function afterResourceFilesLoad() {
 
       // error page
       //res.status(500).json({ error: err.stack });
-      console.log(req.url);
 
       var t = /[/api/internal/]/i;
       if (t.test(req.url)) {

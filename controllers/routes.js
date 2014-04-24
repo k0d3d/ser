@@ -19,7 +19,7 @@ module.exports = function(app, passport) {
     },
     {
       name: 'Distributor',
-      permissions: ['view-activity', 'view-drug-pages', 'add-item','view-profile-distributors', 'view-profile-managers', 'view-profile-staff']
+      permissions: ['view-activity', 'view-drug-pages', 'add-item', 'view-profile-managers', 'view-profile-staff']
     },
     {
       name: 'Manager',

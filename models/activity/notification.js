@@ -9,6 +9,8 @@ var NotificationsSchema = new Schema({
   ownerId: {type: Schema.ObjectId},
   ownerAccountType: {type: Number},
   staffId: {type: Schema.ObjectId},
+  originId: {type: Schema.ObjectId},
+  destId: {type: Schema.ObjectId},
   created: {type: Date, default: Date.now},
   referenceId: {type: String},
   orderId: {type: String},

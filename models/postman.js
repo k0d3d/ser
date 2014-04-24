@@ -2,7 +2,7 @@ var ActivityNotification = require('./activity/notification.js'),
     Order = require('./order/order.js').Order,
     OrderStatus = require('./order/order.js').OrderStatus,
     staffUtils = require('./staff_utils.js'),
-    Item = require('./item.js').Drug,
+    df = require('./item.js').drugsFunctions,
     Distributor = require('./organization/distributor.js'),
     _ = require('underscore'),
 
@@ -80,10 +80,20 @@ noticeFn = {
   },
   getUpdateDescription: function getUpdateDescription (key, kind) {
     var phrases = {
-      order: [
-        'new order placed',
-        'an order has been updated'
-      ]
+      order: {
+        '0' : 'new order placed',
+        '1' : 'an order has been updated'
+      },
+      stockup: {
+        '0' : 'new stock up request',
+        '1' : 'request has been granted',
+        '-1': 'request has been cancelled'
+      },
+      stockdown: {
+        '0' : 'new stock down request',
+        '1' : 'request has been granted',
+        '-1': 'request has been cancelled'
+      }
     };
     console.log(phrases[kind][key]);
     return phrases[kind][key];
@@ -135,6 +145,7 @@ noticeFn = {
         }
         //If found
         if (eventNotice) {
+          console.log('found notices..cool');
           //Lets push it in as an event (activity)
           createdNotices.push(eventNotice.toJSON());
           //Do Nothing, just check if there's 
@@ -151,7 +162,7 @@ noticeFn = {
           //lets create a new one using the id
           var an = new ActivityNotification(meta);
           an.alertType =  noticeData.alertType;
-          an.alertDescription = noticeFn.getUpdateDescription(task.orderStatus, noticeData.alertType);
+          an.alertDescription = noticeFn.getUpdateDescription(task.orderStatus || task.status, noticeData.alertType);
           an.referenceId = str;
           an.save(function (err, noticed) {
             if (err) {
@@ -406,6 +417,27 @@ NotifyController.prototype.allUserNotices = function (userId, accountType) {
  * @return {[type]} [description]
  */
 NotifyController.prototype.userStockNotices = function (userId, accountType) {
+  var oops = Q.defer();
+
+  //
+  //should check if any of these
+  //activity notices has been or 
+  //hasnt been created and return 
+  //activities that havent been created
+  function __isNotified (obj, alert) {
+    var koolio = Q.defer();
+
+    var noticeData = {
+      alertType: 'order',
+      alertDescription: 'New Order Placed',
+      timeStamp: 'orderDate',
+      meta : ['orderId', 'hospitalId']
+    };
+    var task = obj.pop();
+
+
+    return koolio.promise;
+  }
 
   //find all stock transactions concerning you..
   //
@@ -415,22 +447,58 @@ NotifyController.prototype.userStockNotices = function (userId, accountType) {
   if (accountType === 2){
     //distributors get stockup request (internally)
     //and stocdown request from managers and staff
-    var item = new Item(), ntx = [];
-    item.getUserStockUpRequest({
+    var ntx = [];
+    df.getUserStockUpRequest({
       userId: userId,
       accountType: accountType
     })
     .then(function (done) {
       console.log(done);
-      ntx.push(done);
+      //check the 'done' for
+      //stockup request notices
 
-      return item.getUserStockDownRequest({
+      var noticeData = {
+          alertType: 'stockup',
+          timeStamp: 'dateInitiated',
+          meta : ['originId', 'destId']
+      };
+
+      return noticeFn.checkIfNotified(done, userId, noticeData);
+
+    })
+    .then(function (notices) {
+      console.log(notices);
+      _.each(notices, function (val) {
+        ntx.push(val);
+      });
+      return df.getUserStockDownRequest({
         userId: userId,
-        accountType: accountType        
+        accountType: accountType
       });
     })
     .then(function (done) {
-      console.log(done);
+      //check the 'done' for
+      //stockdown request notices
+
+      var noticeData = {
+          alertType: 'stockdown',
+          timeStamp: 'dateInitiated',
+          meta : ['originId', 'destId']
+      };
+
+      return noticeFn.checkIfNotified(done, userId, noticeData);
+
+    })    
+    .then(function (notices) {
+
+      _.each(notices, function (val) {
+        ntx.push(val);
+      });
+      oops.resolve(ntx)      ;
+    })
+    .catch(function (err) {
+      oops.reject(err);
+      console.log(err);
     });
   }
 
@@ -452,6 +520,9 @@ NotifyController.prototype.userStockNotices = function (userId, accountType) {
   //format notices
   //send out notices
   //
+  //
+  
+  return oops.promise;
 
 };
 

@@ -93,7 +93,7 @@ UserController.prototype.session = function(req, res, next) {
       if (err) {
         next(err);
       } else {
-        res.json(200, {nextUrl: '/'});
+        res.json(200, {nextUrl: '/a/profile'});
       }
     });
   })(req, res, next);

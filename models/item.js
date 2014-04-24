@@ -167,6 +167,12 @@
 
         return loot.promise;        
       },
+      /**
+       * queries the list of stockup request
+       * initiated by userId
+       * @param  {[type]} doc [description]
+       * @return {[type]}     [description]
+       */
       getUserStockUpRequest: function getUserStockUpRequest (doc) {
         var loot = Q.defer();
 
@@ -193,10 +199,16 @@
 
         return loot.promise;        
       },
+      /**
+       * queries the list of  stock down request initiated by
+       * userId.
+       * @param  {[type]} doc [description]
+       * @return {[type]}     [description]
+       */
       getUserStockDownRequest: function getUserStockDownRequest (doc) {
         var loot = Q.defer();
 
-        console.log('stockup');
+        console.log('stockdown');
 
         Stock.find({
           recordType: 'secondary',
@@ -219,6 +231,11 @@
 
         return loot.promise;
       },
+      /**
+       * looks up a transaction
+       * @param  {[type]} doc [description]
+       * @return {[type]}     [description]
+       */
       findStockTransaction: function findStockTransaction (doc) {
         var trs = Q.defer();
 
@@ -1055,4 +1072,5 @@ DrugController.prototype.stockRequest = function stockRequest (userId, accountTy
 
 
 module.exports.Drug = DrugController;
+module.exports.drugsFunctions = drugsFunctions;
 module.exports.NDL = NDL;

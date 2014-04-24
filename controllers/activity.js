@@ -1,5 +1,11 @@
 var Notify = require('../models/postman.js').Notify;
 
+//returns the kind of notifications to 
+//be queried for the account level of the
+//currently logged in user..
+function howWhoGetsNotified (accountType)  {
+
+}
 module.exports = function (app) {
   var notify = new Notify();
 
