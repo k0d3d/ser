@@ -129,24 +129,33 @@ module.exports = {
     },
     /**
      * this replaces the field(fieldToPop) on each member / property of 
-     * the doc Object with the actual collection / row 
+     * the doc Object with the actual collection / row .
      * 
      * @param  {Object} doc        the document / object / array containing objects
      * which have a property to be populated.
      * @param  {String} fieldToPop the field on doc to be populated
-     * @param  {Number} accountType the account level or account type to be
-     * populated.
+     * @param  {Number | String} accountType the account level or account type to be
+     * populated. If accountType is a number, its used directly as an argument for 
+     * self.getMeMyModel(). If it is a string, it assumes accountType is a field
+     * in doc.
      * @return {Object}            Promise Object
      */
     populateProfile: function populateProfile (doc, fieldToPop, accountType) {
       console.log('Populating...');
-      var pop = Q.defer(), poppedObject = [];
+      var pop = Q.defer(), poppedObject = [], at;
       var self = this;
 
       function __pop() {
         var task = doc.pop();
 
-        self.getMeMyModel(accountType)
+        if (_.isNumber(accountType)) {
+          at = accountType;
+        }
+        if (_.isString(accountType)) {
+          at = task[accountType];
+        }
+
+        self.getMeMyModel(at)
         .findOne({
           userId: task[fieldToPop]
         }, 'name userId')

@@ -28,8 +28,9 @@ mixin allDrugs()
                       span.caret
                       span.sr-only Click
                     ul.dropdown-menu(role='menu')
-                      li
-                        a(href='#', ng-click="view_stock_down(d); toggleModal('stock-history-modal')") Stock Down History
+                      if (userData.account_type < 4) 
+                        li
+                          a(href='#', ng-click="view_stock_down(d); toggleModal('stock-history-modal')") Stock Down History
                       li
                         a(href='#', ng-click="view_stock_up(d); toggleModal('stock-history-modal')") Stock Up History
                       li
@@ -46,6 +47,7 @@ mixin allRequest()
       thead
         tr
           th Item Name
+          th Requester
           th Amount
           th Date 
           th Last Update
@@ -55,9 +57,10 @@ mixin allRequest()
       tbody
         tr(ng-repeat="tr in _request")
           td {{tr.itemId.itemName}}
+          td {{tr.destId.name}}
           td 
             | {{tr.amount}} 
-            i.fa.fa-exclamation(style="color: #1CAF9A", tooltips, title="This is an internal deduction being added here")
+            i.fa.fa-exclamation(style="color: #1CAF9A", tooltips, title="This is an internal deduction being added here", ng-show="tr.destId == tr.originId")
           td {{tr.dateInitiated | date: 'short'}}
           td <strong>Status: </strong>{{tr.statusLog[0].code | stockRequestState}}, <em> {{tr.statusLog[0].dateStated | date: 'medium'}} </em>
              

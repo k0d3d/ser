@@ -188,6 +188,7 @@
           amount: {$lt: 0}
         })
         .populate('itemId', 'itemName', 'drug')
+        .lean()
         .exec(function (err, i) {
           if (err) {
             return loot.reject(err);
@@ -208,7 +209,7 @@
       getUserStockDownRequest: function getUserStockDownRequest (doc) {
         var loot = Q.defer();
 
-        console.log('stockdown');
+        console.log('stockdown request...');
 
         Stock.find({
           recordType: 'secondary',
@@ -220,13 +221,27 @@
           amount: { $gt: 0}
         })
         .populate('itemId', 'itemName', 'drug')
+        .lean()
         .exec(function (err, i) {
           if (err) {
             return loot.reject(err);
           }
           if (i) {
             return loot.resolve(i);
-          }
+          }      
+              
+          // if (i) {
+          //   staffUtils.getMeMyModel(i.destType)
+          //   .populate(i, {path: 'destId', select: 'name userId'},
+          //    function (err, docs) {
+          //     if (err) {
+          //       return loot.rejecta(err);
+          //     }
+          //     console.log(docs);
+          //     return loot.resolve(docs);
+          //    });
+            
+          // }
         });
 
         return loot.promise;
@@ -1044,6 +1059,7 @@ DrugController.prototype.stockLog = function (itemId, userId, accountType, actio
 };
 
 DrugController.prototype.stockRequest = function stockRequest (userId, accountType, action) {
+  console.log('Checking stock request history...');
   var loot = Q.defer();
 
   var doc = {
@@ -1061,7 +1077,14 @@ DrugController.prototype.stockRequest = function stockRequest (userId, accountTy
   if (action === 'stockDown') {
     drugsFunctions.getUserStockDownRequest(doc)
     .then(function (done) {
-      return loot.resolve(done);
+      //populate the destId
+      staffUtils.populateProfile(done, 'destId', 'destType')
+      .then(function (popd) {
+        return loot.resolve(popd);
+      }, function (err) {
+        return loot.reject(err);
+      });
+      
     });
   }
 

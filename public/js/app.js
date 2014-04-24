@@ -15,8 +15,9 @@ var app = angular.module('stocUser', [
   ]);
 app.config(function ($routeProvider, $locationProvider, $httpProvider) {
   $routeProvider
+  //.when('/', {templateUrl: '/drug/index', controller: 'drugIndexController'})
   .otherwise({
-      redirectTo: '/'
+      redirectTo: '/a/profile'
     });
   $locationProvider.html5Mode(true);
   $httpProvider.interceptors.push('errorNotifier');
