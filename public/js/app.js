@@ -146,6 +146,19 @@ app.directive('dropzone', [function () {
   };
 }]);
 
+app.directive('toggleActiveButton', [ function () {
+  return {
+    compile: function (element, attrs) {
+      element.on('click', function () {
+
+        var eleClass = attrs.toggleActiveButton;
+        angular.element('.' + eleClass).removeClass('btn-success');
+        element.addClass('btn-success');
+      });
+    }
+  };
+}]);
+
 app.directive('typeAhead', [function () {
   return {
     link : function (scope, element, attrs) {

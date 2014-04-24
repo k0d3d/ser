@@ -175,7 +175,12 @@ module.exports = {
         });
       }
 
-      __pop();
+      if (doc.length === 0 ) {
+        pop.resolve(doc);
+      } else {
+        __pop();
+      }
+
 
       return pop.promise;
     }

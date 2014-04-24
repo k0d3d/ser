@@ -1,14 +1,33 @@
 .contentpanel
+  .col-md-12
     .panel.panel-default
-      .col-md-12
-        .panel.panel-default(ng-show="_drugs.length == 0")
-            .panel-body
-                | No Drugs Found
+      .panel-heading(ng-init="ds = 'drugs'")
+        button.btn.drug-panel-buttons.btn-success(ng-class="", toggle-active-button="drug-panel-buttons", ng-click="ds = 'drugs'") 
+          | Current Inventory 
+          span.label.label-default {{_drugs.length}}
+        button.btn.drug-panel-buttons(ng-class="", toggle-active-button="drug-panel-buttons", ng-click="ds = 'request'") 
+          | Incoming Request 
+          span.label.label-default {{_request.length}}
+        button.btn.drug-panel-buttons(ng-class="", toggle-active-button="drug-panel-buttons", ng-click="ds = 'pending'") 
+          | Pending Transfers      
+          span.label.label-default {{_pending.length}}
 
-        include ../widgets/item/all-drugs
-        .panel.panel-default(ng-show="_drugs.length > 0")
+      include ../widgets/item/all-drugs
+
+      .panel-body(ng-show="ds == 'drugs'")
+        .panel-content(ng-show="_drugs.length == 0")
+          | No Drugs Found
+        .panel-content(ng-show="_drugs.length > 0")
           +allDrugs()
-          hr
-          +allRequest()
+      .panel-body(ng-show="ds == 'request'")
+        .panel-content(ng-show="_request.length == 0")
+          | No Request So Far      
+        .panel-content(ng-show="_request.length > 0")
+          +allRequest('_request')
+      .panel-body(ng-show="ds == 'pending'")
+        .panel-content(ng-show="_pending.length == 0")
+          | No Pending Transfers      
+        .panel-content(ng-show="_pending.length > 0")
+          +allPending('_pending')
 include ../widgets/item/manage-stock-modal
 include ../widgets/item/stock-history-modal

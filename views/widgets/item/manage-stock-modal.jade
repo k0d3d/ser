@@ -4,11 +4,14 @@
         .modal-header
           span.label(ng-class="", ng-show="modal.statusText") {{modal.statusText}}
           button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
-          h4#myModalLabel.modal-title Item Properties
+          h4#myModalLabel.modal-title Stock Operations
         .modal-body
           .or-ch.row
             .col-md-5
-              h4 Add to Stock
+              if (userData.account_type === 2)
+                h4 Add to Stock
+              if (userData.account_type > 2)
+                h4 Request Stock Down
               form(ng-submit="stock_from(stockUp)", name="stock_from_form")
                 if (userData.account_type > 2)
                   .form-group

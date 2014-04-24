@@ -122,15 +122,18 @@
 
         console.log('stockup');
 
-        Stock.find({
+        var options = {
           recordType: 'primary',
           visible: 1,
           itemId: doc.itemId,
           destId: doc.userId,
           destType: doc.accountType,
           amount: { $gt: 0}
-        })
+        };
+
+        Stock.find(u.compact(options))
         .populate('itemId', 'itemName', 'drug')
+        .lean()
         .exec(function (err, i) {
           if (err) {
             return loot.reject(err);
@@ -147,15 +150,18 @@
 
         console.log('stockdown');
 
-        Stock.find({
+        var options = {
           recordType: 'primary',
           visible: 1,
           itemId: doc.itemId,
           originId: doc.userId,
           originType: doc.accountType,
           amount: {$lt: 0}
-        })
+        };
+
+        Stock.find(u.compact(options))
         .populate('itemId', 'itemName', 'drug')
+        .lean()
         .exec(function (err, i) {
           if (err) {
             return loot.reject(err);
@@ -258,6 +264,7 @@
           itemId: doc.itemId,
           transactionId: doc.transactionId,
         })
+        //.lean()
         .exec(function (err, trdoc) {
           if (err) {
             return trs.reject(err);
@@ -749,16 +756,25 @@ DrugController.prototype.fetchOneById = function (id) {
   return d.promise;
 };
 /**
- * a stoc transaction is a pair of stock operation 
- * records.i.e. a parent and child operation. A parent operation
- * is recorded with the userId of the currently logged in user
- * as the origin. a child operation is a record of a stock operation 
- * with the userId of the user receiving the stock as the origin.
+ * a stoc down transaction is a pair of stock operation 
+ * records.i.e. a primary and secondary operation. 
+ * A primary operation is recorded with the userId of the currently logged in user
+ * as the originId . 
+ * 
+ * A few rules guide stockdown operations
+ *  - only a distributor and a manager can stock down
+ *  - a manager or staff can receive stock i.e. stocked down to...
+ *  - a distributor stock can go below zero
+ *  - a managers stock for an item cannot go below zero
+ *  - the currently logged in user is the source of the stock i.e. origin (primary)
+ *  - the user submitted with the form is the receiver of stock i.e. destination (secondary).
+ * a child operation is a record of a stock operation 
+ * with the userId of the user receiving the stock as the destinantion.
  * 
  * @param  {[type]} doc [description]
  * @return {[type]}     [description]
  */
-DrugController.prototype.createStockTransaction = function createStockTransaction (itemId, userId, accountType, body, action) {
+DrugController.prototype.createStockDownTransaction = function createStockTransaction (itemId, userId, accountType, body) {
   var op = Q.defer(), transactionId = u.uid(16);
 
   var primary_doc = {
@@ -768,56 +784,34 @@ DrugController.prototype.createStockTransaction = function createStockTransactio
   };
 
 
-  //stock up
-  if (action) {
-    //here the form sends the Id and account type 
-    //of the user who is approving his stock to be
-    //given to 'destId'.  th quanitity requested is
-    //being debitted from him
-    if (body.staff) {
-      primary_doc.originId = body.staff.userId._id || body.staff.userId;
-      primary_doc.originType = body.staff.userId.account_type || 2;    
-    }
+  //if this is a valid stockdown request
+  if (accountType > 3 ) {
+    op.reject(new Error('not allowed'));
+    return op.promise;
+  }
+  
+  //here the currently logged in user is
+  //giving out stock, being debitted.       
+  primary_doc.originId = body.staff.userId._id;
+  primary_doc.originType =  body.staff.userId.account_type;    
+  
 
-    //here the currently logged in user
-    //becomes the destination for a 
-    //stock up request. because the quantity
-    //requested is being credited to him
+  //the form sends the id of the employee 
+  //receiving stock from the currently 
+  //logged in user.
+  if (body.staff) {
     primary_doc.destId = userId;
-    primary_doc.destType = accountType;
-
-    //amount here is a positive int. being that this is 
-    //a primary record and a stockup operation for destId.
-    //i.e. dest is adding to his stock from origin
-    primary_doc.amount = parseInt(body.amount);    
-
-
+    primary_doc.destType = accountType;    
   } else {
-    //if this is a stockdown request
+    op.reject(new Error('invalid request'));
+  }
 
-    
-    //here the currently logged in user is
-    //giving out stock, being debitted.       
-    primary_doc.originId = userId;
-    primary_doc.originType = accountType;    
-    
-
-    //the form sends the id of the employee 
-    //receiving stock from the currently 
-    //logged in user.
-    if (body.staff) {
-      primary_doc.destId = body.staff.userId._id;
-      primary_doc.destType = body.staff.userId.account_type;    
-    } else {
-      op.reject(new Error('invalid request'));
-    }
-
-    //amount here is a negative int. being that this is 
-    //a primary record and a stockdown operation for originId.
-    //i.e. origin is giving his stock to dest
-    primary_doc.amount = parseInt('-' + body.amount); 
+  //amount here is a negative int. being that this is 
+  //a primary record and a stockdown operation for originId.
+  //i.e. origin is giving his stock to dest
+  primary_doc.amount = parseInt('-' + body.amount); 
      
-  }  
+
 
   
 
@@ -837,69 +831,34 @@ DrugController.prototype.createStockTransaction = function createStockTransactio
   };
 
 
-  //stock up
-  if (action) {
-    //here we keep a record of the currently
-    //logged in user, giving out stock to 
-    //an employee. 
 
+  //if this is a stockdown request
+
+  
+  //here the form should send the user
+  //who will be credited with the stock     
+  if (body.staff) {
     secondary_doc.originId = userId;
     secondary_doc.originType = accountType;    
-    
+  } else {
+    op.reject(new Error('invalid request'));
+  } 
+  
 
 
-    //Now this operation can exist 
-    //in a scenerio where the currently logged in 
-    //user is a distributor and is adding stock
-    //from outside stocCloud logic. So the staff 
-    //object might be empty.     
-    if (body.staff) {
-      secondary_doc.destId = body.staff.userId._id || body.staff.userId;
-      secondary_doc.destType = body.staff.userId.account_type || 2;       
-    } else if (accountType === 2) {
-      //allow this only if the currently 
-      //logged in user is a distributor.
-      //this provides distributor stocking up 
-      //from an external source
-      secondary_doc.destId = userId;
-      secondary_doc.destType = accountType;  
-    }
+  //the currently logged in user is 
+  //being debitted for the record
+  //
+  secondary_doc.destId = body.staff.userId._id;
+  secondary_doc.destType = body.staff.userId.account_type;    
+  
+
+  //amount here is a positive int. being that this is 
+  //a secondary record and a stockdown operation for originId.
+  //i.e. origin is giving his stock to dest
+  secondary_doc.amount = parseInt(body.amount); 
    
 
-    //amount here is a negative int. being that this is 
-    //a secondary record and a stockup operation for userId.
-    //i.e. userId is adding to his stock from destId
-    secondary_doc.amount = parseInt('-' + body.amount);
-
-
-  } else {
-    //if this is a stockdown request
-
-    
-    //here the form should send the user
-    //who will be credited with the stock     
-    if (body.staff) {
-      secondary_doc.originId = body.staff.userId._id;
-      secondary_doc.originType = body.staff.userId.account_type;    
-    } else {
-      op.reject(new Error('invalid request'));
-    } 
-    
-
-
-    //the currently logged in user is 
-    //being debitted for the record
-    //
-    secondary_doc.destId = userId;
-    secondary_doc.destType = accountType;    
-    
-
-    //amount here is a positive int. being that this is 
-    //a secondary record and a stockdown operation for originId.
-    //i.e. origin is giving his stock to dest
-    secondary_doc.amount = parseInt(body.amount); 
-     
-  }
 
 
   secondary_doc.statusLog = [{
@@ -933,13 +892,168 @@ DrugController.prototype.createStockTransaction = function createStockTransactio
   return op.promise;
 
 };
+/**
+ * a stoc transaction is a pair of stock operation 
+ * records.i.e. a parent and child operation. A parent operation
+ * is recorded with the userId of the currently logged in user
+ * as the origin. A few rules guide stockdown operations
+ *  - only a distributor and a manager can stock down
+ *  - a manager or staff can receive stock i.e. stocked down to...
+ *  - a distributor stock can go below zero
+ *  - a managers stock for an item cannot go below zero
+ *  - the currently logged in user is the source of the stock i.e. origin (primary)
+ *  - the user submitted with the form is the receiver of stock i.e. destination (secondary).
+ * a child operation is a record of a stock operation 
+ * with the userId of the user receiving the stock as the destinantion.
+ * 
+ * @param  {[type]} doc [description]
+ * @return {[type]}     [description]
+ */
+DrugController.prototype.createStockUpTransaction = function createStockTransaction (itemId, userId, accountType, body) {
+  var op = Q.defer(), transactionId = u.uid(16);
 
+  var primary_doc = {
+    itemId: itemId,
+    referenceId: body.referenceId,
+    transactionId: transactionId
+  };
+
+
+  //stock up
+
+  //here the form sends the Id and account type 
+  //of the user who is approving his stock to be
+  //given to 'destId'.  th quanitity requested is
+  //being debitted from him
+  if (body.staff) {
+    primary_doc.originId = body.staff.userId._id || body.staff.userId;
+    primary_doc.originType = body.staff.userId.account_type || 2;    
+  }
+
+  //here the currently logged in user
+  //becomes the destination for a 
+  //stock up request. because the quantity
+  //requested is being credited to him
+  primary_doc.destId = userId;
+  primary_doc.destType = accountType;
+
+  //amount here is a positive int. being that this is 
+  //a primary record and a stockup operation for destId.
+  //i.e. dest is adding to his stock from origin
+  primary_doc.amount = parseInt(body.amount);    
+
+
+
+
+  
+
+  primary_doc.statusLog = [{
+      code: 0
+    }];
+  primary_doc.status = 0;
+  primary_doc.recordType =  'primary';
+  
+  //---end of primary processing---//
+
+
+  var secondary_doc = {
+    itemId: itemId,
+    referenceId: body.referenceId,
+    transactionId: transactionId
+  };
+
+
+  //stock up
+
+  //here we keep a record of the currently
+  //logged in user, giving out stock to 
+  //an employee. 
+
+  secondary_doc.originId = userId;
+  secondary_doc.originType = accountType;    
+  
+
+  //Now this operation can exist 
+  //in a scenerio where the currently logged in 
+  //user is a distributor and is adding stock
+  //from outside stocCloud logic. So the staff 
+  //object might be empty.     
+  if (body.staff) {
+    secondary_doc.destId = body.staff.userId._id || body.staff.userId;
+    secondary_doc.destType = body.staff.userId.account_type || 2;       
+  } else if (accountType === 2) {
+    //allow this only if the currently 
+    //logged in user is a distributor.
+    //this provides distributor stocking up 
+    //from an external source
+    secondary_doc.destId = userId;
+    secondary_doc.destType = accountType;  
+  }
+ 
+
+  //amount here is a negative int. being that this is 
+  //a secondary record and a stockup operation for userId.
+  //i.e. userId is adding to his stock from destId
+  secondary_doc.amount = parseInt('-' + body.amount);
+
+
+
+
+
+  secondary_doc.statusLog = [{
+      code: 0
+    }];
+  secondary_doc.status = 0;
+  secondary_doc.recordType =  'secondary';
+  
+
+
+  //transaction pair
+  var doc = {
+    primary: primary_doc,
+    secondary: secondary_doc
+  };
+
+
+  drugsFunctions.createPrimaryStockRecord(doc)
+  .then(drugsFunctions.createSecondaryStockRecord)
+  .then(function (done) {
+    //if this is a distributors stockup
+    //operation, lets auto add the stock
+    //without needing to 
+    return op.resolve(done);
+  })
+  .catch(function (err) {
+    console.log(err);
+    return op.reject(err);
+  });
+
+  return op.promise;
+
+};
+/**
+ * processes a stock request. depending on what 
+ * decision the user takes, a request can be 
+ * confirmed i.e. record updated to 1 or denied / rejected
+ * i.e. record updated to -1. If a record has already been attended,
+ * any further request to attend to this record will be cancelled . 
+ * @param  {[type]} itemId        [description]
+ * @param  {[type]} userId        [description]
+ * @param  {[type]} accountType   [description]
+ * @param  {[type]} transactionId [description]
+ * @param  {[type]} nextStatus    [description]
+ * @return {[type]}               [description]
+ */
 DrugController.prototype.attendRequest = function (itemId, userId, accountType, transactionId, nextStatus) {
   var loot = Q.defer();
 
-  var permittedTransitions = function (currentStatus, nextStatus) {
+  var permittedTransitions = function (dest, currentStatus, nextStatus) {
+    // console.log(dest.toString() === userId.toString());
+    // console.log(typeof dest.toString());
+    // console.log(typeof userId);
+    // return console.log(userId, dest);
     //if transaction has been cancelled or completed
-    if (currentStatus === -1 || currentStatus === 1) {
+    if ((currentStatus === -1 || currentStatus === 1) || dest.toString() === userId.toString() ) {
       return false;
     }
     if ((nextStatus === 1 && currentStatus === 0) || (nextStatus === -1 && currentStatus === 0)) {
@@ -960,7 +1074,7 @@ DrugController.prototype.attendRequest = function (itemId, userId, accountType, 
     doc.secondary = _.where(trans, {recordType: 'secondary'})[0];
 
     //validate this transaction 
-    if (permittedTransitions(doc.primary.status, nextStatus)) {
+    if (permittedTransitions(doc.primary.destId, doc.primary.status, nextStatus)) {
       //proceed with operation
       //
       //if nextStatus is -1 which is rejecting 
@@ -1030,7 +1144,55 @@ DrugController.prototype.attendRequest = function (itemId, userId, accountType, 
  * @param  {[type]} action      [description]
  * @return {[type]}             [description]
  */
-DrugController.prototype.stockLog = function (itemId, userId, accountType, action) {
+DrugController.prototype.stockLog = function (userId, accountType, action) {
+  var loot = Q.defer();
+
+  var doc = {
+    userId: userId,
+    accountType: accountType
+  };
+
+  if (action === 'stockUp') {
+    drugsFunctions.getUserStockUp(doc)
+    .then(function (done) {
+      //console.log(done);
+      //populate the destId
+      staffUtils.populateProfile(done, 'destId', 'destType')
+      .then(function (popd) {
+        return loot.resolve(popd);
+      }, function (err) {
+        return loot.reject(err);
+      });
+    });
+  }
+
+  if (action === 'stockDown') {
+    drugsFunctions.getUserStockDown(doc)
+    .then(function (done) {
+      //console.log(done);
+      //populate the destId
+      staffUtils.populateProfile(done, 'destId', 'destType')
+      .then(function (popd) {
+        return loot.resolve(popd);
+      }, function (err) {
+        return loot.reject(err);
+      });
+    });
+  }
+
+
+
+  return loot.promise;
+};
+/**
+ * queries the records of stock operations. 
+ * @param  {[type]} itemId      [description]
+ * @param  {[type]} userId      [description]
+ * @param  {[type]} accountType [description]
+ * @param  {[type]} action      [description]
+ * @return {[type]}             [description]
+ */
+DrugController.prototype.stockItemLog = function (itemId, userId, accountType, action) {
   var loot = Q.defer();
 
   var doc = {
@@ -1070,13 +1232,21 @@ DrugController.prototype.stockRequest = function stockRequest (userId, accountTy
   if (action === 'stockUp') {
     drugsFunctions.getUserStockUpRequest(doc)
     .then(function (done) {
-      return loot.resolve(done);
+      //console.log(done);
+      //populate the destId
+      staffUtils.populateProfile(done, 'destId', 'destType')
+      .then(function (popd) {
+        return loot.resolve(popd);
+      }, function (err) {
+        return loot.reject(err);
+      });
     });
   }
 
   if (action === 'stockDown') {
     drugsFunctions.getUserStockDownRequest(doc)
     .then(function (done) {
+      //console.log(done);
       //populate the destId
       staffUtils.populateProfile(done, 'destId', 'destType')
       .then(function (popd) {

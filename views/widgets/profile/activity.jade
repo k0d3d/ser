@@ -9,15 +9,12 @@ mixin loadActivities
             .row
               .col-md-9
                 strong {{act.alertDescription}}
-                |  
-                strong by <a ng-href="/a/organization/people/{{act.hospitalId}}/person/5">{{act.hospital.name}}</a>
-                | .
                 br
                 small.text-muted.tooltips(title="{{act.created | date: 'medium'}}")  {{act.created | moment}}
               .col-md-3
                   a.btn.btn-xs.pull-right(href="", ng-click="hide_activity($index)")
                     | hide
-                  -if (userData.account_type > 3)
+                  -if (false)
                     button.btn.btn-orange.btn-xs.pull-right(ng-click="confirm_order(act)")
                       | confirm
 

@@ -18,21 +18,53 @@ angular.module('drug', [])
     //Change header title
     $scope.$parent.headerTitle = 'All Drug Items';
 
-    ds.fetchAll()
-    .then(function (r) {
-      $scope._drugs = r;
-    });
+    function __init () {
+      $scope._pending =  [];
+      $scope._request = [];
 
-    ds.getStockDownRequest()
-    .then(function (r) {
-      $scope._request = r;
-      ds.getStockUpRequest()
-      .then(function (u) {
-        angular.forEach(u, function (v) {
+      ds.fetchAll()
+      .then(function (r) {
+        $scope._drugs = r;
+      });
+
+      //get all stock Request
+      //
+      //get stock down request
+      ds.getStockDownRequest()
+      .then(function (r) {
+        //$scope._request = r;
+        angular.forEach(r, function (v) {
           $scope._request.push(v);
         });
+        //get stockup request
+        ds.getStockUpRequest()
+        .then(function (u) {
+          //$scope._request = u;
+          angular.forEach(u, function (v) {
+            $scope._request.push(v);
+          });
+        });
       });
-    });
+
+      //get all pending Request
+      //
+      //get stock down request
+      ds.getPendingStock('stockDown')
+      .then(function (r) {
+          angular.forEach(r, function (v) {
+            $scope._pending.push(v);
+          });
+        //get stockup request
+        ds.getPendingStock('stockUp')
+        .then(function (u) {
+          angular.forEach(u, function (v) {
+            $scope._pending.push(v);
+          });
+        });
+      });
+
+    }
+    __init();
 
     //ds.search
     $scope.searchcmp = function () {
@@ -183,47 +215,47 @@ angular.module('drug', [])
     var d = {};
 
     d.attendRequest = function (itemId, transactionId, nextStatus) {
-      return $http.post('/api/drugs/' + itemId + '/requests/' + transactionId + '?nextStatus=' + nextStatus)
+      return $http.post('/api/internal/drugs/' + itemId + '/requests/' + transactionId + '?nextStatus=' + nextStatus)
       .then(function (done) {
         return done.data;
       });
     };
     d.cancelRequest = function (itemId, transactionId, nextStatus) {
-      return $http.delete('/api/drugs/' + itemId + '/requests/' + transactionId + '?nextStatus=' + nextStatus)
+      return $http.delete('/api/internal/drugs/' + itemId + '/requests/' + transactionId + '?nextStatus=' + nextStatus)
       .then(function (done) {
         return done.data;
       });
     };
 
     d.getStockUpHistory = function (itemId) {
-      return $http.get('/api/drugs/' + itemId + '/history?action=stockUp')
+      return $http.get('/api/internal/drugs/' + itemId + '/history?action=stockUp')
       .then(function (r) {
         return r.data;
       });
     };
     d.getStockUpRequest = function () {
-      return $http.get('/api/drugs/requests?action=stockUp')
+      return $http.get('/api/internal/drugs/requests?action=stockUp')
       .then(function (r) {
         return r.data;
       });
     };
 
     d.getStockDownHistory = function (itemId) {
-      return $http.get('/api/drugs/' + itemId + '/history?action=stockDown')
+      return $http.get('/api/internal/drugs/' + itemId + '/history?action=stockDown')
       .then(function (r) {
         return r.data;
       });      
     };
 
     d.getStockDownRequest = function () {
-      return $http.get('/api/drugs/requests?action=stockDown')
+      return $http.get('/api/internal/drugs/requests?action=stockDown')
       .then(function (r) {
         return r.data;
       });      
     };
 
     d.addNewDrug = function (data) {
-      return $http.post('/api/drugs', data)
+      return $http.post('/api/internal/drugs', data)
       .then(function (r) {
         N.notifier({
           title : 'Yippie!',
@@ -253,7 +285,7 @@ angular.module('drug', [])
 
     d.fetchAll = function (options)  {
       options = options || {};
-      return $http.get('/api/drugs', options)
+      return $http.get('/api/internal/drugs', options)
       .then(function (r) {
         return r.data;
       }, function (err) {
@@ -262,7 +294,7 @@ angular.module('drug', [])
     };
 
     d.fetchOne = function (id) {
-      return $http.get('/api/drugs/' + id)
+      return $http.get('/api/internal/drugs/' + id)
       .then(function (r) {
         return d.data;
       }, function (err) {
@@ -271,7 +303,7 @@ angular.module('drug', [])
     };
     
     d.updateOne = function (id) {
-      return $http.put('/api/drugs/' + id)
+      return $http.put('/api/internal/drugs/' + id)
       .then(function (r) {
         return d.data;
       }, function (err) {
@@ -279,7 +311,7 @@ angular.module('drug', [])
       });
     };    
     d.deleteOne = function (id) {
-      return $http.delete('/api/drugs/' + id)
+      return $http.delete('/api/internal/drugs/' + id)
       .then(function (r) {
         return d.data;
       }, function (err) {
@@ -290,7 +322,7 @@ angular.module('drug', [])
     //d.fetchProps = function (query, )
 
     d.search = function (srchstr, page, callback) {
-      $http.get('/api/drugs/' + srchstr + '/page/' + page)
+      $http.get('/api/internal/drugs/' + srchstr + '/page/' + page)
       .success(function (d) {
         if(_.isEmpty(d)) {
           N.notifier({
@@ -309,7 +341,7 @@ angular.module('drug', [])
     };
 
     d.moreInfo = function (id, callback) {
-      $http.get('/api/drugs/' + id + '/view/summary')
+      $http.get('/api/internal/drugs/' + id + '/view/summary')
       .success(function (d) {
         callback(d);
       })
@@ -322,7 +354,7 @@ angular.module('drug', [])
     };
 
     d.updatePrice = function (id, price, cb) {
-      $http.put('/api/drugs/' + id, {price : price})
+      $http.put('/api/internal/drugs/' + id, {price : price})
       .success(function () {
         N.notifier({
           message: L[L.set].drug.update.success,
@@ -341,7 +373,7 @@ angular.module('drug', [])
     };
 
     d.postStockTo = function postStockTo (stockToData, itemId) {
-      return $http.post('/api/drugs/' + itemId + '/stockto', stockToData)
+      return $http.post('/api/internal/drugs/' + itemId + '/stockto', stockToData)
       .then(function (done) {
         N.notifier({
           title:  L[L.set].titles.success,
@@ -354,7 +386,7 @@ angular.module('drug', [])
     };
 
     d.postStockUp = function postStockUp (stockUpData, itemId) {
-      return $http.post('/api/drugs/' + itemId + '/stockup', stockUpData)
+      return $http.post('/api/internal/drugs/' + itemId + '/stockup', stockUpData)
       .then(function (done) {
         N.notifier({
           title:  L[L.set].titles.success,
@@ -364,6 +396,14 @@ angular.module('drug', [])
 
         return done.data;
       });      
+    };
+
+    d.getPendingStock = function (action) {
+      return $http.get('/api/internal/drugs/history?action=' + action)
+      .then(function (res) {
+        return res.data;
+      });
+
     };
 
     return d;

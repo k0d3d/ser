@@ -190,14 +190,16 @@ function afterResourceFilesLoad() {
 
     // assume 404 since no middleware responded
     app.use(function(req, res){
-      if (req.xhr) {
-        res.json(404, {message: 'resource not found'});
+
+      var t = /[/api/internal/]/i;
+      if (t.test(req.url)) {
+        res.json(404, {message: 'resource not found'});        
       } else {
         res.status(404).render('404', {
           url: req.originalUrl,
           error: 'Not found'
-        });        
-      }
+        });
+      }          
 
     });      
 

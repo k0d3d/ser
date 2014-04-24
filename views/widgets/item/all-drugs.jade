@@ -34,7 +34,7 @@ mixin allDrugs()
                       li
                         a(href='#', ng-click="view_stock_up(d); toggleModal('stock-history-modal')") Stock Up History
                       li
-                        a(href='#', ng-click="item_stock(d); toggleModal('manage-stock-modal');") Stock
+                        a(href='#', ng-click="item_stock(d); toggleModal('manage-stock-modal');") Stock Operations
                       li
                         a(href='#', ng-click="add_to_list(d)") Add to My List
            
@@ -67,5 +67,32 @@ mixin allRequest()
           td {{tr.status | stockRequestState}}
           td {{tr.referenceId}}
           td
-            button.btn.btn-sm.btn-primary(ng-click="approve_request(tr)", ng-disabled="tr.status != 0") Approve
-            button.btn.btn-sm.btn-danger(ng-click="reject_request(tr)", ng-disabled="tr.status != 0") Reject
+            button.btn.btn-xs.btn-primary(ng-click="approve_request(tr)", ng-disabled="tr.status != 0") Confirm
+            button.btn.btn-xs.btn-danger(ng-click="reject_request(tr)", ng-disabled="tr.status != 0") Deny
+
+mixin allPending()
+  .table-responsive
+    table.table.table-stripped
+      thead
+        tr
+          th Item Name
+          th Recipient
+          th Amount
+          th Date 
+          th Last Update
+          th Current Status
+          th Reference
+          th
+      tbody
+        tr(ng-repeat="tr in _pending")
+          td {{tr.itemId.itemName}}
+          td {{tr.destId.name}}
+          td 
+            | {{tr.amount}} 
+            i.fa.fa-exclamation(style="color: #1CAF9A", tooltips, title="This is an internal deduction being added here", ng-show="tr.destId == tr.originId")
+          td {{tr.dateInitiated | date: 'short'}}
+          td <strong>Status: </strong>{{tr.statusLog[0].code | stockRequestState}}, <em> {{tr.statusLog[0].dateStated | date: 'medium'}} </em>
+             
+          td {{tr.status | stockRequestState}}
+          td {{tr.referenceId}}
+          td

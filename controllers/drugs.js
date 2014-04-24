@@ -46,7 +46,7 @@ module.exports.routes = function(app, login) {
     });
   });
   //Fetch Drug Item Summary
-  app.get('/api/drugs/:drugId/view/summary', function(req, res, next){
+  app.get('/api/internal/drugs/:drugId/view/summary', function(req, res, next){
     drugs.summary(req.params.drugId, function(r){
       if(utils.isError(r)){
         next(r);
@@ -56,7 +56,7 @@ module.exports.routes = function(app, login) {
     });
   });
 
-  app.get('/api/drugs/updates/:since', function(req, res, next){
+  app.get('/api/internal/drugs/updates/:since', function(req, res, next){
     var d = new Date(req.params.since);
     drugs.checkUpdate(d, function(r){
       if(utils.isError(r)){
@@ -67,7 +67,7 @@ module.exports.routes = function(app, login) {
     });
   });
 
-  app.get('/api/drugs', function (req, res, next) {
+  app.get('/api/internal/drugs', function (req, res, next) {
     drugs.fetchAllMyDrugs({
       page: req.query.page || 0,
       limit: req.query.limit || 50
@@ -80,7 +80,7 @@ module.exports.routes = function(app, login) {
   });
 
 
-  app.get('/api/drugs/requests', function (req, res) {
+  app.get('/api/internal/drugs/requests', function (req, res) {
     var action = req.query.action;
     var owner = req.user._id;
     var account_type = req.user.account_type;   
@@ -170,13 +170,26 @@ module.exports.routes = function(app, login) {
   
   });
 
-  app.get('/api/drugs/:itemId/history', function (req, res) {
+  app.get('/api/internal/drugs/:itemId/history', function (req, res) {
     var action = req.query.action;
     var itemId = req.params.itemId;
     var owner = req.user._id;
     var account_type = req.user.account_type;   
 
-    drugs.stockLog(itemId, owner, account_type, action) 
+    drugs.stockItemLog(itemId, owner, account_type, action) 
+    .then(function (done) {
+      res.json(200, done);
+    }, function (err) {
+      res.json(400, err.message);
+    });
+  });
+
+  app.get('/api/internal/drugs/history', function (req, res) {
+    var action = req.query.action;
+    var owner = req.user._id;
+    var account_type = req.user.account_type;   
+
+    drugs.stockLog(owner, account_type, action) 
     .then(function (done) {
       res.json(200, done);
     }, function (err) {
@@ -185,7 +198,7 @@ module.exports.routes = function(app, login) {
   });
 
 
-  app.post('/api/drugs', function (req, res) {
+  app.post('/api/internal/drugs', function (req, res) {
     var item = req.body;
     var owner = req.user._id;
     var account_type = req.user.account_type;
@@ -197,14 +210,16 @@ module.exports.routes = function(app, login) {
     });
   });
 
-  //request to stock to 
-  app.post('/api/drugs/:itemId/stockto', function (req, res) {
+  //request to stock to i.e. to send stock 
+  //to a staff. stocking down for a distributor 
+  //or manager and stockup for a staff
+  app.post('/api/internal/drugs/:itemId/stockto', function (req, res) {
     var itemId = req.params.itemId,
         userId = req.user._id,
         accountType = req.user.account_type;
 
 
-    drugs.createStockTransaction(itemId, userId, accountType, req.body, false)
+    drugs.createStockDownTransaction(itemId, userId, accountType, req.body)
     .then(function (done) {
       res.json(200, {status: done});
     }, function (err) {
@@ -213,12 +228,14 @@ module.exports.routes = function(app, login) {
 
   });
 
-  app.post('/api/drugs/:itemId/stockup', function (req, res) {
+  //request stock from a distributor or manager, i.e. stock up
+  //for a staff, manager or even an internal distributor stockup
+  app.post('/api/internal/drugs/:itemId/stockup', function (req, res) {
     var itemId = req.params.itemId,
         userId = req.user._id,
         accountType = req.user.account_type;
 
-    drugs.createStockTransaction(itemId, userId, accountType, req.body, true)
+    drugs.createStockUpTransaction(itemId, userId, accountType, req.body, true)
     .then(function (done) {
       res.json(200, {status: done});
     }, function (err) {
@@ -227,7 +244,7 @@ module.exports.routes = function(app, login) {
 
   });
 
-  app.post('/api/drugs/:itemId/requests/:transactionId', function (req, res) {
+  app.post('/api/internal/drugs/:itemId/requests/:transactionId', function (req, res) {
     var itemId = req.params.itemId, 
         userId = req.user._id, 
         accountType = req.user.account_type,
@@ -244,7 +261,7 @@ module.exports.routes = function(app, login) {
 
 
   //Updates the price of the drug
-  app.put('/api/drugs/:drugId/price', function(req, res, next) {
+  app.put('/api/internal/drugs/:drugId/price', function(req, res, next) {
     drugs.priceUpdate( req.params.drugId, req.body.price, function(r){
       if(utils.isError(r)){
         next(r);
@@ -254,7 +271,7 @@ module.exports.routes = function(app, login) {
     });
   });
   //Updates the drug item
-  app.put('/api/drugs/:drugId', function(req, res, next) {
+  app.put('/api/internal/drugs/:drugId', function(req, res, next) {
     drugs.updateItem( req.params.drugId, req.body)
     .then(function () {
       res.json(200, { message: 'saved'});
@@ -264,7 +281,7 @@ module.exports.routes = function(app, login) {
   });
 
 
-  app.delete('/api/drugs/:itemId/requests/:transactionId', function (req, res) {
+  app.delete('/api/internal/drugs/:itemId/requests/:transactionId', function (req, res) {
     var itemId = req.params.itemId, 
         userId = req.user._id, 
         accountType = req.user.account_type,

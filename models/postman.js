@@ -417,37 +417,37 @@ NotifyController.prototype.allUserNotices = function (userId, accountType) {
  * @return {[type]} [description]
  */
 NotifyController.prototype.userStockNotices = function (userId, accountType) {
-  var oops = Q.defer();
+  var oops = Q.defer(), ntx = [];
 
   //
   //should check if any of these
   //activity notices has been or 
   //hasnt been created and return 
   //activities that havent been created
-  function __isNotified (obj, alert) {
-    var koolio = Q.defer();
+  // function __isNotified (obj, alert) {
+  //   var koolio = Q.defer();
 
-    var noticeData = {
-      alertType: 'order',
-      alertDescription: 'New Order Placed',
-      timeStamp: 'orderDate',
-      meta : ['orderId', 'hospitalId']
-    };
-    var task = obj.pop();
+  //   var noticeData = {
+  //     alertType: 'order',
+  //     alertDescription: 'New Order Placed',
+  //     timeStamp: 'orderDate',
+  //     meta : ['orderId', 'hospitalId']
+  //   };
+  //   var task = obj.pop();
 
 
-    return koolio.promise;
-  }
+  //   return koolio.promise;
+  // }
 
   //find all stock transactions concerning you..
   //
   //lets try and find out what to query for who
   //
   //as a distributor
-  if (accountType === 2){
+  if (accountType < 4){
     //distributors get stockup request (internally)
     //and stocdown request from managers and staff
-    var ntx = [];
+    
     df.getUserStockUpRequest({
       userId: userId,
       accountType: accountType
@@ -503,16 +503,64 @@ NotifyController.prototype.userStockNotices = function (userId, accountType) {
   }
 
   //as a manager
-  if (accountType === 3) {
-    //managers get request to stockup from distributors
-    //and stock down request for staff
-  }
-
-  //as a staff
   if (accountType === 4) {
     //staff get request to stock up from distributors and managers
     //
+    // df.getUserStockUpRequest({
+    //   userId: userId,
+    //   accountType: accountType
+    // })
+    // .then(function (done) {
+    //   console.log(done);
+    //   //check the 'done' for
+    //   //stockup request notices
+
+    //   var noticeData = {
+    //       alertType: 'stockup',
+    //       timeStamp: 'dateInitiated',
+    //       meta : ['originId', 'destId']
+    //   };
+
+    //   return noticeFn.checkIfNotified(done, userId, noticeData);
+
+    // })
+    // .then(function (notices) {
+    //   console.log(notices);
+    //   _.each(notices, function (val) {
+    //     ntx.push(val);
+    //   });
+    df.getUserStockDownRequest({
+        userId: userId,
+        accountType: accountType
+      })
+    //})
+    .then(function (done) {
+      //check the 'done' for
+      //stockdown request notices
+
+      var noticeData = {
+          alertType: 'stockdown',
+          timeStamp: 'dateInitiated',
+          meta : ['originId', 'destId']
+      };
+
+      return noticeFn.checkIfNotified(done, userId, noticeData);
+
+    })    
+    .then(function (notices) {
+
+      _.each(notices, function (val) {
+        ntx.push(val);
+      });
+      oops.resolve(ntx)      ;
+    })
+    .catch(function (err) {
+      oops.reject(err);
+      console.log(err);
+    });
   }
+
+
 
 
   //check if you've created notices
