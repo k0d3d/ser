@@ -34,7 +34,7 @@ angular.module('drug', [])
       .then(function (r) {
         //$scope._request = r;
         angular.forEach(r, function (v) {
-          $scope._request.push(v);
+          $scope._pending.push(v);
         });
         //get stockup request
         ds.getStockUpRequest()
@@ -52,7 +52,7 @@ angular.module('drug', [])
       ds.getPendingStock('stockDown')
       .then(function (r) {
           angular.forEach(r, function (v) {
-            $scope._pending.push(v);
+            $scope._request.push(v);
           });
         //get stockup request
         ds.getPendingStock('stockUp')

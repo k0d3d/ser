@@ -235,7 +235,7 @@ module.exports.routes = function(app, login) {
         userId = req.user._id,
         accountType = req.user.account_type;
 
-    drugs.createStockUpTransaction(itemId, userId, accountType, req.body, true)
+    drugs.createStockUpTransaction(itemId, userId, accountType, req.body)
     .then(function (done) {
       res.json(200, {status: done});
     }, function (err) {
