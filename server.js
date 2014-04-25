@@ -175,8 +175,8 @@ function afterResourceFilesLoad() {
       // error page
       //res.status(500).json({ error: err.stack });
 
-      var t = /[/api/internal/]/i;
-      if (t.test(req.url)) {
+      var t = '/api/internal/';
+      if (req.url.indexOf(t) > -1) {
         res.json(500, err.message);        
       } else {
         res.status(500).render('500', {
@@ -191,8 +191,8 @@ function afterResourceFilesLoad() {
     // assume 404 since no middleware responded
     app.use(function(req, res){
 
-      var t = /[/api/internal/]/i;
-      if (t.test(req.url)) {
+      var t = '/api/internal/';
+      if (req.url.indexOf(t) > -1) {
         res.json(404, {message: 'resource not found'});        
       } else {
         res.status(404).render('404', {

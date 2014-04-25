@@ -11,7 +11,8 @@ var NotificationsSchema = new Schema({
   staffId: {type: Schema.ObjectId},
   originId: {type: Schema.ObjectId},
   destId: {type: Schema.ObjectId},
-  created: {type: Date, default: Date.now},
+  generated: {type: Date, default: Date.now},
+  created: {type: Date},
   referenceId: {type: String},
   orderId: {type: String},
   seen: {type: Boolean, default: 0}

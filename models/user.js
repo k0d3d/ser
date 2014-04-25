@@ -252,17 +252,24 @@ UserController.prototype.getProfile = function (userId, account_type) {
     if (err) {
       return d.reject(err);
     }
+    //if thr is a profile
     if (user_profile) {
       // if the account is not a distributor account
       if (parseInt(account_type) !== 2 && parseInt(account_type) < 5) {
         //lets attach the employer profile
-        staffUtils.getMeMyModel(2).findOne({
-          userId: user_profile.employer.employerId
-        })
-        .exec(function (err, employerIsh) {
-          user_profile.employer = employerIsh;
-          return d.resolve(user_profile);
-        });
+        //if thr is one.
+        if (user_profile.employer) {
+          staffUtils.getMeMyModel(2).findOne({
+            userId: user_profile.employer.employerId
+          })
+          .exec(function (err, employerIsh) {
+            user_profile.employer = employerIsh;
+            return d.resolve(user_profile);
+          });          
+        } else {
+          return d.resolve(user_profile);  
+        }
+
       } else {
         return d.resolve(user_profile);
       }

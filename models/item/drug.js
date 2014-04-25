@@ -13,7 +13,8 @@ var DrugSchema = new Schema ({
   currentPrice: {
     wholesale: {type: Number},
     retail: {type: Number},
-    institution: {type: Number}
+    institution: {type: Number},
+    staffPrice: {type: Number}
   },
   itemForm: {type: String, default: ''},
   itemPackaging: {type: String, default: ''},

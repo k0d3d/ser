@@ -1,77 +1,76 @@
-extends ../layouts/default
+.contentpanel(data-item-id="{{item._id || 'Empty'}}")
+  .row
+      .col-sm-3
+        button.btn.btn-primary.btn-block.start-edit Edit
+        //input.start-edit(type="checkbox", checked, data-label-text="Edit item")
+        .mb30
+        img.thumbnail.img-responsive(src='/images/item-images/default/{{item.image || "item-avatar.jpg"}}' , alt='')
+        .mb30
+        h5.subtitle Drug Name
+        p.mb10.x-editable(data-type="text", onbeforesave="updateItem($data)", editable-text="item.itemName")
+          | {{item.itemName || 'Empty'}} 
+        .mb10        
+        h5.subtitle Composition
+        p.x-editable(data-type="text", onbeforesave="updateItem($data)", editable-text="item.sciName")
+          | {{item.sciName || 'Empty'}} 
+        h5.subtitle Item Form
+        p.x-editable(data-type="select", onbeforesave="updateItem($data)", editable-select="item.itemForm", data-source="/api/internal/items/props?prop=itemForm")
+          | {{item.itemForm || 'Empty'}}
+        h5.subtitle Item Packaging
+        p.x-editable(data-type="select", onbeforesave="updateItem($data)", editable-select="item.itemPackaging", data-source="/api/internal/items/props?prop=itemPackaging")
+          | {{item.itemPackaging || 'Empty'}}
+        h5.subtitle Category
+        p.x-editable(data-type="select", onbeforesave="updateItem($data)", editable-select="item.category", data-source="/api/internal/items/props?prop=category")
+          | {{item.category || 'Empty'}}
+        h5.subtitle Nafdac Reg No
+        p.x-editable(data-type="text", onbeforesave="updateItem($data)", editable-text="item.nafdacRegNo")  
+          | {{item.nafdacRegNo || 'Empty'}}
 
-block contentpanel
-  .contentpanel(data-item-id="#{item._id}")
-    .row
-        .col-sm-3
-          button.btn.btn-primary.btn-block.start-edit Edit
-          //input.start-edit(type="checkbox", checked, data-label-text="Edit item")
-          .mb30
-          - var img = item.images[0] || 'item-avatar.jpg'
-          img.thumbnail.img-responsive(src='/images/item-images/default/#{img}' , alt='')
-          .mb30
-          h5.subtitle Drug Name
-          p.mb10.x-editable(data-type="text", data-name="itemName")
-            | #{item.itemName} 
-          .mb10        
-          h5.subtitle Composition
-          p.x-editable(data-type="text", data-name="sciName")
-            | #{item.sciName} 
-          h5.subtitle Item Form
-          p.x-editable(data-type="select", data-name="itemForm", data-source="/api/internal/items/props?prop=itemForm")
-            | #{item.itemForm}
-          h5.subtitle Item Packaging
-          p.x-editable(data-type="select", data-name="itemPackaging", data-source="/api/internal/items/props?prop=itemPackaging")
-            | #{item.itemPackaging}
-          h5.subtitle Category
-          p.x-editable(data-type="select", data-name="category", data-source="/api/internal/items/props?prop=category")
-            | #{item.category}
-          h5.subtitle Nafdac Reg No
-          p.x-editable(data-type="text", data-name="nafdacRegNo")  
-            | #{item.nafdacRegNo}
+        .mb20    
+        .panel.panel-default
+            .panel-body
+              a(href="#")
+                | 0 Distributors
+        .mb20    
+        .panel.panel-default
+            .panel-body
+              a(href="#")
+                | 0 Staff 
 
-          .mb20    
-          .panel.panel-default
-              .panel-body
-                a(href="#")
-                  | 0 Distributors
-          .mb20    
-          .panel.panel-default
-              .panel-body
-                a(href="#")
-                  | 0 Staff 
-
+      //
+         col-sm-3 
+      .col-sm-9
         //
-           col-sm-3 
-        .col-sm-9
-          //
-             Nav tabs 
-          ul.nav.nav-tabs.nav-justified.nav-profile
-            li.active
-              a(href='#extended-info', data-toggle='tab')
-                strong Extended Info
+           Nav tabs 
+        ul.nav.nav-tabs.nav-justified.nav-profile
+          li.active
+            a(href='#extended-info', data-toggle='tab')
+              strong Item Properties
+          if (false)    
             li
               a(href='#prospects', data-toggle='tab')
                 strong Prospects and Activity
+          if (false)
             li
               a(href='#prospects', data-toggle='tab')
                 strong Map
+          if (false)
             li
               a(href='#comments', data-toggle='tab')
                 strong Comments  
                 span.label.label-default
                   | 0             
-          //
-             Tab panes 
-          .tab-content
-            include ../widgets/item/extended-info
-            +loadItemExtendedInfo()
+        //
+           Tab panes 
+        .tab-content
+          include ../widgets/item/extended-info
+          +loadItemExtendedInfo()
 
-            include ../widgets/item/item-comments
-            +itemComments()
+          include ../widgets/item/item-comments
+          +itemComments()
 
 append foot
   script(src='/js/jquery.prettyPhoto.js')
   script(src='/js/holder.js')
-  script(src="/js/modules/drug/item.js")
+  //script(src="/js/modules/drug/item.js")
   script(src="/js/dropzone.min.js")

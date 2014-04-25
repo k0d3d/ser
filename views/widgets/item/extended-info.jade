@@ -1,35 +1,67 @@
 mixin loadItemExtendedInfo()
   #extended-info.tab-pane.active
-    form.form-horizontal.form-bordered.extended-info(ng-submit="add_drug(add_item_form)", novalidate, name="addItemForm")
-      input#item-id(type="hidden", value="", ng-model="drug._id")
-      .form-group
-        label.col-sm-3.control-label Indications and Usage
+    mixin loadItemPrices()
+    .item-extended
+      h4 Extended Information
+      hr
+      .row
+        .col-sm-3 Indications and Usage
         .col-sm-6
-          p.x-editable.form-control-static.item-name(type='text', placeholder='', ng-model="add_item_form.itemName", required, type-ahead="autoCompleteItemName", remote="/ndl/search?query=%QUERY", name="item-name")
-      .form-group
-        label.col-sm-3.control-label Contradictions
+          p.text-area.item-name(onbeforesave="updateItem($data, $editable.name)", editable-textarea="item.indications" )
+            | {{item.indications || 'Empty'}}
+      .row
+        .col-sm-3 Contradictions
         .col-sm-6
-          p.x-editable.form-control-static(data-type="textarea", data-name="contradictions")
-            | #{item.contradictions}
-      .form-group
-        label.col-sm-3.control-label Warnings
+          p.text-area(onbeforesave="updateItem($data, $editable.name)", editable-textarea="item.contradictions")
+            | {{item.contradictions || 'Empty'}}
+      .row
+        .col-sm-3 Warnings
         .col-sm-6
-          p.x-editable.form-control-static(type='text', placeholder='', ng-model="add_item_form.nafdacRegNo", required)
-      .form-group
-        label.col-sm-3.control-label Precautions
+          p.text-area(onbeforesave="updateItem($data, $editable.name)", editable-textarea="item.warnings")
+            | {{item.warnings || 'Empty'}}
+      .row
+        .col-sm-3 Precautions
         .col-sm-6
-          p.x-editable.form-control-static(type='text', placeholder='', ng-model="add_item_form.category", required)
-      .form-group
-        label.col-sm-3.control-label Adverse Reactions
+          p.text-area(onbeforesave="updateItem($data, $editable.name)", editable-textarea="item.precautions")
+            | {{item.precautions || 'Empty'}}
+      .row
+        .col-sm-3 Adverse Reactions
         .col-sm-6
-          p.x-editable.form-control-static(type='text', placeholder='', ng-model="add_item_form.category", required)
-      .form-group
-        label.col-sm-3.control-label Dosage and Administration
+          p.text-area(onbeforesave="updateItem($data, $editable.name)", editable-textarea="item.reactions")
+            | {{item.reactions || 'Empty'}}
+      .row
+        .col-sm-3 Dosage and Administration
         .col-sm-6
-          p.x-editable.form-control-static(type='text', placeholder='', ng-model="add_item_form.category", required)
-      .form-group
-        label.col-sm-3 Upload Image
+          p.text-area(onbeforesave="updateItem($data, $editable.name)", editable-textarea="item.dosage")
+            | {{item.dosage || 'Empty'}}
+      .row
+        .col-sm-3 Upload Image
         .col-sm-6.dropzone(dropzone, ng-model="add_item_form.images")
             input(name='itemImage', type='file', multiple='multiple', style="display: none")     
             span.help-text 
-              | Add an image for this item. You can click here or drag and drop file right here, easy!                           
+              | Add an image for this item. You can click here or drag and drop file right here, easy!       
+
+mixin loadItemPrices()
+  .item-prices
+    h4 Current Price
+    hr
+    .row
+      .col-sm-3 WholeSale
+      .col-sm-6
+        p.text-area(type='text', onbeforesave="updatePrice($data, $editable.name)", editable-number="item.currentPrice.wholesale" )
+          | {{item.currentPrice.wholesale || 'N0'}}
+    .row
+      .col-sm-3 Institution
+      .col-sm-6
+        p.text-area(onbeforesave="updatePrice($data, $editable.name)", editable-number="item.currentPrice.institution")
+          | {{item.currentPrice.institution || 'N0'}}
+    .row
+      .col-sm-3 Retail
+      .col-sm-6
+        p.text-area(onbeforesave="updatePrice($data, $editable.name)", editable-number="item.currentPrice.retail")
+          | {{item.currentPrice.retail || 'N0'}}
+    .row
+      .col-sm-3 Staff Price
+      .col-sm-6
+        p.text-area(onbeforesave="updatePrice($data, $editable.name)", editable-number="item.currentPrice.staffPrice")
+          | {{item.currentPrice.staffPrice || 'N0'}}

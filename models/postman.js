@@ -125,7 +125,7 @@ noticeFn = {
       str = noticeData.alertType;
       str += userId;
       str += task[noticeData.timeStamp].getTime();
-      str += task.check;
+      str += task.check || task.orderStatus || task.status;
       str += task._id;
       //console.log(str);
       //console.log(task);
@@ -164,6 +164,7 @@ noticeFn = {
           an.alertType =  noticeData.alertType;
           an.alertDescription = noticeFn.getUpdateDescription(task.orderStatus || task.status, noticeData.alertType);
           an.referenceId = str;
+          an.created = task[noticeData.timeStamp];
           an.save(function (err, noticed) {
             if (err) {
               return ifn.reject(err);
@@ -506,34 +507,35 @@ NotifyController.prototype.userStockNotices = function (userId, accountType) {
   if (accountType === 4) {
     //staff get request to stock up from distributors and managers
     //
-    // df.getUserStockUpRequest({
-    //   userId: userId,
-    //   accountType: accountType
-    // })
-    // .then(function (done) {
-    //   console.log(done);
-    //   //check the 'done' for
-    //   //stockup request notices
+    df.getUserStockUpRequest({
+      userId: userId,
+      accountType: accountType
+    })
+    .then(function (done) {
+      console.log('After user stock down..');
+      console.log(done);
+      //check the 'done' for
+      //stockup request notices
 
-    //   var noticeData = {
-    //       alertType: 'stockup',
-    //       timeStamp: 'dateInitiated',
-    //       meta : ['originId', 'destId']
-    //   };
+      var noticeData = {
+          alertType: 'stockup',
+          timeStamp: 'dateInitiated',
+          meta : ['originId', 'destId']
+      };
 
-    //   return noticeFn.checkIfNotified(done, userId, noticeData);
+      return noticeFn.checkIfNotified(done, userId, noticeData);
 
-    // })
-    // .then(function (notices) {
-    //   console.log(notices);
-    //   _.each(notices, function (val) {
-    //     ntx.push(val);
-    //   });
-    df.getUserStockDownRequest({
+    })
+    .then(function (notices) {
+      console.log(notices);
+      _.each(notices, function (val) {
+        ntx.push(val);
+      });
+      return df.getUserStockDownRequest({
         userId: userId,
         accountType: accountType
-      })
-    //})
+      });
+    })
     .then(function (done) {
       //check the 'done' for
       //stockdown request notices

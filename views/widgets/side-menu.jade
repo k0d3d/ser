@@ -1,5 +1,5 @@
 
-mixin oneItem(menuItem)
+mixin oneItem(menuItem, currentIndex)
   -var itemClass = '', anchorVal = menuItem.url
   -if (menuItem.child)
     -itemClass = itemClass + ' nav-parent'
@@ -10,14 +10,15 @@ mixin oneItem(menuItem)
       span=menuItem.name
     -if(menuItem.child)
       ul.children
-        each child in menuItem.child
-          li
-            a(href=child.url)
-              i.fa.fa-caret-right
-              | #{child.name}          
+        each child, index in menuItem.child
+          -if (hasRole(index, true, currentIndex))
+            li
+              a(href=child.url)
+                i.fa.fa-caret-right
+                | #{child.name}          
 
 mixin sidemenu(navLinks)
   ul.nav.nav-pills.nav-stacked.nav-bracket
     each n, index in navLinks
       -if (hasRole(index))
-        +oneItem(n)
+        +oneItem(n, index)

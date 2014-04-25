@@ -23,16 +23,40 @@ module.exports.routes = function(app, login) {
 
   //Displays one item page
   app.get('/a/drugs/:drugId/item', function (req, res, next) {
+    res.render('index');   
+  });
+
+
+  //Displays one item page
+  // app.get('/api/internal/drugs/:drugId/item', function (req, res) {
+  //   drugs.fetchOneById(req.params.drugId)
+  //   .then(function (r) {
+
+  //     res.json(200, r);
+
+  //   }, function (err) {
+  //     res.json(400, err);
+  //   });    
+  // });
+  //Displays one item page
+  app.route('/api/internal/drugs/:drugId/item')
+  .get(function (req, res) {
     drugs.fetchOneById(req.params.drugId)
     .then(function (r) {
 
-      res.render('drug/one-item', {
-        item: r
-      });
+      res.json(200, r);
 
     }, function (err) {
-      next(err);
+      res.json(400, err);
     });    
+  })  //Updates the drug item
+  .put(function(req, res, next) {
+    drugs.updateItem( req.params.drugId, req.body)
+    .then(function () {
+      res.json(200, { message: 'saved'});
+    }, function (err) {
+      next(err);
+    });
   });
 
   //Search for nafdac reg drugs by category
@@ -270,15 +294,7 @@ module.exports.routes = function(app, login) {
       }
     });
   });
-  //Updates the drug item
-  app.put('/api/internal/drugs/:drugId', function(req, res, next) {
-    drugs.updateItem( req.params.drugId, req.body)
-    .then(function () {
-      res.json(200, { message: 'saved'});
-    }, function (err) {
-      next(err);
-    });
-  });
+
 
 
   app.delete('/api/internal/drugs/:itemId/requests/:transactionId', function (req, res) {

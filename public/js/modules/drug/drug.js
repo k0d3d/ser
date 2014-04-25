@@ -10,7 +10,7 @@ angular.module('drug', [])
 
   .config(['$routeProvider', '$locationProvider', function ($routeProvider, $locationProvider) {
     $routeProvider.when('/a/drugs', {templateUrl: '/drug/index', controller: 'drugIndexController'})
-    .when('/a/drugs/:drugId/item', {controller: 'drugPageController'})
+    .when('/a/drugs/:drugId/item', {templateUrl: '/drug/one-item', controller: 'drugPageController'})
     .when('/a/drugs/add-new', {templateUrl: '/drug/add', controller: 'drugAddController'});
     $locationProvider.html5Mode(true);
   }])
@@ -198,8 +198,25 @@ angular.module('drug', [])
 
 
   }])
-  .controller('drugPageController', ['$scope', 'drugService', function ($scope, ds) {
-      
+  .controller('drugPageController', ['$scope', 'drugService', '$routeParams', function ($scope, ds, $routeParams) {
+      function __init () {
+        ds.fetchOne($routeParams.drugId)
+        .then(function (res) {
+          $scope.item = res;
+        });
+      }
+
+      __init();
+
+      $scope.updateItem = function (data, val) {
+        var field = val.split('.');
+        return ds.updateOne($routeParams.drugId, {'name' : field[1], 'value': data});
+      };
+
+      $scope.updatePrice = function (data, val) {
+        var field = val.split('.');
+        return ds.updateOne($routeParams.drugId, {'name' : field[1] + '.' + field[2], 'value': data });
+      };
   }])
   .filter('stockRequestState', function () {
     var states = {
@@ -294,25 +311,26 @@ angular.module('drug', [])
     };
 
     d.fetchOne = function (id) {
-      return $http.get('/api/internal/drugs/' + id)
-      .then(function (r) {
+      return $http.get('/api/internal/drugs/' + id + '/item')
+      .then(function (d) {
         return d.data;
       }, function (err) {
         return err;
       });
     };
     
-    d.updateOne = function (id) {
-      return $http.put('/api/internal/drugs/' + id)
-      .then(function (r) {
+    d.updateOne = function (id, data) {
+      return $http.put('/api/internal/drugs/' + id + '/item', data)
+      .then(function (d) {
         return d.data;
       }, function (err) {
         return err;
       });
     };    
+
     d.deleteOne = function (id) {
-      return $http.delete('/api/internal/drugs/' + id)
-      .then(function (r) {
+      return $http.delete('/api/internal/drugs/' + id + '/item')
+      .then(function (d) {
         return d.data;
       }, function (err) {
         return err;
@@ -354,7 +372,7 @@ angular.module('drug', [])
     };
 
     d.updatePrice = function (id, price, cb) {
-      $http.put('/api/internal/drugs/' + id, {price : price})
+      $http.put('/api/internal/drugs/' + id + '', {price : price})
       .success(function () {
         N.notifier({
           message: L[L.set].drug.update.success,

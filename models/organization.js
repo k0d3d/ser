@@ -156,8 +156,8 @@ staffFunctions = {
     staffUtils.getMeMyModel(doc.account_type).update({
       userId : doc.userId
     }, {
-      $push: {
-        employer:  {employerId : doc.employerId}
+      $set: {
+        employer:  {employerId : doc.employerId, dateAdded: Date.now()}
       }
     }, {upsert: true}, function(err, i) {
 

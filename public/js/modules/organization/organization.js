@@ -6,19 +6,14 @@
 angular.module('organization', [])
 
 .config(['$routeProvider', function ($routeProvider){
-  $routeProvider.when('/a/organization', {templateUrl: '/organization/all-staff', controller: 'staffController'});
+  //$routeProvider.when('/a/organization', {templateUrl: '/organization/all-staff', controller: 'staffController'});
   $routeProvider.when('/a/organization/people/:accountType', {templateUrl: '/organization/all-staff', controller: 'staffController'});
   $routeProvider.when('/a/organization/people/:personId/person/:accountType', {templateUrl: '/organization/profile', controller: 'personController'});
   $routeProvider.when('/a/organization/invitations', {templateUrl: '/organization/invites', controller: 'invitesController'});
 }])
 .controller('staffController', ['$scope', 'organizeStaffService', '$routeParams', '$timeout', function userController($scope, oss, $routeParams, $timeout) {
   $scope.$parent.headerTitle = 'Organization';
-  //Creates new staff.
-  $scope.create_new_staff = function () {
-    oss.inviteStaff($scope.new_staff).then(function (r) {
-      $scope.new_staff = {};
-    });
-  };
+
 
   oss.getMyPeople({
     account_type: $routeParams.accountType
@@ -85,6 +80,13 @@ angular.module('organization', [])
   .then(function (r) {
     $scope.invites = r;
   });
+
+  //Creates new staff.
+  $scope.create_new_staff = function () {
+    oss.inviteStaff($scope.new_staff).then(function (r) {
+      $scope.new_staff = {};
+    });
+  };  
 
   //Activate Staff
   $scope.activate_staff = function (index) {

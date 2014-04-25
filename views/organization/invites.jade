@@ -2,29 +2,31 @@ append head
   link(href="/css/jquery.datatables.css")
 .contentpanel
     .row
-      .table-responsive
-          table#table1.table
-              thead
-                tr
-                  th Email
-                  th Phone Number
-                  th Account Type
-                  th Date Sent
-                  th
-              tbody
-                tr(ng-repeat="iv in invites")
-                  td {{iv.email}}
-                  td {{iv.phone}}
-                  td {{iv.account_type | acctype}}
-                  td {{iv.created | moment}}
-                  td 
-                    button.btn.btn-info.btn-xs(ng-click="activate_staff($index)")
-                      i.fa.fa-check
-                      | Activate
-                    button.btn.btn-danger.btn-xs 
-                      i.fa.fa-times
-                      | Cancel
-
+      .col-md-8
+        .table-responsive
+            table#table1.table
+                thead
+                  tr
+                    th Email
+                    th Phone Number
+                    th Account Type
+                    th Date Sent
+                    th
+                tbody
+                  tr(ng-repeat="iv in invites")
+                    td {{iv.email}}
+                    td {{iv.phone}}
+                    td {{iv.account_type | acctype}}
+                    td {{iv.created | moment}}
+                    td 
+                      button.btn.btn-info.btn-xs(ng-click="activate_staff($index)")
+                        i.fa.fa-check
+                        | Activate
+                      button.btn.btn-danger.btn-xs 
+                        i.fa.fa-times
+                        | Cancel
+      include ../widgets/organization/add-staff
+      +addStaff(userData.account_type)
 
 
 append scripts 

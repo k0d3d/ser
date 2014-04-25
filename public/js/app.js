@@ -11,8 +11,14 @@ var app = angular.module('stocUser', [
   'language',
   'facility',
   'ngTagsInput',
-  'ngDragDrop'
+  'ngDragDrop',
+  'xeditable'
   ]);
+
+app.run(function(editableOptions) {
+  editableOptions.theme = 'bs3'; // bootstrap3 theme. Can be also 'bs2', 'default'
+});
+
 app.config(function ($routeProvider, $locationProvider, $httpProvider) {
   $routeProvider
   //.when('/', {templateUrl: '/drug/index', controller: 'drugIndexController'})

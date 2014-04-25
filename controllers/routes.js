@@ -55,7 +55,7 @@ module.exports = function(app, passport) {
     },
     {
       name: "Drug Pages",
-      roles: [0,1,2,4],
+      roles: [0,1,2,3,4],
       icon: '',
       url: '/a/drugs'
     },
@@ -113,9 +113,9 @@ module.exports = function(app, passport) {
       res.locals.userData = req.user;
     }    
 
-    res.locals.hasRole = function (index) {
+    res.locals.hasRole = function (index, isChild, parent) {
       var account_type = req.user.account_type;
-      var this_nav = nav[index];
+      var this_nav = (isChild) ? nav[parent].child[index] : nav[index];
 
       if (_.indexOf(this_nav.roles, account_type) > -1 || this_nav.roles[0] === '*') {
         return true;

@@ -6,7 +6,6 @@ mixin staffOptions(account, index, account_type)
 
 
 mixin addStaff (account_type) 
-  -var accounts = people
   .col-sm-4.col-md-3
     h4.subtitle.mb5 Add a staff
     form(name="new_staff_form", ng-submit="create_new_staff()")
@@ -16,7 +15,7 @@ mixin addStaff (account_type)
       label.control-label() Staff Type
       select.form-control.chosen-select(placeholder='Distributor or Sales Agent', ng-model="new_staff.account_type", required)
         option(value='')
-        each account, index in accounts
+        each account, index in people
           +staffOptions(account, index, account_type)
 
       .mb20
