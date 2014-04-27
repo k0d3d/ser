@@ -40,8 +40,6 @@ app.controller('MainController', [
   'organizeStaffService',
   function ($scope, $rootScope, $http, $location, Notification, OS, OSS) {
 
-    $scope.orderCart = $rootScope.orderCart = [];
-
 
     $scope.workForce = {};
 

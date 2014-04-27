@@ -47,7 +47,14 @@ var orderManager = {
       //orderStatus: doc.orderStatus,
     };
 
-    query.orderStatus = doc.orderStatus ? {$gt: 0} : undefined;
+    if (doc.orderStatus && (doc.orderStatus !== 0)) {
+      query.status = {$gt: 0};
+    }
+    if(doc.orderStatus) {
+      query.status = doc.orderStatus;
+    }
+    //query.orderStatus = (doc.orderStatus && (doc.orderStatus !== 0)) ? {$gt: 0} : undefined;
+
 
     query[doc.where] = doc.whrVal;
 
@@ -215,7 +222,7 @@ OrderController.prototype.pushOrders = function (body, cb) {
  * @param  {[type]} accountType the user id for the logged in user.
  * @return {[type]}             Promise.
  */
-OrderController.prototype.getOrders = function(orderStatus, displayType, userId, accountType){
+OrderController.prototype.getOrders = function getOrders (orderStatus, displayType, userId, accountType){
   console.log('Checking Orders....');
   var gt = Q.defer(), __orders;
 
@@ -504,24 +511,51 @@ OrderController.prototype.redressOrder = function (order, orderOwner, status) {
   console.log('Placing order');
   var ot = Q.defer();
 
-  Order.update({
+  Order.findOne({
     orderId : order.orderId
-  }, {
-    $set : {
-      orderStatus: status
-    }
-  }, function (err, i) {
+  })
+  .exec(function (err, i) {
     if (err) {
       return ot.reject(err);
-    }
-    if (i > 0) {
-      
-      return ot.resolve(i);
-    }
-    if (i === 0) {
+    }  
+    if (!i) {
       return ot.reject(new Error('order update failed'));
     }
+    //if the current order status is greater
+    //than the next status, reject the request
+    if (i.status > status && status !== -1) {
+      return ot.reject(new Error('invalid transaction'));
+    }
+    i.orderStatus = status;
+    i.statusLog.push({
+      orderStatus: status,
+      orderCharge : order.orderCharge
+    });
+    i.save(function (err, i) {
+      return ot.resolve(i);
+    });
+
+
   });
+
+  // Order.update({
+  //   orderId : order.orderId
+  // }, {
+  //   $set : {
+  //     orderStatus: status
+  //   }
+  // }, function (err, i) {
+  //   if (err) {
+  //     return ot.reject(err);
+  //   }
+  //   if (i > 0) {
+      
+  //     return ot.resolve(i);
+  //   }
+  //   if (i === 0) {
+  //     return ot.reject(new Error('order update failed'));
+  //   }
+  // });
 
   return ot.promise;
 };

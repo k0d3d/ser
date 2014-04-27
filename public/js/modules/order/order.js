@@ -13,16 +13,20 @@ config(['$routeProvider',function($routeProvider){
 .controller('orderCartController', ['$scope', '$http', 'ordersService', '$rootScope', function($scope, $http, ordersService, $rootScope) {
   $scope.$parent.headerTitle = 'Search and Place Order';
 
-console.log($rootScope.orderCart);
-  $scope.orderCart = $rootScope.orderCart;
+  //$scope.orderCart = $rootScope.orderCart;
+  console.log($scope.orderCart);
 
   $scope.order_this = function(order, index){
     console.log(order);
     ordersService.postCartItem(order)
     .then(function () {
-      $scope.$parent.orderCart.splice(index, 1);
+      $scope.orderCart.splice(index, 1);
     });
   };
+
+  $scope.$on('cartloaded', function () {
+    $scope.orderCart = $rootScope.orderCart;
+  });
 
 }])
 .controller('ordersIndexController', ['$scope', '$http', '$location', '$routeParams', 'ordersService', 'organizeStaffService', function ($scope, $http, $location, $routeParams, ordersService, organizeStaffService) {
@@ -173,7 +177,7 @@ console.log($rootScope.orderCart);
     ordersService.addToCart(item)
     .then(function(data){
         console.log(data);
-        $scope.$parent.orderCart.push(data);
+        $rootScope.orderCart.push(data);
         $scope.form = '';
     });
 
@@ -414,8 +418,23 @@ console.log($rootScope.orderCart);
     link: linker
   };
 }])
+.directive('orderCartBasket', ['ordersService', '$rootScope', function (OS, $rootScope) {
+  return {
+    link: function (scope) {
+      //Fetch All Orders
+      OS.orders(0, 'short')
+      .then(function (i) {
+       scope.orderCart = i;
+       $rootScope.orderCart = i;
+       $rootScope.$broadcast('cartloaded');
+      });
+
+    },
+    //controller: 'orderCartController',
+  };
+}])
 .directive('orderList', ['ordersService','Notification','Language', function(OS, N, L){
-  function link (scope, element, attrs) {
+  function link () {
     
 
   }

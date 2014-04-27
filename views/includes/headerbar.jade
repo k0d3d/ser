@@ -6,12 +6,12 @@
     .header-right
       ul.headermenu
         -if (isPermitted(['order-cart'])) 
-          li
+          li(ng-controller="orderCartController")
             .btn-group
-              a.btn.btn-default.tp-icon(href="/a/orders/cart", order-cart)
+              a.btn.btn-default.tp-icon(href="/a/orders/cart", order-cart-basket="orderCart")
                 | Order Cart
                 i.fa.fa-shopping-cart
-                span.badge {{$parent.orderCart.length}}
+                span.badge {{orderCart.length}}
 
         li
           .btn-group

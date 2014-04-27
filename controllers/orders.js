@@ -63,7 +63,7 @@ module.exports.routes = function(app, login){
     .then(function (r) {
       res.json(200, r);
     }, function (err) {
-      res.json(400, err);
+      res.json(400, err.message);
     });
   });
 
@@ -73,7 +73,7 @@ module.exports.routes = function(app, login){
     .then(function(r){
       res.json(200, true);
     }, function (err) {
-      res.json(400, err);
+      res.json(400, err.message);
     });
   });
 
@@ -85,7 +85,7 @@ module.exports.routes = function(app, login){
       .then(function (r) {
         res.json(200, r);
       }, function (err) {
-        res.json(400, err);
+        res.json(400, err.message);
       });
     }
 

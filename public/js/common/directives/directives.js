@@ -317,17 +317,3 @@ angular.module('directives').directive('equals', function() {
     }
   }
 });
-
-angular.module('directives').directive('orderCart', ['ordersService', '$rootScope', function (OS, $rootScope) {
-  return {
-    link: function (scope, element, attrs) {
-      //Fetch All Orders
-      OS.orders(0, 'short')
-      .then(function (i) {
-       $rootScope.orderCart = i;
-      });
-
-    },
-    controller: 'MainController'
-  };
-}]);
