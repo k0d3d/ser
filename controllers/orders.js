@@ -71,7 +71,7 @@ module.exports.routes = function(app, login){
   app.post('/api/orders',function(req, res){
     order.placeItemInCart(req.body, req.user._id)
     .then(function(r){
-      res.json(200, r);
+      res.json(200, true);
     }, function (err) {
       res.json(400, err);
     });
@@ -79,8 +79,9 @@ module.exports.routes = function(app, login){
 
   //Progresses an order from the cart to being placed
   app.put('/api/orders/:orderId/status/:orderStatus', function (req, res) {
-    if (req.params.orderStatus === parseInt(1)) {
-      order.redressOrder(req.body, req.user._id, req.params.orderStatus)
+    console.log('message');
+    if (parseInt(req.params.orderStatus) === 1) {
+      order.redressOrder(req.body, req.user._id, parseInt(req.params.orderStatus))
       .then(function (r) {
         res.json(200, r);
       }, function (err) {

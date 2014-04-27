@@ -1,11 +1,11 @@
 .contentpanel
   .col-md-12
-    .panel.panel-default(ng-show="!$parent.orderCart || $parent.orderCart.length == 0")
+    .panel.panel-default(ng-show="!orderCart || orderCart.length == 0")
         .panel-body
             | No Items in your cart
 
     include ../widgets/order/all-cart
-    .panel.panel-default(ng-show="$parent.orderCart.length > 0")
+    .panel.panel-default(ng-show="orderCart.length > 0")
       .panel-heading
         .panel-btns
           button.btn.btn-xs.btn-darkblue Place Order

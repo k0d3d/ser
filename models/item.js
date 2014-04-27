@@ -10,7 +10,7 @@
 
     var drugsFunctions = {
       searchByRegDrugs : function searchByRegDrugs (query, param, filter, option) {
-        var s = Q.defer(), modelName = staffUtils.getMeMyModel()
+        var s = Q.defer();
 
         Drug.find({},
           'itemName sciName category currentPrice pharma supplier'

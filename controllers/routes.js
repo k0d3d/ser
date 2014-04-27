@@ -27,7 +27,7 @@ module.exports = function(app, passport) {
     },
     {
       name: 'Staff',
-      permissions: ['view-activity', 'view-drug-pages', 'employer', 'coverage', 'profile-activity']
+      permissions: ['view-activity', 'view-drug-pages', 'employer', 'coverage', 'profile-activity', 'manager']
     },
     {
       name: 'Hospitals',

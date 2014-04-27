@@ -8,7 +8,8 @@ function howWhoGetsNotified (accountType)  {
   var list = {
     '2' : ['myOrderNotices', 'userStockNotices'],
     '3' : ['myOrderNotices', 'userStockNotices'],
-    '4' : ['myOrderNotices', 'userStockNotices']
+    '4' : ['myOrderNotices', 'userStockNotices'],
+    '5' : ['myOrderNotices']
   };
 
   return list[accountType];

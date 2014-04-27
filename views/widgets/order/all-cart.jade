@@ -11,9 +11,9 @@ mixin allCart()
           th.noprint Supplier
           th.noprint Action
       tbody
-        tr(ng-repeat="or in $parent.orderCart")
+        tr(ng-repeat="or in orderCart")
           td 
-            img.item-image(ng-src="/images/item-images/{{or.itemId.images[0]}}")
+            img.item-image(ng-src="/images/item-images/{{or.itemId.images[0] || 'default/item-avatar-small.jpg'}}")
             | {{or.itemId.itemName}}
           td {{or.orderAmount}}
           td {{or.perItemPrice * or.orderAmount}}

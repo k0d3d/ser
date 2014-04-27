@@ -69,7 +69,15 @@
                 span.x-editable(data-name="position", data-type="text", title="Position", data-default-value="Position") #{userProfile.position} 
                 span(style="margin: 0 2px;") at 
                 a(href='/a/organization/people/#{userProfile.employer.userId}/staff/2', data-type="text", data-name="employer", title="Employer", data-default-value="Employer") #{userProfile.employer.name} 
+            - if (isPermitted(['manager']))
+              .profile-position
+                span(style="margin: 0 2px;") under 
+                a(href='/a/organization/people/#{userProfile.manager.userId}/staff/3', data-type="text", data-name="employer", title="Employer", data-default-value="Employer") #{userProfile.manager.name} 
             .mb20
+            - if (isPermitted(['place-order']))
+              a.btn.btn-white
+                i.fa.fa-envelope-o
+                | Order              
             button.btn.btn-success.mr5.start-edit
               i.fa.fa-user
               | Edit Profile

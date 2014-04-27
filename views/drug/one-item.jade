@@ -1,41 +1,48 @@
 .contentpanel(data-item-id="{{item._id || 'Empty'}}")
   .row
       .col-sm-3
-        button.btn.btn-primary.btn-block.start-edit Edit
         //input.start-edit(type="checkbox", checked, data-label-text="Edit item")
         .mb30
         img.thumbnail.img-responsive(src='/images/item-images/default/{{item.image || "item-avatar.jpg"}}' , alt='')
         .mb30
-        h5.subtitle Drug Name
-        p.mb10.x-editable(data-type="text", onbeforesave="updateItem($data)", editable-text="item.itemName")
-          | {{item.itemName || 'Empty'}} 
+        .row
+          h5.subtitle Drug Name
+          p.mb10.x-editable(data-type="text", onbeforesave="updateItem($data)", editable-text="item.itemName")
+            | {{item.itemName || 'Empty'}} 
         .mb10        
-        h5.subtitle Composition
-        p.x-editable(data-type="text", onbeforesave="updateItem($data)", editable-text="item.sciName")
-          | {{item.sciName || 'Empty'}} 
-        h5.subtitle Item Form
-        p.x-editable(data-type="select", onbeforesave="updateItem($data)", editable-select="item.itemForm", data-source="/api/internal/items/props?prop=itemForm")
-          | {{item.itemForm || 'Empty'}}
-        h5.subtitle Item Packaging
-        p.x-editable(data-type="select", onbeforesave="updateItem($data)", editable-select="item.itemPackaging", data-source="/api/internal/items/props?prop=itemPackaging")
-          | {{item.itemPackaging || 'Empty'}}
-        h5.subtitle Category
-        p.x-editable(data-type="select", onbeforesave="updateItem($data)", editable-select="item.category", data-source="/api/internal/items/props?prop=category")
-          | {{item.category || 'Empty'}}
-        h5.subtitle Nafdac Reg No
-        p.x-editable(data-type="text", onbeforesave="updateItem($data)", editable-text="item.nafdacRegNo")  
-          | {{item.nafdacRegNo || 'Empty'}}
+        .row
+          h5.subtitle Composition
+          p.x-editable(data-type="text", onbeforesave="updateItem($data)", editable-text="item.sciName")
+            | {{item.sciName || 'Empty'}} 
+        .row
+          h5.subtitle Item Form
+          p.x-editable(data-type="select", onbeforesave="updateItem($data)", editable-select="item.itemForm", data-source="/api/internal/items/props?prop=itemForm")
+            | {{item.itemForm || 'Empty'}}
+        .row
+          h5.subtitle Item Packaging
+          p.x-editable(data-type="select", onbeforesave="updateItem($data)", editable-select="item.itemPackaging", data-source="/api/internal/items/props?prop=itemPackaging")
+            | {{item.itemPackaging || 'Empty'}}
+        .row
+          h5.subtitle Category
+          p.x-editable(data-type="select", onbeforesave="updateItem($data)", editable-select="item.category", data-source="/api/internal/items/props?prop=category")
+            | {{item.category || 'Empty'}}
+        .row
+          h5.subtitle Nafdac Reg No
+          p.x-editable(data-type="text", onbeforesave="updateItem($data)", editable-text="item.nafdacRegNo")  
+            | {{item.nafdacRegNo || 'Empty'}}
 
-        .mb20    
-        .panel.panel-default
-            .panel-body
-              a(href="#")
-                | 0 Distributors
-        .mb20    
-        .panel.panel-default
-            .panel-body
-              a(href="#")
-                | 0 Staff 
+        .mb20 
+        .row   
+          .panel.panel-default
+              .panel-body
+                a(href="#")
+                  | 0 Distributors
+        .mb20  
+        .row  
+          .panel.panel-default
+              .panel-body
+                a(href="#")
+                  | 0 Staff 
 
       //
          col-sm-3 

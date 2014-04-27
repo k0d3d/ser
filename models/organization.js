@@ -173,6 +173,30 @@ staffFunctions = {
 
     return addingEmpl.promise;        
   },
+  addNewManager : function addNewManager (doc) {
+    console.log('Adding employer');
+    var addingEmpl = Q.defer();
+
+    staffUtils.getMeMyModel(doc.account_type).update({
+      userId : doc.userId
+    }, {
+      $set: {
+        manager:  {managerId : doc.employerId, dateAdded: Date.now()}
+      }
+    }, {upsert: true}, function(err, i) {
+
+      if (err) {
+        return addingEmpl.reject(err);
+      }
+      if (i === 1) {
+        return addingEmpl.resolve(doc);
+      } else {
+        return addingEmpl.reject(new Error('update failed'));
+      }
+    });
+
+    return addingEmpl.promise;        
+  },
   lookUpPeople : function lookUpPeople(doc) {
     var book = Q.defer();
 
@@ -421,7 +445,7 @@ Staff.prototype.lookUpPreAccounts = function (options) {
  * @param  {Number} account_type    [description]
  * @return {Object}                 [description]
  */
-Staff.prototype.activateAccount = function (activationToken, email, employer, phone, password, account_type) {
+Staff.prototype.activateAccount = function (activationToken, email, employer, employerType, phone, password, account_type) {
   var activator = Q.defer();
   var options = {
     activationToken : activationToken,
@@ -431,6 +455,8 @@ Staff.prototype.activateAccount = function (activationToken, email, employer, ph
     password: password,
     account_type: account_type
   };
+
+  console.log(arguments);
 
   //Find the activation / preaccount record
   staffFunctions.findPreAccount(options)
@@ -454,15 +480,25 @@ Staff.prototype.activateAccount = function (activationToken, email, employer, ph
 
       //Attach the profile specific information
       //to the user profile. 
-      //This will create a profile for the uset if 
+      //This will create a profile for the user if 
       //one doesnt exist or ammend an existing profile
-      //
-      staffFunctions.addNewEmployer(prepProfileData(options, r.toJSON()))
-      .then(function (profile) {
-        return createOrAmmend.resolve(profile);
-      }, function (err) {
-        return createOrAmmend.reject(err);
-      });
+      if (employerType === 2) {
+        staffFunctions.addNewEmployer(prepProfileData(options, r.toJSON()))
+        .then(function (profile) {
+          return createOrAmmend.resolve(profile);
+        }, function (err) {
+          return createOrAmmend.reject(err);
+        });
+      }
+
+      if (employerType === 3) {
+        staffFunctions.addNewManager(prepProfileData(options, r.toJSON()))
+        .then(function (profile) {
+          return createOrAmmend.resolve(profile);
+        }, function (err) {
+          return createOrAmmend.reject(err);
+        });
+      }
 
       return createOrAmmend.promise;          
   })

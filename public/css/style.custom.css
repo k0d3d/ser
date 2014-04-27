@@ -262,10 +262,10 @@ p.text-area {
   border-bottom: solid 1px #ddd;
 }
 .editable-wrap {
-  padding: 5px;
+/*  padding: 5px;
   background-color: #C4C4C4;
   border: solid 1px #949494;
   position: absolute;
   z-index: 9;  
-  top: -5px;
+  top: -5px;*/
 }

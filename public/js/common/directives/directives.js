@@ -134,15 +134,16 @@
     };
   });
 
-  angular.module('directives').directive('tooltip', function(){
-      return {
-          link: function(scope, element, attrs){
-              element.tooltip({
-                placement: attrs.tooltipPosition || 'top'
-              });
-          }
-      }
-  });
+angular.module('directives').directive('tooltips', function () {
+  return {
+    restrict: 'C',
+    link: function (element, attrs) {
+      $(element).tooltip({
+        title : attrs.title
+      });
+    }
+  };
+});
 
   angular.module('directives').directive('scrollBar', function(){
       return {
@@ -317,15 +318,16 @@ angular.module('directives').directive('equals', function() {
   }
 });
 
-angular.module('directives').directive('orderCart', ['orderService', function (os) {
+angular.module('directives').directive('orderCart', ['ordersService', '$rootScope', function (OS, $rootScope) {
   return {
     link: function (scope, element, attrs) {
       //Fetch All Orders
       OS.orders(0, 'short')
       .then(function (i) {
-        $scope.$parent.orderCart = i;
+       $rootScope.orderCart = i;
       });
 
-    }
+    },
+    controller: 'MainController'
   };
 }]);

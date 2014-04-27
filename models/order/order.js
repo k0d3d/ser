@@ -5,6 +5,17 @@
 var mongoose = require('mongoose'),
     Schema = mongoose.Schema;
 
+
+var OrderStatusSchema = new Schema({
+  orderId: {type: String},
+  date: {type: Date, default: Date.now},
+  hospitalId: {type: Schema.ObjectId},
+  orderStatus: {type: Number, required: true},
+  orderSupplier: {type: Schema.ObjectId},
+  orderCharge: {type: Schema.ObjectId},
+  check: {type:String, unique: true}
+});    
+
 /**
  * Orders Schema
  */
@@ -40,7 +51,8 @@ var OrderSchema = new Schema({
    * 6: order paid
    * @type {Object}
    */
-  orderStatus: {type: Number, default: 0},
+  status: {type: Number, default: 0},
+  statusLOg: [OrderStatusSchema],
   orderVisibility: {type: Boolean, default: true},
   //This is the id of the hospital placing the order, order author..blah
   hospitalId: {type: Schema.ObjectId},
@@ -49,15 +61,7 @@ var OrderSchema = new Schema({
   amountSupplied: {type: Number},
 });
 
-var OrderStatusSchema = new Schema({
-  orderId: {type: String},
-  date: {type: Date, default: Date.now},
-  hospitalId: {type: Schema.ObjectId},
-  orderStatus: {type: Number, required: true},
-  orderSupplier: {type: Schema.ObjectId},
-  orderCharge: {type: Schema.ObjectId},
-  check: {type:String, unique: true}
-});
+
 
 
 /**

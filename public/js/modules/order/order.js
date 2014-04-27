@@ -10,8 +10,11 @@ config(['$routeProvider',function($routeProvider){
   .when('/a/orders/new', {templateUrl: '/order/new-order-search-item', controller: 'orderAddController'})
   .when('/a/orders/cart', {templateUrl: '/order/cart', controller: 'orderCartController'});
 }])
-.controller('orderCartController', ['$scope', '$http', 'ordersService', function($scope, $http, ordersService){
+.controller('orderCartController', ['$scope', '$http', 'ordersService', '$rootScope', function($scope, $http, ordersService, $rootScope) {
   $scope.$parent.headerTitle = 'Search and Place Order';
+
+console.log($rootScope.orderCart);
+  $scope.orderCart = $rootScope.orderCart;
 
   $scope.order_this = function(order, index){
     console.log(order);
@@ -20,57 +23,6 @@ config(['$routeProvider',function($routeProvider){
       $scope.$parent.orderCart.splice(index, 1);
     });
   };
-
-  // $scope.placeOrder = function (cb) {
-  //   if (!confirm('Confirm you want to place an order for these items!')) {
-  //     cb(false); 
-  //     return false;
-  //   } 
-
-  //   $scope.printScope = null;
-  //   $scope.printScope = angular.copy($scope.basket);
-
-  //   oS.postCart($scope.basket, function (list) {
-  //     var cartIds = _.map($scope.orderCart, function (a) {
-  //       return a.itemId;
-  //     });
-
-
-  //     var l = list.length;
-
-  //     function __pop() {
-  //       var t = list.pop();
-  //       var o = _.indexOf(cartIds, t);
-
-  //       if (o > -1) {
-  //         $scope.orderCart.splice(o, 1);
-  //       }
-        
-  //       if (l--) {
-  //         __pop();
-  //       } else {
-  //         cb(true);
-  //       }
-
-  //     }
-
-  //     __pop();
-  //   });
-  // };
-
-  // $scope.send_sms = function(){
-  //   var allSuppliers = _.map($scope.basket, function(v, i){
-  //     return v.supplier.supplierID;
-  //   });
-  //   var uniqSupId = _.uniq(allSuppliers);
-  //   if(uniqSupId.length > 1){
-  //     return alert('Cannot send SMS to '+ uniqSupId.length +' suppliers at once');
-  //   }else{
-  //     oS.notifySupplier(uniqSupId, 'sms', function(d){
-
-  //     });
-  //   }
-  // };
 
 }])
 .controller('ordersIndexController', ['$scope', '$http', '$location', '$routeParams', 'ordersService', 'organizeStaffService', function ($scope, $http, $location, $routeParams, ordersService, organizeStaffService) {
@@ -263,7 +215,6 @@ config(['$routeProvider',function($routeProvider){
 
     //Gets orders by status and display
     f.orders = function(status, displayType){
-      var res = [];
       return $http.get('/api/orders/' + status + '/display/' + displayType)
       .then(function (d){
         return d.data;

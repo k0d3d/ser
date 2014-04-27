@@ -4,6 +4,7 @@
 var app = angular.module('stocUser', [
   'ngRoute',
   'services',
+  'directives',
   'user',
   'organization',
   'drug',
@@ -31,14 +32,15 @@ app.config(function ($routeProvider, $locationProvider, $httpProvider) {
 
 app.controller('MainController', [
   '$scope', 
+  '$rootScope',
   '$http', 
   '$location', 
   'Notification', 
   'ordersService',
   'organizeStaffService',
-  function ($scope, $http, $location, Notification, OS, OSS) {
+  function ($scope, $rootScope, $http, $location, Notification, OS, OSS) {
 
-    $scope.orderCart = [];
+    $scope.orderCart = $rootScope.orderCart = [];
 
 
     $scope.workForce = {};
@@ -91,6 +93,11 @@ app.controller('MainController', [
 
     $scope.$on('newEvent', function () {
       $scope.modal = Notification.message;
+    });
+
+    $scope.$on('newCart', function () {
+      //angular.forEach()
+      //$socpe.orderCart.push()
     });
 
     $scope.toggleModal = function (modalId) {
@@ -201,18 +208,9 @@ app.directive('typeAhead', [function () {
       remote: '@',
       typeAhead: '&'
     }
-  }
+  };
 }]);
-app.directive('tooltips', function () {
-  return {
-    restrict: 'C',
-    link: function (element, attrs) {
-      $(element).tooltip({
-        title : attrs.title
-      });
-    }
-  }
-});
+
 app.factory('errorNotifier', ['$q', 'Notification', 'Language', function($q, N, L) {
   return {
     responseError: function (response) {

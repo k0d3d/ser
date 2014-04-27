@@ -41,11 +41,13 @@ var orderManager = {
   },
   getOrders: function getOrders (doc) {
     console.log('Attempting to get orders..');
-
+    console.log(doc);
     var query = {
       orderVisibility: true,
-      orderStatus: doc.orderStatus
+      //orderStatus: doc.orderStatus,
     };
+
+    query.orderStatus = doc.orderStatus ? {$gt: 0} : undefined;
 
     query[doc.where] = doc.whrVal;
 
@@ -60,7 +62,7 @@ var orderManager = {
     }
 
     Order.find(_.compactObject(query), fields)
-    //.where(doc.where, doc.whrVal)
+    // .where(doc.where, doc.whrVal)
     .populate('itemId', 'itemName images pharma', 'drug')
     .lean()
     //.limit(perPage)
@@ -78,28 +80,38 @@ var orderManager = {
   },
   getItemSuppliers : function getItemSuppliers (__orders) {
     console.log('Getting Item Suppliers');
-    var task = __orders.pop(), gt = Q.defer(), populatedOrderList = [];
-    staffUtils.getMeMyModel(task.orderSupplier.supplier_type)
-    .findOne({
-      userId: task.orderSupplier.supplierId
-    }, 'name ')
-    .exec(function (err, supplierResult) {
-      console.log(err, supplierResult);
-      if (err) {
-        return gt.reject(err);
-      }
-      if (!supplierResult) {
-        return gt.reject(new Error('supplier not found'));
-      }
-      task.orderSupplier = supplierResult;
+    //console.log(__orders);
+    var gt = Q.defer(), populatedOrderList = [];
 
-      populatedOrderList.push(task);
-      if (__orders.length) {
-        orderManager.getItemSuppliers();
-      } else {
-        return gt.resolve(populatedOrderList);
-      }
-    });
+
+    function __gt () {
+      var task = __orders.pop();
+
+      staffUtils.getMeMyModel(task.orderSupplier.supplier_type)
+      .findOne({
+        userId: task.orderSupplier.supplierId
+      }, 'name ')
+      .exec(function (err, supplierResult) {
+        //console.log(err, supplierResult);
+        if (err) {
+          return gt.reject(err);
+        }
+        if (!supplierResult) {
+          return gt.reject(new Error('supplier not found'));
+        }
+        task.orderSupplier = supplierResult;
+
+        populatedOrderList.push(task);
+        console.log(__orders.length);
+        if (__orders.length) {
+          __gt();
+        } else {
+          return gt.resolve(populatedOrderList);
+        }
+      });      
+    }
+
+    __gt();
 
     return gt.promise;
   },
@@ -465,7 +477,7 @@ OrderController.prototype.placeItemInCart = function (orderData, orderOwner) {
   var procs = Q.defer();
 
   orderData.itemId = orderData._id;
-  orderData.perItemPrice = orderData.currentPrice;
+  orderData.perItemPrice = orderData.currentPrice.retail;
   orderData.orderSupplier = {supplierId: orderData.owner.userId, supplier_type: orderData.owner.account_type};
   orderData.hospitalId = orderOwner;
   orderData.orderId = utilz.uid(32);

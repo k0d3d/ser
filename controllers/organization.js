@@ -174,7 +174,9 @@ module.exports.routes = function (app, login) {
       var employerId = req.user._id;
       staff.activateAccount(
         req.body.activationToken,
-        req.body.email, employerId,
+        req.body.email, 
+        employerId,
+        req.user.account_type,        
         req.body.phone,
         'blahbla',
         req.body.account_type)

@@ -259,13 +259,33 @@ UserController.prototype.getProfile = function (userId, account_type) {
         //lets attach the employer profile
         //if thr is one.
         if (user_profile.employer) {
+          console.log('user employer found...');
           staffUtils.getMeMyModel(2).findOne({
             userId: user_profile.employer.employerId
           })
           .exec(function (err, employerIsh) {
             user_profile.employer = employerIsh;
-            return d.resolve(user_profile);
-          });          
+            //lets get the manager profile
+            //if its available
+            console.log('user manager found...');
+            if (user_profile.manager) {
+              staffUtils.getMeMyModel(3)
+              .findOne({
+                userId: user_profile.manager.managerId
+              })
+              .exec(function (err, managerIsh) {
+                if (err) {
+                  return d.reject(err);
+                }
+                user_profile.manager = managerIsh;
+                return d.resolve(user_profile);
+              });              
+            } else {
+              return d.resolve(user_profile);
+            }
+            
+          });  
+
         } else {
           return d.resolve(user_profile);  
         }
