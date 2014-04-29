@@ -67,7 +67,7 @@ module.exports.routes = function (app, login) {
 
   //Fetches list of people employed by the logged in user per account type
   app.get('/api/organization/people/:accountType', function (req, res) {
-    staff.lookUpMyPeople(req.params.accountType, req.user._id)
+    staff.lookUpMyPeople(req.params.accountType, req.user._id, req.user.account_type)
     .then(function (r) {
       res.json(200, r);
     }, function (err) {

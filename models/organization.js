@@ -278,10 +278,17 @@ staffFunctions = {
     return addingEmpl.promise;        
   },
   lookUpPeople : function lookUpPeople(doc) {
-    var book = Q.defer();
+    var book = Q.defer(), options;
 
+    if (doc.employerType === 2) {
+      options = {'employer.employerId' : doc.employerId};
+    }
+    if (doc.employerType === 3) {
+      options = {'manager.managerId' : doc.employerId};
+    }
+    
     staffUtils.getMeMyModel(doc.account_type)
-    .find({'employer.employerId' : doc.employerId})
+    .find(options)
     .populate('userId', 'email account_type', 'User')
     .exec(function (err, i) {
       if (err) {
@@ -613,12 +620,13 @@ Staff.prototype.activateAccount = function (activationToken, email, employer, em
  * @param  {ObjectId} employerId       the employerId
  * @return {Object}             promisse Object
  */
-Staff.prototype.lookUpMyPeople = function lookUpMyPeople (accountType, employerId) {
+Staff.prototype.lookUpMyPeople = function lookUpMyPeople (accountType, employerId, employerType) {
   var libr = Q.defer();
 
   staffFunctions.lookUpPeople({
     account_type : accountType,
-    employerId : employerId
+    employerId : employerId,
+    employerType: employerType
   })
   .then(function (people) {
     return libr.resolve(people);
