@@ -40,7 +40,7 @@ config(['$routeProvider',function($routeProvider){
     $scope.orders = [];
     $scope.__temp = {};
     
-    ordersService.orders(7, 'short')
+    ordersService.orders(7, 'full')
     .then(function(r){
       angular.forEach(r, function(v, i){
         //v.nextStatus = v.orderStatus + 1;
@@ -103,10 +103,22 @@ config(['$routeProvider',function($routeProvider){
     }
   });
 
+  $scope.open_order_manager = function (cmp) {
+    console.log(cmp);
+    $scope.__manageOrderModal = cmp;
+  };
+
   $scope.update_order = function (order) {
     ordersService.updateOrder(order)
     .then(function () {
-
+      $('#manage-order-modal').modal('hide');
+    });
+  };
+  $scope.cancel_order = function (order) {
+    order.status = -1;
+    ordersService.updateOrder(order)
+    .then(function () {
+      $('#manage-order-modal').modal('hide');
     });
   };
 
@@ -280,13 +292,12 @@ config(['$routeProvider',function($routeProvider){
     f.updateOrder = function (o) {
       return $http.put('/api/orders/'+escape(o.orderId), o)
       .then(function (data) {
-        return data.data;
-      }, function (err) {
         N.notifier({
           title: L[L.set].titles.error,
-          text: err,
-          class_name: 'growl-danger'
-        });          
+          text: L[L.set].order.update.success,
+          class_name: 'growl-success'
+        });         
+        return data.data;
       });
     };
 
@@ -500,11 +511,14 @@ config(['$routeProvider',function($routeProvider){
 .filter('orderState', function () {
   return function (num) {
     switch (parseInt(num)) {
+      case -1:
+      return 'cancelled';
+      break;
       case 1:
       return 'placed';
       break;
       case 2:
-      return 'received';
+      return 'disputed';
       break;
       case 3:
       return 'confirmed';

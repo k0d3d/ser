@@ -2,11 +2,12 @@
 /**
  * Module Dependencies
  */
-var mongoose = require("mongoose"),
-    util = require('util'),
-    User = mongoose.model('User'),
-    _ = require('underscore'),
-    Hospital = require('../models/organization.js');
+var util = require('util'),
+    User = require('../models/user/user.js'),
+    Govt = require('../models/item/govt-facility.js'),
+    _ = require('lodash'),
+    Q = require('q'),
+    Hospital = require('../models/organization/hospital.js');
 
 function HospitalController (){
 
@@ -75,7 +76,7 @@ HospitalController.prototype.delete = function(h_id, u_id, callback){
         }
       })
     }
-  })
+  });
 };
 
 HospitalController.prototype.fetchOne = function (userId, cb) {
@@ -87,6 +88,51 @@ HospitalController.prototype.fetchOne = function (userId, cb) {
       cb(i);
     }
   });
+};
+
+HospitalController.prototype.searchGovtRegister = function searchGovtRegister (query) {
+  var t = Q.defer();
+
+  Govt.find({
+    stateCode: query.state
+  })
+  .regex('facilityName',new RegExp(query.name, 'i'))
+  .exec(function (err, i) {
+    if (err) {
+      return t.reject(err);
+    }
+    return t.resolve(i);
+  });
+
+  return t.promise;
+};
+
+HospitalController.prototype.validateFacility = function validateFacility (userId, accountType, valData) {
+  var t = Q.defer();
+  if (accountType !== 5) {
+    t.reject(new Error('can not complete request'));
+  } else {
+    Hospital.update({
+      userId: userId
+    },{
+      $set:{ 
+        validation: _.omit(valData, ['_id', '__v']),
+        isValidated: true
+      }
+    }, function (err, i) {
+      if (err) {
+        return t.reject(err);
+      }
+      if (i) {
+        return t.resolve(valData);
+      } else {
+        return t.reject(new Error('validation operation failed'));
+      }
+    });
+
+  }
+
+  return t.promise;
 };
 
 module.exports.hospital = HospitalController;
@@ -124,6 +170,16 @@ module.exports.routes = function (app, login) {
     });
   });
 
+  app.route('/api/internal/facilities/search')
+  .get(function (req, res) {
+    hospital.searchGovtRegister(req.query)
+    .then(function (r) {
+      res.json(200, r);
+    }, function (err) {
+      res.json(400, err.message);
+    });
+  });
+
   app.route('/api/facilities/:facilityId')
   .get(function (req, res, next) {
     hospital.fetchOne(req.params.facilityId, function (r) {
@@ -144,6 +200,17 @@ module.exports.routes = function (app, login) {
       } else {
         res.json(200, true);
       }
+    });
+  });
+
+  app.post('/api/internal/facilities/validate', function (req, res) {
+    var userId = req.user._id;
+    var accountType = req.user.account_type;
+    hospital.validateFacility(userId, accountType, req.body)
+    .then(function (r) {
+      res.json(200, r);
+    }, function (err) {
+      res.json(400, err.message);
     });
   });
 

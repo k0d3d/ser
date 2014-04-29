@@ -1,4 +1,5 @@
 var user = require('../models/user.js'),
+    _ = require('lodash'),
     util = require('util');
 
 module.exports.routes = function(app, passport, login, people){
@@ -29,20 +30,13 @@ module.exports.routes = function(app, passport, login, people){
     });
   });
 
-  app.route('/user/profile')
-  .get(login.ensureLoggedIn('/signin'), function (req, res, next) {
-    //return console.log(req.user);
-    var userId = req.user._id;
-    var account_type = req.user.account_type;
-    users.getProfile(userId, account_type).then(function (r) {
-      res.render('user/profile', {
-        userProfile: r || {},
-        userData: req.user
-      });
-    }, function (err) {
-      next(err);
-    });
-  });
+  // app.route('/user/profile')
+  // .get(login.ensureLoggedIn('/signin'), function (req, res) {
+  //   //return console.log(req.user);
+  //   res.render('index', {
+  //     userData : req.user
+  //   });
+  // });
 
   //Handle Public user registration
   app.route('/users')
@@ -55,10 +49,26 @@ module.exports.routes = function(app, passport, login, people){
       }
     });
   });
-  //Handle Public user registration
-  app.route('/api/users/profile')
+  
+
+  app.route('/api/internal/users/profile')
+  .get(function (req, res, next) {
+    var userId = req.user._id;
+    var account_type = req.user.account_type;
+    users.getProfile(userId, account_type).then(function (r) {
+      console.log(r);
+      res.json(200, r);
+      // res.json(200, _.extend(req.user.toJSON(), r));
+      // res.render('user/profile', {
+      //   userProfile: r || {},
+      //   userData: req.user
+      // });
+    }, function (err) {
+      next(err);
+    });
+  })
   .put(function (req, res, next){
-    var id = req.body.pk;
+    var id = req.user._id;
     var body = {},
         account_type = req.user.account_type;
 

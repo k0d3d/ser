@@ -16,7 +16,6 @@ function howWhoGetsNotified (accountType)  {
 }
 module.exports = function (app) {
   var notify = new Notify();
-
   app.route('/api/internal/activities')
   .get(function (req, res) {
     var userId = req.user._id,

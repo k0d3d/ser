@@ -1,0 +1,77 @@
+mixin manageOrderModal (accountType) 
+  #manage-order-modal.modal.fade.in(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
+    .modal-dialog
+        .modal-content
+          .modal-header
+            span.label(ng-class="", ng-show="modal.statusText") {{modal.statusText}}
+            button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+            h4#myModalLabel.modal-title Order Details
+          .modal-body
+            .or-ch
+              -if (accountType < 4)
+                form.form-horizontal(ng-submit="update_order(__manageOrderModal)")
+                  .form-group
+                    label.control-label.col-sm-3.col-md-3 Staff in charge
+                    .col-sm-5.col-md-5
+                      select.form-control(ng-click="check_people()", ng-model="__manageOrderModal.orderCharge", ng-options="c.userId._id as c.name for c in employer_peeps")
+                    .col-sm-2.col-md-2
+                      button.btn.btn-primary-alt(type="submit") Re-assign Order 
+                hr
+              -if (accountType === 4)
+                form.form-horizontal(ng-submit="update_order(__manageOrderModal)")
+                  .form-group
+                    label.control-label.col-sm-3.col-md-3 ETA
+                    .col-sm-5.col-md-5
+                      input.form-control(type="date", ng-model="__manageOrderModal.eta")
+                      span.help-text 
+                  .form-group
+                    label.control-label.col-sm-3.col-md-3 Resolution
+                    .col-sm-5.col-md-5
+                      select.form-control(type="date", ng-model="__manageOrderModal.status")
+                        option(value="3") Confirm
+                        option(value="2") Dispute
+                  .form-group(ng-show="__manageOrderModal.status == 2")
+                    label.control-label.col-sm-3.col-md-3 Reason
+                    .col-sm-5.col-md-5
+                      textarea.form-control(ng-model="__manageOrderModal.reason")
+                  .form-group(ng-show="__manageOrderModal.status == 2")
+                    label.control-label.col-sm-3.col-md-3 Change Price
+                    .col-sm-5.col-md-5                        
+                      input.form-control(type="number", ng-model="__manageOrderModal.perItemPrice")
+                  .form-group
+                    .col-sm-3.col-md-3
+                    .col-sm-5.col-md-5
+                      button.btn.btn-info(type="submit") Save Changes  
+              -if (accountType === 5)                
+                form.form-horizontal(ng-submit="update_order(__manageOrderModal)")
+                  .form-group
+                    label.control-label.col-sm-3.col-md-3 ETA
+                    .col-sm-5.col-md-5
+                    p.form-control-static {{__manageOrderModal.eta | moment}}
+                  .form-group
+                    label.control-label.col-sm-3.col-md-3 Current Status
+                    .col-sm-5.col-md-5
+                      p.form-control-static {{__manageOrderModal.status | orderState}}
+                  .form-group
+                    label.control-label.col-sm-3.col-md-3 Reason
+                    .col-sm-5.col-md-5
+                      p.form-control-static {{__manageOrderModal.reason}}
+                  .form-group
+                    label.control-label.col-sm-3.col-md-3 Price
+                    .col-sm-5.col-md-5                        
+                      p.form-control-static {{__manageOrderModal.perItemPrice}}
+                  .form-group
+                    .col-sm-3.col-md-3
+                    .col-sm-3.col-md-3
+                      button.btn.btn-success(ng-click="__manageOrderModal.status = 1", type="submit", ng-disabled="__manageOrderModal.status == 3 || __manageOrderModal.status == 1") Confirm Order  
+                    .col-sm-3.col-md-3         
+                      button.btn.btn-danger(ng-click="cancel_order(__manageOrderModal)", type="submit", ng-disabled="__manageOrderModal.status == -1") Cancel Order           
+                
+
+          .modal-footer
+            button.btn.btn-default(type='button', data-dismiss='modal', ng-click="__manageOrderModal = ''") Close
+        //
+           modal-content 
+      //
+         modal-dialog     
+

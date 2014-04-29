@@ -47,7 +47,7 @@ var orderManager = {
       //orderStatus: doc.orderStatus,
     };
 
-    if (doc.orderStatus && (doc.orderStatus !== 0)) {
+    if (!doc.orderStatus) {
       query.status = {$gt: 0};
     }
     if(doc.orderStatus) {
@@ -62,10 +62,10 @@ var orderManager = {
         gt = Q.defer();
 
     if (doc.displayType === 'full') {
-      fields = 'itemId orderAmount perItemPrice orderDate orderSupplier orderStatus hospitalId orderId amountSupplied';
+      fields = '';
     }
     if (doc.displayType === 'short') {
-      fields = 'itemId orderAmount perItemPrice orderDate orderSupplier orderStatus hospitalId orderId amountSupplied';
+      fields = 'itemId orderAmount perItemPrice orderDate orderSupplier status hospitalId orderId amountSupplied';
     }
 
     Order.find(_.compactObject(query), fields)
@@ -93,33 +93,47 @@ var orderManager = {
 
     function __gt () {
       var task = __orders.pop();
-
-      staffUtils.getMeMyModel(task.orderSupplier.supplier_type)
-      .findOne({
-        userId: task.orderSupplier.supplierId
-      }, 'name ')
-      .exec(function (err, supplierResult) {
-        //console.log(err, supplierResult);
-        if (err) {
-          return gt.reject(err);
-        }
-        if (!supplierResult) {
-          return gt.reject(new Error('supplier not found'));
-        }
-        task.orderSupplier = supplierResult;
-
+      console.log(task.orderSupplier);
+      if (_.isEmpty(task.orderSupplier)) {
         populatedOrderList.push(task);
-        console.log(__orders.length);
         if (__orders.length) {
           __gt();
         } else {
           return gt.resolve(populatedOrderList);
         }
-      });      
+      } else {
+        staffUtils.getMeMyModel(task.orderSupplier.supplier_type)
+        .findOne({
+          userId: task.orderSupplier.supplierId
+        }, 'name ')
+        .exec(function (err, supplierResult) {
+          //console.log(err, supplierResult);
+          if (err) {
+            return gt.reject(err);
+          }
+          if (!supplierResult) {
+            return gt.reject(new Error('supplier not found'));
+          }
+          task.orderSupplier = supplierResult;
+
+          populatedOrderList.push(task);
+          if (__orders.length) {
+            __gt();
+          } else {
+            return gt.resolve(populatedOrderList);
+          }
+        });          
+      }
+    
     }
 
-    __gt();
+    if (__orders.length) {
+      __gt();
+    } else {
+      gt.resolve([]);
+    }
 
+    
     return gt.promise;
   },
   getEmployerOrder : function getEmployerOrder (doc) {
@@ -133,7 +147,13 @@ var orderManager = {
       whrVal: doc.employerId
     })
     .then(function (orderList) {
-        return g.resolve(orderList); 
+      staffUtils.populateProfile(orderList, 'hospitalId', 5)
+      .then(function (hehe) {
+        return g.resolve(hehe); 
+      }, function (err) {
+        return g.reject(err);
+      });
+        // return g.resolve(orderList); 
     }); 
 
     return g.promise;      
@@ -299,12 +319,7 @@ OrderController.prototype.getOrders = function getOrders (orderStatus, displayTy
       orderStatus: orderStatus
     })
     .then(function (orders) {
-      //populate hospital data
-      staffUtils.populateProfile(orders, 'hospitalId', 5)
-      .then(function (populatedWithHospitals) {
-        return gt.resolve(populatedWithHospitals);
-      });
-      
+      return gt.resolve(orders);     
     });
 
    
@@ -332,14 +347,40 @@ OrderController.prototype.updateOrder = function(orderData, userId, accountType)
   //queries, etc
   //Updates the order status 
   var law = Q.defer(),
-      __body = _.omit(orderData, ['_id', 'hospitalId', 'itemId']);
+      __body = _.omit(orderData, ['_id', 'hospitalId', 'itemId', 'statusLog', 'orderSupplier']);
+  var options = {
+      $set: __body,
+      $push: {
+        statusLog: {
+          orderStatus: __body.status,
+          orderCharge: __body.orderCharge
+        }
+      }
+    };
+
+  //if the currently logged in user
+  //is a staff and is confirming or disputing an order
+  if ((__body.status === parseInt(3) || __body.status === parseInt(2)) && accountType === parseInt(4)) {
+    options.$push = {
+      statusLog: {
+          orderStatus: __body.status,
+          orderCharge: userId      
+      }
+    };
+  }
+
+  //TODO:: use fine and Update instead of update
+  //to check for current order status
+  //if the order has been confirmed.. it cannot be 
+  //replace again, or confirmed again
+  //if(__body.status)
+
+  console.log(options);
 
   try {
     Order.update({
       'orderId': orderData.orderId
-    },{
-      $set: __body
-    })
+    }, options)
     .exec(function (err, i) {
       console.log(err, i);
       if (err) {
@@ -347,13 +388,7 @@ OrderController.prototype.updateOrder = function(orderData, userId, accountType)
       }
 
       if (i > 0) {
-        __body.hospitalId = orderData.hospitalId.userId;
-        orderManager.createOrderStatus(__body)
-        .then(function (state) {
-          return law.resolve(state);
-        }, function (err) {
-          return law.reject(err);
-        });
+        return law.resolve(orderData);
       }
 
       if (i === 0) {
@@ -382,20 +417,22 @@ OrderController.prototype.updateOrder = function(orderData, userId, accountType)
  */
 //OrderController.prototype.getOrderStatuses = function getOrderStatuses (orderId, userId, accountType) {
 OrderController.prototype.getOrderStatuses = function getOrderStatuses (orderId) {
+  console.log('Getting order statuses...');
   var d = Q.defer();
 
-  OrderStatus.find({
+  Order.findOne({
     orderId : orderId
-  })
+  }, 'statusLog')
   .lean()
   .exec(function (err, i) {
     if (err) {
       return d.reject(err);
     }
-    if (i.length) {
-      staffUtils.populateProfile(i, 'orderCharge', 4)
+    console.log(i);
+    if (i.statusLog.length) {
+      staffUtils.populateProfile(i.statusLog, 'orderCharge', 4)
       .then(function (popped) {
-        //console.log(popped);
+        console.log(popped);
         return d.resolve(popped);
       }, function (err) {
         return d.reject(err);
@@ -451,7 +488,7 @@ var suppliersTypeahead = function(req, res){
  * @param  {Function} callback [description]
  * @return {[type]}            [description]
  */
-OrderController.prototype.removeOrder = function(order_id, callback){
+OrderController.prototype.removeOrder = function removeOrder (order_id, callback){
   Order.update({_id: order_id}, {
     $set:{
       orderVisibility: false,
@@ -460,7 +497,7 @@ OrderController.prototype.removeOrder = function(order_id, callback){
   }, callback);
 };
 
-OrderController.prototype.orderUpdates = function(hospitalId, dayte, cb){
+OrderController.prototype.orderUpdates = function orderUpdates (hospitalId, dayte, cb){
 
   var d = new Date(dayte);
   var sinceDate = d.toString();
@@ -479,7 +516,7 @@ OrderController.prototype.orderUpdates = function(hospitalId, dayte, cb){
  * @param  {[type]} orderOwner the user placing the order
  * @return {[type]}            [description]
  */
-OrderController.prototype.placeItemInCart = function (orderData, orderOwner) {
+OrderController.prototype.placeItemInCart = function placeItemInCart (orderData, orderOwner) {
   console.log('Placing Items in Cart');
   var procs = Q.defer();
 
@@ -507,7 +544,7 @@ OrderController.prototype.placeItemInCart = function (orderData, orderOwner) {
  * the browser. 
  * @return {[type]}       [description]
  */
-OrderController.prototype.redressOrder = function (order, orderOwner, status) {
+OrderController.prototype.redressOrder = function redressOrder (order, orderOwner, status) {
   console.log('Placing order');
   var ot = Q.defer();
 
@@ -526,7 +563,7 @@ OrderController.prototype.redressOrder = function (order, orderOwner, status) {
     if (i.status > status && status !== -1) {
       return ot.reject(new Error('invalid transaction'));
     }
-    i.orderStatus = status;
+    i.status = status;
     i.statusLog.push({
       orderStatus: status,
       orderCharge : order.orderCharge
@@ -561,7 +598,7 @@ OrderController.prototype.redressOrder = function (order, orderOwner, status) {
 };
 
 
-OrderController.prototype.hideOrderItem = function (orderId) {
+OrderController.prototype.hideOrderItem = function hideOrderItem (orderId) {
   var aladin = Q.defer();
 
   Order.update({

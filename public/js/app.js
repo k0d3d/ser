@@ -68,23 +68,6 @@ app.controller('MainController', [
 
     };
 
-    $scope.itemCategory = [
-    'Anasthetics', 
-    'Analgesics,Anti Inflammatory & Anti Pyretics', 
-    'Animal Vaccine Products', 
-    'Anti Acids & Ulcer Healer Drugs', 
-    'Anti Diabetics ', 
-    'Anti  Asthmatics', 
-    'Anti Bacterial Agents & Anti Protozal agents', 
-    'Anti Biotics', 
-    'Anti Caner', 
-    'Anti Diarrhoea Drugs & Laxatives', 
-    'Antiemetics & Antispasmodic', 
-    'Anti Fungals', 
-    'Anti Hemorroid Preparations', 
-    'Anti Helminitics', 
-    'Anti Histamines', 'Anti Malrials', 'Anti Migraine Drugs', 'Anti Muscarinic', 'Anti Neoplastic & Immunomodulating Agents', 'Anti Psychotic', 'Antiseptics,Disinfectants & Mouthwashes', 'Anti tussive,Expectorants & Mucolytics', 'Antiviral', 'Cardiovascular System', 'Contraceptives', 'Dermatological Preparations', 'Parkinson Drugs', 'Eye,Ear & Throat Preparations', 'Haematinics', 'Herbal Products', 'Hormones,Synthetics,Substitutes & Thyroid Drugs', 'Human Biologicals', 'Human Vaccine Products', 'Hypnotics,Anxiolities,Anti Convulsants & Anti depressant', 'Insecticides', 'Oxytocics', 'Pesticide Products', 'Rubefacients', 'Skeletal Muscle Relaxants', 'Vaccines & Biologicals', 'Veterinary Drugs/Products', 'Vitamins & Minerals', 'Miscellaneous', 'Others'];
-
     $scope.$on('newNotification', function (){
       $.gritter.add(Notification.notice);      
     });
@@ -108,6 +91,12 @@ app.filter('moment', function(){
     return function(time){
         var m = moment(time);
         return m.fromNow();
+    };
+});
+app.filter('etaMoment', function(){
+    return function(time){
+        var m = moment(time);
+        return m.calendar();
     };
 });
 app.filter('dashed', function () {
@@ -146,7 +135,7 @@ app.directive('dropzone', [function () {
         init : function () {
           this.on('success', function (file, name) {
             scope.ngModel.push(name);
-          })
+          });
         }
       });
     },

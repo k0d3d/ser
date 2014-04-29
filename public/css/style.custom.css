@@ -269,3 +269,10 @@ p.text-area {
   z-index: 9;  
   top: -5px;*/
 }
+
+span.media-desc {
+  background-color: #eee;
+  padding: 4px;
+  border: solid 1px #ddd;
+  margin: 0 4px;
+}

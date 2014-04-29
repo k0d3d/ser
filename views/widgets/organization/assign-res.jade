@@ -9,7 +9,7 @@ mixin assignRes (account_type)
     form(name="search_wards_teritory")
       label.control-label Select a state
       select.form-control(type='text', placeholder='States', ng-model="current_state", required)
-        each s , index in states
+        each s , index in commons.states
           option(value=index + 1) #{s}
       .mb5
    

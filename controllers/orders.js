@@ -97,12 +97,8 @@ module.exports.routes = function(app, login){
     console.log('In the put route');
     order.updateOrder(req.body, req.user._id, req.user.account_type)
     .then(function (data) {
-      console.log('dta');
-      console.log(data);
-      res.json(200, data);
+      res.json(200, true);
     }, function (err) {
-      console.log('err');
-      console.log(err);
       res.json(400, err);
     });
   });

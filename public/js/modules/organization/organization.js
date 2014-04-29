@@ -121,7 +121,7 @@ angular.module('organization', [])
     scope: {
       staffSelect: '='
     },
-    template: '<select class="form-control" ng-model="staffSelect.staff" placeholder="name or email address" ng-options="c.name for c in pplWf " required></select>'
+    template: '<select class="form-control" ng-model="staffSelect.staff" placeholder="name or email address" ng-options="c.userId.email for c in pplWf " required></select>'
   };
 }])
 .factory('organizeStaffService', ['$http', 'Notification', 'Language', function ($http, N, L) {

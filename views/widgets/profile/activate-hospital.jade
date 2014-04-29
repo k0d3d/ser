@@ -1,0 +1,53 @@
+mixin activateHospital (accountType) 
+  -if (accountType === 5)
+    #activate-hospital-modal.modal.fade.in(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
+      .modal-dialog
+          .modal-content
+            .modal-header
+              span.label(ng-class="", ng-show="modal.statusText") {{modal.statusText}}
+              button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+              h4#myModalLabel.modal-title Verify Your Facility
+            .modal-body
+              .or-ch
+                -if (accountType === 5)
+                  form.form-horizontal(ng-submit="validate_facility(__temp)", )
+                    .form-group
+                      label.control-label.col-sm-3.col-md-3 Hospital Name
+                      .col-sm-8.col-md-8
+                        input.form-control(type="text", ng-model="__temp.name", required)
+                        span.help-text 
+                    .form-group
+                      label.control-label.col-sm-3.col-md-3 State
+                      .col-sm-5.col-md-5
+                        select.form-control(type="date", ng-model="__temp.state", required)
+                          each state, index in commons.states
+                            option(value="#{index + 1}") #{state}
+                      .col-sm-3.col-md-3
+                        button.btn.btn-small.btn-white(ng-disabled="") Search
+                  hr
+                  .alert.alert-danger(ng-show="valRes == 'none'")
+                    p.text-center
+                      | Facility Not Found
+                  .media(ng-repeat="res in valRes", style=" border-bottom: solid 2px #78B8FD; ",ng-mouseenter="res.show = true" ng-mouseleave="res.show = false")
+                    .pull-left
+                      img.media-object.thumbnail(src='/images/hospital-icon.png', alt='100x100')
+                    .media-body(style="height: 60px")
+                      h4.media-heading
+                        | {{res.facilityName}}
+                      span.media-desc(title="Facility Type", tooltips) {{res.facilityType}}
+                      span.media-desc(title="Local Government Area", tooltips) {{res.lga}}
+                      span.media-desc(title="LGA Ward", tooltips) {{res.lga_ward}}
+                      span.media-desc(title="Ownership", tooltips) {{res.ownership}}
+                      span.media-desc(title="Facility Code", tooltips) {{res.facilityNoCode}}
+                    button.btn.btn-primary.pull-right(ng-show="res.show", ng-click="validate_this(res)") Validate
+
+         
+                  
+
+            .modal-footer
+              button.btn.btn-default(type='button', data-dismiss='modal', ng-click="__temp = ''") Close
+          //
+             modal-content 
+        //
+           modal-dialog     
+

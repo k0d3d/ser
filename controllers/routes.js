@@ -146,8 +146,8 @@ module.exports = function(app, passport) {
     users.routes(app, passport, login, people);
     
     //Hospital Routes
-    var hospital = require('./hospitals');
-    hospital.routes(app, login);
+    var facility = require('./facilities');
+    facility.routes(app, login);
 
     //Drug Routes
     var drug = require('./drugs');
@@ -199,42 +199,7 @@ module.exports = function(app, passport) {
   .get(function(req, res){
     var parent = req.params.parent;
     var child = req.params.child;
-    res.locals.states = ['Anambra',
-                'Enugu',
-                'Akwa Ibom',
-                'Adamawa',
-                'Abia',
-                'Bauchi',
-                'Bayelsa',
-                'Benue',
-                'Borno',
-                'Cross River',
-                'Delta',
-                'Ebonyi',
-                'Edo',
-                'Ekiti',
-                'Gombe',
-                'Imo',
-                'Jigawa',
-                'Kaduna',
-                'Kano',
-                'Katsina',
-                'Kebbi',
-                'Kogi',
-                'Kwara',
-                'Lagos',
-                'Nasarawa',
-                'Niger',
-                'Ogun',
-                'Ondo',
-                'Osun',
-                'Oyo',
-                'Plateau',
-                'Rivers',
-                'Sokoto',
-                'Taraba',
-                'Yobe',
-                'Zamfara'];    
+    res.locals.commons = require('../config/commons.js');    
     res.render(parent+'/'+child, {
       userData: req.user
     });

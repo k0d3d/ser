@@ -153,23 +153,69 @@ staffFunctions = {
     console.log('Adding employer');
     var addingEmpl = Q.defer();
 
-    staffUtils.getMeMyModel(doc.account_type).update({
+    staffUtils.getMeMyModel(doc.account_type).findOne({
       userId : doc.userId
-    }, {
-      $set: {
-        employer:  {employerId : doc.employerId, dateAdded: Date.now()}
-      }
-    }, {upsert: true}, function(err, i) {
-
+    })
+    .exec(function (err, i) {
       if (err) {
         return addingEmpl.reject(err);
       }
-      if (i === 1) {
-        return addingEmpl.resolve(doc);
-      } else {
-        return addingEmpl.reject(new Error('update failed'));
+      //if we find an account, we check if its 
+      //all got a manager or employer, if it has one
+      //we throw back an error/
+      //else we add one to it 
+      //
+      //if no account found, create
+      if (!i) {
+        var ac = new staffUtils.getMeMyModel(doc.account_type);
+        ac.employer = {employerId : doc.employerId, dateAdded: Date.now()};
+        ac.save(function (err, i) {
+          if (err) {
+            return addingEmpl.reject(err);
+          } else {
+            return addingEmpl.resolve(i);
+          }          
+        });
       }
+
+      //account found and has employer / manager
+      if (i.employer) {
+        return addingEmpl.reject(new Error('user is already attached to another employer')); 
+      }
+
     });
+    //   $set: {
+    //     employer:  {employerId : doc.employerId, dateAdded: Date.now()}
+    //   }
+    // }, {upsert: true}, function(err, i) {
+
+    //   if (err) {
+    //     return addingEmpl.reject(err);
+    //   }
+    //   if (i === 1) {
+    //     return addingEmpl.resolve(doc);
+    //   } else {
+    //     return addingEmpl.reject(new Error('update failed'));
+    //   }
+    // });
+
+    // staffUtils.getMeMyModel(doc.account_type).update({
+    //   userId : doc.userId
+    // }, {
+    //   $set: {
+    //     employer:  {employerId : doc.employerId, dateAdded: Date.now()}
+    //   }
+    // }, {upsert: true}, function(err, i) {
+
+    //   if (err) {
+    //     return addingEmpl.reject(err);
+    //   }
+    //   if (i === 1) {
+    //     return addingEmpl.resolve(doc);
+    //   } else {
+    //     return addingEmpl.reject(new Error('update failed'));
+    //   }
+    // });
 
     return addingEmpl.promise;        
   },
@@ -177,23 +223,57 @@ staffFunctions = {
     console.log('Adding employer');
     var addingEmpl = Q.defer();
 
-    staffUtils.getMeMyModel(doc.account_type).update({
-      userId : doc.userId
-    }, {
-      $set: {
-        manager:  {managerId : doc.employerId, dateAdded: Date.now()}
-      }
-    }, {upsert: true}, function(err, i) {
 
+    staffUtils.getMeMyModel(doc.account_type).findOne({
+      userId : doc.userId
+    })
+    .exec(function (err, i) {
       if (err) {
         return addingEmpl.reject(err);
       }
-      if (i === 1) {
-        return addingEmpl.resolve(doc);
-      } else {
-        return addingEmpl.reject(new Error('update failed'));
+      //if we find an account, we check if its 
+      //all got a manager or employer, if it has one
+      //we throw back an error/
+      //else we add one to it 
+      //
+      //if no account found, create
+      if (!i) {
+        var ac = new staffUtils.getMeMyModel(doc.account_type);
+        ac.manager = {managerId : doc.employerId, dateAdded: Date.now()};
+        ac.save(function (err, i) {
+          if (err) {
+            return addingEmpl.reject(err);
+          } else {
+            return addingEmpl.resolve(i);
+          }          
+        });
       }
+
+      //account found and has employer / manager
+      if (i.manager) {
+        return addingEmpl.reject(new Error('user is already attached to another manager')); 
+      }
+
     });
+
+
+    // staffUtils.getMeMyModel(doc.account_type).update({
+    //   userId : doc.userId
+    // }, {
+    //   $set: {
+    //     manager:  {managerId : doc.employerId, dateAdded: Date.now()}
+    //   }
+    // }, {upsert: true}, function(err, i) {
+
+    //   if (err) {
+    //     return addingEmpl.reject(err);
+    //   }
+    //   if (i === 1) {
+    //     return addingEmpl.resolve(doc);
+    //   } else {
+    //     return addingEmpl.reject(new Error('update failed'));
+    //   }
+    // });
 
     return addingEmpl.promise;        
   },
@@ -653,6 +733,9 @@ Staff.prototype.getPersonProfile = function getPersonProfile (userId, accountTyp
     if (user_profile) {
       // if the account is not a distributor account
       if (parseInt(accountType) !== 2 && parseInt(accountType) < 5) {
+        if (!user_profile.employer) {
+          return d.reject(new Error ('You do not have an employer registered!'))
+        }
         //lets attach the employer profile
         staffUtils.getMeMyModel(2).findOne({
           userId: user_profile.employer.employerId

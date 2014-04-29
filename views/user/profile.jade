@@ -1,78 +1,94 @@
-.contentpanel(data-user-id="#{userData._id}")
+.contentpanel(data-user-id="{{userProfile.userId._id || 'Empty'}}")
     .row
         .col-sm-3
-          -var proImg = userProfile.image || 'default-avatar.jpg'
-          img.thumbnail.img-responsive.profile-img(src='/images/#{proImg}' , alt='')
+          
+          img.thumbnail.img-responsive.profile-img(ng-src='/images/{{ userProfile.image || "default-avatar.jpg" }}' , alt='')
           .mb30
           h5.subtitle About
-          p.mb10.x-editable(data-type="textarea", data-name="summary")
-            | #{userProfile.summary}
+          p.mb10.x-editable(data-type="textarea", onbeforesave="update_profile($data, $editable.name)", editable-textarea="userProfile.summary")
+            | {{userProfile.summary || 'Empty'}}
           a(href='#') Show More
           .mb10        
           h5.subtitle Connect
           ul.profile-social-list
             li
               i.fa.fa-twitter
-              a.x-editable(href='#', data-type="text", data-name="twitter") #{userProfile.twitter}
+              a.x-editable(href='#', data-type="text", onbeforesave="update_profile($data, $editable.name)", editable-text="userProfile.twitter") {{userProfile.twitter || 'Empty'}}
             li
               i.fa.fa-facebook
-              a.x-editable(href='#', data-type="text", data-name="facebook") #{userProfile.facebook}
+              a.x-editable(href='#', data-type="text", onbeforesave="update_profile($data, $editable.name)", editable-text="userProfile.facebook") {{userProfile.facebook || 'Empty'}}
 
           .mb30
           h5.subtitle Office Address
-          address.x-editable(data-type="textarea", data-name="address", data-defaultValue="Address")
-            | #{userProfile.address}
+          address.x-editable(data-type="textarea", onbeforesave="update_profile($data, $editable.name)", editable-textarea="userProfile.address", data-defaultValue="Address")
+            | {{userProfile.address || 'Empty'}}
           -if (userData.account_type === 5)
             h5.subtitle State
-            p.states-select(data-type="select", data-name="state")
-              | #{userProfile.state}
+            p.states-select(data-type="select", onbeforesave="update_profile($data, $editable.name)", editable-select="userProfile.state")
+              | {{userProfile.state || 'Empty'}}
             h5.subtitle Local Govt Area
-            p.lga-select(data-type="select", data-name="lga")
-              | #{userProfile.lga}
+            p.lga-select(data-type="select", onbeforesave="update_profile($data, $editable.name)", editable-select="userProfile.lga")
+              | {{userProfile.lga || 'Empty'}}
           h5.subtitle Telephone
-          p.x-editable(title='Phone', data-type="text", data-name="phone", data-default-value="Your Phone Number")
-            | #{userProfile.phone}
+          p.x-editable(title='Phone', data-type="text", onbeforesave="update_profile($data, $editable.name)", editable-text="userProfile.phone", data-default-value="Your Phone Number")
+            | {{userProfile.phone || 'Empty'}}
+          -if (userData.account_type === 5)
+            h5.subtitle Contact Person
+            p.x-editable(title='Phone', data-type="text", onbeforesave="update_profile($data, $editable.name)", editable-text="userProfile.contactPerson", data-default-value="Your Phone Number")
+              | {{userProfile.contactPerson || 'None'}}
+          -if (userData.account_type === 5)
+            h5.subtitle Contact Person Phone
+            p.x-editable(title='Phone', data-type="text", onbeforesave="update_profile($data, $editable.name)", editable-text="userProfile.contactPersonPhone", data-default-value="Your Phone Number")
+              | {{userProfile.contactPersonPhone || 'None'}}
+          -if (userData.account_type === 5)
+            h5.subtitle Facility Code
+            p(title='Facility Code')
+              | {{userProfile.validation.facilityNoCode || 'Not Validated'}}
 
           -if (isPermitted(['view-profile-distributors']))
             .mb20    
             .panel.panel-default
                 .panel-body
                   a(href="#")
-                    | {{workForce[2].length}} Distributors 
+                    | {{workForce[2].length || 0}} Distributors 
           -if (isPermitted(['view-profile-managers']))
             .mb20    
             .panel.panel-default
                 .panel-body
                   a(href="#")
-                    | {{workForce[1].length + workForce[3].length}} Managers
+                    | {{workForce[1].length + workForce[3].length || 0}} Managers
           -if (isPermitted(['view-profile-staff']))
             .mb20    
             .panel.panel-default
                 .panel-body
                   a(href="#")
-                    | {{workForce[4].length}} Staff
+                    | {{workForce[4].length || 0}} Staff
         //
            col-sm-3 
         .col-sm-9
+          -if (userData.account_type === 5)
+            .alert.alert-warning(ng-show="!userProfile.isValidated")
+              p Your profile is incomplete. Please complete the facility verification process
+              a.btn.btn-danger.btn-xs.pull-right(ng-click="toggleModal('activate-hospital-modal')") Start Now
           .profile-header
-            h2.profile-name.x-editable(data-name="name", data-type="text", data-default-value="Full Name or Company Name") #{userProfile.name}
+            h2.profile-name.x-editable(onbeforesave="update_profile($data, $editable.name)", editable-text="userProfile.name", data-type="text", data-default-value="Full Name or Company Name") {{userProfile.name || 'Empty'}}
             - if (isPermitted(['coverage']))
               .profile-location
                 span(style="display: block", title="Your Coverage / Territory") 
                   i.fa.fa-map-marker
                   | Coverage
-                span(data-type="text", data-name="coverage", data-default-value="Territory")
-                  | #{userProfile.coverage}
+                span()
+                  | {{userProfile.coverage || 'None' | territory}}
             - if (isPermitted(['employer']))
               .profile-position
                 i.fa.fa-briefcase
-                span.x-editable(data-name="position", data-type="text", title="Position", data-default-value="Position") #{userProfile.position} 
+                span.x-editable(onbeforesave="update_profile($data, $editable.name)", editable-text="userProfile.position", data-type="text", title="Position", data-default-value="Position") {{userProfile.position || 'Empty'}} 
                 span(style="margin: 0 2px;") at 
-                a(href='/a/organization/people/#{userProfile.employer.userId}/staff/2', data-type="text", data-name="employer", title="Employer", data-default-value="Employer") #{userProfile.employer.name} 
+                a(href="/a/organization/people/{{userProfile.employer.userId || 'Empty'}}/staff/2", data-type="text", onbeforesave="update_profile($data, $editable.name)", editable-text="userProfile.employer", title="Employer", data-default-value="Employer") {{userProfile.employer.name || 'Empty'}} 
             - if (isPermitted(['manager']))
               .profile-position
                 span(style="margin: 0 2px;") under 
-                a(href='/a/organization/people/#{userProfile.manager.userId}/staff/3', data-type="text", data-name="employer", title="Employer", data-default-value="Employer") #{userProfile.manager.name} 
+                a(href="/a/organization/people/{{userProfile.manager.userId || 'Empty'}}/staff/3", data-type="text", onbeforesave="update_profile($data, $editable.name)", editable-text="userProfile.employer", title="Employer", data-default-value="Employer") {{userProfile.manager.name || 'Empty'}} 
             .mb20
             - if (isPermitted(['place-order']))
               a.btn.btn-white
@@ -125,8 +141,9 @@
             include ../widgets/profile/prospects
             +loadProspects()
             
+include ../widgets/profile/activate-hospital
++activateHospital(userData.account_type)
 
 append scripts
 script(src='/js/jquery.prettyPhoto.js')
 script(src='/js/holder.js')
-script(src="/js/modules/user/profile.js")

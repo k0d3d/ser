@@ -433,7 +433,7 @@
       populateUserDrugStoc: function populateUserDrugStoc (drugs, doc) {
         console.log('Populating drug item stock...');
         var m = Q.defer(), reOb = [];
-
+        Q.longStackSupport = true;
         function __popDzDrugs(){
           var task = drugs.pop();
           //find users stock
@@ -457,7 +457,13 @@
         }
 
         //pop dz fuckin drugs dude...
-        __popDzDrugs();
+        if (drugs.length) {
+          __popDzDrugs();
+        } else {
+          m.resolve([]);
+          return m.promise;
+        }
+        
 
         return m.promise;
       }
@@ -504,7 +510,8 @@ DrugController.prototype.search = function(query, param, filter, option) {
           return populate.reject(err);
         }
         if (!i) {
-          return populate.reject(new Error('cannot find owner profile'));
+          // return populate.reject(new Error('cannot find owner profile'));
+          return populate.resolve([]);
         }
 
         oneDrug.owner = i;
@@ -1044,7 +1051,7 @@ DrugController.prototype.createStockUpTransaction = function createStockTransact
  * @param  {[type]} nextStatus    [description]
  * @return {[type]}               [description]
  */
-DrugController.prototype.attendRequest = function (itemId, userId, accountType, transactionId, nextStatus) {
+DrugController.prototype.attendRequest = function attendRequest (itemId, userId, accountType, transactionId, nextStatus) {
   var loot = Q.defer();
 
   var permittedTransitions = function (dest, currentStatus, nextStatus) {
@@ -1144,7 +1151,7 @@ DrugController.prototype.attendRequest = function (itemId, userId, accountType, 
  * @param  {[type]} action      [description]
  * @return {[type]}             [description]
  */
-DrugController.prototype.stockLog = function (userId, accountType, action) {
+DrugController.prototype.stockLog = function stockLog (userId, accountType, action) {
   var loot = Q.defer();
 
   var doc = {

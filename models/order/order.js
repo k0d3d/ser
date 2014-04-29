@@ -40,7 +40,7 @@ var OrderSchema = new Schema({
    * -1: order canceld
    * 0 : in cart
    * 1: order placed
-   * 2: order received // at this point, disputes about who takes charge of the order is settled
+   * 2: order rejected // at this point, disputes about who takes charge of the order is settled
    * 3: order confirmed
    * 4: order in transit
    * 5: order supplied
@@ -55,10 +55,15 @@ var OrderSchema = new Schema({
   originWard: {type: String},
   orderId: {type: String, unique: true},
   amountSupplied: {type: Number},
+  eta: {type: Date},
+  reason: {type: String}
 });
 
 
-
+OrderSchema.virtual('lastUpdate')
+.get(function () {
+  return this.statusLog[this.statusLog.length - 1].date;
+});
 
 /**
  * Statics

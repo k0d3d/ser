@@ -1,0 +1,28 @@
+mixin orderStatusUpdates
+  #manage-order-updates.modal.fade.in(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
+    .modal-dialog
+        .modal-content
+          .modal-header
+            span.label(ng-class="", ng-show="modal.statusText") {{modal.statusText}}
+            button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+            h4#myModalLabel.modal-title Order Updates
+          .modal-body
+            .or-ch                
+              .status-row.row(ng-repeat="status in __temp.orderStatusList")
+                .col-md-3
+                  strong.status-title Status 
+                  | {{status.orderStatus | orderState}}
+                .col-md-3
+                  strong.status-title Time
+                  p.tooltips(data-placement="left", data-toggle="tooltip", data-title="{{status.date | moment}}") {{status.date | date: 'medium'}}
+                .col-md-3
+                  strong.status-title Staff in charge
+                  | {{status.orderCharge.name}}
+                
+
+          .modal-footer
+            button.btn.btn-default(type='button', data-dismiss='modal', ng-click="__temp = ''") Close
+        //
+           modal-content 
+      //
+         modal-dialog     

@@ -16,60 +16,32 @@
                     th Drug Name
                     th Amount
                     th Date / Time
-                    -if (userData.account_type > 2)
+                    -if (userData.account_type === 5)
                       th Supplier
                     th Status
-                    th Hospital
+                    -if (userData.account_type !== 5)
+                      th Hospital
+                    th ETA
                     th 
                 tbody
                   tr(ng-repeat="cmp in orders")
                     td {{cmp.itemId.itemName}}
                     td {{cmp.orderAmount}}
                     td {{cmp.orderDate | date:medium}}
-                    -if (userData.account_type > 2)
-                      td {{cmp.orderSupplier.supplierName}}
-                    td {{cmp.orderStatus | orderState}}
-                    td 
-                      a(href="", ng-click="commons.href('hospital/'+cmp.hospitalId)") {{cmp.hospitalId.name}}
+                    -if (userData.account_type === 5)
+                      td {{cmp.orderSupplier.name}}
+                    td {{cmp.status | orderState}}
+                    -if (userData.account_type !== 5)
+                      td 
+                        a(href="", ng-click="commons.href('hospital/'+cmp.hospitalId)") {{cmp.hospitalId.name}}
                     td
-                      button.btn.btn-warning.btn-xs(ng-click="toggleModal('manage-order-modal'); $parent.__temp = cmp") Manage this      
-                      button.btn.btn-danger.btn-xs(ng-click="hide_order($index)")
-                        i.fa.fa-times
+                      | {{cmp.eta | etaMoment}}
+                      span.label.label-success.pull-right {{cmp.eta | moment}}
+                    td
+                      button.btn.btn-warning.btn-xs(ng-click=" open_order_manager(cmp); toggleModal('manage-order-modal');") Manage this      
+                      button.btn.btn-info.btn-xs(ng-click="toggleModal('manage-order-updates'); $parent.__temp = cmp") Tracking      
               .x-pagination(pagination="orders", page-to="page(pageNo, limit, cb)")
-
-#manage-order-modal.modal.fade.in(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
-  .modal-dialog
-      .modal-content
-        .modal-header
-          span.label(ng-class="", ng-show="modal.statusText") {{modal.statusText}}
-          button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
-          h4#myModalLabel.modal-title Order Details
-        .modal-body
-          .or-ch
-            -if (userData.account_type < 3)
-              form.form-horizontal(ng-submit="update_order(__temp)")
-                .form-group
-                  label.control-label.col-sm-3.col-md-3 Staff in charge
-                  .col-sm-5.col-md-5
-                    select.form-control(ng-click="check_people()", ng-model="__temp.orderCharge", ng-options="c.userId._id as c.name for c in employer_peeps")
-                  .col-sm-2.col-md-2
-                    button.btn.btn-primary-alt(type="submit") Re-assign Order
-              hr
-            .status-row.row(ng-repeat="status in __temp.orderStatusList")
-              .col-md-3
-                strong.status-title Status 
-                | {{status.orderStatus | orderState}}
-              .col-md-3
-                strong.status-title Time
-                p.tooltips(data-placement="left", data-toggle="tooltip", data-title="{{status.date | moment}}") {{status.date | date: 'medium'}}
-              .col-md-3
-                strong.status-title Staff in charge
-                | {{status.orderCharge.name}}
-              
-
-        .modal-footer
-          button.btn.btn-default(type='button', data-dismiss='modal', ng-click="__temp = ''") Close
-      //
-         modal-content 
-    //
-       modal-dialog     
+include ../widgets/order/manage-order-modal
+include ../widgets/order/manage-order-updates
++manageOrderModal(userData.account_type)
++orderStatusUpdates()

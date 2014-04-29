@@ -5,7 +5,7 @@ var ActivityNotification = require('./activity/notification.js'),
     df = require('./item.js').drugsFunctions,
     Distributor = require('./organization/distributor.js'),
     _ = require('underscore'),
-
+    u = require('../lib/utils.js'),
     Q = require('q'),
 
 noticeFn = {
@@ -47,16 +47,16 @@ noticeFn = {
     console.log('Getting placed orders ...');
     var proc = Q.defer();
 
-    OrderStatus.find({
-      //orderStatus : 1,
-      "orderSupplier" : doc.supplierId
+    Order.find({
+      status : {$gt : 0 },
+      "orderSupplier.supplierId" : doc.supplierId
     })
     .exec(function (err, i) {
       if (err) {
         return proc.reject(err);
       }
       return proc.resolve(i);
-    })
+    });
 
     return proc.promise;
   },
@@ -82,7 +82,9 @@ noticeFn = {
     var phrases = {
       order: {
         '0' : 'new order placed',
-        '1' : 'an order has been updated'
+        '1' : 'an order has been placed',
+        '2' : 'an order is in dispute',
+        '3' : 'an order has been confirmed'
       },
       stockup: {
         '0' : 'new stock up request',
@@ -115,7 +117,8 @@ noticeFn = {
   checkIfNotified: function checkIfNotified (obj, userId, noticeData) {
     console.log('Checking Notifications...');
     var ifn = Q.defer(), createdNotices = [];
-    //console.log(obj);
+
+
     //console.log(noticeData);
     function __check (){
       console.log('Running checks...');
@@ -124,8 +127,8 @@ noticeFn = {
       //Create special referenceId
       str = noticeData.alertType;
       str += userId;
-      str += task[noticeData.timeStamp].getTime();
-      str += task.check || task.orderStatus || task.status;
+      str += u.strToObj(task, noticeData.timeStamp).getTime();
+      str += task.check || task.status;
       str += task._id;
       //console.log(str);
       //console.log(task);
@@ -161,8 +164,8 @@ noticeFn = {
           //If no event notice is found,
           //lets create a new one using the id
           var an = new ActivityNotification(meta);
-          an.alertType =  noticeData.alertType;
-          an.alertDescription = noticeFn.getUpdateDescription(task.orderStatus || task.status, noticeData.alertType);
+          an.alertType = noticeData.alertType;
+          an.alertDescription = noticeFn.getUpdateDescription(task.status, noticeData.alertType);
           an.referenceId = str;
           an.created = task[noticeData.timeStamp];
           an.save(function (err, noticed) {
@@ -187,45 +190,60 @@ noticeFn = {
       ifn.resolve([]);
       return ifn.promise;
     } else {
-      __check();
+      try {
+        __check();
+      }catch (e) {
+        console.log(e);
+      }
+      // __check();
     }
 
     return ifn.promise;
   },
   poppedMedFac: function poppedMedFac (obj) {
+   console.log('Adding Med Facilities to Object'); 
     var poper = Q.defer(), newObj = [];
     //console.log(obj);
 
     function __curios () {
       var task = obj.pop();
-
-      staffUtils.getMeMyModel(5)
-      .findOne({
-        userId: task.hospitalId
-      }, 'name')
-      .lean()
-      .exec(function (err, i) {
-        //console.log(err, i);
-        if (err) {
-          return poper.reject(err);
-        }
-
-        if (i) {
-          task.hospital = i;
-          newObj.push(task);
-          if (obj.length) {
-            __curios();
-          } else {
-            return poper.resolve(newObj);
+      console.log(task);
+      try {
+        staffUtils.getMeMyModel(5)
+        .findOne({
+          userId: task.hospitalId
+        }, 'name')
+        .lean()
+        .exec(function (err, i) {
+          //console.log(err, i);
+          if (err) {
+            return poper.reject(err);
           }
-        } else {
-          return poper.reject(new Error('cant find hospitals'));
-        }
 
-      });
+          if (i) {
+            task.hospital = i;
+            newObj.push(task);
+            if (obj.length) {
+              __curios();
+            } else {
+              return poper.resolve(newObj);
+            }
+          } else {
+            return poper.reject(new Error('cant find hospitals'));
+          }
+
+        });
+      } catch (e) {
+        console.log(e);
+      }
     }
 
-    __curios();
+    if (obj.length) {
+      __curios();
+    } else {
+      poper.resolve([]);
+      return poper.promise;
+    }
 
     return poper.promise;
   },
@@ -239,6 +257,7 @@ noticeFn = {
       //Create activity entries
       noticeFn.checkIfNotified(distOrders, doc.userId, doc.noticeData)
       .then(function (v) {
+        // console.log(v);
         //lets populate the hospital data
         noticeFn.poppedMedFac(v)
         .then(function (poppedResult) {
@@ -253,12 +272,15 @@ noticeFn = {
       })
       .catch(noticeFn.logError);
 
+    })
+    .catch(function (err) {
+      console.log(err);
     });
 
     return mine.promise;
   },
   logError: function logError (err){
-    console.log(err);
+    console.trace(err);
   }
 
 },
@@ -281,7 +303,7 @@ NotifyController.prototype.myOrderNotices = function (userId, accountType) {
     noticeData = {
       alertType: 'order',
       alertDescription: 'New Order Placed',
-      timeStamp: 'date',
+      timeStamp: 'lastUpdate',
       meta : ['orderId', 'hospitalId']
     };
 
@@ -315,6 +337,9 @@ NotifyController.prototype.myOrderNotices = function (userId, accountType) {
         }, function (err) {
           //Some error populating hospitals
           return mine.reject(err);
+        })
+        .catch(function (err) {
+          console.log(err);
         });
 
       } catch (e) {
@@ -335,6 +360,9 @@ NotifyController.prototype.myOrderNotices = function (userId, accountType) {
     }, function (err) {
       //Some error populating hospitals
       return mine.reject(err);
+    })
+    .catch(function (err) {
+      console.log(err);
     });    
   }
 
@@ -342,76 +370,6 @@ NotifyController.prototype.myOrderNotices = function (userId, accountType) {
   return mine.promise;
 };
 
-NotifyController.prototype.allUserNotices = function (userId, accountType) {
-  console.log('Fetching my all notices...');
-  var mine = Q.defer(),
-    noticeData = {
-      alertType: 'order',
-      alertDescription: 'New Order Placed',
-      timeStamp: 'orderDate',
-      meta : ['orderId', 'hospitalId']
-    };
-
-  //create a global 
-
-  //No order notices for account level 5
-  //i.e. hospitals
-  if (accountType > 4) {
-    mine.resolve({});
-    return mine.promise;
-  }
-
-  function __getPlaced (distributorId) {
-    console.log('Getting placed distributor orders...');
-    noticeFn.getAllPlacedOrders({
-      supplierId : distributorId
-    })
-    .then(function (distOrders) {
-      //Create activity entries
-      noticeFn.checkIfNotified(distOrders, userId, noticeData)
-      .then(function (v) {
-        //lets populate the hospital data
-        noticeFn.poppedMedFac(v)
-        .then(function (poppedResult) {
-          return mine.resolve(poppedResult);
-        }, function (err) {
-          //Some error populating hospitals
-          return mine.reject(err);
-        });
-      }, function (err) {
-        return mine.reject(err);
-      });
-
-    });
-  }
-
-  if (accountType > 2 && accountType < 5) {
-    console.log('staff or manager detected');
-    //lets get the employerId for any account 
-    //that isnt a staff or distributor manager
-    noticeFn.fetchUserEmployer({
-      userId: userId,
-      accountType: accountType
-    })
-    .then(function (id) {
-      console.log(id.employer);
-      //user = ;
-      try {
-        __getPlaced(id.employer.employerId);
-      } catch (e) {
-        console.log(e);
-      }
-      
-    }, function (err) {
-      return mine.reject(err);
-    });
-  } else {
-    __getPlaced(userId);
-  }
-
-
-  return mine.promise;
-};
 
 /**
  * [userStockNotices description]
