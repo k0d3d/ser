@@ -109,9 +109,11 @@ angular.module('organization', [])
         angular.forEach(_.compact(wf), function(v) {
           if (_.isArray(v)) {
             angular.forEach(_.compact(v), function (vSub) {
+              vSub.personTag = vSub.name + ' <' + vSub.userId.email + '>';
               scope.pplWf.push(vSub);
             });
           } else {
+            v.personTag = v.name + ' <' + v.userId.email + '>';
             scope.pplWf.push(v);
           }
           
@@ -121,7 +123,7 @@ angular.module('organization', [])
     scope: {
       staffSelect: '='
     },
-    template: '<select class="form-control" ng-model="staffSelect.staff" placeholder="name or email address" ng-options="c.userId.email for c in pplWf " required></select>'
+    template: '<select class="form-control" ng-model="staffSelect.staff" placeholder="name or email address" ng-options="c.personTag for c in pplWf " required></select>'
   };
 }])
 .factory('organizeStaffService', ['$http', 'Notification', 'Language', function ($http, N, L) {

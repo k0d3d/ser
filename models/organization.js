@@ -728,6 +728,7 @@ Staff.prototype.cancelActivation = function cancelActivation (activationToken) {
  * @return {[type]}              Promise Object
  */
 Staff.prototype.getPersonProfile = function getPersonProfile (userId, accountType) {
+  console.log('checking employers on staff profile...');
   var d = Q.defer();
   staffUtils.getMeMyModel(accountType).findOne({
     userId: userId
@@ -735,12 +736,14 @@ Staff.prototype.getPersonProfile = function getPersonProfile (userId, accountTyp
   .populate('drugs', null, 'drug')
   .lean()
   .exec(function (err, user_profile) {
+    console.log(user_profile);
     if (err) {
       return d.reject(err);
     }
     if (user_profile) {
       // if the account is not a distributor account
       if (parseInt(accountType) !== 2 && parseInt(accountType) < 5) {
+        //check for a vald employer
         if (!user_profile.employer) {
           return d.reject(new Error ('You do not have an employer registered!'))
         }
@@ -748,9 +751,24 @@ Staff.prototype.getPersonProfile = function getPersonProfile (userId, accountTyp
         staffUtils.getMeMyModel(2).findOne({
           userId: user_profile.employer.employerId
         })
+        .populate('userId', 'email', 'User')
         .exec(function (err, employerIsh) {
           user_profile.employer = employerIsh;
-          return d.resolve(user_profile);
+
+          //if there is a manager account 
+          if (user_profile.manager) {
+            staffUtils.getMeMyModel(3).findOne({
+              userId: user_profile.manager.managerId
+            })
+            .populate('userId', 'email', 'User')
+            .exec(function (err, managerIsh) {
+              user_profile.manager = managerIsh;
+              return d.resolve(user_profile);
+            }); 
+          } else {
+            return d.resolve(user_profile);
+          }
+          
         });
       } else {
         return d.resolve(user_profile);
