@@ -22,7 +22,7 @@ append head
                       button.btn.btn-info.btn-xs(ng-click="activate_staff($index)")
                         i.fa.fa-check
                         | Activate
-                      button.btn.btn-danger.btn-xs 
+                      button.btn.btn-danger.btn-xs(ng-click="cancel_staff($index)") 
                         i.fa.fa-times
                         | Cancel
       include ../widgets/organization/add-staff

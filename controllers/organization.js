@@ -94,7 +94,7 @@ module.exports.routes = function (app, login) {
         //console.log(r);
         res.json(200, rs);
       }, function (err) {
-        res.json(400, err);
+        res.json(400, err.message);
       });
 
     }else if (direction === 'employees') {
@@ -111,7 +111,7 @@ module.exports.routes = function (app, login) {
 
         res.json(200, rs);
       }, function (err) {
-        res.json(400, err);
+        res.json(400, err.message);
       });
     }    
   });
@@ -183,7 +183,17 @@ module.exports.routes = function (app, login) {
       .then(function () {
         res.json(200, true);
       }, function (err) {
-        res.json(400, err);
+        res.json(400, err.message);
+      });
+    }
+    
+    if (req.query.activation == 0) {
+      //var employerId = req.user._id;
+      staff.cancelActivation(req.body.activationToken)
+      .then(function () {
+        res.json(200, true);
+      }, function (err) {
+        res.json(400, err.message);
       });
     }
 
@@ -240,9 +250,9 @@ module.exports.routes = function (app, login) {
 
   //Attempts to activate an account, and add the employer to 
   //the users profile.
-  app.del('/api/organization/invites/:activationToken',login.ensureLoggedIn('/signin'), function (req, res) {
+  app.delete('/api/organization/invites/:activationToken',login.ensureLoggedIn('/signin'), function (req, res) {
     
-    if (req.query.activation == 1) {
+    if (req.query.activation === 1) {
       //var employerId = req.user._id;
       staff.cancelActivation(req.params.activationToken)
       .then(function () {

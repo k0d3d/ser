@@ -10,11 +10,11 @@ StaffSchema = new Schema({
   position: {type: String},
   employer: {
     employerId :{type: Schema.ObjectId},
-    dateAdded : {type: Date, default: Date.now}
+    dateAdded : {type: Date}
   },
   manager: {
     managerId :{type: Schema.ObjectId},
-    dateAdded : {type: Date, default: Date.now}
+    dateAdded : {type: Date}
   },
   summary: {type: String},
   twitter: {type: String},

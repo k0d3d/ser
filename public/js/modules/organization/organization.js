@@ -82,19 +82,26 @@ angular.module('organization', [])
   });
 
   //Creates new staff.
-  $scope.create_new_staff = function () {
+  $scope.create_new_staff = function create_new_staff () {
     oss.inviteStaff($scope.new_staff).then(function (r) {
       $scope.new_staff = {};
     });
   };  
 
   //Activate Staff
-  $scope.activate_staff = function (index) {
+  $scope.activate_staff = function activate_staff (index) {
     oss.activateStaff($scope.invites[index])
     .then(function (r) {
 
     });
-  }
+  };
+
+  $scope.cancel_staff = function cancel_staff (index) {
+    oss.cancelStaff($scope.invites[index])
+    .then(function (r) {
+
+    });
+  };
 
 }])
 .directive('staffSelect', ['organizeStaffService', function (oss) {
@@ -157,6 +164,20 @@ angular.module('organization', [])
     activateStaff : function (data) {
       console.log(data);
       return $http.put('/api/organization/invites?activation=1', data)
+      .then(function (r) {
+        N.notifier({
+          title: L[L.set].titles.success,
+          text: L[L.set].organization.activate.success ,
+          class_name: 'growl-success'
+        });
+        return r.data;
+      }, function (err) {
+        return err;
+      });
+    },
+    cancelStaff : function (data) {
+      console.log(data);
+      return $http.put('/api/organization/invites?activation=0', data)
       .then(function (r) {
         N.notifier({
           title: L[L.set].titles.success,

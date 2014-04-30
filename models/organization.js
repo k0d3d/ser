@@ -157,15 +157,16 @@ staffFunctions = {
       userId : doc.userId
     })
     .exec(function (err, i) {
+      console.log(i);
       if (err) {
         return addingEmpl.reject(err);
       }
-      //if we find an account, we check if its 
+      //if we find a profile, we check if its 
       //all got a manager or employer, if it has one
       //we throw back an error/
       //else we add one to it 
       //
-      //if no account found, create
+      //if no profile found, create
       if (!i) {
         var ac = new staffUtils.getMeMyModel(doc.account_type);
         ac.employer = {employerId : doc.employerId, dateAdded: Date.now()};
@@ -179,43 +180,25 @@ staffFunctions = {
       }
 
       //account found and has employer / manager
-      if (i.employer) {
-        return addingEmpl.reject(new Error('user is already attached to another employer')); 
+      if (i.employer.employerId) {
+        return addingEmpl.reject(new Error('user is already attached to an employer')); 
+      } 
+
+      //if a profile has been found without 
+      //an employer / manager.. we'll just add 
+      //one right in
+      if (!i.employer.employerId) {
+        i.employer = {employerId : doc.employerId, dateAdded: Date.now()};
+        i.save(function (err, i) {
+          if (err) {
+            return addingEmpl.reject(err);
+          } else {
+            return addingEmpl.resolve(i);
+          }          
+        });        
       }
 
     });
-    //   $set: {
-    //     employer:  {employerId : doc.employerId, dateAdded: Date.now()}
-    //   }
-    // }, {upsert: true}, function(err, i) {
-
-    //   if (err) {
-    //     return addingEmpl.reject(err);
-    //   }
-    //   if (i === 1) {
-    //     return addingEmpl.resolve(doc);
-    //   } else {
-    //     return addingEmpl.reject(new Error('update failed'));
-    //   }
-    // });
-
-    // staffUtils.getMeMyModel(doc.account_type).update({
-    //   userId : doc.userId
-    // }, {
-    //   $set: {
-    //     employer:  {employerId : doc.employerId, dateAdded: Date.now()}
-    //   }
-    // }, {upsert: true}, function(err, i) {
-
-    //   if (err) {
-    //     return addingEmpl.reject(err);
-    //   }
-    //   if (i === 1) {
-    //     return addingEmpl.resolve(doc);
-    //   } else {
-    //     return addingEmpl.reject(new Error('update failed'));
-    //   }
-    // });
 
     return addingEmpl.promise;        
   },
@@ -250,30 +233,25 @@ staffFunctions = {
       }
 
       //account found and has employer / manager
-      if (i.manager) {
-        return addingEmpl.reject(new Error('user is already attached to another manager')); 
+      if (i.manager.managerId) {
+        return addingEmpl.reject(new Error('user is already attached to a manager')); 
       }
 
+      //if a profile has been found without 
+      //an employer / manager.. we'll just add 
+      //one right in
+      if (!i.manager.managerId) {
+        i.manager = {managerId : doc.employerId, dateAdded: Date.now()};
+        i.save(function (err, i) {
+          if (err) {
+            return addingEmpl.reject(err);
+          } else {
+            return addingEmpl.resolve(i);
+          }          
+        });        
+      }
     });
 
-
-    // staffUtils.getMeMyModel(doc.account_type).update({
-    //   userId : doc.userId
-    // }, {
-    //   $set: {
-    //     manager:  {managerId : doc.employerId, dateAdded: Date.now()}
-    //   }
-    // }, {upsert: true}, function(err, i) {
-
-    //   if (err) {
-    //     return addingEmpl.reject(err);
-    //   }
-    //   if (i === 1) {
-    //     return addingEmpl.resolve(doc);
-    //   } else {
-    //     return addingEmpl.reject(new Error('update failed'));
-    //   }
-    // });
 
     return addingEmpl.promise;        
   },
@@ -532,7 +510,7 @@ Staff.prototype.lookUpPreAccounts = function (options) {
  * @param  {Number} account_type    [description]
  * @return {Object}                 [description]
  */
-Staff.prototype.activateAccount = function (activationToken, email, employer, employerType, phone, password, account_type) {
+Staff.prototype.activateAccount = function activateAccount (activationToken, email, employer, employerType, phone, password, account_type) {
   var activator = Q.defer();
   var options = {
     activationToken : activationToken,
@@ -543,7 +521,6 @@ Staff.prototype.activateAccount = function (activationToken, email, employer, em
     account_type: account_type
   };
 
-  console.log(arguments);
 
   //Find the activation / preaccount record
   staffFunctions.findPreAccount(options)
@@ -736,7 +713,8 @@ Staff.prototype.getPersonProfile = function getPersonProfile (userId, accountTyp
   .populate('drugs', null, 'drug')
   .lean()
   .exec(function (err, user_profile) {
-    console.log(user_profile);
+    // console.log('This users profile is here....');
+    // console.log(user_profile);
     if (err) {
       return d.reject(err);
     }
@@ -745,7 +723,7 @@ Staff.prototype.getPersonProfile = function getPersonProfile (userId, accountTyp
       if (parseInt(accountType) !== 2 && parseInt(accountType) < 5) {
         //check for a vald employer
         if (!user_profile.employer) {
-          return d.reject(new Error ('You do not have an employer registered!'))
+          return d.reject(new Error ('You do not have an employer on record!'));
         }
         //lets attach the employer profile
         staffUtils.getMeMyModel(2).findOne({
