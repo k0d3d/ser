@@ -195,7 +195,21 @@ angular.module('drug', [])
         }
       });
     };
-
+    $scope.search_by_reg_no = function(regNo){
+      ds.getByRegNo(regNo)
+      .then(function(r){
+        if (r === 'null') {
+          alert('Not found');
+          return false;
+        } else {
+          $scope.add_item_form.itemName = r.productName;
+          $scope.add_item_form.nafdacRegNo = r.regNo;
+          $scope.add_item_form.importer = r.man_imp_supp;
+          $scope.add_item_form.sciName = r.composition;
+          $scope.add_item_form.nafdacId = r._id;      
+        }
+      }); 
+    };
 
   }])
   .controller('drugPageController', ['$scope', 'drugService', '$routeParams', function ($scope, ds, $routeParams) {
@@ -243,6 +257,13 @@ angular.module('drug', [])
         return done.data;
       });
     };
+
+    d.getByRegNo = function(query){
+      return $http.get('/api/internal/nafdacdrugs/search?q='+encodeURI(query))
+      .then(function(d){
+        return d.data;
+      });
+    };    
 
     d.getStockUpHistory = function (itemId) {
       return $http.get('/api/internal/drugs/' + itemId + '/history?action=stockUp')

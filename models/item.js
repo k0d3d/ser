@@ -1271,6 +1271,24 @@ DrugController.prototype.stockRequest = function stockRequest (userId, accountTy
 };
 
 
+DrugController.prototype.fetchByRegNo = function(query){
+  console.log(query);
+  var loot = Q.defer();
+
+  NDL.findOne({
+    regNo: query
+  }, function(err, i){
+    console.log(err, i);
+    if(err){
+      return loot.reject(err);
+    }else{
+      return loot.resolve(i);
+    }
+  });
+
+  return loot.promise; 
+};
+
 module.exports.Drug = DrugController;
 module.exports.drugsFunctions = drugsFunctions;
 module.exports.NDL = NDL;

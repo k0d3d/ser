@@ -69,7 +69,7 @@
           -if (userData.account_type === 5)
             .alert.alert-warning(ng-show="!userProfile.isValidated")
               p Your profile is incomplete. Please complete the facility verification process
-              a.btn.btn-danger.btn-xs.pull-right(ng-click="toggleModal('activate-hospital-modal')") Start Now
+                a.btn.btn-danger.btn-xs.pull-right(ng-click="toggleModal('activate-hospital-modal')") Start Now
           .profile-header
             h2.profile-name.x-editable(onbeforesave="update_profile($data, $editable.name)", editable-text="userProfile.name", data-type="text", data-default-value="Full Name or Company Name") {{userProfile.name || 'Empty'}}
             - if (isPermitted(['coverage']))

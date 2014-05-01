@@ -28,13 +28,16 @@ mixin manageOrderModal (accountType)
                     label.control-label.col-sm-3.col-md-3 Resolution
                     .col-sm-5.col-md-5
                       select.form-control(type="date", ng-model="__manageOrderModal.status")
-                        option(value="3") Confirm
-                        option(value="2") Dispute
-                  .form-group(ng-show="__manageOrderModal.status == 2")
+                        option(value="3", ng-disabled="__manageOrderModal.status > 3") Confirm
+                        option(value="2", ng-disabled="__manageOrderModal.status > 3") Dispute
+                        option(value="4", ng-disabled="__manageOrderModal.status <= 4") In Transit
+                        option(value="5", ng-disabled="__manageOrderModal.status != 4 ") Supplied
+                        option(value="6", ng-disabled="__manageOrderModal.status != 5 || __manageOrderModal.status == 6 ") Paid
+                  .form-group(ng-show="__manageOrderModal.status == 2 && __manageOrderModal.status < 3 ")
                     label.control-label.col-sm-3.col-md-3 Reason
                     .col-sm-5.col-md-5
                       textarea.form-control(ng-model="__manageOrderModal.reason")
-                  .form-group(ng-show="__manageOrderModal.status == 2")
+                  .form-group(ng-show="__manageOrderModal.status == 2 && __manageOrderModal.status < 3 ")
                     label.control-label.col-sm-3.col-md-3 Change Price
                     .col-sm-5.col-md-5                        
                       input.form-control(type="number", ng-model="__manageOrderModal.perItemPrice")

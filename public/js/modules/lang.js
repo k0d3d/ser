@@ -161,6 +161,10 @@ angular.module('language', [])
 			"activate": {
 				"success" : "User successfully activated",
 				"error": "We could not send this invitation right now. Please try again."
+			},
+			"cancelActivate": {
+				"success" : "User activation successfully cancelled",
+				"error": "We could not cancel this invitation right now. Please try again."
 			}
 		}
 	}

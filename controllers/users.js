@@ -56,7 +56,6 @@ module.exports.routes = function(app, passport, login, people){
     var userId = req.user._id;
     var account_type = req.user.account_type;
     users.getProfile(userId, account_type).then(function (r) {
-      console.log(r);
       res.json(200, r);
       // res.json(200, _.extend(req.user.toJSON(), r));
       // res.render('user/profile', {

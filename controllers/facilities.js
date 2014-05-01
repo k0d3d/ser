@@ -109,6 +109,7 @@ HospitalController.prototype.searchGovtRegister = function searchGovtRegister (q
 
 HospitalController.prototype.validateFacility = function validateFacility (userId, accountType, valData) {
   var t = Q.defer();
+  console.log(userId);
   if (accountType !== 5) {
     t.reject(new Error('can not complete request'));
   } else {
@@ -117,9 +118,13 @@ HospitalController.prototype.validateFacility = function validateFacility (userI
     },{
       $set:{ 
         validation: _.omit(valData, ['_id', '__v']),
-        isValidated: true
+        isValidated: true,
+        lga_ward: valData.lga_ward,
+        lga: valData.lga,
+        name: valData.facilityName
       }
-    }, function (err, i) {
+    },{upsert: true}, function (err, i) {
+      console.log(i);
       if (err) {
         return t.reject(err);
       }

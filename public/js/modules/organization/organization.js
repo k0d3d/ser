@@ -92,14 +92,14 @@ angular.module('organization', [])
   $scope.activate_staff = function activate_staff (index) {
     oss.activateStaff($scope.invites[index])
     .then(function (r) {
-
+      $scope.invites.splice(index, 1);
     });
   };
 
   $scope.cancel_staff = function cancel_staff (index) {
     oss.cancelStaff($scope.invites[index])
     .then(function (r) {
-
+      $scope.invites.splice(index, 1);
     });
   };
 
@@ -150,7 +150,7 @@ angular.module('organization', [])
           text: L[L.set].organization.invite.error ,
           class_name: 'growl-danger'
         });
-        return err;
+        //return err;
       });
     },
     loadInvites : function () {
@@ -171,8 +171,6 @@ angular.module('organization', [])
           class_name: 'growl-success'
         });
         return r.data;
-      }, function (err) {
-        return err;
       });
     },
     cancelStaff : function (data) {
@@ -181,12 +179,10 @@ angular.module('organization', [])
       .then(function (r) {
         N.notifier({
           title: L[L.set].titles.success,
-          text: L[L.set].organization.activate.success ,
+          text: L[L.set].organization.cancelActivate.success ,
           class_name: 'growl-success'
         });
         return r.data;
-      }, function (err) {
-        return err;
       });
     },
     //fetch the list of people having a 

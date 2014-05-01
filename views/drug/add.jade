@@ -7,17 +7,19 @@
         .panel-body.panel-body-nopadding
           form.form-horizontal.form-bordered(ng-submit="add_drug(add_item_form)", novalidate, name="addItemForm")
             .form-group
-              label.col-sm-3.control-label Brand Name
-              .col-sm-6
+              label.col-sm-3.control-label NAFDAC Reg No.
+              .col-sm-2
+                input.form-control(type='text', placeholder='', ng-model="add_item_form.nafdacRegNo")          
+                a.btn.btn-default.btn-small(ng-click="search_by_reg_no(add_item_form.nafdacRegNo)", ng-disabled="add_item_form.nafdacRegNo.length < 6 || !add_item_form.nafdacRegNo")
+                  i.fa.fa-search
+              label.col-sm-2.control-label(style="width: 100px") Brand Name
+              .col-sm-3
                 input.form-control.item-name(type='text', placeholder='', ng-model="add_item_form.itemName", required, type-ahead="autoCompleteItemName(result)", name="item-name", remote='/api/internal/items/typeahead?query=%QUERY')
+                //- input.form-control.item-name(type='text', placeholder='', ng-model="add_item_form.itemName", required, name="item-name", remote='/api/internal/items/typeahead?query=%QUERY')
             .form-group
               label.col-sm-3.control-label Composition
               .col-sm-6
                 input.form-control(type='text', placeholder='', ng-model="add_item_form.sciName")
-            .form-group
-              label.col-sm-3.control-label NAFDAC Reg No.
-              .col-sm-6
-                input.form-control(type='text', placeholder='', ng-model="add_item_form.nafdacRegNo")
             .form-group
               label.col-sm-3.control-label Category
               .col-sm-6

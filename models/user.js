@@ -8,7 +8,7 @@
  passport = require('passport'),
  //Organization = require('./organization.js').Staff,
  staffUtils = require('./staff_utils.js'),
-
+Orders = require('./order.js'),
 
 UserController = function (){
   console.log('Loading User Controller...');
@@ -287,11 +287,27 @@ UserController.prototype.getProfile = function (userId, account_type) {
           });  
 
         } else {
-          return d.resolve(user_profile);  
+          return d.resolve(user_profile);
         }
 
       } else {
-        return d.resolve(user_profile);
+          //lets check if the account is 
+          //a facility account, if it is,
+          //we wanna have all the facilities orders
+          //summed up into drug item quick list
+          //on the profile page
+          if (parseInt(account_type) === 5) {
+            var orders = new Orders();
+            orders.getUserOrders(userId, account_type)
+            .then(function (done) {
+              user_profile.drugs = done;
+              return d.resolve(user_profile);
+            }, function (err) {
+              return d.reject(err);
+            });
+          } else {            
+            return d.resolve(user_profile);  
+          }        
       }
     } else {
       //var tree = new staffUtils.getMeMyModel(account_type);

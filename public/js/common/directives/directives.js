@@ -5,21 +5,6 @@
   * Description
   */
   angular.module('directives', []);
-  angular.module('directives').directive('typeAhead',function(ordersService, itemsService){
-
-    var linker = function(scope, element, attrs){
-      $(element).typeahead({
-        name: 'item-search',
-        remote: '/search.php?query=%QUERY',
-        // minLength: 3,
-        // limit: 10
-      })
-    };
-    return{
-      restrict: 'A',
-      link: linker
-    };
-  });
   angular.module('directives').directive('onFinish',function($timeout){
     return {
       restrict: 'A',

@@ -179,6 +179,24 @@ var orderManager = {
     });    
 
     return upd.promise; 
+  },
+  getFacilityOrders: function getFacilityOrders (doc) {
+    var ht = Q.defer();
+
+    Order.find({
+      hospitalId: doc.hospitalId
+    }, 'itemId')
+    .populate('itemId', 'itemName', 'drug')
+    .exec(function (err, i) {
+      if (err) {
+        return ht.reject(err);
+      }
+      if (i) {
+        return ht.resolve(i);
+      }
+    });
+
+    return ht.promise;
   }
 };
 
@@ -622,6 +640,25 @@ OrderController.prototype.hideOrderItem = function hideOrderItem (orderId) {
   });
 
   return aladin.promise;
+};
+
+OrderController.prototype.getUserOrders = function getUserOrders (userId, accountType) {
+  console.log('Calling getUserOrders');
+  var gini = Q.defer();
+
+  if (accountType === 5) {
+
+    orderManager.getFacilityOrders({
+      hospitalId: userId
+    })
+    .then(function (orders) {
+      return gini.resolve(orders);
+    }, function (err) {
+      return gini.reject(err);
+    });
+  }
+
+  return gini.promise;
 };
 
 module.exports = OrderController;

@@ -164,7 +164,9 @@ p + p {
 .gist {
   font-size: 14px;
 }
-
+span.twitter-typeahead {
+  display: block !important;
+}
 /* example specific styles */
 /* ----------------------- */
 

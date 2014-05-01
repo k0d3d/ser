@@ -5,13 +5,12 @@ var mongoose = require('mongoose'),
     Schema = mongoose.Schema;
 
 var HospitalSchema =  new Schema({
-  hospitalId: {type: Number},
   name: {type: String},
   address: {type: String},
   state: {type: String},
   lga: {type: String},
   phone: {type: String},
-  location: {type: String},
+  lga_ward: {type: String},
   userId:{type: Schema.ObjectId, ref: 'User'},
   personel: {type: String},
   personelContactNumber: {type: String},
@@ -35,6 +34,8 @@ var HospitalSchema =  new Schema({
   contactPerson: {type: String},
   contactPersonPhone: {type: String}
 });
+
+// HospitalSchema.virtual('stateName').get
 
 
 mongoose.model('Hospital', HospitalSchema);

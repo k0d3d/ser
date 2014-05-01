@@ -58,7 +58,7 @@ angular.module('user', [])
   $scope.validate_this = function validate_this (res) {
     US.validateThis(res)
     .then(function (v) {
-
+      $('#activate-hospital-modal').modal('hide');
     });
   };
 }])
@@ -71,7 +71,7 @@ angular.module('user', [])
     return e;
   };
 })
-.factory('userServices', ['$http', function ($http) {
+.factory('userServices', ['$http', 'Notification', function ($http, N) {
   return {
     fetchActivities: function fetchActivities () {
       return $http.get('/api/internal/activities')
@@ -100,6 +100,11 @@ angular.module('user', [])
     validateThis : function validateThis (data) {
       return $http.post('/api/internal/facilities/validate', data)
       .then(function (r){
+        N.notifier({
+          title: 'Welldone',
+          text: 'Hospital Validated Successfully',
+          class_name: 'growl-success'
+        });
         return r.data;
       });
     }

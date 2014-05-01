@@ -31,7 +31,7 @@ module.exports = function(app, passport) {
     },
     {
       name: 'Hospitals',
-      permissions: ['place-order', 'view-activity', 'order-cart']
+      permissions: ['place-order', 'view-activity', 'order-cart', 'view-drug-pages']
     }
   ];
   var nav = [
@@ -61,7 +61,7 @@ module.exports = function(app, passport) {
     },
     {
       name: 'Med. Facilities',
-      roles: [0,1,2,3,4],
+      roles: [0,1],
       icon:'',
       url: '/a/facilities'
     },

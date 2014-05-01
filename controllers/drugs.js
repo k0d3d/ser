@@ -221,6 +221,15 @@ module.exports.routes = function(app, login) {
     });
   });
 
+  //NAFDAC Fetch item by Registeration Number
+  app.get('/api/internal/nafdacdrugs/search', function(req, res){
+    drugs.fetchByRegNo(req.query.q)
+    .then(function(r){
+      res.json(200, r);
+    }, function (err) {
+      res.json(400, err.message);
+    });
+  });
 
   app.post('/api/internal/drugs', function (req, res) {
     var item = req.body;
