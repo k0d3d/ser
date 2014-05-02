@@ -12,11 +12,23 @@
       searchByRegDrugs : function searchByRegDrugs (query, param, filter, option) {
         var s = Q.defer();
 
+        if (param === 'sciName') {
+          param = 'composition';
+        }
+
+        if (param === 'itemName') {
+          param = 'productName';
+        }
+
+        if (param === 'manufacturer') {
+          param = 'pharma.pharmaName';
+        }
+
         Drug.find({},
           'itemName sciName category currentPrice pharma supplier'
         )
         //.populate('owner', null, '')
-        .regex('itemName', new RegExp(query, 'i'))
+        .regex(param, new RegExp(query, 'i'))
         .limit(50)
         .lean()
         //.skip(page * 10)
@@ -39,6 +51,10 @@
 
         if (param === 'itemName') {
           param = 'productName';
+        }
+
+        if (param === 'manufacturer') {
+          param = 'man_imp_supp';
         }
 
         NDL.find({},
