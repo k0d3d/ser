@@ -1,4 +1,4 @@
-.contentpanel
+.contentpanel(ng-show="searchedItems")
     .row
         .col-sm-4.col-md-3
           form.form(ng-submit="search(item_query)", name="searchItemForm")
@@ -10,6 +10,7 @@
               select.form-control(ng-model="item_query.param", required)
                 option(value="itemName") Brand Name
                 option(value="sciName") Composition
+                option(value="manufacturer") Manufacturer
               label.control-label Filter by:
               select.form-control(ng-model="item_query.filter", ng-init="item_query.filter = 'Price'")
                 option Proximity
@@ -84,3 +85,29 @@
                   .col-sm-8.col-sm-offset-5
 
 
+.contentpanel(ng-show="!searchedItems")
+    .row
+      p.text-center
+        img(src="/images/search-icon.png", style="width: 190px")
+
+    .row
+        .col-xs-8.col-xs-offset-2
+          .input-group
+            .input-group-btn.search-panel
+              button.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown', )
+                span#search_concept Search by
+                span.caret
+              ul.dropdown-menu(role='menu', ng-init="item_query.param = 'itemName'")
+                li
+                  a(href='', ng-click="item_query.param == 'itemName'") Brand Name
+                li
+                  a(href='', ng-click="item_query.param == 'sciName'") Composition
+                li
+                  a(href='', ng-click="item_query.param == 'manufacturer'") Manufacturer 
+            input.form-control(type='text', name='x', placeholder='Search term...', ng-model="item_query.s")
+            span.input-group-btn
+              button.btn.btn-default(type='button', ng-click="search(item_query)", ng-disabled="item_query.s == 0")
+                span.glyphicon.glyphicon-search
+
+append foot
+  script(src="/js/modules/order/google-search.js")

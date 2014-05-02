@@ -7,7 +7,7 @@ angular.module('order', []).
 
 config(['$routeProvider',function($routeProvider){
   $routeProvider.when('/a/orders', {templateUrl: '/order/index', controller: 'ordersIndexController'})
-  .when('/a/orders/new', {templateUrl: '/order/google-search', controller: 'orderAddController'})
+  .when('/a/orders/new', {templateUrl: '/order/new-order-search-item', controller: 'orderAddController'})
   .when('/a/orders/cart', {templateUrl: '/order/cart', controller: 'orderCartController'});
 }])
 .controller('orderCartController', ['$scope', '$http', 'ordersService', '$rootScope', function($scope, $http, ordersService, $rootScope) {
@@ -195,6 +195,7 @@ config(['$routeProvider',function($routeProvider){
 
     
   };
+
 
 })
 .factory('ordersService',['$http', 'Notification','Language', function($http, N, L){

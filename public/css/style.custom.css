@@ -127,7 +127,9 @@ p + p {
 }
 
 .tt-hint {
-  color: #999
+  color: #999;
+  background-color: transparent !important;
+  top: -35px !important;
 }
 
 .tt-dropdown-menu {
