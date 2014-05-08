@@ -17,15 +17,20 @@
         }
 
         if (param === 'itemName') {
-          param = 'productName';
+          param = 'itemName';
         }
 
         if (param === 'manufacturer') {
           param = 'pharma.pharmaName';
         }
 
+        if (param === 'nafdacRegNo') {
+          query = query.toUpperCase();
+          param = 'nafdacRegNo';
+        }
+
         Drug.find({},
-          'itemName sciName category currentPrice pharma supplier'
+          'itemName sciName category currentPrice pharma supplier itemPackaging packageQty instantQuote'
         )
         //.populate('owner', null, '')
         .regex(param, new RegExp(query, 'i'))
@@ -55,6 +60,11 @@
 
         if (param === 'manufacturer') {
           param = 'man_imp_supp';
+        }
+
+        if (param === 'nafdacRegNo') {
+          query = query.toUpperCase();
+          param = 'regNo';
         }
 
         NDL.find({},
@@ -508,12 +518,10 @@ DrugController.prototype.search = function(query, param, filter, option) {
 
   drugsFunctions.searchByRegDrugs(query, param, filter, option)
   .then(function (found_drugs) {
-    console.log(found_drugs);
     var populate = Q.defer();
 
     function __recurseOwner () {
       var oneDrug = found_drugs.pop();
-      console.log(oneDrug);
       var accountType = oneDrug.supplier.supplier_type;
       var Model = staffUtils.getMeMyModel(oneDrug.supplier.supplier_type);
 

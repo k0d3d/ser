@@ -9,7 +9,7 @@
             .form-group
               label.col-sm-3.control-label NAFDAC Reg No.
               .col-sm-2
-                input.form-control(type='text', placeholder='', ng-model="add_item_form.nafdacRegNo")          
+                input.form-control(type='text', placeholder='XX-XXXX', ng-model="add_item_form.nafdacRegNo")          
                 a.btn.btn-default.btn-small(ng-click="search_by_reg_no(add_item_form.nafdacRegNo)", ng-disabled="add_item_form.nafdacRegNo.length < 6 || !add_item_form.nafdacRegNo")
                   i.fa.fa-search
               label.col-sm-2.control-label(style="width: 100px") Brand Name
@@ -32,10 +32,6 @@
               label.col-sm-3.control-label Manufacturer
               .col-sm-6
                 input.form-control(type='text', placeholder='', ng-model="add_item_form.pharma.pharmaName")
-            .form-group
-              label.col-sm-3.control-label Distributor
-              .col-sm-6
-                input.form-control(type='text', placeholder='', ng-model="add_item_form.distributor")
 
             .form-group
               label.col-sm-3.control-label Price
@@ -43,6 +39,12 @@
                 input.form-control(type='number', placeholder='Retail', ng-model="add_item_form.currentPrice.retail")
                 input.form-control(type='number', placeholder='Institution', ng-model="add_item_form.currentPrice.institution")
                 input.form-control(type='number', placeholder='Wholesale', ng-model="add_item_form.currentPrice.wholesale")
+              label.col-sm-1.control-label Instant Quote
+              .col-sm-2
+                select.form-control(ng-model="add_item_form.instantQuote")
+                  option(value="Yes") Yes
+                  option(value="No") No
+
             .form-group
               label.col-sm-3.control-label Item Form
               .col-sm-3
@@ -69,7 +71,7 @@
             .form-group
               label.col-sm-3.control-label Item Packaging
               .col-sm-3
-                select.form-control(type='number', placeholder='', ng-model="add_item_form.itemPackaging")
+                select.form-control(placeholder='', ng-model="add_item_form.itemPackaging")
                   option(value='?', selected='selected')
                   option Bags
                   option Bottles
@@ -82,7 +84,9 @@
                   option Sachet
                   option Tin
                   option Tube
-
+              label.col-sm-1.control-label Package Quantity 
+              .col-sm-2
+                input.form-control(type="number", ng-model="add_item_form.packageQty")
             .form-group
               label.col-sm-3.control-label Upload Image
               .col-sm-6.dropzone(dropzone, ng-model="add_item_form.images")

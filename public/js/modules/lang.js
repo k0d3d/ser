@@ -84,6 +84,9 @@ angular.module('language', [])
 				"place": {
 					"success": "You have added one more item to your cart"
 				}
+			},
+			"cancel": {
+				"success": "Order has been cancelled."
 			}
 		},
 		"dispense":{

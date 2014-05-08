@@ -7,8 +7,13 @@ var ActivityNotification = require('./activity/notification.js'),
     _ = require('underscore'),
     u = require('../lib/utils.js'),
     Q = require('q'),
+    sendEmail = require('../lib/email/sendMail.js').sendMail,
+    sendSms = require('../lib/sms/smsSend.js'),
+    // messageStrings = require('../lib/message-strings.js'),
+    lingua = require('lingua'),
 
 noticeFn = {
+
   addBareNotice : function addBareNotice (doc) {
     console.log('Called bare notice');
 
@@ -44,14 +49,26 @@ noticeFn = {
    * @return {[type]}     [description]
    */
   getOrderStatuses: function getOrderStatuses (doc) {
-    console.log('Getting placed orders ...');
+    console.log('Getting orders statuses...');
     var proc = Q.defer();
 
-    Order.find({
-      status : {$gt : 0 },
-      "orderSupplier.supplierId" : doc.supplierId
-    })
+    var options = {
+      status : {$gte : 0 }
+    };
+
+    if (doc.hospitalId) {
+      options.hospitalId = doc.hospitalId;
+    }
+
+    if (doc.supplierId) {
+      options["orderSupplier.supplierId"] = doc.supplierId;
+    }
+
+
+    Order.find(options)
+    //.lean()
     .exec(function (err, i) {
+      console.log('gotten order status result...');
       if (err) {
         return proc.reject(err);
       }
@@ -78,13 +95,184 @@ noticeFn = {
 
     return fetch.promise;
   },
+  /**
+   * uses staff_utils.js to query the list of users
+   * connected to an account. Its primarily used to send 
+   * notifications out. For instance, if you query the managers
+   * and staff belonging to a distributor or staffs under a manager.
+   * 
+   * 
+   * @param  {object} doc Object containing userId and account_type 
+   * properties.
+   * @return {object}     Promise object
+   */
+  getConcernedStaff: function getConcernedStaff (doc) {
+    var dfr = Q.defer();
+    //list of employees
+    staffUtils.getMyPeople(doc.userId, doc.account_type)
+    .then(function (peps) {
+      var listOfRecpt = [];
+
+
+      //list of managers 
+      if (peps.managers) {
+        _.each(peps.managers, function (v) {
+          listOfRecpt.push({
+            userId: v.userId, 
+            allowedNotifications: v.allowedNotifications, 
+            approvedNotices: v.approvedNotices,
+            name: v.name,
+            phone: v.phone
+          });
+        });
+      }
+
+      //list of staffs 
+      if (peps.staff) {
+        _.each(peps.staff, function (v) {
+          listOfRecpt.push({
+            userId: v.userId, 
+            allowedNotifications: v.allowedNotifications, 
+            approvedNotices: v.approvedNotices,
+            name: v.name,
+            phone: v.phone
+          });
+        });
+      }
+
+      //get the employers profile
+      staffUtils.getMeMyModel(doc.account_type)
+      .findOne({
+        userId: doc.userId
+      })
+      .populate('userId', 'email account_type', 'User')
+      .lean()
+      .exec(function (err, md) {
+        if (err) {
+          return dfr.reject(err);
+        }
+        listOfRecpt.concat(_.map(md, function (v) {
+          return {
+            userId: v.userId, 
+            allowedNotifications: v.allowedNotifications, 
+            name: v.name,
+            phone: v.phone,            
+            approvedNotices: v.approvedNotices
+          };
+        }));
+        return dfr.resolve(listOfRecpt);
+      });
+
+
+      // return procs.resolve(d);
+    }, function (err) {
+      return dfr.reject(err);
+    });
+
+    return dfr.promise;
+  },
+  /**
+   * Send out / delivers notifications to individual
+   * stoc-cloud users. It uses the 'allowedNotifications'
+   * property on the user's profile to determine what mediums to send to.
+   * it second argument also specifies the kind of message 
+   * to deliver.
+   * 
+   * @param  {Array} listOfRecpt   List of users to send messages to.
+   * should contain a populated userId {email, ObjectId and account_type}.
+   * All objects must contain 'allowedNotifications' and 'approvedNotices' property.
+   * @param  {String} typeOfMessage The type of message to deliver or send out.
+   * @return {Promise}               Returns Promise
+   */
+  deliveryAgent : function deliveryAgent (doc) {
+    var da = Q.defer();
+    da.longStackSupport = true;
+
+    // var noticeData
+    console.log(lingua.home);
+
+    function __pushMessages () {
+
+      var task = doc.listOfRecpt.pop();
+      //task here is a user object.
+      //
+      //lets try sending an email. if the 
+      //user allows emails.
+      if (task.allowedNotifications.email) {
+
+        //if his email is on file.. 
+        //just a check.. he def has 
+        //to have an email.
+        if (task.userId.email) {
+          //send an email.
+          sendEmail({
+            to: task.userId.email,
+            // to: task.userId.email,
+            subject: "new quotation request",
+            // subject: lingua[doc.typeOfMessage].email.subject,
+            text: "you have received a new quotation request"
+            // text: lingua[doc.typeOfMessage].email.message
+          })
+          .then(function (done) {
+            //just wanna log to console for now..
+            //TODO:: log to file 
+            console.log(done);
+          },  function (err) {
+            //log to file later
+            console.log(err.stack);
+          });
+        }
+
+
+
+      } 
+      //try sending sms
+      if (task.allowedNotifications.sms) {
+        if (task.phone) {
+          
+          sendSms.sendSMS("you have received a new quotation request", task.phone)
+          .then(function (done) {
+            //just wanna log to console for now..
+            //TODO:: log to file 
+            console.log(done);
+          },  function (err) {
+            //log to file later
+            console.log(err);
+          });          
+        }
+      }
+
+      if (doc.listOfRecpt.length) {
+        __pushMessages();
+      } else {
+        return da.resolve();
+      }
+    }
+
+    if (doc.listOfRecpt.length === 0) {
+      da.resolve([]);
+    } else {
+      try {
+        __pushMessages();
+      } catch (e) {
+        da.reject(e);
+        console.log(e.stack);
+      }
+    }
+
+    return da.promise;
+  },  
   getUpdateDescription: function getUpdateDescription (key, kind) {
     var phrases = {
       order: {
-        '0' : 'new order placed',
+        '0' : 'new quotation request',
         '1' : 'an order has been placed',
         '2' : 'an order is in dispute',
-        '3' : 'an order has been confirmed'
+        '3' : 'an order has been confirmed',
+        '4': 'order in transit',
+        '5': 'order supplied',
+        '6': 'order paid',
+        '-1': 'order cancelled'
       },
       stockup: {
         '0' : 'new stock up request',
@@ -122,16 +310,17 @@ noticeFn = {
     //console.log(noticeData);
     function __check (){
       console.log('Running checks...');
-      var task = obj.pop(),
+      var task = obj.pop();
+      var ts = new Date(task[noticeData.timeStamp]);
 
       //Create special referenceId
-      str = noticeData.alertType;
+      var str = noticeData.alertType;
       str += userId;
-      str += u.strToObj(task, noticeData.timeStamp).getTime();
+      str += ts.getTime();
       str += task.check || task.status;
       str += task._id;
       //console.log(str);
-      //console.log(task);
+      // console.log(task);
 
       var meta = _.pick(task, noticeData.meta);
 
@@ -249,10 +438,21 @@ noticeFn = {
   },
   __getPlaced:   function __getPlaced (doc) {
     var mine = Q.defer();
-    console.log('Getting placed distributor orders...');
-    noticeFn.getOrderStatuses({
-      supplierId : doc.distributorId
-    })
+    console.log('Getting placed orders...');
+    var options = {};
+
+    if (doc.hospitalId) {
+      options.hospitalId = doc.hospitalId;
+    }
+
+    if (doc.supplierId) {
+      options.supplierId = doc.supplierId;
+    }
+
+    // var obj = _.extend(options, doc);
+    // console.log(doc, obj);
+
+    noticeFn.getOrderStatuses(options)
     .then(function (distOrders) {
       //Create activity entries
       noticeFn.checkIfNotified(distOrders, doc.userId, doc.noticeData)
@@ -279,17 +479,23 @@ noticeFn = {
 
     return mine.promise;
   },
+  bulkPost: function bulkNotice (obj, noticeData ) {
+    var qu = Q.defer();
+
+    
+    return qu.promise;
+  },
   logError: function logError (err){
     console.trace(err);
   }
 
 },
 
-NotifyController = function () {
- 
+PostmanController = function () {
+  Q.longStackSupport = true;
 };
 
-NotifyController.prototype.constructor = NotifyController;
+PostmanController.prototype.constructor = PostmanController;
 
 /**
  * get
@@ -297,21 +503,33 @@ NotifyController.prototype.constructor = NotifyController;
  * @param  {[type]} accountType [description]
  * @return {[type]}             [description]
  */
-NotifyController.prototype.myOrderNotices = function (userId, accountType) {
+PostmanController.prototype.myOrderNotices = function (userId, accountType) {
   console.log('Fetching my order notices...');
   var mine = Q.defer(),
     noticeData = {
       alertType: 'order',
-      alertDescription: 'New Order Placed',
       timeStamp: 'lastUpdate',
       meta : ['orderId', 'hospitalId']
     };
 
-  //No order notices for account level 5
+  //order notices for account level 5
   //i.e. hospitals
   if (accountType > 4) {
-    mine.resolve({});
-    return mine.promise;
+    console.log('bcos no orders for u');
+    noticeFn.__getPlaced({
+      hospitalId: userId,
+      userId: userId,
+      noticeData: noticeData
+    })
+    .then(function (poppedResult) {
+      return mine.resolve(poppedResult);
+    }, function (err) {
+      //Some error populating hospitals
+      return mine.reject(err);
+    })
+    .catch(function (err) {
+      console.log(err);
+    });
   }
 
   if (accountType > 2 && accountType < 5) {
@@ -349,7 +567,7 @@ NotifyController.prototype.myOrderNotices = function (userId, accountType) {
     }, function (err) {
       return mine.reject(err);
     });
-  } else {
+  } else if (accountType === 2) {
     noticeFn.__getPlaced({
       distributorId: userId,
       userId: userId,
@@ -375,7 +593,7 @@ NotifyController.prototype.myOrderNotices = function (userId, accountType) {
  * [userStockNotices description]
  * @return {[type]} [description]
  */
-NotifyController.prototype.userStockNotices = function (userId, accountType) {
+PostmanController.prototype.userStockNotices = function (userId, accountType) {
   var oops = Q.defer(), ntx = [];
 
   //
@@ -534,5 +752,5 @@ NotifyController.prototype.userStockNotices = function (userId, accountType) {
 
 };
 
-
-module.exports.Notify = NotifyController;
+module.exports.noticeFn = noticeFn;
+module.exports.Notify = PostmanController;

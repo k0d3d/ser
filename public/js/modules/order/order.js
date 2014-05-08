@@ -11,22 +11,45 @@ config(['$routeProvider',function($routeProvider){
   .when('/a/orders/cart', {templateUrl: '/order/cart', controller: 'orderCartController'});
 }])
 .controller('orderCartController', ['$scope', '$http', 'ordersService', '$rootScope', function($scope, $http, ordersService, $rootScope) {
-  $scope.$parent.headerTitle = 'Search and Place Order';
+  $scope.$parent.headerTitle = 'Pending Quotations';
+  $scope.orderCart = [];
+
+  //Fetch All Orders
+  ordersService.orders('quotes', 'short')
+  .then(function (i) {
+    angular.forEach(i, function (v) {
+      if (v.status === 0 && v.itemId.instantQuote === false) {
+        v.viewPrice = '...';
+        v.canGo = false;
+      } else {
+        v.viewPrice = v.perItemPrice * v.orderAmount;
+        v.canGo = true;
+      }
+
+
+      $scope.orderCart.push(v);
+    });
+   // $rootScope.my_quotation = i;
+  });  
 
   //$scope.orderCart = $rootScope.orderCart;
-  console.log($scope.orderCart);
 
   $scope.order_this = function(order, index){
-    console.log(order);
     ordersService.postCartItem(order)
     .then(function () {
       $scope.orderCart.splice(index, 1);
+      $scope.my_quotation.splice(index, 1);
     });
   };
 
-  $scope.$on('cartloaded', function () {
-    $scope.orderCart = $rootScope.orderCart;
-  });
+  $scope.removeFromCart = function removeFromCart (index) {
+    ordersService.remove($scope.orderCart[index].orderId)
+    .then(function (){
+      $scope.orderCart.splice(index, 1);
+      $scope.my_quotation.splice(index, 1);
+    });
+  };
+
 
 }])
 .controller('ordersIndexController', ['$scope', '$http', '$location', '$routeParams', 'ordersService', 'organizeStaffService', function ($scope, $http, $location, $routeParams, ordersService, organizeStaffService) {
@@ -34,6 +57,20 @@ config(['$routeProvider',function($routeProvider){
  
   $scope.ordersfilter = {
     orderStatus : ''
+  };
+
+  $scope.orderStatusFilter = function orderStatusFilter (item) {
+    if ($scope.orderFilter.status == 2) {
+      return (item.status < 2)? true : false;
+    }
+    if ($scope.orderFilter.status == 3) {
+      return (item.status >= 3 && item.status < 5) ? true : false;
+    }
+    if ($scope.orderFilter.status == 6) {
+      return (item.status >= 5 && item.status <= 6)? true : false;
+    }
+    return false;
+    // console.log(item);
   };
   //
   (function(){
@@ -104,7 +141,6 @@ config(['$routeProvider',function($routeProvider){
   });
 
   $scope.open_order_manager = function (cmp) {
-    console.log(cmp);
     $scope.__manageOrderModal = cmp;
   };
 
@@ -120,6 +156,26 @@ config(['$routeProvider',function($routeProvider){
     .then(function () {
       $('#manage-order-modal').modal('hide');
     });
+  };
+
+  $scope.__isEnabled = function (status, permission) {
+    var per = {
+      'change_price' : [0,1,2],
+      'send_quotation_button': [0,1],
+      'change_qty' : [0,1,2],
+      'update_order': [3,4,5],
+      'comment': [2],
+      'resolution': [3,4,5],
+      'option_r_confirm': [],
+      'option_r_in_transit': [3],
+      'option_r_supplied': [4],
+      'option_r_paid' : [5]
+    };
+    if (per[permission].indexOf(status) > -1) {
+      return true;
+    } else {
+      return false;
+    }
   };
 
 }])
@@ -156,11 +212,12 @@ config(['$routeProvider',function($routeProvider){
     
     ordersService.searchCmp(queryObj)
     .then(function (r) {
-      console.log(r);
-      //if (!_.isError(r)) {
-        $scope.searchedItems = r;
-        $scope.searchedItems.s = queryObj.s;
-      //}
+      
+      angular.forEach(r.drug, function (v, i) {
+        r.drug[i].packageQty = v.packageQty || 1;
+      }, r);
+      $scope.searchedItems = r;
+      $scope.searchedItems.s = queryObj.s;
       
     });
   };
@@ -183,13 +240,13 @@ config(['$routeProvider',function($routeProvider){
 
 
   $scope.add_to_cart = function (item){
-    if (!item.orderAmount) return false;
-    
+    if (!item.packageCount) return false;
+    item.orderAmount = item.packageCount * item.packageQty;
     //return console.log(item);
-    ordersService.addToCart(item)
+    ordersService.addToQuotations(item)
     .then(function(data){
-        console.log(data);
-        $rootScope.orderCart.push(data);
+        item.sentRequest = 'sent';
+        $scope.my_quotation.push(data);
         $scope.form = '';
     });
 
@@ -242,7 +299,7 @@ config(['$routeProvider',function($routeProvider){
 
     //Post one item to be sent as an order
     f.postCartItem = function(form){
-      return $http.put('/api/orders/' + form.orderId + '/status/1', form)
+      return $http.put('/api/orders/' + form.orderId + '/status/3', form)
       .then(function (r) {
         N.notifier({
           title: L[L.set].titles.success,
@@ -261,8 +318,8 @@ config(['$routeProvider',function($routeProvider){
     };
 
     //post one item to be added to the cart    
-    f.addToCart = function(form){
-      return $http.post('/api/orders', form)
+    f.addToQuotations = function(form){
+      return $http.post('/api/internal/orders', form)
       .then(function (r) {
         N.notifier({
           title: L[L.set].titles.success,
@@ -323,9 +380,12 @@ config(['$routeProvider',function($routeProvider){
     f.remove = function(order_id){
       return $http.delete('/api/orders/'+order_id)
       .then(function (r) {
-        return r.data
-      }, function(err) {
-
+        N.notifier({
+          title: L[L.set].titles.success,
+          text: L[L.set].order.cancel.success,
+          class_name: 'growl-success'
+        });         
+        return r.data;
       });
     };
 
@@ -434,15 +494,14 @@ config(['$routeProvider',function($routeProvider){
   return {
     link: function (scope) {
       //Fetch All Orders
-      OS.orders(0, 'short')
+      OS.orders('quotes', 'count')
       .then(function (i) {
-       scope.orderCart = i;
-       $rootScope.orderCart = i;
-       $rootScope.$broadcast('cartloaded');
+       scope.my_quotation = i;
+       // $rootScope.my_quotation = i;
       });
 
     },
-    //controller: 'orderCartController',
+    controller: 'orderCartController',
   };
 }])
 .directive('orderList', ['ordersService','Notification','Language', function(OS, N, L){
@@ -509,17 +568,21 @@ config(['$routeProvider',function($routeProvider){
     templateUrl: '/templates/order-list'
   };
 }])
+
 .filter('orderState', function () {
   return function (num) {
     switch (parseInt(num)) {
       case -1:
       return 'cancelled';
       break;
+      case 0:
+      return 'requesting quote';
+      break;
       case 1:
-      return 'placed';
+      return 'replied quote';
       break;
       case 2:
-      return 'disputed';
+      return 'order accepted';
       break;
       case 3:
       return 'confirmed';

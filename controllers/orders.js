@@ -68,7 +68,7 @@ module.exports.routes = function(app, login){
   });
 
   // Order POST Routes
-  app.post('/api/orders',function(req, res){
+  app.post('/api/internal/orders',function(req, res){
     order.placeItemInCart(req.body, req.user._id)
     .then(function(r){
       res.json(200, true);
@@ -80,7 +80,7 @@ module.exports.routes = function(app, login){
   //Progresses an order from the cart to being placed
   app.put('/api/orders/:orderId/status/:orderStatus', function (req, res) {
     console.log('message');
-    if (parseInt(req.params.orderStatus) === 1) {
+    if (parseInt(req.params.orderStatus) === 3) {
       order.redressOrder(req.body, req.user._id, parseInt(req.params.orderStatus))
       .then(function (r) {
         res.json(200, r);

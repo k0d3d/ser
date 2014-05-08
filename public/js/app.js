@@ -13,7 +13,8 @@ var app = angular.module('stocUser', [
   'facility',
   'ngTagsInput',
   'ngDragDrop',
-  'xeditable'
+  'xeditable',
+  'checklist-model'
   ]);
 
 app.run(function(editableOptions) {
@@ -38,7 +39,8 @@ app.controller('MainController', [
   'Notification', 
   'ordersService',
   'organizeStaffService',
-  function ($scope, $rootScope, $http, $location, Notification, OS, OSS) {
+  'appServices',
+  function ($scope, $rootScope, $http, $location, Notification, OS, OSS, appServices) {
 
 
     $scope.workForce = {};
@@ -56,17 +58,23 @@ app.controller('MainController', [
 
     $scope.appName = 'stocCloud';
 
-    $scope.commons = {
-      href : function href (target) {
-        //clear any modal-overlay displayed
-        $scope.modal = {};
-        $location.path(target);
-      },
-      backBtn: function backBtn() {
-        history.back();
-      }
+    // $scope.commons = {
+    //   href : function href (target) {
+    //     //clear any modal-overlay displayed
+    //     $scope.modal = {};
+    //     $location.path(target);
+    //   },
+    //   backBtn: function backBtn() {
+    //     history.back();
+    //   }
+    // };
 
-    };
+    appServices.getCommons()
+    .then(function (r) {
+      // angular.extend($scope.commons, r);
+      $scope.commons = r;
+      // console.log($scope.commons);
+    });
 
     $scope.$on('newNotification', function (){
       $.gritter.add(Notification.notice);      

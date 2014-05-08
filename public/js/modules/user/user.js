@@ -61,6 +61,8 @@ angular.module('user', [])
       $('#activate-hospital-modal').modal('hide');
     });
   };
+  //quick send to quote
+  $scope.quickQuote = [];
 }])
 .filter('territory', function () {
   return function (arr) {

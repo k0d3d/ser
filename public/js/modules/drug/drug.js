@@ -196,7 +196,7 @@ angular.module('drug', [])
       });
     };
     $scope.search_by_reg_no = function(regNo){
-      ds.getByRegNo(regNo)
+      ds.getByRegNo(regNo.toUpperCase())
       .then(function(r){
         if (r === 'null') {
           alert('Not found');
@@ -204,7 +204,7 @@ angular.module('drug', [])
         } else {
           $scope.add_item_form.itemName = r.productName;
           $scope.add_item_form.nafdacRegNo = r.regNo;
-          $scope.add_item_form.importer = r.man_imp_supp;
+          $scope.add_item_form.pharma.pharmaName = r.man_imp_supp;
           $scope.add_item_form.sciName = r.composition;
           $scope.add_item_form.nafdacId = r._id;      
         }
@@ -240,6 +240,11 @@ angular.module('drug', [])
     };
     return function (num) {
       return states[num];
+    };
+  })
+  .filter('instantQuote', function () {
+    return function (bool) {
+      return (bool === true) ? 'Quote Available' : 'Quote Not Available';
     };
   })
   .factory('drugService', ['$http', 'Notification', 'Language', function ($http, N, L) {

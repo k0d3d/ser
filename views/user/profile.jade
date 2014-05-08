@@ -24,10 +24,10 @@
             | {{userProfile.address || 'Empty'}}
           -if (userData.account_type === 5)
             h5.subtitle State
-            p.states-select(data-type="select", onbeforesave="update_profile($data, $editable.name)", editable-select="userProfile.state")
+            p.states-select(data-type="select", onbeforesave="update_profile($data, $editable.name)", editable-select="userProfile.state", e-ng-options="s for s in commons.states")
               | {{userProfile.state || 'Empty'}}
             h5.subtitle Local Govt Area
-            p.lga-select(data-type="select", onbeforesave="update_profile($data, $editable.name)", editable-select="userProfile.lga")
+            p.lga-select(onbeforesave="update_profile($data, $editable.name)", editable-text="userProfile.lga")
               | {{userProfile.lga || 'Empty'}}
           h5.subtitle Telephone
           p.x-editable(title='Phone', data-type="text", onbeforesave="update_profile($data, $editable.name)", editable-text="userProfile.phone", data-default-value="Your Phone Number")

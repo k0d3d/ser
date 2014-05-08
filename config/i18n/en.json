@@ -1,6 +1,12 @@
  {
-     "title": "Hello World",
-     "content": {
-         "description": "A little description."
-     }
+  "new_quotation_request": {
+    "email" : {
+      "subject" : "new quotation request",
+      "message" : "you have received a new quotation request"      
+    },
+    "sms" : {
+      "message": "you have received a new quotation request"
+    }
+  },
+  "home" : "chilling"
  }

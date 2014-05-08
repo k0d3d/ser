@@ -19,7 +19,7 @@ module.exports = function(app, passport) {
     },
     {
       name: 'Distributor',
-      permissions: ['view-activity', 'view-drug-pages', 'add-item', 'view-profile-managers', 'view-profile-staff']
+      permissions: ['activity-count', 'view-activity', 'view-drug-pages', 'add-item', 'view-profile-managers', 'view-profile-staff']
     },
     {
       name: 'Manager',
@@ -27,11 +27,11 @@ module.exports = function(app, passport) {
     },
     {
       name: 'Staff',
-      permissions: ['view-activity', 'view-drug-pages', 'employer', 'coverage', 'profile-activity', 'manager']
+      permissions: ['activity-count', 'view-activity', 'view-drug-pages', 'employer', 'coverage', 'profile-activity', 'manager']
     },
     {
       name: 'Hospitals',
-      permissions: ['place-order', 'view-activity', 'order-cart', 'view-drug-pages']
+      permissions: ['activity-count', 'place-order', 'view-activity', 'order-cart', 'view-drug-pages']
     }
   ];
   var nav = [
@@ -186,6 +186,10 @@ module.exports = function(app, passport) {
     res.render('home/index',{
       title: 'Dashboard'
     });
+  });
+
+  app.get('/api/internal/commons', function (req, res) {
+    res.json(200, require('../config/commons.js'));
   });
 
   app.route('/partials/:name')

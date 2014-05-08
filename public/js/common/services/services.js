@@ -53,6 +53,16 @@ angular.module('services', [])
 	}
 	return d;
 })
+.factory('appServices', ['$http', function ($http) {
+	return {
+		getCommons: function () {
+      return $http.get('/api/internal/commons')
+      .then(function (r) {
+        return r.data;
+      });
+		}
+	};
+}])
 .factory('userService', ['$http', 'Notification', 'Language', function ($http, N, L) {
 	return {
 		 loginUser: function (u, p, cb) {

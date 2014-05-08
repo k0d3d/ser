@@ -5,6 +5,15 @@ var mongoose = require('mongoose'),
   Schema = mongoose.Schema;
 
 
+function getQuoteString (bool) {
+  console.log(bool);
+  return (bool === false) ? 'No' : 'Yes'; 
+}
+function setQuoteString (word) {
+  return (word === 'No') ? false : true; 
+}
+
+
 var DrugSchema = new Schema ({
   itemName : {type: String, default: '', required: true},
   sciName : {type: String, default: '', required: false},
@@ -39,7 +48,9 @@ var DrugSchema = new Schema ({
   },
   distributor: [{type: Schema.ObjectId}],
   images: [{type: String}],
-  drugTags: [{type: String}]
+  drugTags: [{type: String}],
+  instantQuote: {type: Boolean, default: false, get: getQuoteString, set: setQuoteString},
+  packageQty: {type: Number, default: 0}
 });
 
 DrugSchema.statics = {

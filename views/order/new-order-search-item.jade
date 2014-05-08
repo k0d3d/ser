@@ -11,6 +11,7 @@
                 option(value="itemName") Brand Name
                 option(value="sciName") Composition
                 option(value="manufacturer") Manufacturer
+                option(value="nafdacRegNo") NAFDAC Reg Number
               label.control-label Filter by:
               select.form-control(ng-model="item_query.filter", ng-init="item_query.filter = 'Price'")
                 option Proximity
@@ -50,29 +51,44 @@
               .item-result-list
                 .media(ng-repeat="drugItem in searchedItems.drug")
                   .row
-                    .col-sm-9
+                    .col-sm-12.col-md-12
                       a.pull-left(href='#')
-                        img.media-object.drug-search-img(alt='', ng-src='/images/photos/{{drugItem.images[0]}}')
+                        img.media-object.drug-search-img(alt='', ng-src='/images/item-images/{{drugItem.images[0] || "default/item-avatar-small.jpg"}}')
                       .media-body
                         h4.filename.text-primary {{drugItem.itemName}}
                         table.table
                           thead
                             tr 
                               th Composition
-                              th Current Price
-                              th Manufacturer                          
+                              th Manufacturer 
+                              th Current Price                                                       
                           tbody
                             tr
                               td {{drugItem.sciName}}
-                              td N{{drugItem.currentPrice.retail}}
                               td {{drugItem.pharma.pharmaName}}                        
-                        span.label.label-info  <strong>Supplier: </strong> {{drugItem.owner.name}}                          
-                    .col-sm-3
-                      .form-group
-                        input.form-control(type='number', placeholder="Amount", ng-model="drugItem.orderAmount", required, ng-init="drugItem.orderAmount = 0")
-                      .btn-group
-                        button.btn.btn-default.btn-primary-alt(disabled) N{{drugItem.orderAmount * drugItem.currentPrice.retail}}
-                        button.btn.btn-primary(ng-click="add_to_cart(drugItem)", ng-disabled="drugItem.orderAmount == 0 || !drugItem.orderAmount") Order
+                              td {{drugItem.instantQuote | instantQuote }}
+                  .row
+                    .col-sm-4
+                      span.label.label-info(style="display: inline-block")  <strong>Supplier: </strong> {{drugItem.owner.name}}                          
+                    .col-sm-8
+                      div.pull-right  
+                        div(style="width: 150px; float: left; margin-left: 5px", ng-show="drugItem.sentRequest == 'input'")
+                          span(style="text-align: center; display: block") {{drugItem.packageQty}} \ {{drugItem.itemPackaging || '--'}}
+                          span(style="text-align: center; display: block") <strong>Total items :</strong> {{drugItem.packageQty * drugItem.packageCount || 0}}
+                        div(style="width: 70px; float: left; margin-left: 5px", ng-show="drugItem.sentRequest == 'input'")
+                          input.form-control(type='number', ng-model="drugItem.packageCount", required, ng-init="drugItem.packageCount = 0", placeholder="number of packages")
+                        div(style="float: left; margin-left: 5px")
+                          button.btn.btn-default.dropdown-toggle(type='button', ng-show="!drugItem.sentRequest || drugItem.sentRequest == 'no'", ng-click="drugItem.sentRequest = 'input'")
+                            | Request Quote
+                        div(style="width: 150px; float: left; margin-left: 5px", ng-show="drugItem.sentRequest == 'sent'")
+                          button.btn.btn-success-alt.dropdown-toggle(type='button', disabled)
+                            | Request Sent
+                        div(style="width: 150px; float: left; margin-left: 5px")
+                          button.btn.btn-default.dropdown-toggle.pull-right(ng-click="add_to_cart(drugItem)", ng-show="drugItem.sentRequest == 'input'")
+                            | Send Request
+                        div.sr-ol(style="width: 50px; float: left; margin-left: 5px", ng-show="drugItem.sentRequest == 'input'", ng-click="drugItem.sentRequest = 'no'")
+                          i.fa.fa-times-circle
+
 
               .ndl-list(ng-show="show_ndl", style="border-top: solid 1px #1489A0;padding-top: 20px;")
                 .media(ng-repeat="drugItem in searchedItems.ndl")
@@ -104,7 +120,9 @@
                   a(href='', ng-click="item_query.param == 'sciName'") Composition
                 li
                   a(href='', ng-click="item_query.param == 'manufacturer'") Manufacturer 
-            input.form-control(type='text', name='x', placeholder='Search term...', ng-model="item_query.s")
+                li
+                  a(href='', ng-click="item_query.param == 'nafdacRegNo'") NAFDAC Reg Number
+            input.form-control(type='text', name='x', placeholder='Search term...', ng-model="item_query.s", autofocus)
             span.input-group-btn
               button.btn.btn-default(type='button', ng-click="search(item_query)", ng-disabled="item_query.s == 0")
                 span.glyphicon.glyphicon-search

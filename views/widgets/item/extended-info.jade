@@ -65,3 +65,8 @@ mixin loadItemPrices()
       .col-sm-6
         p.text-area(onbeforesave="updatePrice($data, $editable.name)", editable-number="item.currentPrice.staffPrice")
           | {{item.currentPrice.staffPrice || 'N0'}}
+    .row
+      .col-sm-3 Instant Quote
+      .col-sm-6
+        p.text-area(onbeforesave="updateItem($data, $editable.name)", editable-select="item.instantQuote", e-ng-options="s.value as s.text for s in [{'value': 'false', 'text': 'Not Available'}, {'value': 'true', 'text': 'Available'}]")
+          | {{item.instantQuote || 'Not Available'}}

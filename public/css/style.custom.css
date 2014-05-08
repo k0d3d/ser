@@ -280,3 +280,9 @@ span.media-desc {
   border: solid 1px #ddd;
   margin: 0 4px;
 }
+select.editable-has-buttons {
+  max-width: 170px
+}
+.sr-ol i:hover {
+  color: #D9534F;
+}

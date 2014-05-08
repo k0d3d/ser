@@ -51,15 +51,17 @@ module.exports = {
      * @return {[type]}             [description]
      */
     getMyPeople : function getMyPeople(userId, accountType) {
+      console.log('getMyPeople', arguments);
       var book = Q.defer(), people = {};
 
       // private function to find managers. return a promise
-      function __findMyManagers () {
+      function __findMyManagers (uid) {
+        console.log('find my manager');
         var distSearch = Q.defer();
 
         //Check for managers 
         Manager.find({
-          'employer.employerId' : userId
+          'employer.employerId' : uid
         })
         .populate('userId', 'email account_type', 'User')
         .exec(function (err, managedManagers) {
@@ -76,7 +78,7 @@ module.exports = {
 
       //first of all, lets deny any other account (staff, hospital, pharma) from 
       //getting employees
-      if (parseInt(accountType) !== 3 || parseInt(accountType) !== 2) {
+      if (parseInt(accountType) > 3) {
         book.resolve([]);
         return book.promise;
       }
@@ -104,10 +106,9 @@ module.exports = {
       //we have to look for both staffs and managers 
       //under the distributor.
       if (parseInt(accountType) === 2) {
-        __findMyManagers()
+        __findMyManagers(userId)
         .then(function (myManagers) {
           people.managers = myManagers || {};
-          console.log(people);
           //find the staff employed by a distributor
           Staff.find({
             'employer.employerId' : userId

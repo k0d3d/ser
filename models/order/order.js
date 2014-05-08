@@ -7,7 +7,7 @@ var mongoose = require('mongoose'),
 
 
 var OrderStatusSchema = new Schema({
-  date: {type: Date, default: Date.now},
+  date: {type: Date},
   orderStatus: {type: Number, required: true},
   orderCharge: {type: Schema.ObjectId},
 });    
@@ -38,9 +38,9 @@ var OrderSchema = new Schema({
   /**
    * orderStatus values 
    * -1: order canceld
-   * 0 : in cart
-   * 1: order placed
-   * 2: order rejected // at this point, disputes about who takes charge of the order is settled
+   * 0 : quote request
+   * 1: quote reply
+   * 2: order accepted // at this point, disputes about who takes charge of the order is settled
    * 3: order confirmed
    * 4: order in transit
    * 5: order supplied
@@ -56,7 +56,7 @@ var OrderSchema = new Schema({
   orderId: {type: String, unique: true},
   amountSupplied: {type: Number},
   eta: {type: Date},
-  reason: {type: String}
+  reason: {type: String},
 });
 
 
@@ -100,7 +100,7 @@ OrderSchema.statics = {
     q.sort({orderDate: -1});
     q.exec(cb);
   }
-}
+};
 
 
 mongoose.model('Order', OrderSchema);

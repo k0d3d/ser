@@ -7,7 +7,7 @@ mixin allCart()
           th Quantity
           th Price (N)
           th.noprint Order Date
-          th.noprint Manufacturer
+          th.noprint Status
           th.noprint Supplier
           th.noprint Action
       tbody
@@ -16,16 +16,17 @@ mixin allCart()
             img.item-image(ng-src="/images/item-images/{{or.itemId.images[0] || 'default/item-avatar-small.jpg'}}")
             | {{or.itemId.itemName}}
           td {{or.orderAmount}}
-          td {{or.perItemPrice * or.orderAmount}}
+          td
+            |  {{or.viewPrice}}
           td.noprint {{or.orderDate | moment}}
-          td.noprint {{or.itemId.pharma.pharmaName}}
+          td.noprint(style="font-size: 11px") {{or.status | orderState}}
           td.noprint {{or.orderSupplier.name}}
           td.noprint
-            button.btn.btn-xs.btn-info.btn-bell(ng-click="order_this(or, $index)") 
+            button.btn.btn-xs.btn-info.btn-bell(ng-click="order_this(or, $index)", ng-disabled="!or.canGo") 
               i.fa.fa-check
-              |  Place this
+              |  Accept Quote 
             button.btn.btn-xs.btn-danger.btn-bell(ng-click="removeFromCart($index)") 
               i.fa.fa-times
-              | Cancel Order
+              | Cancel
   //
      table-responsive 

@@ -6,7 +6,9 @@ var Order = require('./order/order.js').Order,
   utilz = require('../lib/utils.js'),
   //EventRegister = require('../lib/event_register').register,
   staffUtils = require('./staff_utils.js'),
+  postman = require('./postman'),
   utils = require('util');
+
 
 //Underscore mixin to remove 
 //false values from an object
@@ -25,15 +27,15 @@ _.mixin({
 var orderManager = {
   cartOrder : function cartOrder (orderData) {
     console.log('cartOrder is working....');
+
     var order = new Order(orderData), or = Q.defer();
-    console.log(order);
+    
     order.orderDate = orderData.orderDate || Date.now();
     order.save(function (err, i) {
-      console.log(err, i);
       if (err) {
         return or.reject(err);
       } else {
-        return or.resolve(i); 
+        return or.resolve(i.toJSON()); 
       }
     });
 
@@ -48,9 +50,14 @@ var orderManager = {
     };
 
     if (!doc.orderStatus) {
-      query.status = {$gt: 0};
+      query.status = {$gt: -1};
+
     }
-    if(doc.orderStatus) {
+
+    if(doc.orderStatus === 'quotes') {
+      query.status = {$gt: -1, $lt: 2};
+      // query.status = doc.orderStatus;
+    } else {
       query.status = doc.orderStatus;
     }
     //query.orderStatus = (doc.orderStatus && (doc.orderStatus !== 0)) ? {$gt: 0} : undefined;
@@ -67,10 +74,13 @@ var orderManager = {
     if (doc.displayType === 'short') {
       fields = 'itemId orderAmount perItemPrice orderDate orderSupplier status hospitalId orderId amountSupplied';
     }
+    if (doc.displayType === 'count') {
+      fields = 'itemId';
+    }
 
     Order.find(_.compactObject(query), fields)
     // .where(doc.where, doc.whrVal)
-    .populate('itemId', 'itemName images pharma', 'drug')
+    .populate('itemId', 'itemName images pharma instantQuote', 'drug')
     .lean()
     //.limit(perPage)
     //.skip(perPage * page)
@@ -185,8 +195,9 @@ var orderManager = {
 
     Order.find({
       hospitalId: doc.hospitalId
-    }, 'itemId')
-    .populate('itemId', 'itemName', 'drug')
+    }, 'itemId orderDate')
+    .where('status').gte(3)
+    .populate('itemId', 'itemName category itemPackaging packageQty', 'drug')
     .exec(function (err, i) {
       if (err) {
         return ht.reject(err);
@@ -202,7 +213,7 @@ var orderManager = {
 
 
 function OrderController () {
-
+    Q.longStackSupport = true;
 }
 
 OrderController.prototype.constructor = OrderController;
@@ -542,14 +553,58 @@ OrderController.prototype.placeItemInCart = function placeItemInCart (orderData,
   orderData.perItemPrice = orderData.currentPrice.retail;
   orderData.orderSupplier = {supplierId: orderData.owner.userId, supplier_type: orderData.owner.account_type};
   orderData.hospitalId = orderOwner;
+  orderData.statusLog = [{
+    orderStatus: 0,
+    date : Date.now()
+  }];  
   orderData.orderId = utilz.uid(32);
   var order = _.omit(orderData, '_id');
   orderManager.cartOrder(order)
   .then(function (d) {
-    return procs.resolve(d);
+    //simple hack to ensure i have the 
+    //lastUpdate property. Usually with a find
+    //or findOne query, lastUpdate is a virtual.
+    d.lastUpdate = Date.now();
+    var noticeData = {
+      alertType: 'order',
+      timeStamp: 'lastUpdate',
+      meta : ['orderId', 'hospitalId']
+    };
+
+    postman.noticeFn.getConcernedStaff({
+      userId: orderData.owner.userId,
+      account_type: orderData.owner.account_type
+    })
+    .then(function (listOfRecpt) {
+      return postman.noticeFn.deliveryAgent({
+        listOfRecpt: listOfRecpt, 
+        typeOfMessage: 'new_quotation_request'
+      });
+    })
+    .then(function () {
+      return procs.resolve(d);
+    })
+    .catch(function (err) {
+      console.log(err.stack);
+      return procs.reject(err);
+    });
+
+
+    // then return promise which should send messages and 
+    // sms and set activity. 
+    // arguments : -  recipient, noticeType
+    // 
+    // postman.noticeFn.checkIfNotified([d], orderOwner, noticeData)
+    // .then(function (done) {
+    //   //use done to send email and sms
+    //   return procs.resolve(d);
+    // }, function (err) {
+    //   return procs.reject(err);
+    // });
+    
   }, function (err) {
     return procs.reject(err);
-  })
+  });
 
   return procs.promise;
 };

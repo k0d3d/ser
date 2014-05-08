@@ -6,12 +6,19 @@
     .header-right
       ul.headermenu
         -if (isPermitted(['order-cart'])) 
-          li(ng-controller="orderCartController")
+          li
             .btn-group
-              a.btn.btn-default.tp-icon(href="/a/orders/cart", order-cart-basket="orderCart")
-                | Order Cart
+              a.btn.btn-default.tp-icon(href="/a/orders/cart", order-cart-basket="my_quotation")
+                | My Quotations
                 i.fa.fa-shopping-cart
-                span.badge {{orderCart.length}}
+                span.badge {{my_quotation.length}}
+        -if (isPermitted(['activity-count'])) 
+          li
+            .btn-group
+              a.btn.btn-default.tp-icon(href="/a/profile")
+                | Updates 
+                i.fa.fa-star-o
+                span.badge {{activity.length || 0}}
 
         li
           .btn-group

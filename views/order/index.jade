@@ -2,14 +2,24 @@
     .panel.panel-default
       .col-md-12
         .panel.panel-default()
+          -var orderStatus = (userData.account_type !== 5) ? 2 : 3
+            .panel-heading(ng-init="orderFilter = {}; orderFilter.status = #{orderStatus}", style="height: 70px")  
+              .col-md-8
+                -if (userData.account_type !== 5)
+                  button.btn.drug-panel-buttons.btn-success(ng-class="", toggle-active-button="drug-panel-buttons", ng-click="orderFilter.status = 2") 
+                    | Pending Quotations
+                button.btn.drug-panel-buttons(ng-class="", toggle-active-button="drug-panel-buttons", ng-click="orderFilter.status = 3") 
+                  | Confirmed Orders 
+                button.btn.drug-panel-buttons(ng-class="", toggle-active-button="drug-panel-buttons", ng-click="orderFilter.status = 6") 
+                  | Supplied Orders    
+              .col-md-3
+                .form-content(style="margin-bottom: 30px")
+                  form.form-inline(name="searchform", novalidate)
+                    .form-group
+                      //- input.input-large.form-control(type="search", ng-model="orderFilter.status", placeholder="Search your orders...")
+              .col-md-1
+                | Showing {{funnel.length}} Order(s)                        
             .panel-body
-              .form-content(style="margin-bottom: 30px")
-                form.form-inline(name="searchform", novalidate, ng-submit="searchcmp()")
-                  .form-group
-                    .col-md-5
-                      input.input-large.form-control(type="search", ng-model="drugname", placeholder="Search your orders...")
-                    .col-md-7
-
               table.table.table-hover.table-bordered(style="margin-top: 30px")
                 thead
                   tr
@@ -24,7 +34,7 @@
                     th ETA
                     th 
                 tbody
-                  tr(ng-repeat="cmp in orders")
+                  tr(ng-repeat="cmp in (funnel = (orders | filter: orderStatusFilter))")
                     td {{cmp.itemId.itemName}}
                     td {{cmp.orderAmount}}
                     td {{cmp.orderDate | date:medium}}
@@ -35,8 +45,9 @@
                       td 
                         a(href="", ng-click="commons.href('hospital/'+cmp.hospitalId)") {{cmp.hospitalId.name}}
                     td
-                      | {{cmp.eta | etaMoment}}
-                      span.label.label-success.pull-right {{cmp.eta | moment}}
+                      span(ng-show="cmp.eta", style="font-size: 11px")
+                        | {{cmp.eta | etaMoment}}
+                      span.label.label-success.pull-right(ng-show="cmp.eta") {{cmp.eta | moment}}
                     td
                       button.btn.btn-warning.btn-xs(ng-click=" open_order_manager(cmp); toggleModal('manage-order-modal');") Manage this      
                       button.btn.btn-info.btn-xs(ng-click="toggleModal('manage-order-updates'); $parent.__temp = cmp") Tracking      

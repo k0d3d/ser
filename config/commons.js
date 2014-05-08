@@ -37,7 +37,39 @@ module.exports = {
     'Yobe',
     'Zamfara'
   ],
-
+  "itemPackaging" : [
+      'Bags',
+      'Bottles',
+      'Box',
+      'Carton',
+      'Gallon',
+      'Packet',
+      'Pieces',
+      'Roll',
+      'Sachet',
+      'Tin',
+      'Tube'
+  ],
+  "itemForm": [
+      'Amples',
+      'Caplets',
+      'Capsules',
+      'Cream',
+      'Drops',
+      'Emugels',
+      'Gels',
+      'Lotion',
+      'Ointments',
+      'Powder',
+      'Sheet',
+      'Solutions',
+      'Sprays',
+      'Suppositories',
+      'Suspensions',
+      'Syrup',
+      'Tablets',
+      'Vials'  
+  ],
   "categories" : [
     'Anasthetics', 
     'Analgesics,Anti Inflammatory & Anti Pyretics', 

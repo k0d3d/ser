@@ -123,11 +123,6 @@ function afterResourceFilesLoad() {
     // should be declared after session and flash
     app.use(helpers(pjson.name));
 
-    // set our default view engine
-    app.set('views', __dirname + '/views');
-    app.set('view engine', 'jade');
-
-
     //pass in the app config params in to locals
     app.use(function(req, res, next) {
 

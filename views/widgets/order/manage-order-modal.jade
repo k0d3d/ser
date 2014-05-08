@@ -22,29 +22,33 @@ mixin manageOrderModal (accountType)
                   .form-group
                     label.control-label.col-sm-3.col-md-3 ETA
                     .col-sm-5.col-md-5
-                      input.form-control(type="date", ng-model="__manageOrderModal.eta")
-                      span.help-text 
-                  .form-group
+                      input.form-control(type="date", ng-model="__manageOrderModal.eta", ng-required="!__manageOrderModal.eta")
+                      span.help-text(style="font-size: 9px; color: #999") {{__manageOrderModal.eta | date:'medium'}}
+                  .form-group(ng-show="__isEnabled(__manageOrderModal.status, 'resolution')", ng-disabled="__manageOrderModal.status <= 1")
                     label.control-label.col-sm-3.col-md-3 Resolution
                     .col-sm-5.col-md-5
                       select.form-control(type="date", ng-model="__manageOrderModal.status")
-                        option(value="3", ng-disabled="__manageOrderModal.status > 3") Confirm
-                        option(value="2", ng-disabled="__manageOrderModal.status > 3") Dispute
-                        option(value="4", ng-disabled="__manageOrderModal.status <= 4") In Transit
-                        option(value="5", ng-disabled="__manageOrderModal.status != 4 ") Supplied
-                        option(value="6", ng-disabled="__manageOrderModal.status != 5 || __manageOrderModal.status == 6 ") Paid
-                  .form-group(ng-show="__manageOrderModal.status == 2 && __manageOrderModal.status < 3 ")
+                        option(value="3", ng-disabled="!__isEnabled(__manageOrderModal.status, 'option_r_confirm')") Confirm
+                        option(value="4", ng-disabled="!__isEnabled(__manageOrderModal.status, 'option_r_in_transit')") In Transit
+                        option(value="5", ng-disabled="!__isEnabled(__manageOrderModal.status, 'option_r_supplied')") Supplied
+                        option(value="6", ng-disabled="!__isEnabled(__manageOrderModal.status, 'option_r_paid')") Paid
+                  .form-group(ng-show="__isEnabled(__manageOrderModal.status, 'comment')")
                     label.control-label.col-sm-3.col-md-3 Reason
                     .col-sm-5.col-md-5
                       textarea.form-control(ng-model="__manageOrderModal.reason")
-                  .form-group(ng-show="__manageOrderModal.status == 2 && __manageOrderModal.status < 3 ")
+                  .form-group(ng-show="__isEnabled(__manageOrderModal.status, 'change_price')")
                     label.control-label.col-sm-3.col-md-3 Change Price
                     .col-sm-5.col-md-5                        
                       input.form-control(type="number", ng-model="__manageOrderModal.perItemPrice")
+                  .form-group(ng-show="__isEnabled(__manageOrderModal.status, 'change_qty')")
+                    label.control-label.col-sm-3.col-md-3 Change Quanity to supply
+                    .col-sm-5.col-md-5                        
+                      input.form-control(type="number", ng-model="__manageOrderModal.orderAmount")
                   .form-group
                     .col-sm-3.col-md-3
                     .col-sm-5.col-md-5
-                      button.btn.btn-info(type="submit") Save Changes  
+                      button.btn.btn-info(type="submit", ng-show="__isEnabled(__manageOrderModal.status, 'update_order')") Update Order 
+                      a.btn.btn-info(ng-disabled="__manageOrderModal.eta.length == 0 || !__manageOrderModal.eta" ng-show="__isEnabled(__manageOrderModal.status, 'send_quotation_button')", ng-click="__manageOrderModal.status = 1; update_order(__manageOrderModal)") Send Quote  
               -if (accountType === 5)                
                 form.form-horizontal(ng-submit="update_order(__manageOrderModal)")
                   .form-group

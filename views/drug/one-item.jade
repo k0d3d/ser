@@ -16,15 +16,20 @@
             | {{item.sciName || 'Empty'}} 
         .row
           h5.subtitle Item Form
-          p.x-editable(data-type="select", onbeforesave="updateItem($data, $editable.name)", editable-select="item.itemForm", data-source="/api/internal/items/props?prop=itemForm")
+          p.x-editable(data-type="select", onbeforesave="updateItem($data, $editable.name)", editable-select="item.itemForm", e-ng-options="s for s in commons.itemForm")
             | {{item.itemForm || 'Empty'}}
         .row
           h5.subtitle Item Packaging
-          p.x-editable(data-type="select", onbeforesave="updateItem($data, $editable.name)", editable-select="item.itemPackaging", data-source="/api/internal/items/props?prop=itemPackaging")
+          p.x-editable(data-type="select", onbeforesave="updateItem($data, $editable.name)", editable-select="item.itemPackaging", e-ng-options="s for s in commons.itemPackaging")
             | {{item.itemPackaging || 'Empty'}}
         .row
+        .row
+          h5.subtitle Package Quantity
+          p.x-editable(onbeforesave="updateItem($data, $editable.name)", editable-number="item.packageQty")
+            | {{item.packageQty || '0'}}
+        .row
           h5.subtitle Category
-          p.x-editable(data-type="select", onbeforesave="updateItem($data, $editable.name)", editable-select="item.category", data-source="/api/internal/items/props?prop=category")
+          p.x-editable(data-type="select", onbeforesave="updateItem($data, $editable.name)", editable-select="item.category", e-ng-options="s for s in commons.categories")
             | {{item.category || 'Empty'}}
         .row
           h5.subtitle Nafdac Reg No

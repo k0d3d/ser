@@ -17,6 +17,8 @@
                   a(href='#', ng-click="item_query.param == 'composition'") Composition
                 li
                   a(href='#', ng-click="item_query.param == 'manufacturer'") Manufacturer 
+                li
+                  a(href='#', ng-click="item_query.param == 'manufacturer'") Location 
             input.form-control(type='text', name='x', placeholder='Search term...', ng-model="item_query.s")
             span.input-group-btn
               button.btn.btn-default(type='button', ng-click="search(item_query)")
