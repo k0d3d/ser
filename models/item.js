@@ -698,10 +698,11 @@ DrugController.prototype.checkUpdate = function(since, cb){
 };
 
 DrugController.prototype.fetchAllMyDrugs = function (options, userId, accountType) {
+  console.log(arguments);
   var d = Q.defer();
   //if you are not a distributor,
   //lets your employers id
-  if (accountType > 2) {
+  if (accountType > 2 && accountType !== 5) {
     staffUtils.getMeMyModel(accountType)
     .findOne({
       userId: userId
@@ -740,7 +741,7 @@ DrugController.prototype.fetchAllMyDrugs = function (options, userId, accountTyp
 
     });
 
-  } else {
+  } else if (accountType === 2){
       Drug.find({'supplier.supplierId': userId})
       //.sort()
       .limit(options.limit)
@@ -763,6 +764,8 @@ DrugController.prototype.fetchAllMyDrugs = function (options, userId, accountTyp
           });
         }
       });
+  } else {
+    return [];
   }
 
 

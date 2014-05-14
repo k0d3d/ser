@@ -5,14 +5,17 @@ mixin loadDrugPages()
         .panel-heading
           .col-title(style="float: left")
             h4 Found {{userProfile.drugs.length || 0}} Drugs / Medical Items
-          .col-button(style="float: right; width: 20%")
-            button.btn.btn-lightblue.pull-right(ng-click="place_quick_cart(quickQuote)") Action
-              | {{quickQuote.length}}
-          .col-button(style="float: right; width: 20%")
-            select.form-control(ng-model="quickOrderFilter.itemId.category")
-              option(value="") --Filter by--
-              each cat in commons.categories
-                option=cat
+          -if (userData.account_type === 5)
+            .col-button(style="float: right; width: 20%")
+              .btn-group.pull-right
+                button.btn.btn-lightblue(ng-click="place_quick_cart(quickQuote)", ng-disabled="!quickQuote.length > 0") Order
+                button.btn.btn-lightblue(ng-click="place_quick_cart(quickQuote)", ng-disabled="!quickQuote.length > 0")
+                  | {{quickQuote.length}}
+            .col-button(style="float: right; width: 20%")
+              select.form-control(ng-model="quickOrderFilter.itemId.category")
+                option(value="") --Filter by--
+                each cat in commons.categories
+                  option=cat
           .clearfix
         .panel-body
           -if (userData.account_type === 5)
@@ -37,13 +40,13 @@ mixin loadDrugPages()
                         button.btn.btn-sm.btn-danger
                           i.fa.fa-times
                       -if (userData.account_type === 5 )
-                        input.form-control(type="number", placeholder="Amount", ng-model="drug.orderAmount")
-                        span.hepl-text <strong> Total Qty: </strong> {{drug.itemId.packageQty * drug.orderAmount || 0}}
+                        input.form-control(type="number", placeholder="Amount", ng-model="drug.packageCount")
+                        span.hepl-text <strong> Total Qty: </strong> {{drug.itemId.packageQty * drug.packageCount || 0}}
                 .col-md-1.col-sm-1
                   input.pull-right(type="checkbox", checklist-model="quickQuote",  checklist-value="drug")
                 .clearfix
           -if (userData.account_type !== 5)
-            .media(ng-repeat="drug in userProfile.drugs", )
+            .media(ng-repeat="drug in userProfile.drugs | filter: quickOrderFilter")
               .row
                 .col-sm-9.col-md-9
                   a.pull-left(href='#')

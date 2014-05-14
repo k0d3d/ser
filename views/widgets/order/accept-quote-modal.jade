@@ -1,0 +1,37 @@
+#accept-quote-modal.modal.fade.in(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
+  .modal-dialog
+      .modal-content
+        .modal-header
+          button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+          h4#myModalLabel.modal-title Please confirm
+        .modal-body
+          .or-ch            
+            -if (userData.account_type === 5)                
+              form.form-horizontal()
+                .form-group
+                  label.control-label.col-sm-3.col-md-3 ETA
+                  .col-sm-5.col-md-5
+                  p.form-control-static {{__modal_data.eta | moment}}
+                .form-group
+                  label.control-label.col-sm-3.col-md-3 Amount being supplied
+                  .col-sm-5.col-md-5
+                    p.form-control-static {{__modal_data.orderAmount}}
+                .form-group
+                  label.control-label.col-sm-3.col-md-3 Accepted Price (Naira)
+                  .col-sm-5.col-md-5                        
+                    p.form-control-static {{__modal_data.perItemPrice}}
+                .form-group
+                  .col-md-offset-1.col-sm-offset-1.col-sm-10.col-md-10
+                    .alert.alert-warning
+                      p.form-control-static
+                        | Please confirm the above order summary. By clicking the accept button
+                        | you are ..TOS........
+
+        .modal-footer
+          button.btn.btn-success(type='button', data-dismiss='modal', ng-click="order_this(__modal_data, __modal_index);") Accept Quotation
+          button.btn.btn-white(type='button', data-dismiss='modal') Close
+      //
+         modal-content 
+    //
+       modal-dialog     
+

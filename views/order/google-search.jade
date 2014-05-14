@@ -12,14 +12,14 @@
                 span.caret
               ul.dropdown-menu(role='menu')
                 li
-                  a(href='#', ng-click="item_query.param == 'brandName'") Brand Name
+                  a(href='#', ng-click="item_query.param = 'brandName'") Brand Name
                 li
-                  a(href='#', ng-click="item_query.param == 'composition'") Composition
+                  a(href='#', ng-click="item_query.param = 'composition'") Composition
                 li
-                  a(href='#', ng-click="item_query.param == 'manufacturer'") Manufacturer 
+                  a(href='#', ng-click="item_query.param = 'manufacturer'") Manufacturer 
                 li
-                  a(href='#', ng-click="item_query.param == 'manufacturer'") Location 
-            input.form-control(type='text', name='x', placeholder='Search term...', ng-model="item_query.s")
+                  a(href='#', ng-click="item_query.param = 'manufacturer'") Location 
+            input.form-control(type='text', placeholder='Search term...', ng-model="item_query.s")
             span.input-group-btn
               button.btn.btn-default(type='button', ng-click="search(item_query)")
                 span.glyphicon.glyphicon-search

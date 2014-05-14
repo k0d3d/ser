@@ -10,7 +10,13 @@ config(['$routeProvider',function($routeProvider){
   .when('/a/orders/new', {templateUrl: '/order/new-order-search-item', controller: 'orderAddController'})
   .when('/a/orders/cart', {templateUrl: '/order/cart', controller: 'orderCartController'});
 }])
-.controller('orderCartController', ['$scope', '$http', 'ordersService', '$rootScope', function($scope, $http, ordersService, $rootScope) {
+.controller('orderCartController', [
+  '$scope', 
+  '$http', 
+  'ordersService', 
+  '$rootScope', 
+  'Notification', 
+  function($scope, $http, ordersService, $rootScope, N) {
   $scope.$parent.headerTitle = 'Pending Quotations';
   $scope.orderCart = [];
 
@@ -18,16 +24,24 @@ config(['$routeProvider',function($routeProvider){
   ordersService.orders('quotes', 'short')
   .then(function (i) {
     angular.forEach(i, function (v) {
-      if (v.status === 0 && v.itemId.instantQuote === false) {
-        v.viewPrice = '...';
-        v.canGo = false;
-      } else {
-        v.viewPrice = v.perItemPrice * v.orderAmount;
-        v.canGo = true;
+      try {
+        if (v.status === 0 && v.itemId.instantQuote === false) {
+          v.viewPrice = '...';
+          v.canGo = false;
+        } else {
+          v.viewPrice = v.perItemPrice * v.orderAmount;
+          v.canGo = true;
+        }
+        $scope.orderCart.push(v);
+      } catch (e) {
+        N.notifier({
+          title: 'Ooops!',
+          text: 'We could not load one of the quotes',
+          class_name: 'growl-danger'
+        });
       }
 
 
-      $scope.orderCart.push(v);
     });
    // $rootScope.my_quotation = i;
   });  
@@ -59,20 +73,21 @@ config(['$routeProvider',function($routeProvider){
     orderStatus : ''
   };
 
-  $scope.orderStatusFilter = function orderStatusFilter (item) {
-    if ($scope.orderFilter.status == 2) {
+  $scope.orderStatusFilter =  function orderStatusFilter (item) {
+    var state = $scope.orderFilter.status;
+    if (state == 2) {
       return (item.status < 2)? true : false;
     }
-    if ($scope.orderFilter.status == 3) {
-      return (item.status >= 3 && item.status < 5) ? true : false;
+    if (state == 3) {
+      return (item.status >= 2 && item.status < 5) ? true : false;
     }
-    if ($scope.orderFilter.status == 6) {
+    if (state == 6) {
       return (item.status >= 5 && item.status <= 6)? true : false;
     }
     return false;
     // console.log(item);
   };
-  //
+
   (function(){
     $scope.orders = [];
     $scope.__temp = {};
@@ -144,34 +159,37 @@ config(['$routeProvider',function($routeProvider){
     $scope.__manageOrderModal = cmp;
   };
 
-  $scope.update_order = function (order) {
+  $scope.update_order = function (order, index) {
     ordersService.updateOrder(order)
     .then(function () {
+      $scope.orders[index] = order;      
       $('#manage-order-modal').modal('hide');
     });
   };
-  $scope.cancel_order = function (order) {
+  $scope.cancel_order = function (order, index) {
     order.status = -1;
     ordersService.updateOrder(order)
     .then(function () {
+      $scope.orders[index] = order;
       $('#manage-order-modal').modal('hide');
     });
   };
 
   $scope.__isEnabled = function (status, permission) {
     var per = {
-      'change_price' : [0,1,2],
+      'change_price' : [0,1],
       'send_quotation_button': [0,1],
-      'change_qty' : [0,1,2],
+      'change_qty' : [0,1],
       'update_order': [3,4,5],
-      'comment': [2],
-      'resolution': [3,4,5],
-      'option_r_confirm': [],
+      'comment': [1],
+      'resolution': [2,3,4,5],
+      'option_r_confirm': [2],
       'option_r_in_transit': [3],
       'option_r_supplied': [4],
-      'option_r_paid' : [5]
+      'option_r_paid' : [5],
+      'cancel_order' : [1,2,3,4]
     };
-    if (per[permission].indexOf(status) > -1) {
+    if (per[permission].indexOf(parseInt(status)) > -1) {
       return true;
     } else {
       return false;
@@ -184,6 +202,7 @@ config(['$routeProvider',function($routeProvider){
     itemData: {},
     supplierData: {}
   };
+  $scope.searchedItems = {};
   $scope.modal = {};
   if($routeParams.itemId){
     drugService.summary($routeParams.itemId, 'main', function(r){
@@ -200,22 +219,15 @@ config(['$routeProvider',function($routeProvider){
     });
   }
 
-  if($location.by === 'composition'){
-    $scope.plcordr = true;
-  }else{
-    $scope.searchndl = true;
-  }
-
   $scope.search = function(queryObj){
     // $scope.ds = '';
     // var page = p || 0;
     
     ordersService.searchCmp(queryObj)
     .then(function (r) {
-      
       angular.forEach(r.drug, function (v, i) {
-        r.drug[i].packageQty = v.packageQty || 1;
-      }, r);
+        r.drug[i].packageQty = 1;
+      });
       $scope.searchedItems = r;
       $scope.searchedItems.s = queryObj.s;
       
@@ -269,27 +281,9 @@ config(['$routeProvider',function($routeProvider){
 
     };
 
-    f.getAllSuppliers = function(callback){
-      $http.get('/api/orders/suppliers/'+escape(query)).success(function(data){
-        callback(data);
-      });
-    };
-    f.getSupplierName = function(query, callback){
-      // $http.get('/api/orders/supplier/typeahead/'+query).success(function(data){
-      //   callback(data);
-      // });
-      $.getJSON('/api/orders/supplier/typeahead/'+escape(query), function(s) {
-          var results = [];
-          $.each(s,function(){
-            results.push(this.supplierName);
-          });
-          callback(results);
-      });
-    };
-
     //Gets orders by status and display
     f.orders = function(status, displayType){
-      return $http.get('/api/orders/' + status + '/display/' + displayType)
+      return $http.get('/api/internal/orders/' + status + '/display/' + displayType)
       .then(function (d){
         return d.data;
       }, function (err) {
@@ -297,9 +291,10 @@ config(['$routeProvider',function($routeProvider){
       });
     };
 
-    //Post one item to be sent as an order
+    //Post one item to be sent as an order.
+    //Accepts a replied quotation.
     f.postCartItem = function(form){
-      return $http.put('/api/orders/' + form.orderId + '/status/3', form)
+      return $http.put('/api/internal/orders/' + form.orderId + '/status/2', form)
       .then(function (r) {
         N.notifier({
           title: L[L.set].titles.success,
@@ -338,7 +333,7 @@ config(['$routeProvider',function($routeProvider){
     };
 
     f.fetchActivities = function () {
-      return $http.get('/api/activities')
+      return $http.get('/api/internal/activities')
       .then(function (r) {
         return r.data;
       }, function (err) {
@@ -348,7 +343,7 @@ config(['$routeProvider',function($routeProvider){
 
     //makes an order update request.
     f.updateOrder = function (o) {
-      return $http.put('/api/orders/'+escape(o.orderId), o)
+      return $http.put('/api/internal/orders/'+escape(o.orderId), o)
       .then(function (data) {
         N.notifier({
           title: L[L.set].titles.error,
@@ -368,7 +363,7 @@ config(['$routeProvider',function($routeProvider){
 
     //remove or cancel an order
     f.hideOrderItem = function(orderId){
-      return $http.delete('/api/orders/' + orderId)
+      return $http.delete('/api/internal/orders/' + orderId)
       .then(function (r) {
         return r.data;
       }, function(err) {
@@ -378,7 +373,7 @@ config(['$routeProvider',function($routeProvider){
 
     //remove or cancel an order
     f.remove = function(order_id){
-      return $http.delete('/api/orders/'+order_id)
+      return $http.delete('/api/internal/orders/'+order_id)
       .then(function (r) {
         N.notifier({
           title: L[L.set].titles.success,
@@ -389,21 +384,8 @@ config(['$routeProvider',function($routeProvider){
       });
     };
 
-    f.moreInfo = function (id, callback) {
-      $http.get('/api/orders/ndl/' + id + '/summary')
-      .success(function (d) {
-        callback(d);
-      })
-      .error(function (d) {
-        Notification.notifier({
-          message: Lang[Lang.set].order.summary.error,
-          type: 'error'
-        });
-      });
-    };
-
     f.notifySupplier = function(id, type, cb){
-      $http.post('/api/suppliers/'+id+'/notify?type='+type)
+      $http.post('/api/internal/suppliers/'+id+'/notify?type='+type)
       .success(function(d){
         cb(d);
       })
@@ -415,7 +397,7 @@ config(['$routeProvider',function($routeProvider){
     //Request for order statuses and updates for a 
     //particular order
     f.getOrderStatusUpdates = function getOrderStatusUpdates (orderId) {
-      return $http.get('/api/orders/' + orderId + '/statuses')
+      return $http.get('/api/internal/orders/' + orderId + '/statuses')
       .then(function (data) {
         return data.data;
       }, function (err) {
@@ -504,70 +486,6 @@ config(['$routeProvider',function($routeProvider){
     controller: 'orderCartController',
   };
 }])
-.directive('orderList', ['ordersService','Notification','Language', function(OS, N, L){
-  function link () {
-    
-
-  }
-  function Ctrlr ($scope){
-  
-    $scope.updateOrder = function(index){
-      if($scope.orderList[index].nextStatus == 'supplied' && 
-        (!$scope.orderList[index].amountSupplied || 
-          !$scope.orderList[index].orderInvoice)){
-        alert('Please check the required fields: Missing Amount / Invoice Number');
-        return false;
-      }
-      if($scope.orderList[index].nextStatus == 'paid' && 
-        (!$scope.orderList[index].paymentReferenceType || 
-          !$scope.orderList[index].paymentReferenceID)){
-        alert('Please check the required fields: Payment ID / Payment Type');
-        return false;
-      } 
-      var o ={
-        status : $scope.orderList[index].nextStatus,
-        itemData : $scope.orderList[index].itemData,
-        amount : $scope.orderList[index].orderAmount,
-        order_id : $scope.orderList[index]._id,
-        invoiceno : $scope.orderList[index].orderInvoice,
-        amountSupplied: $scope.orderList[index].amountSupplied,
-        paymentReferenceType: $scope.orderList[index].paymentReferenceType,
-        paymentReferenceID: $scope.orderList[index].paymentReferenceID
-      };
-      OS.updateOrder(o, function(r){
-        $scope.orderList[index].orderStatus = r.result;
-        $scope.orderList[index].nextStatus = $scope.getStatus({status: r.result});
-        if(r.result == 'supplied' && ($scope.orderList[index].amountSupplied < $scope.orderList[index].orderAmount)){
-          N.notifier({
-            message: L[L.set].order.update.amountDis,
-            type: 'info'
-          });
-        }
-      });
-    };
-
-
-    $scope.removeOrder = function(event, order_id){
-      var currentItem = event.currentTarget;
-      OS.remove(order_id, function(o){
-        if(o.state === 1){
-          $(currentItem).parents('tr').remove();
-        }
-      });
-    };    
-
-  }
-  return {
-    link: link,
-    controller: Ctrlr,
-    scope: {
-      orderList: '=',
-      ordersFilter: '=',
-      getStatus: '&'
-    },
-    templateUrl: '/templates/order-list'
-  };
-}])
 
 .filter('orderState', function () {
   return function (num) {
@@ -602,3 +520,4 @@ config(['$routeProvider',function($routeProvider){
     }
   }
 });
+

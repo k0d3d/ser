@@ -48,7 +48,7 @@ module.exports.routes = function(app, login){
   //get sent back as a response. The available options are full or short.
   //
   //
-  app.get('/api/orders/:orderStatus/display/:displayType',function(req, res){
+  app.get('/api/internal/orders/:orderStatus/display/:displayType',function(req, res){
 
     order.getOrders(req.params.orderStatus, req.params.displayType, req.user._id, req.user.account_type)
     .then(function(r){
@@ -58,7 +58,7 @@ module.exports.routes = function(app, login){
     });
   });
 
-  app.get('/api/orders/:orderId/statuses', function (req, res) {
+  app.get('/api/internal/orders/:orderId/statuses', function (req, res) {
     order.getOrderStatuses(req.params.orderId, req.user._id, req.user.account_type)
     .then(function (r) {
       res.json(200, r);
@@ -69,7 +69,7 @@ module.exports.routes = function(app, login){
 
   // Order POST Routes
   app.post('/api/internal/orders',function(req, res){
-    order.placeItemInCart(req.body, req.user._id)
+    order.requestItemQuotation(req.body, req.user._id)
     .then(function(r){
       res.json(200, true);
     }, function (err) {
@@ -78,33 +78,38 @@ module.exports.routes = function(app, login){
   });
 
   //Progresses an order from the cart to being placed
-  app.put('/api/orders/:orderId/status/:orderStatus', function (req, res) {
+  app.put('/api/internal/orders/:orderId/status/:orderStatus', function (req, res) {
     console.log('message');
-    if (parseInt(req.params.orderStatus) === 3) {
-      order.redressOrder(req.body, req.user._id, parseInt(req.params.orderStatus))
+    var userId, accountType;
+    if (parseInt(req.user.account_type) === 5) {
+      userId = req.user._id;
+      accountType = req.user.account_type;
+      order.addressQuotation(req.body, parseInt(req.params.orderStatus), userId, accountType)
       .then(function (r) {
         res.json(200, r);
       }, function (err) {
         res.json(400, err.message);
       });
+    } else {
+      res.json(401, 'not authorized');
     }
 
     //if(req.params.orderStatus == )
   });
 
   //updates an order
-  app.put('/api/orders/:orderId', function (req, res) {
+  app.put('/api/internal/orders/:orderId', function (req, res) {
     console.log('In the put route');
-    order.updateOrder(req.body, req.user._id, req.user.account_type)
+    order.distUpdateOrder(req.body, req.user._id, req.user.account_type)
     .then(function (data) {
       res.json(200, true);
     }, function (err) {
-      res.json(400, err);
+      res.json(400, err.message);
     });
   });
 
   //Delete Order (logically)
-  app.delete('/api/orders/:order_id', function(req, res, next){
+  app.delete('/api/internal/orders/:order_id', function(req, res, next){
     order.hideOrderItem(req.param('order_id'))
     .then(function(err){
       if(util.isError(err)){

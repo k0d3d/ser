@@ -1,13 +1,18 @@
 var publicModule = angular.module('stocPublic', [
-  'ngRoute'
+  'ngRoute',
+  'order',
+  'services',
+  'language',
+  'drug',
   ]);
+
 
 publicModule.controller('userController', [
   '$scope',
   'userServices',
   '$location',
   '$window',
-  function loginController ($scope, userServices, $location, $window) {
+  function userController ($scope, userServices, $location, $window) {
     $scope.send_login = function () {
       userServices.login($scope.form).then(function (r) {
 

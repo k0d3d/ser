@@ -6,6 +6,8 @@ angular.module('services', [])
 .factory('Notification', function($rootScope){
 	var s = {};
 
+	s.activityCount = 0;
+
 	s.notice = {
 
 		// (string | mandatory) the heading of the notification
@@ -35,12 +37,18 @@ angular.module('services', [])
 	};
 
 	s.broadcastNotification = function() {
-	    $rootScope.$broadcast('newNotification');
+    $rootScope.$broadcast('newNotification');
 	};
 
 	s.broadcastEvent = function(){
 		$rootScope.$broadcast('newEvent');
 	};
+
+	s.broadcastActivity = function (count) {
+		s.activityCount = count;
+		$rootScope.$broadcast('activity_refresh');
+	};
+
 	return s;
 })
 .factory('Dialog', function($rootScope, $timeout){

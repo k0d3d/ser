@@ -8,10 +8,14 @@
                 -if (userData.account_type !== 5)
                   button.btn.drug-panel-buttons.btn-success(ng-class="", toggle-active-button="drug-panel-buttons", ng-click="orderFilter.status = 2") 
                     | Pending Quotations
+                    //- span.label.label-default {{(orders | filter:orderStatusFilter).length}}
                 button.btn.drug-panel-buttons(ng-class="", toggle-active-button="drug-panel-buttons", ng-click="orderFilter.status = 3") 
                   | Confirmed Orders 
+                  //- span.label.label-default {{(orders | filter:orderStatusFilter).length}}
                 button.btn.drug-panel-buttons(ng-class="", toggle-active-button="drug-panel-buttons", ng-click="orderFilter.status = 6") 
                   | Supplied Orders    
+                  //- span.label.label-default {{(orders | filter:orderStatusFilter).length}}
+
               .col-md-3
                 .form-content(style="margin-bottom: 30px")
                   form.form-inline(name="searchform", novalidate)
@@ -34,8 +38,9 @@
                     th ETA
                     th 
                 tbody
-                  tr(ng-repeat="cmp in (funnel = (orders | filter: orderStatusFilter))")
-                    td {{cmp.itemId.itemName}}
+                  tr(ng-repeat="cmp in funnel = (orders | filter:orderStatusFilter)")
+                    td 
+                      a(link-to="drug", link-to-id="{{cmp.itemId._id}}") {{cmp.itemId.itemName}}
                     td {{cmp.orderAmount}}
                     td {{cmp.orderDate | date:medium}}
                     -if (userData.account_type === 5)
@@ -49,8 +54,9 @@
                         | {{cmp.eta | etaMoment}}
                       span.label.label-success.pull-right(ng-show="cmp.eta") {{cmp.eta | moment}}
                     td
-                      button.btn.btn-warning.btn-xs(ng-click=" open_order_manager(cmp); toggleModal('manage-order-modal');") Manage this      
-                      button.btn.btn-info.btn-xs(ng-click="toggleModal('manage-order-updates'); $parent.__temp = cmp") Tracking      
+                      -if (userData.account_type !== 5)
+                        button.btn.btn-warning.btn-xs(ng-click="toggleModal('manage-order-modal', cmp, $index);") Manage this      
+                      button.btn.btn-info.btn-xs(ng-click="toggleModal('manage-order-updates', cmp.statusLog, $index)") Tracking      
               .x-pagination(pagination="orders", page-to="page(pageNo, limit, cb)")
 include ../widgets/order/manage-order-modal
 include ../widgets/order/manage-order-updates

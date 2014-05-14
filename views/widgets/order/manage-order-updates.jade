@@ -8,7 +8,7 @@ mixin orderStatusUpdates
             h4#myModalLabel.modal-title Order Updates
           .modal-body
             .or-ch                
-              .status-row.row(ng-repeat="status in __temp.orderStatusList")
+              .status-row.row(ng-repeat="status in __modal_data")
                 .col-md-3
                   strong.status-title Status 
                   | {{status.orderStatus | orderState}}
@@ -21,7 +21,7 @@ mixin orderStatusUpdates
                 
 
           .modal-footer
-            button.btn.btn-default(type='button', data-dismiss='modal', ng-click="__temp = ''") Close
+            button.btn.btn-default(type='button', data-dismiss='modal') Close
         //
            modal-content 
       //

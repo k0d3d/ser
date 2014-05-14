@@ -49,7 +49,7 @@ module.exports = function(app, passport) {
     },
     {
       name: 'Suppliers',
-      roles: [5],
+      roles: [],
       icon: '',
       url: '/a/suppliers',
     },
@@ -174,19 +174,18 @@ module.exports = function(app, passport) {
 
   //Home route
   app.route('/')
-  .get(login.ensureLoggedIn('/signin'), function(req, res){
-    res.render('index',{
-      title: 'Dashboard',
-      userData: req.user
-    });
-  });
-
-  app.route('/home/index')
-  .get(login.ensureLoggedIn('/signin'), function(req, res){
-    res.render('home/index',{
+  .get(function(req, res){
+    res.render('home/splash',{
       title: 'Dashboard'
     });
   });
+
+  // app.route('/home/index')
+  // .get(login.ensureLoggedIn('/signin'), function(req, res){
+  //   res.render('home/splash',{
+  //     title: 'Dashboard'
+  //   });
+  // });
 
   app.get('/api/internal/commons', function (req, res) {
     res.json(200, require('../config/commons.js'));

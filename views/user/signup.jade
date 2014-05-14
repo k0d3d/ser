@@ -32,10 +32,14 @@ block mainbody
                 .mb20
                 strong
                   | Not a member? 
-                  a(href='/signup') Sign Up
+                  a(href='/signup', target="_top") Sign Up
 
             .col-md-6
               include ../widgets/public/register
               +register()
 append foot
   script(src="/js/modules/public.js")
+  script(src="/js/modules/lang.js")
+  script(src="/js/modules/order/order.js")
+  script(src="/js/modules/drug/drug.js")
+  script(src="/js/common/services/services.js")        

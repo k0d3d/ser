@@ -25,6 +25,7 @@ _.mixin({
 });
 
 var orderManager = {
+
   cartOrder : function cartOrder (orderData) {
     console.log('cartOrder is working....');
 
@@ -81,6 +82,7 @@ var orderManager = {
     Order.find(_.compactObject(query), fields)
     // .where(doc.where, doc.whrVal)
     .populate('itemId', 'itemName images pharma instantQuote', 'drug')
+    // .populate('statusLog', '')
     .lean()
     //.limit(perPage)
     //.skip(perPage * page)
@@ -197,7 +199,7 @@ var orderManager = {
       hospitalId: doc.hospitalId
     }, 'itemId orderDate')
     .where('status').gte(3)
-    .populate('itemId', 'itemName category itemPackaging packageQty', 'drug')
+    .populate('itemId', 'itemName category itemPackaging packageQty supplier currentPrice', 'drug')
     .exec(function (err, i) {
       if (err) {
         return ht.reject(err);
@@ -292,8 +294,8 @@ OrderController.prototype.getOrders = function getOrders (orderStatus, displayTy
       if (orderList.length) {
         __orders = orderList;
 
-        orderManager.getItemSuppliers(__orders).
-        then(function (populatedOrderList) {
+        orderManager.getItemSuppliers(__orders)
+        .then(function (populatedOrderList) {
           return gt.resolve(populatedOrderList);
         });      
       } else {
@@ -370,41 +372,48 @@ OrderController.prototype.getOrders = function getOrders (orderStatus, displayTy
  * @param  {Number} accountType the account level of the currently logged in user
  * @return {Object}             Promise Object
  */
-OrderController.prototype.updateOrder = function(orderData, userId, accountType){
+OrderController.prototype.distUpdateOrder = function(orderData, userId, accountType){
   console.log('Updating order...');
   //Updates the order statuses, these are useful for order history
   //queries, etc
   //Updates the order status 
   var law = Q.defer(),
       __body = _.omit(orderData, ['_id', 'hospitalId', 'itemId', 'statusLog', 'orderSupplier']);
+  
+      //add the currently logged in
+      //user as the person making changes
+      //or taking charge of the order.
+      __body.orderCharge = (accountType === parseInt(4)) ? userId : undefined;
   var options = {
       $set: __body,
       $push: {
         statusLog: {
           orderStatus: __body.status,
-          orderCharge: __body.orderCharge
+          orderCharge: __body.orderCharge,
+          date: Date.now()
         }
       }
     };
 
   //if the currently logged in user
   //is a staff and is confirming or disputing an order
-  if ((__body.status === parseInt(3) || __body.status === parseInt(2)) && accountType === parseInt(4)) {
-    options.$push = {
-      statusLog: {
-          orderStatus: __body.status,
-          orderCharge: userId      
-      }
-    };
-  }
+  // if (parseInt(__body.status) < 4 && accountType === parseInt(4)) {
+  //   // options.$set.orderCharge = 
+  //   // // options.$push = {
+  //   // //   statusLog: {
+  //   // //       orderStatus: __body.status,
+  //   // //       orderCharge: userId ,
+  //   // //       date: Date.now()     
+  //   // //   }
+  //   // // };
+  // }
+
 
   //TODO:: use fine and Update instead of update
   //to check for current order status
   //if the order has been confirmed.. it cannot be 
   //replace again, or confirmed again
   //if(__body.status)
-
-  console.log(options);
 
   try {
     Order.update({
@@ -417,7 +426,41 @@ OrderController.prototype.updateOrder = function(orderData, userId, accountType)
       }
 
       if (i > 0) {
-        return law.resolve(orderData);
+        // if order has been updates, notify
+        // concerned..i.e. hospital
+        postman.noticeFn.getConcernedStaff({
+          userId: orderData.hospitalId.userId,
+          accountType: 5,
+          operation: 'user'
+        })
+        .then(function (listOfRecpt) {
+          var tom;
+          if (__body.status !== 3) {
+            tom = 'quotation_request_replied';
+          } else {
+            tom = 'quotation_request_updated'; 
+          }          
+          return postman.noticeFn.deliveryAgent({
+            listOfRecpt: listOfRecpt, 
+            typeOfMessage: tom
+          });          
+        })
+        .then(function () {
+
+          // postman.noticeFn.checkIfNotified([d], userId, noticeData)
+          // .then(function (done) {
+          //   //use done to send email and sms
+          //   return procs.resolve(d);
+          // }, function (err) {
+          //   return procs.reject(err);
+          // });          
+          return law.resolve(__body);
+        })
+        .catch(function (err) {
+          console.log(err.stack);
+          return law.reject(err);          
+        });
+        
       }
 
       if (i === 0) {
@@ -540,16 +583,16 @@ OrderController.prototype.orderUpdates = function orderUpdates (hospitalId, dayt
 };
 
 /**
- * [placeItemInCart description]
+ * Places a request for quotation to a distributor. 
  * @param  {[type]} orderData  [description]
  * @param  {[type]} orderOwner the user placing the order
  * @return {[type]}            [description]
  */
-OrderController.prototype.placeItemInCart = function placeItemInCart (orderData, orderOwner) {
+OrderController.prototype.requestItemQuotation = function requestItemQuotation (orderData, orderOwner) {
   console.log('Placing Items in Cart');
   var procs = Q.defer();
 
-  orderData.itemId = orderData._id;
+  orderData.itemId = orderData._id || orderData.itemId;
   orderData.perItemPrice = orderData.currentPrice.retail;
   orderData.orderSupplier = {supplierId: orderData.owner.userId, supplier_type: orderData.owner.account_type};
   orderData.hospitalId = orderOwner;
@@ -565,15 +608,16 @@ OrderController.prototype.placeItemInCart = function placeItemInCart (orderData,
     //lastUpdate property. Usually with a find
     //or findOne query, lastUpdate is a virtual.
     d.lastUpdate = Date.now();
-    var noticeData = {
-      alertType: 'order',
-      timeStamp: 'lastUpdate',
-      meta : ['orderId', 'hospitalId']
-    };
+    // var noticeData = {
+    //   alertType: 'order',
+    //   timeStamp: 'lastUpdate',
+    //   meta : ['orderId', 'hospitalId']
+    // };
 
     postman.noticeFn.getConcernedStaff({
       userId: orderData.owner.userId,
-      account_type: orderData.owner.account_type
+      accountType: orderData.owner.account_type,
+      operation: 'organization'
     })
     .then(function (listOfRecpt) {
       return postman.noticeFn.deliveryAgent({
@@ -617,13 +661,14 @@ OrderController.prototype.placeItemInCart = function placeItemInCart (orderData,
  * the browser. 
  * @return {[type]}       [description]
  */
-OrderController.prototype.redressOrder = function redressOrder (order, orderOwner, status) {
+OrderController.prototype.addressQuotation = function addressQuotation (order, status, userId, accountType) {
   console.log('Placing order');
   var ot = Q.defer();
 
   Order.findOne({
     orderId : order.orderId
   })
+  // .populate('orderCharge', 'email', 'User')
   .exec(function (err, i) {
     if (err) {
       return ot.reject(err);
@@ -636,36 +681,56 @@ OrderController.prototype.redressOrder = function redressOrder (order, orderOwne
     if (i.status > status && status !== -1) {
       return ot.reject(new Error('invalid transaction'));
     }
+
     i.status = status;
     i.statusLog.push({
       orderStatus: status,
-      orderCharge : order.orderCharge
+      orderCharge : i.orderCharge,
+      date: Date.now()
     });
+
     i.save(function (err, i) {
+      // if order has been updates, notify
+      // concerned..i.e. sales staff,
+      // by now, a sales staff should be incharge of the order
+      postman.noticeFn.getConcernedStaff({
+        userId: i.orderCharge || i.orderSupplier.supplierId,
+        accountType: (i.orderCharge) ? 4 : 2,
+        operation: (i.orderCharge) ? 'user' : 'organization'
+      })
+      .then(function (listOfRecpt) {
+        var tom;
+        if (status === 2) {
+          tom = 'quotation_accepted';
+        } else if (status === -1) {
+          tom = 'order_cancelled'; 
+        }
+        return postman.noticeFn.deliveryAgent({
+          listOfRecpt: listOfRecpt, 
+          typeOfMessage: tom
+        });          
+      })
+      .then(function () {
+
+        // postman.noticeFn.checkIfNotified([d], userId, noticeData)
+        // .then(function (done) {
+        //   //use done to send email and sms
+        //   return procs.resolve(d);
+        // }, function (err) {
+        //   return procs.reject(err);
+        // });          
+        return ot.resolve(i);
+      })
+      .catch(function (err) {
+        console.log(err.stack);
+        return ot.reject(err);          
+      });
+
       return ot.resolve(i);
     });
 
 
   });
-
-  // Order.update({
-  //   orderId : order.orderId
-  // }, {
-  //   $set : {
-  //     orderStatus: status
-  //   }
-  // }, function (err, i) {
-  //   if (err) {
-  //     return ot.reject(err);
-  //   }
-  //   if (i > 0) {
-      
-  //     return ot.resolve(i);
-  //   }
-  //   if (i === 0) {
-  //     return ot.reject(new Error('order update failed'));
-  //   }
-  // });
 
   return ot.promise;
 };

@@ -56,6 +56,8 @@ app.controller('MainController', [
     $scope.waiting = '';
     $scope.headerTitle = 'Dashboard';
 
+    
+
     $scope.appName = 'stocCloud';
 
     // $scope.commons = {
@@ -89,7 +91,22 @@ app.controller('MainController', [
       //$socpe.orderCart.push()
     });
 
-    $scope.toggleModal = function (modalId) {
+    $scope.$on('activity_refresh', function () {
+      console.log(Notification.activityCount);
+      $scope.activity = Notification.activityCount;
+    });
+
+    $scope.toggleModal = function (modalId, modalData, index) {
+      if ($scope.__modal_data) {
+        delete $scope.__modal_data;
+      }
+      if (modalData) {
+        $scope.__modal_data = angular.copy(modalData);
+
+      }
+      if (index) {
+        $scope.__modal_index = index;
+      }
       $('#' + modalId).modal('toggle');
     };
 
@@ -218,4 +235,29 @@ app.factory('errorNotifier', ['$q', 'Notification', 'Language', function($q, N, 
       return $q.reject(response);
     }
   }
-}])
+}]);
+
+app.directive('linkTo', function () {
+  return {
+    link: function (scope, ele, attrs) {
+        // var t = attrs.linkTo.split('-');
+        // var aspect = t[0].trim();
+        var id = scope.linkToId;
+
+        switch (scope.linkTo) {
+          case 'drug':
+            $(ele).prop('href', '/a/drug/' + id + '/item');
+            // attrs.href = ;
+            break;
+          default: 
+            $(ele).prop('href', '/a/drug/' + id + '/item');
+            break;
+        }
+
+    },
+    scope: {
+      linkTo: '=',
+      linkToId: '@'
+    }
+  };
+});

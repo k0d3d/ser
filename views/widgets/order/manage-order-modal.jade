@@ -9,74 +9,73 @@ mixin manageOrderModal (accountType)
           .modal-body
             .or-ch
               -if (accountType < 4)
-                form.form-horizontal(ng-submit="update_order(__manageOrderModal)")
+                form.form-horizontal(ng-submit="update_order(__modal_data)")
                   .form-group
                     label.control-label.col-sm-3.col-md-3 Staff in charge
                     .col-sm-5.col-md-5
-                      select.form-control(ng-click="check_people()", ng-model="__manageOrderModal.orderCharge", ng-options="c.userId._id as c.name for c in employer_peeps")
+                      select.form-control(ng-click="check_people()", ng-model="__modal_data.orderCharge", ng-options="c.userId._id as c.name for c in employer_peeps")
                     .col-sm-2.col-md-2
                       button.btn.btn-primary-alt(type="submit") Re-assign Order 
                 hr
               -if (accountType === 4)
-                form.form-horizontal(ng-submit="update_order(__manageOrderModal)")
+                form.form-horizontal(ng-submit="update_order(__modal_data, __modal_index)")
                   .form-group
                     label.control-label.col-sm-3.col-md-3 ETA
                     .col-sm-5.col-md-5
-                      input.form-control(type="date", ng-model="__manageOrderModal.eta", ng-required="!__manageOrderModal.eta")
-                      span.help-text(style="font-size: 9px; color: #999") {{__manageOrderModal.eta | date:'medium'}}
-                  .form-group(ng-show="__isEnabled(__manageOrderModal.status, 'resolution')", ng-disabled="__manageOrderModal.status <= 1")
+                      input.form-control(type="date", ng-model="__modal_data.eta", ng-required="!__modal_data.eta")
+                      span.help-text(style="font-size: 9px; color: #999") {{__modal_data.eta | date:'medium'}}
+                  .form-group(ng-show="__isEnabled(__modal_data.status, 'resolution')", ng-disabled="__modal_data.status <= 1")
                     label.control-label.col-sm-3.col-md-3 Resolution
                     .col-sm-5.col-md-5
-                      select.form-control(type="date", ng-model="__manageOrderModal.status")
-                        option(value="3", ng-disabled="!__isEnabled(__manageOrderModal.status, 'option_r_confirm')") Confirm
-                        option(value="4", ng-disabled="!__isEnabled(__manageOrderModal.status, 'option_r_in_transit')") In Transit
-                        option(value="5", ng-disabled="!__isEnabled(__manageOrderModal.status, 'option_r_supplied')") Supplied
-                        option(value="6", ng-disabled="!__isEnabled(__manageOrderModal.status, 'option_r_paid')") Paid
-                  .form-group(ng-show="__isEnabled(__manageOrderModal.status, 'comment')")
+                      select.form-control(type="date", ng-model="__modal_data.status")
+                        option(value="3", ng-disabled="!__isEnabled(__modal_data.status, 'option_r_confirm')") Confirm
+                        option(value="4", ng-disabled="!__isEnabled(__modal_data.status, 'option_r_in_transit')") In Transit
+                        option(value="5", ng-disabled="!__isEnabled(__modal_data.status, 'option_r_supplied')") Supplied
+                        option(value="6", ng-disabled="!__isEnabled(__modal_data.status, 'option_r_paid')") Paid
+                  .form-group(ng-show="__isEnabled(__modal_data.status, 'comment')")
                     label.control-label.col-sm-3.col-md-3 Reason
                     .col-sm-5.col-md-5
-                      textarea.form-control(ng-model="__manageOrderModal.reason")
-                  .form-group(ng-show="__isEnabled(__manageOrderModal.status, 'change_price')")
+                      textarea.form-control(ng-model="__modal_data.reason")
+                  .form-group(ng-show="__isEnabled(__modal_data.status, 'change_price')")
                     label.control-label.col-sm-3.col-md-3 Change Price
                     .col-sm-5.col-md-5                        
-                      input.form-control(type="number", ng-model="__manageOrderModal.perItemPrice")
-                  .form-group(ng-show="__isEnabled(__manageOrderModal.status, 'change_qty')")
+                      input.form-control(type="number", ng-model="__modal_data.perItemPrice")
+                  .form-group(ng-show="__isEnabled(__modal_data.status, 'change_qty')")
                     label.control-label.col-sm-3.col-md-3 Change Quanity to supply
                     .col-sm-5.col-md-5                        
-                      input.form-control(type="number", ng-model="__manageOrderModal.orderAmount")
+                      input.form-control(type="number", ng-model="__modal_data.orderAmount")
                   .form-group
                     .col-sm-3.col-md-3
-                    .col-sm-5.col-md-5
-                      button.btn.btn-info(type="submit", ng-show="__isEnabled(__manageOrderModal.status, 'update_order')") Update Order 
-                      a.btn.btn-info(ng-disabled="__manageOrderModal.eta.length == 0 || !__manageOrderModal.eta" ng-show="__isEnabled(__manageOrderModal.status, 'send_quotation_button')", ng-click="__manageOrderModal.status = 1; update_order(__manageOrderModal)") Send Quote  
+                    .col-sm-3.col-md-3
+                      button.btn.btn-info(type="submit", ng-show="__isEnabled(__modal_data.status, 'update_order')") Update Order 
+                    .col-sm-3.col-md-3
+                      button.btn.btn-danger(ng-click="cancel_order(__modal_data)", type="submit", ng-show="__isEnabled(__modal_data.status, 'update_order')") Cancel Order           
+                      a.btn.btn-info(ng-disabled="__modal_data.eta.length == 0 || !__modal_data.eta" ng-show="__isEnabled(__modal_data.status, 'send_quotation_button')", ng-click="__modal_data.status = 1; update_order(__modal_data)") Send Quote  
               -if (accountType === 5)                
-                form.form-horizontal(ng-submit="update_order(__manageOrderModal)")
+                form.form-horizontal(ng-submit="update_order(__modal_data, __modal_index)")
                   .form-group
                     label.control-label.col-sm-3.col-md-3 ETA
                     .col-sm-5.col-md-5
-                    p.form-control-static {{__manageOrderModal.eta | moment}}
+                    p.form-control-static {{__modal_data.eta | moment}}
                   .form-group
                     label.control-label.col-sm-3.col-md-3 Current Status
                     .col-sm-5.col-md-5
-                      p.form-control-static {{__manageOrderModal.status | orderState}}
+                      p.form-control-static {{__modal_data.status | orderState}}
                   .form-group
                     label.control-label.col-sm-3.col-md-3 Reason
                     .col-sm-5.col-md-5
-                      p.form-control-static {{__manageOrderModal.reason}}
+                      p.form-control-static {{__modal_data.reason}}
                   .form-group
                     label.control-label.col-sm-3.col-md-3 Price
                     .col-sm-5.col-md-5                        
-                      p.form-control-static {{__manageOrderModal.perItemPrice}}
+                      p.form-control-static {{__modal_data.perItemPrice}}
                   .form-group
                     .col-sm-3.col-md-3
                     .col-sm-3.col-md-3
-                      button.btn.btn-success(ng-click="__manageOrderModal.status = 1", type="submit", ng-disabled="__manageOrderModal.status == 3 || __manageOrderModal.status == 1") Confirm Order  
-                    .col-sm-3.col-md-3         
-                      button.btn.btn-danger(ng-click="cancel_order(__manageOrderModal)", type="submit", ng-disabled="__manageOrderModal.status == -1") Cancel Order           
-                
+                      button.btn.btn-success(ng-click="__modal_data.status = 1", type="submit", ng-disabled="__modal_data.status == 3 || __modal_data.status == 1") Confirm Order  
 
           .modal-footer
-            button.btn.btn-default(type='button', data-dismiss='modal', ng-click="__manageOrderModal = ''") Close
+            button.btn.btn-default(type='button', data-dismiss='modal') Close
         //
            modal-content 
       //

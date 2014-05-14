@@ -22,7 +22,7 @@ mixin allCart()
           td.noprint(style="font-size: 11px") {{or.status | orderState}}
           td.noprint {{or.orderSupplier.name}}
           td.noprint
-            button.btn.btn-xs.btn-info.btn-bell(ng-click="order_this(or, $index)", ng-disabled="!or.canGo") 
+            button.btn.btn-xs.btn-info.btn-bell(ng-click="toggleModal('accept-quote-modal', or, $index)", ng-disabled="!or.canGo") 
               i.fa.fa-check
               |  Accept Quote 
             button.btn.btn-xs.btn-danger.btn-bell(ng-click="removeFromCart($index)") 

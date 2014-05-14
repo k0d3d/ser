@@ -3,8 +3,8 @@ mixin register()
       h3.nomargin Sign Up
       p.mt5.mb20
         | Already a member?
-        a(href='/signin')
-          strong Sign In
+        a(href='/signin', target="_top")
+          strong  Sign In
       .alert.alert-danger(ng-show="auth_message.length > 0")
         | {{auth_message}}
       .mb10

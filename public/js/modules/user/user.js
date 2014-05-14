@@ -12,13 +12,21 @@ angular.module('user', [])
   '$scope', 
   'userServices', 
   'ordersService', 
-  function userController($scope, US, ordersService){
+  'Notification',
+  function userController($scope, US, ordersService, N){
   //Change HeaderTitle
   $scope.$parent.headerTitle = 'Profile';
+  $scope.activity = [] ;
   //Fetch Activities
   US.fetchActivities()
   .then(function (i) {
-    $scope.activity = i;
+    angular.forEach(i, function (v) {
+      v.created = new Date(v.created);
+      $scope.activity.push(v);
+    });
+    N.broadcastActivity(i.length);
+    // N.activityCount = i.length;
+    // $scope.activity = i;
   });
 
   US.fetchProfile()
@@ -63,6 +71,44 @@ angular.module('user', [])
   };
   //quick send to quote
   $scope.quickQuote = [];
+
+  //Places a quick quote
+  $scope.place_quick_cart = function place_quick_cart (load) {
+    var l = 0;
+    function __qu () {    
+      var item = load.pop();
+      if (!item.packageCount) return alert('please check the amount to be ordered.');
+      item.orderAmount = item.packageCount * item.itemId.packageQty;
+      item.owner = {
+        "userId" : item.itemId.supplier.supplierId,
+        "account_type": 2
+      };
+      item.currentPrice =  item.itemId.currentPrice;
+      item.itemId = item.itemId._id;
+      // item.instantQuote = true;
+      delete item._id;
+      ordersService.addToQuotations(item)
+      .then(function(data){
+          item.sentRequest = 'sent';
+          $scope.my_quotation.push(data);
+
+          l++;
+          
+          if (load.length) {
+            __qu();
+          } else {
+            N.notifier({
+              title: 'Welldone!',
+              text: l + 'Quick Quote(s) Requested',
+              class_name: 'growl-success'
+            });
+          }
+      });    
+    }
+
+    __qu();
+
+  };
 }])
 .filter('territory', function () {
   return function (arr) {

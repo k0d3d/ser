@@ -1,7 +1,7 @@
 mixin loadActivities
   -if (isPermitted(['view-activity']))
     #activities.tab-pane.active
-      .activity-list(ng-repeat="act in activity")
+      .activity-list(ng-repeat="act in activity | orderBy: 'created': true")
         .media.act-media
           a.pull-left(href='#')
             img.media-object.act-thumb(src='images/photos/user1.png', alt='')

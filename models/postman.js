@@ -9,7 +9,7 @@ var ActivityNotification = require('./activity/notification.js'),
     Q = require('q'),
     sendEmail = require('../lib/email/sendMail.js').sendMail,
     sendSms = require('../lib/sms/smsSend.js'),
-    // messageStrings = require('../lib/message-strings.js'),
+    messageStrings = require('../lib/message-strings.js'),
     lingua = require('lingua'),
 
 noticeFn = {
@@ -102,72 +102,102 @@ noticeFn = {
    * and staff belonging to a distributor or staffs under a manager.
    * 
    * 
-   * @param  {object} doc Object containing userId and account_type 
-   * properties.
+   * @param  {object} doc Object containing userId and accountType 
+   * properties and also an operation property which determines what 
+   * users are concerned (the operation to carry out) .
    * @return {object}     Promise object
    */
   getConcernedStaff: function getConcernedStaff (doc) {
     var dfr = Q.defer();
-    //list of employees
-    staffUtils.getMyPeople(doc.userId, doc.account_type)
-    .then(function (peps) {
-      var listOfRecpt = [];
-
-
-      //list of managers 
-      if (peps.managers) {
-        _.each(peps.managers, function (v) {
-          listOfRecpt.push({
-            userId: v.userId, 
-            allowedNotifications: v.allowedNotifications, 
-            approvedNotices: v.approvedNotices,
-            name: v.name,
-            phone: v.phone
+    var listOfRecpt = [];
+    console.log('Getting concerned staff...');
+    if (doc.operation === 'organization') {    //list of employees
+          staffUtils.getMyPeople(doc.userId, doc.accountType)
+          .then(function (peps) {
+    
+    
+            //list of managers 
+            if (peps.managers) {
+              _.each(peps.managers, function (v) {
+                listOfRecpt.push({
+                  userId: v.userId, 
+                  allowedNotifications: v.allowedNotifications, 
+                  approvedNotices: v.approvedNotices,
+                  name: v.name,
+                  phone: v.phone
+                });
+              });
+            }
+    
+            //list of staffs 
+            if (peps.staff) {
+              _.each(peps.staff, function (v) {
+                listOfRecpt.push({
+                  userId: v.userId, 
+                  allowedNotifications: v.allowedNotifications, 
+                  approvedNotices: v.approvedNotices,
+                  name: v.name,
+                  phone: v.phone
+                });
+              });
+            }
+    
+            //get the employers profile
+            staffUtils.getMeMyModel(doc.accountType)
+            .findOne({
+              userId: doc.userId
+            })
+            .populate('userId', 'email account_type', 'User')
+            // .lean()
+            .exec(function (err, md) {
+              if (err) {
+                return dfr.reject(err);
+              }
+    
+    
+              listOfRecpt.push({
+                  userId: md.userId, 
+                  allowedNotifications: md.allowedNotifications, 
+                  name: md.name,
+                  phone: md.phone,            
+                  approvedNotices: md.approvedNotices
+                });
+              return dfr.resolve(listOfRecpt);
+            });
+    
+    
+            // return procs.resolve(d);
+          }, function (err) {
+            return dfr.reject(err);
           });
-        });
-      }
+    }
 
-      //list of staffs 
-      if (peps.staff) {
-        _.each(peps.staff, function (v) {
-          listOfRecpt.push({
-            userId: v.userId, 
-            allowedNotifications: v.allowedNotifications, 
-            approvedNotices: v.approvedNotices,
-            name: v.name,
-            phone: v.phone
-          });
-        });
-      }
-
-      //get the employers profile
-      staffUtils.getMeMyModel(doc.account_type)
+    if (doc.operation === 'user') {
+      staffUtils.getMeMyModel(doc.accountType)
       .findOne({
         userId: doc.userId
       })
-      .populate('userId', 'email account_type', 'User')
-      .lean()
-      .exec(function (err, md) {
+      .populate('userId', 'email', 'User')
+      .exec(function (err, i) {
         if (err) {
           return dfr.reject(err);
         }
-        listOfRecpt.concat(_.map(md, function (v) {
-          return {
-            userId: v.userId, 
-            allowedNotifications: v.allowedNotifications, 
-            name: v.name,
-            phone: v.phone,            
-            approvedNotices: v.approvedNotices
-          };
-        }));
-        return dfr.resolve(listOfRecpt);
-      });
 
+        if (i) {
+          listOfRecpt.push({
+            userId: i.userId, 
+            allowedNotifications: i.allowedNotifications, 
+            name: i.name,
+            phone: i.phone,            
+            approvedNotices: i.approvedNotices
+          });
 
-      // return procs.resolve(d);
-    }, function (err) {
-      return dfr.reject(err);
-    });
+          dfr.resolve(listOfRecpt);
+        } else {
+          dfr.resolve([]);
+        }
+      });      
+    }
 
     return dfr.promise;
   },
@@ -187,12 +217,14 @@ noticeFn = {
   deliveryAgent : function deliveryAgent (doc) {
     var da = Q.defer();
     da.longStackSupport = true;
+    // console.log(doc);
+    // da.resolve();
+    // return da.promise;
 
     // var noticeData
-    console.log(lingua.home);
 
     function __pushMessages () {
-
+      // console.log(doc.listOfRecpt);
       var task = doc.listOfRecpt.pop();
       //task here is a user object.
       //
@@ -208,10 +240,10 @@ noticeFn = {
           sendEmail({
             to: task.userId.email,
             // to: task.userId.email,
-            subject: "new quotation request",
-            // subject: lingua[doc.typeOfMessage].email.subject,
-            text: "you have received a new quotation request"
-            // text: lingua[doc.typeOfMessage].email.message
+            // subject: "new quotation request",
+            subject: messageStrings(doc.typeOfMessage + '.email.subject'),
+            // text: "you have received a new quotation request"
+            text: messageStrings(doc.typeOfMessage + '.email.message')
           })
           .then(function (done) {
             //just wanna log to console for now..
@@ -230,20 +262,20 @@ noticeFn = {
       if (task.allowedNotifications.sms) {
         if (task.phone) {
           
-          sendSms.sendSMS("you have received a new quotation request", task.phone)
+          sendSms.sendSMS(messageStrings(doc.typeOfMessage + '.sms.message'), task.phone)
           .then(function (done) {
             //just wanna log to console for now..
             //TODO:: log to file 
             console.log(done);
           },  function (err) {
             //log to file later
-            console.log(err);
+            console.log(err.stack);
           });          
         }
       }
-
+      console.log('sent to: ' + task.userId.email);
       if (doc.listOfRecpt.length) {
-        __pushMessages();
+        process.nextTick(__pushMessages);
       } else {
         return da.resolve();
       }
@@ -267,7 +299,7 @@ noticeFn = {
       order: {
         '0' : 'new quotation request',
         '1' : 'an order has been placed',
-        '2' : 'an order is in dispute',
+        '2' : 'an order quote has been accepted',
         '3' : 'an order has been confirmed',
         '4': 'order in transit',
         '5': 'order supplied',

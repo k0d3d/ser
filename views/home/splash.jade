@@ -1,0 +1,248 @@
+extends ../layouts/splash
+
+block bodyContent
+    main#top.masthead(role='main')
+      .container
+        .logo
+          a(href='#')
+            img(src='/images/startup-template-logo.png', alt='startup-logo')
+        h1
+          | The Most 
+          span(data-typer-targets='Easy,Efficient,Secure,Simple')  Efficient
+          |  and 
+          strong Safe Way
+          br
+          | to
+          strong  Order
+          |  your Drugs
+        .row
+          .col-md-12.col-sm-12.col-md-offset-2.subscribe()
+            form#subscribeForm.form-horizontal(role='form')
+              .form-group
+                .col-md-7.col-sm-6.col-sm-offset-0.col-md-offset-0
+                  .input-group
+                    input#address.form-control.input-lg(style="height: 52px", name='text', placeholder='Search By Brand Name, Composition, NAFDAC No', required='required', ng-model="item_query.s")
+                    .input-group-btn
+                      button.btn.btn-default.dropdown-toggle.btn-lg(ng-init="view_param = 'Brand Name'; item_query.param = 'itemName'", type='button', data-toggle='dropdown',style="background-color: white;border: solid 0px white;border-left: solid 1px #A5A5A5;")
+                        | Search by: {{view_param}} 
+                        span.caret
+                      ul.dropdown-menu.pull-right(role='menu')
+                        li
+                          a(href='#', ng-click="item_query.param = 'itemName'; view_param = 'Brand Name'") Brand Name
+                        li
+                          a(href='#', ng-click="item_query.param = 'composition'; view_param = 'Composition'") Composition
+                        li
+                          a(href='#', ng-click="item_query.param = 'manufacturer'; view_param = 'Manufacturer'") Manufacturer 
+                        li
+                          a(href='#', ng-click="item_query.param = 'manufacturer'; view_param = 'Location'") Location                       
+                .col-md-1.col-sm-1
+                  button.btn.btn-success.btn-lg(type='submit', ng-click="search(item_query)") Search Now
+            span#result.alertMsg
+        a.scrollto(href='#explore')
+          p SCROLL DOWN TO EXPLORE
+          p.scrollto--arrow
+            img(src='/images/scroll_down.png', alt='scroll down arrow')
+    .highlight
+      #search-results.container(ng-show="searchedItems.drug || searchedItems.ndl")
+        .row
+            .well(style="border: none")
+              h1.text-center We've found something for you!
+              .list-group
+                a.list-group-item.active(ng-repeat="drugItem in searchedItems.drug")
+                  .media.col-md-3
+                    figure.pull-left
+                      img.media-object.img-rounded.img-responsive(src='http://placehold.it/350x250', alt='placehold.it/350x250')
+                  .col-md-6
+                    h4.list-group-item-heading  {{drugItem.itemName}}
+                    table.table
+                      thead
+                        tr 
+                          th Composition
+                          th Manufacturer 
+                          th Current Price                                                       
+                      tbody
+                        tr
+                          td {{drugItem.sciName}}
+                          td {{drugItem.pharma.pharmaName}}                        
+                          td Login to see
+                  .col-md-3.text-center
+                    h2
+                      | 14240
+                      small  votes 
+                    button.btn.btn-default.btn-lg.btn-block(type='button')  Vote Now! 
+                    .stars
+                      span.glyphicon.glyphicon-star
+                      span.glyphicon.glyphicon-star
+                      span.glyphicon.glyphicon-star
+                      span.glyphicon.glyphicon-star
+                      span.glyphicon.glyphicon-star-empty
+                    p
+                      | Average 4.5
+                      small  / 
+                      | 5
+                a.list-group-item.active(ng-repeat="drugItem in searchedItems.ndl")
+                  .media.col-md-3
+                    figure.pull-left
+                      img.media-object.img-rounded.img-responsive(src='http://placehold.it/350x250', alt='placehold.it/350x250')
+                  .col-md-6
+                    h4.list-group-item-heading  {{drugItem.productName}} 
+                    table.table
+                      thead
+                        tr 
+                          th Composition
+                          th Manufacturer 
+                          th Current Price                                                       
+                      tbody
+                        tr
+                          td {{drugItem.composition}}
+                          td {{drugItem.man_imp_supp}} 
+                          td Login to see                       
+                  .col-md-3.text-center
+                    h2
+                      | 14240
+                      small  votes 
+                    button.btn.btn-default.btn-lg.btn-block(type='button')  Vote Now! 
+                    .stars
+                      span.glyphicon.glyphicon-star
+                      span.glyphicon.glyphicon-star
+                      span.glyphicon.glyphicon-star
+                      span.glyphicon.glyphicon-star
+                      span.glyphicon.glyphicon-star-empty
+                    p
+                      | Average 4.5
+                      small  / 
+                      | 5
+
+        .section-title
+          h2 {{searchedItems.drug.length + searchedItems.ndl.length}} Found.
+          h4 Sign up or Log-in to View all search results. 
+    #explore.container
+      section.row.heroimg.breath
+        .col-md-12.text-center
+          img(src='/images/flat-mockup-template.png', alt='flat-mockup-template')
+      .section-title
+        h2 Some great features of DrugStoc
+        h4 With our advanced features, you'll fall in love with
+      section.row.features
+        .col-sm-6.col-md-3
+          .thumbnail
+            img(src='/images/flat-feature-icon-1.png', alt='analytics-icon')
+            .caption
+              h3 Advanced analytics
+              p Browse and analyze detailed statistics of each of your orders. 
+        .col-sm-6.col-md-3
+          .thumbnail
+            img(src='/images/flat-feature-icon-2.png', alt='analytics-icon')
+            .caption
+              h3 Competitive Pricing
+              p Get competitive Market Pricing when you get on our platform. 
+        .col-sm-6.col-md-3
+          .thumbnail
+            img(src='/images/flat-feature-icon-3.png', alt='analytics-icon')
+            .caption
+              h3 Convenient and Secure
+              p Experience convenience when ordering drugs. 
+        .col-sm-6.col-md-3
+          .thumbnail
+            img(src='/images/flat-feature-icon-4.png', alt='analytics-icon')
+            .caption
+              h3 Genuine Products and Support
+              p From the source to the user. No adulteratiomn
+      .section-title
+        h2 We partner with the best
+        h4 We are partners with world's trusted brands. 
+      section.row.clientlogo.breath
+        .col-md-12.text-center
+          img(src='/images/client-logos.png', alt='client-logos')
+    .highlight.testimonials
+      .container
+        .section-title
+          h2 What our customers said
+          h4 Don't take our word. See our testimonials 
+        section.row.breath
+          .col-md-6
+            .testblock
+            .clientblock
+              img(src='/images/customer-img-1.jpg', alt='.')
+              p
+                strong Paul
+                br
+                a(href='#')
+          .col-md-6
+            .testblock I like this platform.
+            .clientblock
+              img(src='/images/customer-img-2.jpg', alt='.')
+              p
+                strong Michael Slats
+                br
+                | Project Lead at
+                a(href='#') Airbnb.com
+    .container
+      .section-title
+        h2 Honest pricing. No surprises.
+        h4 No contract. No risk. No credit card required. 
+      section.row.breath.planpricing
+        .col-md-4
+          .pricing.color1
+            .planname Personal
+            .price
+              span.curr $
+              | 14
+              span.per /MO
+            .billing Billed Annually
+        .col-md-4
+          .pricing.color2
+            .planname Agency
+            .price
+              span.curr $
+              | 49
+              span.per /MO
+            .billing Billed Annually
+        .col-md-4
+          .pricing.color3
+            .planname Enterprise
+            .price
+              span.curr $
+              | 99
+              span.per /MO
+            .billing Billed Annually
+      .section-title
+        h5 Frequently Asked Questions
+      section.row.faq.breath
+        .col-md-6
+          h6 How does the free trial work?
+          p
+            | Our 10 day trial is 100% free and does not require credit card information to start. If at the end of your trial you would like to upgrade, great. If not, you can cancel your account altogether, or let us mark it as inactive for you to come back to later.
+          h6 Can I switch plans later?
+          p
+            | Absolutely. You can switch between our paid plans, or cancel your account altogether, whenever you like. We will adjust any payments accordingly.
+        .col-md-6
+          h6 Do I need to choose a plan now?
+          p
+            | No. You get the full featured, unlimited version of Startup completely free for 10 days. Once you're ready to upgrade, you may choose a plan which suits your needs.
+          h6 What payment types do you accept?
+          p
+            | We accept payments from MasterCard, Visa, Visa Debit and American Express. We do not accept PayPal. Remember, you do not need to supply card details to start your free trial.
+    main.footercta(role='main')
+      .container
+        h1
+          | The Most Simple & Yet
+          strong Powerful Way
+          br
+          | to
+          strong launch
+          | your startup
+        .row
+          .col-md-12.breath.text-center
+            a.btn.btn-success.btn-lg.gototop(href='#top') GET EARLY ACCESS
+    .container
+      section.row.breath
+        .col-md-12.footerlinks
+          a(href='#') About
+          a(href='#') Pricing
+          a(href='#') Blog
+          a(href='#') Help
+          a(href='#') Contact
+          a(href='#') Privacy
+          a(href='#') Terms
+          p © 2014 Startup. All Rights Reserved
