@@ -62,7 +62,8 @@
     "lingua": "^0.4.0",
     "lodash": "~2.4.1",
     "string-template": "~0.1.3",
-    "string-format": "~0.2.1"
+    "string-format": "~0.2.1",
+    "mongoose-q": "0.0.10"
   },
   "devDependencies": {
     "supertest": "latest",

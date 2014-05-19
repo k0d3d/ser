@@ -102,7 +102,7 @@ module.exports.routes = function(app, login) {
 
   app.get('/api/internal/drugs', function (req, res, next) {
     drugs.fetchAllMyDrugs({
-      page: req.query.page || 0,
+      page: req.query.page - 1 || 0,
       limit: req.query.limit || 50
     }, req.user._id, req.user.account_type)
     .then(function (r) {

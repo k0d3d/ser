@@ -7,6 +7,7 @@ var util = require('util'),
     Govt = require('../models/item/govt-facility.js'),
     _ = require('lodash'),
     Q = require('q'),
+    staffUtils = require('../models/staff_utils'),
     Hospital = require('../models/organization/hospital.js');
 
 function HospitalController (){
@@ -27,7 +28,7 @@ HospitalController.prototype.list = function(page, callback){
         callback(i);
       }
     });
-}
+};
 
 HospitalController.prototype.create = function (o, callback) {
   var user = new User({
@@ -74,7 +75,7 @@ HospitalController.prototype.delete = function(h_id, u_id, callback){
         } else {
           callback(i);
         }
-      })
+      });
     }
   });
 };
@@ -90,19 +91,64 @@ HospitalController.prototype.fetchOne = function (userId, cb) {
   });
 };
 
-HospitalController.prototype.searchGovtRegister = function searchGovtRegister (query) {
-  var t = Q.defer();
+HospitalController.prototype.searchGovtRegister = function searchGovtRegister (userId, accountType, query) {
+  var t = Q.defer(), options = null;
 
-  Govt.find({
-    stateCode: query.state
-  })
-  .regex('facilityName',new RegExp(query.name, 'i'))
-  .exec(function (err, i) {
-    if (err) {
-      return t.reject(err);
-    }
-    return t.resolve(i);
-  });
+  // if (query.state) {
+  //   
+  // } else {
+    staffUtils.getMeMyModel(accountType)
+    .findOne({
+      userId: userId
+    }, 'coverage')   
+    .execQ()
+    .then(function (user) {
+      //if we have a coverage area without 
+      //a query state, 
+      if (user.coverage && !query.state) {
+        options = {
+          lga: {
+            '$in': _.invoke(user.coverage, function () {
+              var str = new RegExp(this, 'gi');
+              return str;
+            }) 
+          }
+        };
+      }
+      // if we have a state property
+      // in our query, we use it
+      if (query.state) {
+        options = {stateCode: query.state};
+      }
+      // no query state or coverage...
+      // lets return based on query.name
+      if (!query.state && !user.coverage) {
+        options = {};
+      }
+      console.log(options);
+      Govt.find(options)
+      .regex('facilityName',new RegExp(query.name, 'i'))
+      .limit(50)
+      .execQ()
+      .then(function (i) {
+        console.log(i);
+        return t.resolve(i);
+      })
+      .fail(function (err) {
+        if (err) {
+          return t.reject(err);
+        }        
+      })
+      .done();
+
+    })
+    .fail(function (err) {
+      if (err) {
+        return t.reject(err);
+      }
+    })
+    .done();
+    
 
   return t.promise;
 };
@@ -177,7 +223,7 @@ module.exports.routes = function (app, login) {
 
   app.route('/api/internal/facilities/search')
   .get(function (req, res) {
-    hospital.searchGovtRegister(req.query)
+    hospital.searchGovtRegister(req.user._id, req.user.account_type, req.query)
     .then(function (r) {
       res.json(200, r);
     }, function (err) {

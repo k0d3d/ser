@@ -1,4 +1,4 @@
-var mongoose = require('mongoose'),
+var mongoose = require('mongoose-q')(),
     Schema = mongoose.Schema;
 
 var GovtFacSchema = new Schema({

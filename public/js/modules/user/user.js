@@ -15,7 +15,8 @@ angular.module('user', [])
   'Notification',
   'drugService',
   'organizeStaffService',
-  function userController($scope, US, ordersService, N, ds, oss){
+  'facilityServices',
+  function userController($scope, US, ordersService, N, ds, oss, facilityService){
   //Change HeaderTitle
   $scope.$parent.headerTitle = 'Profile';
   $scope.activity = [] ;
@@ -70,7 +71,7 @@ angular.module('user', [])
   };
 
   $scope.validate_facility = function validate_facility (data) {
-    US.validateFacility(data)
+    facilityService.searchFacility(data)
     .then(function (res) {
       if (!_.isEmpty(res)) {
         $scope.valRes = res;
@@ -171,12 +172,12 @@ angular.module('user', [])
         return r.data;
       });
     },
-    validateFacility: function validateFacility (data) {
-      return $http.get('/api/internal/facilities/search?type=facilty&' + $.param(data))
-      .then(function (r) {
-        return r.data;
-      });
-    },
+    // searchFacility: function searchFacility (data) {
+    //   return $http.get('/api/internal/facilities/search?type=facilty&' + $.param(data))
+    //   .then(function (r) {
+    //     return r.data;
+    //   });
+    // },
     validateThis : function validateThis (data) {
       return $http.post('/api/internal/facilities/validate', data)
       .then(function (r){
