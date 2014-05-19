@@ -435,6 +435,29 @@ noticeFn = {
 
     return ifn.promise;
   },
+  /**
+   * finds all notifications belonging to a user. 
+   * @param  {[type]} userId     [description]
+   * @param  {[type]} noticeData [description]
+   * @return {[type]}            [description]
+   */
+  findUserNotices: function findUserNotices (userId, noticeData) {
+    var ri = Q.defer();
+
+    ActivityNotification.find({
+      ownerId: userId
+    })
+    .exec(function (err, i) {
+      if (err) {
+        return ri.reject(err);
+      }
+      if (i) {
+        return ri.resolve(i);
+      }
+    });
+
+    return ri.promise;
+  },
 
   /**
    * [poppedMedFac description]
@@ -479,12 +502,12 @@ noticeFn = {
       }
     }
 
-    if (obj.length) {
-      __curios();
-    } else {
+    // if (obj.length) {
+    //   __curios();
+    // } else {
       poper.resolve([]);
       return poper.promise;
-    }
+    // }
 
     return poper.promise;
   },
@@ -504,10 +527,8 @@ noticeFn = {
     // var obj = _.extend(options, doc);
     // console.log(doc, obj);
 
-    noticeFn.getOrderStatuses(options)
-    .then(function (distOrders) {
       //Create activity entries
-      noticeFn.checkIfNotified(distOrders, doc.userId, doc.noticeData)
+      noticeFn.findUserNotices(doc.userId, doc.noticeData)
       .then(function (v) {
         // console.log(v);
         //lets populate the hospital data
@@ -523,11 +544,6 @@ noticeFn = {
         return mine.reject(err);
       })
       .catch(noticeFn.logError);
-
-    })
-    .catch(function (err) {
-      console.log(err);
-    });
 
     return mine.promise;
   },
@@ -560,8 +576,6 @@ PostmanController.prototype.myOrderNotices = function (userId, accountType) {
   var mine = Q.defer(),
     noticeData = {
       alertType: 'order',
-      timeStamp: 'lastUpdate',
-      meta : ['orderId', 'hospitalId']
     };
 
   //order notices for account level 5
@@ -569,7 +583,6 @@ PostmanController.prototype.myOrderNotices = function (userId, accountType) {
   if (accountType > 4) {
     console.log('bcos no orders for u');
     noticeFn.__getPlaced({
-      hospitalId: userId,
       userId: userId,
       noticeData: noticeData
     })
@@ -598,7 +611,6 @@ PostmanController.prototype.myOrderNotices = function (userId, accountType) {
       try {
 
         noticeFn.__getPlaced({
-          distributorId: id.employer.employerId,
           userId: userId,
           noticeData: noticeData
         })
@@ -621,7 +633,6 @@ PostmanController.prototype.myOrderNotices = function (userId, accountType) {
     });
   } else if (accountType === 2) {
     noticeFn.__getPlaced({
-      distributorId: userId,
       userId: userId,
       noticeData: noticeData
     })
