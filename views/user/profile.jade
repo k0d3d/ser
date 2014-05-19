@@ -84,11 +84,11 @@
                 i.fa.fa-briefcase
                 span.x-editable(onbeforesave="update_profile($data, $editable.name)", editable-text="userProfile.position", data-type="text", title="Position", data-default-value="Position") {{userProfile.position || 'Empty'}} 
                 span(style="margin: 0 2px;") at 
-                a(href="/a/organization/people/{{userProfile.employer.userId || 'Empty'}}/staff/2", data-type="text", onbeforesave="update_profile($data, $editable.name)", editable-text="userProfile.employer", title="Employer", data-default-value="Employer") {{userProfile.employer.name || 'Empty'}} 
+                a(href="/a/organization/people/{{userProfile.employer.userId || 'Empty'}}/person/2") {{userProfile.employer.name || 'Empty'}} 
             - if (isPermitted(['manager']))
               .profile-position
                 span(style="margin: 0 2px;") under 
-                a(href="/a/organization/people/{{userProfile.manager.userId || 'Empty'}}/staff/3", data-type="text", onbeforesave="update_profile($data, $editable.name)", editable-text="userProfile.employer", title="Employer", data-default-value="Employer") {{userProfile.manager.name || 'Empty'}} 
+                a(href="/a/organization/people/{{userProfile.manager.userId || 'Empty'}}/person/3") {{userProfile.manager.name || 'Empty'}} 
             .mb20
             - if (isPermitted(['place-order']))
               a.btn.btn-white

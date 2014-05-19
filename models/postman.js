@@ -112,8 +112,6 @@ noticeFn = {
               _.each(peps.managers, function (v) {
                 listOfRecpt.push({
                   userId: v.userId, 
-                  allowedNotifications: v.allowedNotifications, 
-                  approvedNotices: v.approvedNotices,
                   name: v.name,
                   phone: v.phone
                 });
@@ -125,8 +123,6 @@ noticeFn = {
               _.each(peps.staff, function (v) {
                 listOfRecpt.push({
                   userId: v.userId, 
-                  allowedNotifications: v.allowedNotifications, 
-                  approvedNotices: v.approvedNotices,
                   name: v.name,
                   phone: v.phone
                 });
@@ -138,7 +134,7 @@ noticeFn = {
             .findOne({
               userId: doc.userId
             })
-            .populate('userId', 'email account_type', 'User')
+            .populate('userId', 'email account_type allowedNotifications approvedNotices', 'User')
             // .lean()
             .exec(function (err, md) {
               if (err) {
@@ -148,10 +144,8 @@ noticeFn = {
     
               listOfRecpt.push({
                   userId: md.userId, 
-                  allowedNotifications: md.allowedNotifications, 
                   name: md.name,
                   phone: md.phone,            
-                  approvedNotices: md.approvedNotices
                 });
               return dfr.resolve(listOfRecpt);
             });
@@ -225,7 +219,7 @@ noticeFn = {
       //
       //lets try sending an email. if the 
       //user allows emails.
-      if (task.allowedNotifications.email) {
+      if (task.userId.allowedNotifications.email) {
 
         //if his email is on file.. 
         //just a check.. he def has 
@@ -254,7 +248,7 @@ noticeFn = {
 
       } 
       //try sending sms
-      if (task.allowedNotifications.sms) {
+      if (task.userId.allowedNotifications.sms) {
         if (task.phone) {
           
           sendSms.sendSMS(messageStrings(typeOfMessage + '.sms.message', noticeData.meta), task.phone)
@@ -269,7 +263,7 @@ noticeFn = {
         }
       }
 
-      if (task.allowedNotifications.portal) {
+      if (task.userId.allowedNotifications.portal) {
         noticeData.alertDescription = messageStrings(typeOfMessage + '.portal.message', noticeData.meta);
         self.addUserNotice(task.userId._id, noticeData)
         .then(function () {

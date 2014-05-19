@@ -236,7 +236,8 @@ module.exports.routes = function (app, login) {
   });
 
   //Adds a drug item to a staff profile
-  app.post('/api/internal/organization/staff/drugs/',login.ensureLoggedIn('/signin'), function (req, res) {
+  app.route('/api/internal/organization/staff/drugs', login.ensureLoggedIn('/signin'))
+  .post(function (req, res) {
     var owner = req.user._id,
         account_type = req.user.account_type;
     staff.stateYourDrugs(req.body.drugId, owner, account_type)
@@ -244,6 +245,17 @@ module.exports.routes = function (app, login) {
       res.json(200, true);
     }, function (err) {
       res.json(400, err);
+    });
+  })
+  .delete(function (req, res) {
+    var owner = req.user._id,
+        account_type = req.user.account_type;
+    staff.removeMyDrug(owner, account_type, req.query.drugId)
+    .then(function () {
+      res.json(200, true);
+    }, function (err) {
+      console.log(err.stack);
+      res.json(400, err.message);
     });
   });
 

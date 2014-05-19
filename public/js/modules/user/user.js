@@ -13,7 +13,9 @@ angular.module('user', [])
   'userServices', 
   'ordersService', 
   'Notification',
-  function userController($scope, US, ordersService, N){
+  'drugService',
+  'organizeStaffService',
+  function userController($scope, US, ordersService, N, ds, oss){
   //Change HeaderTitle
   $scope.$parent.headerTitle = 'Profile';
   $scope.activity = [] ;
@@ -125,6 +127,14 @@ angular.module('user', [])
     __qu();
 
   };
+  //removes a drug from the users profile.+ 
+  $scope.remove_my_drug = function (drugId, index) {
+    oss.removeMyDrug(drugId)
+    .then(function () {
+      $scope.userProfile.drugs.splice(index, 1);
+    });
+  };
+
 }])
 .filter('territory', function () {
   return function (arr) {

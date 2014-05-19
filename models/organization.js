@@ -827,7 +827,35 @@ Staff.prototype.getStateFacility = function getStateFacility (stateId) {
   });
 
   return gsf.promise;
-}
+};
+
+
+Staff.prototype.removeMyDrug = function removeMyDrug (userId, accountType, drugId) {
+  var d = Q.defer();
+  console.log(arguments);
+  staffUtils.getMeMyModel(accountType)
+  .update({
+    userId: userId
+  }, {
+    $pull: {
+      'drugs': {
+        'drug': drugId
+      }
+    }
+  }, function (err, i) {
+    console.log(err, i);
+    if (err) {
+      return d.reject(err);
+    }
+    if (i) {
+      return d.resolve(true);
+    }
+    return d.reject(new Error('unable to remove drugs'));
+  });
+
+  return d.promise;
+};
+
 
 
 module.exports.Staff = Staff;

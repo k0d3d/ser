@@ -96,7 +96,7 @@ angular.module('drug', [])
 
 
     $scope.add_to_list = function (item) {
-      ds.addToMyList({drugId: item._id})
+      oss.addToMyList({drugId: item._id})
       .then(function (r) {
         
       });      
@@ -325,16 +325,6 @@ angular.module('drug', [])
       });
     };
 
-    d.addToMyList = function (data) {
-      return $http.post('/api/internal/organization/staff/drugs/', data)
-      .then(function (r) {
-        return r.data;
-      }, function (err) {
-        console.log(err);
-        return err;
-      });
-    };
-
     d.fetchAll = function (options)  {
       options = options || {};
       return $http.get('/api/internal/drugs?' + $.param(options))
@@ -451,7 +441,7 @@ angular.module('drug', [])
       });      
     };
 
-    d.getPendingStock = function (action) {
+    d.getPendingStock = function getPendingStock (action) {
       return $http.get('/api/internal/drugs/history?action=' + action)
       .then(function (res) {
         return res.data;

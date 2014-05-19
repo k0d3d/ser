@@ -4,6 +4,7 @@ var Staff = require('./organization/staff.js'),
     Hospital = require('./organization/hospital.js'),
     PharmaComp = require('./organization/pharmacomp.js'),
     _ = require('underscore'),
+    sysUtils = require('../lib/utils.js'),
     Q = require('q');
 
 module.exports = {
@@ -46,13 +47,14 @@ module.exports = {
     /**
      * fetches the employees under a manager or a distributor.
      * if the userId has an account type 
-     * @param  {[type]} userId      [description]
+     * @param  {objectId} userId     userId of the user being queried
      * @param  {[type]} accountType [description]
      * @return {[type]}             [description]
      */
     getMyPeople : function getMyPeople(userId, accountType) {
       console.log('getMyPeople', arguments);
       var book = Q.defer(), people = {};
+
 
       // private function to find managers. return a promise
       function __findMyManagers (uid) {
@@ -63,7 +65,7 @@ module.exports = {
         Manager.find({
           'employer.employerId' : uid
         })
-        .populate('userId', 'email account_type', 'User')
+        .populate('userId', 'email account_type allowedNotifications approvedNotices', 'User')
         .exec(function (err, managedManagers) {
           if (err) {
             return distSearch.reject(err);
@@ -90,7 +92,7 @@ module.exports = {
         Staff.find({
           'manager.managerId' : userId
         })
-        .populate('userId', 'email account_type', 'User')
+        .populate('userId', 'email account_type allowedNotifications approvedNotices', 'User')
         .exec(function (err, managedStaff) {
           if (err) {
             return book.reject(err);
@@ -113,7 +115,7 @@ module.exports = {
           Staff.find({
             'employer.employerId' : userId
           })
-          .populate('userId', 'email account_type', 'User')
+          .populate('userId', 'email account_type allowedNotifications approvedNotices', 'User')
           .exec(function (err, managedStaff) {
             if (err) {
               return book.reject(err);
