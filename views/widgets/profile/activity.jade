@@ -8,7 +8,7 @@ mixin loadActivities
           .media-body.act-media-body
             .row
               .col-md-9
-                strong {{act.alertDescription}}
+                p(alert-message="act") 
                 br
                 small.text-muted.tooltips(title="{{act.created | date: 'medium'}}")  {{act.created | moment}}
               .col-md-3

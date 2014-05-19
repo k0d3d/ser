@@ -37,6 +37,33 @@ app.directive('onFinish',function($timeout){
   };
 });
 
+app.directive('alertMessage', ['$interpolate', '$sce', function ($interpolate, $sce) {
+  //passing in the status for different 
+  //alert type and stages. this function
+  //return the right sentence, and html
+  //formating to be displayed
+  function gramar (alertType, alertDesc,  status) {
+    var words = {
+      'order': {
+        '0' : alertDesc + ' from <a href="">{{hospital.name}}</a>'
+      }
+    };
+
+    return words[alertType][status];
+  }
+
+  return {
+    link: function (scope) {
+      var phrase = $interpolate(gramar(scope.act.alertType, scope.act.alertDescription, scope.act.meta.status))(scope.act);
+      scope.phrase = $sce.trustAsHtml(phrase);
+    },
+    scope: {
+      act: '=alertMessage' 
+    },
+    template: '<strong ng-bind-html="phrase"></strong>'
+  };
+}]);
+
 app.directive('modalbox', [function(){
   return {
     link: function($scope, iElm, iAttrs, controller) {

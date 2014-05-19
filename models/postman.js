@@ -101,6 +101,7 @@ noticeFn = {
   getConcernedStaff: function getConcernedStaff (doc) {
     var dfr = Q.defer();
     var listOfRecpt = [];
+    
     console.log('Getting concerned staff...');
     if (doc.operation === 'organization') {    //list of employees
           staffUtils.getMyPeople(doc.userId, doc.accountType)
@@ -205,6 +206,12 @@ noticeFn = {
     var da = Q.defer();
     da.longStackSupport = true;
     var self = this;
+    // var allowed_defaults = {
+    //   email : {type: Boolean, default: true},
+    //   sms : {type: Boolean, default: false},
+    //   portal: {type: Boolean, default: true},
+    //   mobile: {type: Boolean, default: false}        
+    // };    
     // console.log(doc);
     // da.resolve();
     // return da.promise;
@@ -214,12 +221,22 @@ noticeFn = {
     function __pushMessages () {
 
       var task = listOfRecpt.pop();
-      console.log(task);
+
+      var allowedEmail = ( typeof task.userId.allowedNotifications.email !== 'undefined') ? 
+        task.userId.allowedNotifications.email : 
+        true;
+      var allowedSMS = ( typeof task.userId.allowedNotifications.sms !== 'undefined') ? 
+        task.userId.allowedNotifications.sms : 
+        false;
+      var allowedPortal = ( typeof task.userId.allowedNotifications.portal !== 'undefined') ? 
+        task.userId.allowedNotifications.portal : 
+        true;
+
       //task here is a user object.
       //
       //lets try sending an email. if the 
       //user allows emails.
-      if (task.userId.allowedNotifications.email) {
+      if (allowedEmail) {
 
         //if his email is on file.. 
         //just a check.. he def has 
@@ -248,7 +265,7 @@ noticeFn = {
 
       } 
       //try sending sms
-      if (task.userId.allowedNotifications.sms) {
+      if (allowedSMS) {
         if (task.phone) {
           
           sendSms.sendSMS(messageStrings(typeOfMessage + '.sms.message', noticeData.meta), task.phone)
@@ -263,10 +280,12 @@ noticeFn = {
         }
       }
 
-      if (task.userId.allowedNotifications.portal) {
+      if (allowedPortal) {
         noticeData.alertDescription = messageStrings(typeOfMessage + '.portal.message', noticeData.meta);
         self.addUserNotice(task.userId._id, noticeData)
         .then(function () {
+            console.log('sent to: ' + task.userId.email);
+
             if (listOfRecpt.length) {
               process.nextTick(__pushMessages);
             } else {
@@ -278,6 +297,8 @@ noticeFn = {
         });
       } else {
         
+        console.log('sent to: ' + task.userId.email);
+
         if (listOfRecpt.length) {
           process.nextTick(__pushMessages);
         } else {
@@ -286,7 +307,6 @@ noticeFn = {
       }
 
 
-      console.log('sent to: ' + task.userId.email);
     }
 
     if (listOfRecpt.length === 0) {
@@ -441,6 +461,7 @@ noticeFn = {
     ActivityNotification.find({
       ownerId: userId
     })
+    .lean()
     .exec(function (err, i) {
       if (err) {
         return ri.reject(err);
@@ -469,7 +490,7 @@ noticeFn = {
       try {
         staffUtils.getMeMyModel(5)
         .findOne({
-          userId: task.hospitalId
+          userId: task.meta.hospitalId
         }, 'name')
         .lean()
         .exec(function (err, i) {
@@ -496,12 +517,12 @@ noticeFn = {
       }
     }
 
-    // if (obj.length) {
-    //   __curios();
-    // } else {
+    if (obj.length) {
+      __curios();
+    } else {
       poper.resolve([]);
       return poper.promise;
-    // }
+    }
 
     return poper.promise;
   },

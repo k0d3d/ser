@@ -96,7 +96,6 @@ app.controller('MainController', [
     });
 
     $scope.$on('activity_refresh', function () {
-      console.log(Notification.activityCount);
       $scope.activity = Notification.activityCount;
     });
 
