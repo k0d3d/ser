@@ -32,14 +32,7 @@ var HospitalSchema =  new Schema({
     facilityNoCode: {type: String}
   },
   contactPerson: {type: String},
-  contactPersonPhone: {type: String},
-  allowedNotifications: {
-    email : {type: Boolean, default: true},
-    sms : {type: Boolean, default: false},
-    portal: {type: Boolean, default: false},
-    mobile: {type: Boolean, default: false}
-  },
-  approvedNotices: {}
+  contactPersonPhone: {type: String}
 });
 
 // HospitalSchema.virtual('stateName').get

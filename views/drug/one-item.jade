@@ -35,19 +35,19 @@
           h5.subtitle Nafdac Reg No
           p.x-editable(data-type="text", onbeforesave="updateItem($data, $editable.name)", editable-text="item.nafdacRegNo")  
             | {{item.nafdacRegNo || 'Empty'}}
-
-        .mb20 
-        .row   
-          .panel.panel-default
-              .panel-body
-                a(href="#")
-                  | 0 Distributors
-        .mb20  
-        .row  
-          .panel.panel-default
-              .panel-body
-                a(href="#")
-                  | 0 Staff 
+        -if (false)
+          .mb20 
+          .row   
+            .panel.panel-default
+                .panel-body
+                  a(href="#")
+                    | 0 Distributors
+          .mb20  
+          .row  
+            .panel.panel-default
+                .panel-body
+                  a(href="#")
+                    | 0 Staff 
 
       //
          col-sm-3 
@@ -76,10 +76,10 @@
            Tab panes 
         .tab-content
           include ../widgets/item/extended-info
-          +loadItemExtendedInfo()
+          +loadItemExtendedInfo(true)
 
           include ../widgets/item/item-comments
-          +itemComments()
+          +itemComments(true)
 
 append foot
   script(src='/js/jquery.prettyPhoto.js')

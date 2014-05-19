@@ -24,9 +24,9 @@ hospital.controller('hospitalIndexController', ['$scope', 'hospitalService', fun
   $scope.$parent.headerTitle = 'Hospitals';
 
   //Request hospitals
-  hs.all({page: 0}, function(r){
-    $scope.hospitals = r;
-  });
+  // hs.all({page: 0}, function(r){
+  //   $scope.hospitals = r;
+  // });
 
   $scope.removeh = function(index){
     hs.remove($scope.hospitals[index]._id,$scope.hospitals[index].user, function(r){

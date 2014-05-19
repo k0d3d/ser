@@ -681,8 +681,8 @@ Staff.prototype.getPersonProfile = function getPersonProfile (userId, accountTyp
   .populate('drugs', null, 'drug')
   .lean()
   .exec(function (err, user_profile) {
-    // console.log('This users profile is here....');
-    // console.log(user_profile);
+    console.log('This users profile is here....');
+    console.log(err, user_profile);
     if (err) {
       return d.reject(err);
     }
@@ -719,6 +719,8 @@ Staff.prototype.getPersonProfile = function getPersonProfile (userId, accountTyp
       } else {
         return d.resolve(user_profile);
       }
+    } else {
+        return d.reject(new Error ('Profile not found'));
     }
   });
 

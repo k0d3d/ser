@@ -20,14 +20,7 @@ ManagerSchema = new Schema({
   drugs: [{
     drug: {type: Schema.ObjectId},
     notes: {type: String, default: ''}
-  }],
-  allowedNotifications: {
-    email : {type: Boolean, default: true},
-    sms : {type: Boolean, default: false},
-    portal: {type: Boolean, default: false},
-    mobile: {type: Boolean, default: false}
-  },
-  approvedNotices: {}
+  }]
 });
 
 mongoose.model('Manager', ManagerSchema);

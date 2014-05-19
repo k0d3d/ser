@@ -15,7 +15,8 @@ var NotificationsSchema = new Schema({
   created: {type: Date},
   referenceId: {type: String},
   orderId: {type: String},
-  seen: {type: Boolean, default: 0}
+  seen: {type: Boolean, default: false},
+  meta: {type: Schema.Types.Mixed}
 });
 
 

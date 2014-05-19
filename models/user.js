@@ -169,31 +169,56 @@ UserController.prototype.findOrCreate = function (doc) {
  * @param  {Object}   body     [description]
  * @param  {Object}   account_type    This refers to the type of account / profile to update. Since 
  * user accounts are global and the model ObjectId is the reference to a profile/account type which 
- * could be Hospital / Facility, Sales Agent, Distributor and Pharma Comp.
- * @param  {Function} callback [description]
+ * could be Hospital / Facility, Sales Agent, Distributor and Pharma Comp. If the accountType param 
+ * is omitted, the code process the update for the user's account, not his profile.
  * @return {[type]}            [description]
  */
-UserController.prototype.update = function(id, body, account_type) {
+UserController.prototype.update = function update (id, body, account_type) {
 
   console.log(id, body, account_type);
   var d = Q.defer();
 
+  if (account_type) {  
+    staffUtils.getMeMyModel(account_type).update({
+      userId : id
+    }, {
+      $set: body
+    }, {upsert: true}, function(err, i) {
 
-  staffUtils.getMeMyModel(account_type).update({
-    userId : id
-  }, {
-    $set: body
-  }, {upsert: true}, function(err, i) {
+      if (err) {
+        return d.reject(err);
+      }
+      if (i === 1) {
+        return d.resolve(true);
+      } else {
+        return d.reject(new Error('update failed'));
+      }
+    });
+  } else {
 
-    if (err) {
-      return d.reject(err);
-    }
-    if (i === 1) {
-      return d.resolve(true);
-    } else {
-      return d.reject(new Error('update failed'));
-    }
-  });
+    User.update({
+      _id: id
+    }, {
+      $set: body
+    }, function (err, done) {
+      console.log(err, done);
+      if (err) {
+        return d.reject(err);
+      }
+      if (done) {
+        // utils
+        return d.resolve(true);
+      } else {
+        return d.reject(new Error('update failed'));
+      }
+      
+    });
+    // User.findOne({
+    //   _id: id
+    // }, function (err, i ) {
+    // });
+  }
+
 
   return d.promise;
 };

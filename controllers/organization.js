@@ -51,7 +51,7 @@ module.exports.routes = function (app, login) {
   });
 
   //fetch list of invitations for a company
-  app.get('/api/organization/invites', login.ensureLoggedIn(), function (req, res, next) {
+  app.get('/api/internal/organization/invites', login.ensureLoggedIn(), function (req, res, next) {
     var options = {
       page : req.query.page,
       limit : req.query.limit,
@@ -66,7 +66,7 @@ module.exports.routes = function (app, login) {
   });
 
   //Fetches list of people employed by the logged in user per account type
-  app.get('/api/organization/people/:accountType', function (req, res) {
+  app.get('/api/internal/organization/people/:accountType', function (req, res) {
     staff.lookUpMyPeople(req.params.accountType, req.user._id, req.user.account_type)
     .then(function (r) {
       res.json(200, r);
@@ -76,7 +76,7 @@ module.exports.routes = function (app, login) {
   });
 
   //Fetches list of people employed by the logged in user
-  app.get('/api/organization/workforce', function (req, res) {
+  app.get('/api/internal/organization/workforce', function (req, res) {
     if (req.user.account_type === 5) return res.json(200, []);
     var direction = req.query.direction;
 
@@ -117,18 +117,18 @@ module.exports.routes = function (app, login) {
   });
 
   //Fetches a person profile 
-  app.get('/api/organization/people/:personId/staff/:accountType', function (req, res) {
+  app.get('/api/internal/organization/people/:personId/staff/:accountType', function (req, res) {
     //return res.json(200, {});
     staff.getPersonProfile(req.params.personId, req.params.accountType)
     .then(function (r) {
       res.json(200, r);
     }, function (err) {
-      res.json(400, err);
+      res.json(400, err.message);
     });
   });
 
   //gets all the lga's in selected state
-  app.get('/api/organization/states/:stateId/lga', function (req, res) {
+  app.get('/api/internal/organization/states/:stateId/lga', function (req, res) {
 
     Facility.getStateLGA(req.params.stateId, function (lgas) {
       if (util.isError(lgas)) {
@@ -143,13 +143,13 @@ module.exports.routes = function (app, login) {
     });
   });
 
-  app.get('/api/organization/states/:stateId/facility', function (req, res) {
+  app.get('/api/internal/organization/states/:stateId/facility', function (req, res) {
 
     staff.getStateFacility(req.params.stateId)
     .then(function (f) {
       res.json(200, f);
     }, function (err) {
-      res.json(400, err);
+      res.json(400, err.message);
     });
 
     // 
@@ -168,7 +168,7 @@ module.exports.routes = function (app, login) {
 
   //Attempts to activate an account, and add the employer to 
   //the users profile.
-  app.put('/api/organization/invites',login.ensureLoggedIn('/signin'), function (req, res) {
+  app.put('/api/internal/organization/invites',login.ensureLoggedIn('/signin'), function (req, res) {
     
     if (req.query.activation == 1) {
       var employerId = req.user._id;
@@ -201,7 +201,7 @@ module.exports.routes = function (app, login) {
 
   //Attempts to add a tag:  territory (lga) or med. fac to 
   //staff
-  app.put('/api/organization/people/:personId/tag', login.ensureLoggedIn('/signin'), function (req, res) {
+  app.put('/api/internal/organization/people/:personId/tag', login.ensureLoggedIn('/signin'), function (req, res) {
     staff.tagStaff(req.params.personId, req.query.tagType, req.query.tag)
     .then(function () {
       res.json(200, req.query.tag);
@@ -211,7 +211,7 @@ module.exports.routes = function (app, login) {
     });
   });
 
-  app.post('/api/organization/invites',login.ensureLoggedIn('/signin'), function (req, res) {
+  app.post('/api/internal/organization/invites',login.ensureLoggedIn('/signin'), function (req, res) {
 
     //var password = (!req.body.password) ? utilities.uid(8) : req.body.password;
     var password = req.body.password || utilities.uid(8);
@@ -223,7 +223,7 @@ module.exports.routes = function (app, login) {
       res.json(400, err);
     });
   });
-  app.post('/api/organization/staff',login.ensureLoggedIn('/signin') , function (req, res) {
+  app.post('/api/internal/organization/staff',login.ensureLoggedIn('/signin') , function (req, res) {
 
     //var password = (!req.body.password) ? utilities.uid(8) : req.body.password;
     var password = req.body.password || utilities.uid(8);
@@ -250,7 +250,7 @@ module.exports.routes = function (app, login) {
 
   //Attempts to activate an account, and add the employer to 
   //the users profile.
-  app.delete('/api/organization/invites/:activationToken',login.ensureLoggedIn('/signin'), function (req, res) {
+  app.delete('/api/internal/organization/invites/:activationToken',login.ensureLoggedIn('/signin'), function (req, res) {
     
     if (req.query.activation === 1) {
       //var employerId = req.user._id;
@@ -265,7 +265,7 @@ module.exports.routes = function (app, login) {
   });
 
   //removes a tag; med fac. or lga from a staff
-  app.delete('/api/organization/people/:personId/tag', login.ensureLoggedIn('/signin'), function (req, res) {
+  app.delete('/api/internal/organization/people/:personId/tag', login.ensureLoggedIn('/signin'), function (req, res) {
     if (req.user.account_type < 4) {
       staff.unTagStaff(req.params.personId, req.query.tagType, req.query.tag)
       .then(function (done) {

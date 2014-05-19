@@ -17,16 +17,17 @@
             i.fa.fa-facebook
             a(ng-href='http://', data-type="text", data-name="facebook") {{person.facebook}}
 
-        .mb20    
-        .panel.panel-default
-            .panel-body
-              a(href="#")
-                | 0 Distributors 
-        .mb20    
-        .panel.panel-default
-            .panel-body
-              a(href="#")
-                | 0 Sales Agent
+        .mb20  
+        -if (false)  
+          .panel.panel-default
+              .panel-body
+                a(href="#")
+                  | 0 Distributors 
+          .mb20    
+          .panel.panel-default
+              .panel-body
+                a(href="#")
+                  | 0 Sales Agent
 
         .mb30
         h5.subtitle Office Address
@@ -52,9 +53,10 @@
             span(style="margin: 0 2px;") at 
             a(href='#', data-type="text", data-name="employer", title="Employer", data-default-value="Employer") #{employer}
           .mb20
-          button.btn.btn-white
-            i.fa.fa-envelope-o
-            | Message
+          -if (false)
+            button.btn.btn-white
+              i.fa.fa-envelope-o
+              | Message
         //
            profile-header 
         //

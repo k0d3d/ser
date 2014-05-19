@@ -30,7 +30,7 @@ module.exports.routes = function(app, passport, login, people){
     });
   });
 
-  // app.route('/user/profile')
+  // app.route('/user/:userId/profile')
   // .get(login.ensureLoggedIn('/signin'), function (req, res) {
   //   //return console.log(req.user);
   //   res.render('index', {
@@ -40,7 +40,7 @@ module.exports.routes = function(app, passport, login, people){
 
   //Handle Public user registration
   app.route('/users')
-  .post(function (req, res){
+  .post(login.ensureLoggedIn('/signin'), function (req, res){
     users.create(req.body, function (r){
       if (util.isError(r)) {
         res.json(400, {message: r.message});
@@ -50,8 +50,23 @@ module.exports.routes = function(app, passport, login, people){
     });
   });
   
+  app.route('/api/internal/users', login.ensureLoggedIn('/signin'))
+  .put(function (req, res, next) {
+    var id = req.user._id;
+    var body = {};
 
-  app.route('/api/internal/users/profile')
+    body[req.body.name] = req.body.value;    
+    users.update(id, body)
+    .then(function () {
+      res.json(200, {message: 'Saved'});
+    })
+    .fail(function (err) {
+      console.log(err);
+      next(err);
+    });
+  });
+
+  app.route('/api/internal/users/profile', login.ensureLoggedIn('/signin'))
   .get(function (req, res, next) {
     var userId = req.user._id;
     var account_type = req.user.account_type;

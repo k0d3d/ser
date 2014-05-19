@@ -21,7 +21,7 @@ config(['$routeProvider',function($routeProvider){
   $scope.orderCart = [];
 
   //Fetch All Orders
-  ordersService.orders('quotes', 'short')
+  ordersService.orders('quotes', 'full')
   .then(function (i) {
     angular.forEach(i, function (v) {
       try {
@@ -66,7 +66,14 @@ config(['$routeProvider',function($routeProvider){
 
 
 }])
-.controller('ordersIndexController', ['$scope', '$http', '$location', '$routeParams', 'ordersService', 'organizeStaffService', function ($scope, $http, $location, $routeParams, ordersService, organizeStaffService) {
+.controller('ordersIndexController', [
+  '$scope', 
+  '$http', 
+  '$location', 
+  '$routeParams', 
+  'ordersService', 
+  'organizeStaffService', 
+  function ($scope, $http, $location, $routeParams, ordersService, organizeStaffService) {
   $scope.$parent.headerTitle = 'Orders';
  
   $scope.ordersfilter = {
@@ -138,13 +145,29 @@ config(['$routeProvider',function($routeProvider){
   //watch the __temp scope for changes.
   //make calls for order updates when the scope 
   //changes
-  $scope.$watch('__temp', function (n) {
-    console.log(n);
-    if (!_.isEmpty(n)) {
+  // $scope.$watch('__temp', function (n) {
+  //   console.log(n);
+  //   if (!_.isEmpty(n)) {
+  //     var orderId = n.orderId;
+  //     ordersService.getOrderStatusUpdates(orderId)
+  //     .then(function (data) {
+  //       $scope.__temp.orderStatusList = data;
+  //       //qucik hack for tooltips.
+  //       //please remove. it is very embarassing
+  //       //.Oh mighty koded
+  //       setTimeout(function () {
+  //         $('.tooltips').tooltip();
+  //       }, 1000);
+  //     });
+  //   }
+  // });
+
+  $scope.get_status_updates = function (n) {
       var orderId = n.orderId;
       ordersService.getOrderStatusUpdates(orderId)
       .then(function (data) {
-        $scope.__temp.orderStatusList = data;
+        // $scope.__temp.orderStatusList = data;
+        n.statusLog = data;
         //qucik hack for tooltips.
         //please remove. it is very embarassing
         //.Oh mighty koded
@@ -152,8 +175,7 @@ config(['$routeProvider',function($routeProvider){
           $('.tooltips').tooltip();
         }, 1000);
       });
-    }
-  });
+  };
 
   $scope.open_order_manager = function (cmp) {
     $scope.__manageOrderModal = cmp;
@@ -197,12 +219,12 @@ config(['$routeProvider',function($routeProvider){
   };
 
 }])
-.controller('orderAddController',function($scope, $http, $location, ordersService,drugService, $routeParams){
+.controller('orderAddController',function($scope, $http, $location, ordersService, drugService, $routeParams){
   $scope.form = {
     itemData: {},
     supplierData: {}
   };
-  $scope.searchedItems = {};
+  $scope.searchedItems = null;
   $scope.modal = {};
   if($routeParams.itemId){
     drugService.summary($routeParams.itemId, 'main', function(r){

@@ -23,8 +23,14 @@ var UserSchema = new Schema({
     account_type: {type: Number, required: true},
     activated : {type: Boolean, default: false},
     activatedDate: {type: Date},
-    isTempPassword: {type: Boolean, default: true}
-
+    isTempPassword: {type: Boolean, default: true},
+    allowedNotifications: {
+        email : {type: Boolean, default: true},
+        sms : {type: Boolean, default: false},
+        portal: {type: Boolean, default: true},
+        mobile: {type: Boolean, default: false}
+    },
+    approvedNotices: {}
 
 });
 

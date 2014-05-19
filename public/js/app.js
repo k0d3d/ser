@@ -3,6 +3,7 @@
 
 var app = angular.module('stocUser', [
   'ngRoute',
+  'ui.bootstrap',
   'services',
   'directives',
   'user',
@@ -21,7 +22,7 @@ app.run(function(editableOptions) {
   editableOptions.theme = 'bs3'; // bootstrap3 theme. Can be also 'bs2', 'default'
 });
 
-app.config(function ($routeProvider, $locationProvider, $httpProvider) {
+app.config(function ($routeProvider, $locationProvider, $httpProvider, pagerConfig) {
   $routeProvider
   //.when('/', {templateUrl: '/drug/index', controller: 'drugIndexController'})
   .otherwise({
@@ -29,6 +30,9 @@ app.config(function ($routeProvider, $locationProvider, $httpProvider) {
     });
   $locationProvider.html5Mode(true);
   $httpProvider.interceptors.push('errorNotifier');
+  pagerConfig.itemsPerPage = 20;
+  pagerConfig.boundaryLinks = true;
+
 });
 
 app.controller('MainController', [
@@ -242,22 +246,25 @@ app.directive('linkTo', function () {
     link: function (scope, ele, attrs) {
         // var t = attrs.linkTo.split('-');
         // var aspect = t[0].trim();
-        var id = scope.linkToId;
+        var id = scope.linkToId, accountType = scope.linkToAccountType;
 
         switch (scope.linkTo) {
           case 'drug':
-            $(ele).prop('href', '/a/drug/' + id + '/item');
-            // attrs.href = ;
+            $(ele).prop('href', '/a/drugs/' + id + '/item');
+            break;
+          case 'user':
+            $(ele).prop('href', '/a/organization/people/' + id+ '/person/' + accountType);
             break;
           default: 
-            $(ele).prop('href', '/a/drug/' + id + '/item');
+            $(ele).prop('href', '/a/drugs/' + id + '/item');
             break;
         }
 
     },
     scope: {
-      linkTo: '=',
-      linkToId: '@'
+      linkTo: '@',
+      linkToId: '@',
+      linkToAccountType: '@'
     }
   };
 });

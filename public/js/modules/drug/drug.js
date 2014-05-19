@@ -10,7 +10,8 @@ angular.module('drug', [])
 
   .config(['$routeProvider', '$locationProvider', function ($routeProvider, $locationProvider) {
     $routeProvider.when('/a/drugs', {templateUrl: '/drug/index', controller: 'drugIndexController'})
-    .when('/a/drugs/:drugId/item', {templateUrl: '/drug/one-item', controller: 'drugPageController'})
+    .when('/a/drugs/:drugId/item', {templateUrl: '/drug/public-item', controller: 'drugPageController'})
+    .when('/a/users/:userId/drugs/:drugId/item', {templateUrl: '/drug/one-item', controller: 'drugPageController'})
     .when('/a/drugs/add-new', {templateUrl: '/drug/add', controller: 'drugAddController'});
     $locationProvider.html5Mode(true);
   }])
@@ -21,8 +22,11 @@ angular.module('drug', [])
     function __init () {
       $scope._pending =  [];
       $scope._request = [];
+      //current Page for Pagination
+      $scope.currentPage = 1;
+      $scope.totalItems =($scope.currentPage + 1) * 20;
 
-      ds.fetchAll()
+      ds.fetchAll({page: 1, limit: 20})
       .then(function (r) {
         $scope._drugs = r;
       });
@@ -162,6 +166,10 @@ angular.module('drug', [])
         item.status = done.status;
       });
     };
+
+    $scope.page_changed = function () {
+      console.log($scope.currentPage);
+    };
   }])
   .controller('drugAddController', ['$scope', 'drugService', function ($scope, ds) {
     //Init the add item form model and 
@@ -217,6 +225,7 @@ angular.module('drug', [])
         ds.fetchOne($routeParams.drugId)
         .then(function (res) {
           $scope.item = res;
+          $scope.$parent.headerTitle = res.itemName;
         });
       }
 
@@ -328,7 +337,7 @@ angular.module('drug', [])
 
     d.fetchAll = function (options)  {
       options = options || {};
-      return $http.get('/api/internal/drugs', options)
+      return $http.get('/api/internal/drugs?' + $.param(options))
       .then(function (r) {
         return r.data;
       }, function (err) {

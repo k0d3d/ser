@@ -117,7 +117,7 @@ var orderManager = {
         staffUtils.getMeMyModel(task.orderSupplier.supplier_type)
         .findOne({
           userId: task.orderSupplier.supplierId
-        }, 'name ')
+        }, 'name userId')
         .exec(function (err, supplierResult) {
           //console.log(err, supplierResult);
           if (err) {
@@ -608,11 +608,11 @@ OrderController.prototype.requestItemQuotation = function requestItemQuotation (
     //lastUpdate property. Usually with a find
     //or findOne query, lastUpdate is a virtual.
     d.lastUpdate = Date.now();
-    // var noticeData = {
-    //   alertType: 'order',
-    //   timeStamp: 'lastUpdate',
-    //   meta : ['orderId', 'hospitalId']
-    // };
+
+    var noticeData = {
+      alertType: 'order',
+      meta : d
+    };
 
     postman.noticeFn.getConcernedStaff({
       userId: orderData.owner.userId,
@@ -620,10 +620,12 @@ OrderController.prototype.requestItemQuotation = function requestItemQuotation (
       operation: 'organization'
     })
     .then(function (listOfRecpt) {
-      return postman.noticeFn.deliveryAgent({
-        listOfRecpt: listOfRecpt, 
-        typeOfMessage: 'new_quotation_request'
-      });
+
+      return postman.noticeFn.deliveryAgent(
+        listOfRecpt, 
+        'new_quotation_request',
+        noticeData
+      );
     })
     .then(function () {
       return procs.resolve(d);

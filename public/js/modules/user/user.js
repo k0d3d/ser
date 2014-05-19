@@ -17,6 +17,7 @@ angular.module('user', [])
   //Change HeaderTitle
   $scope.$parent.headerTitle = 'Profile';
   $scope.activity = [] ;
+
   //Fetch Activities
   US.fetchActivities()
   .then(function (i) {
@@ -32,6 +33,7 @@ angular.module('user', [])
   US.fetchProfile()
   .then(function (i) {
     $scope.userProfile = i;
+    // angular.extend($scope.userProfile, i);
   });
 
 
@@ -49,6 +51,20 @@ angular.module('user', [])
     .then(function (r) {
 
     });
+  };
+
+  $scope.update_account_notices = function update_account_notices (field) {
+    // e.stopPropagation();
+    var value = $scope.userAccount.allowedNotifications[field];
+    // console.log(field, value);
+    US.updateAccount({name : 'allowedNotifications.' + field, value: !value})
+    .then(function (r) {
+      N.notifier({
+        title: 'Success',
+        text: 'Alert preference changed!!',
+        class_name: 'growl-success'
+      });
+    });    
   };
 
   $scope.validate_facility = function validate_facility (data) {
@@ -135,6 +151,12 @@ angular.module('user', [])
     },
     updateProfile: function updateProfile (data) {
       return $http.put('/api/internal/users/profile', data)
+      .then(function (r) {
+        return r.data;
+      });
+    },
+    updateAccount: function updateProfile (data) {
+      return $http.put('/api/internal/users', data)
       .then(function (r) {
         return r.data;
       });

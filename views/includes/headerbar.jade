@@ -20,13 +20,35 @@
                 i.fa.fa-star-o
                 span.badge {{activity || 0}}
 
-        li
+        li(ng-controller="userController")
           .btn-group
             button.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown')
               img(src='/images/photos/loggeduser.png', alt='')
               | #{userData.email}
               span.caret
             ul.dropdown-menu.dropdown-menu-usermenu.pull-right
+              li.dropdown-header(role='presentation', ng-init="userAccount.allowedNotifications = #{userData.allowedNotifications}") Alerts
+              li
+                a(href='')
+                  | Portal
+                  .btn-group.pull-right
+                    label.btn.btn-primary.btn-xs.toggle-UAN(ng-click="update_account_notices('portal')" ng-model='userAccount.allowedNotifications.portal', btn-radio="true") On
+                    label.btn.btn-primary.btn-xs.toggle-UAN(ng-click="update_account_notices('portal')" ng-model='userAccount.allowedNotifications.portal', btn-radio="false") Off
+              li
+                a(href='')
+                  | SMS
+                  .btn-group.pull-right
+                    label.btn.btn-primary.btn-xs.toggle-UAN(ng-click="update_account_notices('sms')" ng-model='userAccount.allowedNotifications.sms', btn-radio="true") On
+                    label.btn.btn-primary.btn-xs.toggle-UAN(ng-click="update_account_notices('sms')" ng-model='userAccount.allowedNotifications.sms', btn-radio="false") Off
+              li
+                a.disabled(href='')
+                  | EMail                
+                  .btn-group.pull-right
+                    label.btn.btn-primary.btn-xs.toggle-UAN(ng-click="update_account_notices('email')" ng-model='userAccount.allowedNotifications.email', btn-radio="true") On
+                    label.btn.btn-primary.btn-xs.toggle-UAN(ng-click="update_account_notices('email')" ng-model='userAccount.allowedNotifications.email', btn-radio="false") Off
+
+              li.divider
+              li.dropdown-header(role='presentation') Account
               li
                 a(href='/a/profile')
                   i.glyphicon.glyphicon-user

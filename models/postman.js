@@ -14,34 +14,25 @@ var ActivityNotification = require('./activity/notification.js'),
 
 noticeFn = {
 
-  addBareNotice : function addBareNotice (doc) {
+  addUserNotice : function addBareNotice (userId, noticeData) {
     console.log('Called bare notice');
+    var _n = Q.defer();
 
-    var _notice = Q.defer();
-    try {
-      var notice = new ActivityNotification(doc);
-
-      notice.save(function (err, i) {
-        console.log(err, i);
-        if (err) {
-          return _notice.reject(err);
-        }
-        return _notice.resolve(i);
-      });
-    } catch (e) {
-      console.log(e);
-    }
-
-
-
-    return _notice.promise;
-  },
-  searchForStaff : function searchForStaff(doc) {
-    var search = Q.defer();
-
-
-
-    return search.promise;
+    //specify owner of notice,
+    var note = new ActivityNotification();
+    note.ownerId = userId;
+    note.alertType = noticeData.alertType;
+    note.alertDescription = noticeData.alertDescription;
+    note.created = Date.now();
+    note.meta = noticeData.meta;
+    note.save(function(err) {
+      if (err) {
+        return _n.reject(err);
+      }
+      return _n.resolve(true);
+    });
+    //save notice..
+    return _n.promise;
   },
   /**
    * gets all orders placed to a certain supplier / distributor
@@ -212,11 +203,14 @@ noticeFn = {
    * should contain a populated userId {email, ObjectId and account_type}.
    * All objects must contain 'allowedNotifications' and 'approvedNotices' property.
    * @param  {String} typeOfMessage The type of message to deliver or send out.
+   * @param {Object} noticeData object {alertType, alertDescription, meta} containing the alert type , alert description, 
+   * and meta data (i.e. the object to be used in creating the alert )- properties.
    * @return {Promise}               Returns Promise
    */
-  deliveryAgent : function deliveryAgent (doc) {
+  deliveryAgent : function deliveryAgent (listOfRecpt, typeOfMessage, noticeData) {
     var da = Q.defer();
     da.longStackSupport = true;
+    var self = this;
     // console.log(doc);
     // da.resolve();
     // return da.promise;
@@ -224,8 +218,9 @@ noticeFn = {
     // var noticeData
 
     function __pushMessages () {
-      // console.log(doc.listOfRecpt);
-      var task = doc.listOfRecpt.pop();
+
+      var task = listOfRecpt.pop();
+      console.log(task);
       //task here is a user object.
       //
       //lets try sending an email. if the 
@@ -241,9 +236,9 @@ noticeFn = {
             to: task.userId.email,
             // to: task.userId.email,
             // subject: "new quotation request",
-            subject: messageStrings(doc.typeOfMessage + '.email.subject'),
+            subject: messageStrings(typeOfMessage + '.email.subject', noticeData.meta),
             // text: "you have received a new quotation request"
-            text: messageStrings(doc.typeOfMessage + '.email.message')
+            text: messageStrings(typeOfMessage + '.email.message', noticeData.meta)
           })
           .then(function (done) {
             //just wanna log to console for now..
@@ -262,7 +257,7 @@ noticeFn = {
       if (task.allowedNotifications.sms) {
         if (task.phone) {
           
-          sendSms.sendSMS(messageStrings(doc.typeOfMessage + '.sms.message'), task.phone)
+          sendSms.sendSMS(messageStrings(typeOfMessage + '.sms.message', noticeData.meta), task.phone)
           .then(function (done) {
             //just wanna log to console for now..
             //TODO:: log to file 
@@ -273,15 +268,34 @@ noticeFn = {
           });          
         }
       }
-      console.log('sent to: ' + task.userId.email);
-      if (doc.listOfRecpt.length) {
-        process.nextTick(__pushMessages);
+
+      if (task.allowedNotifications.portal) {
+        noticeData.alertDescription = messageStrings(typeOfMessage + '.portal.message', noticeData.meta);
+        self.addUserNotice(task.userId._id, noticeData)
+        .then(function () {
+            if (listOfRecpt.length) {
+              process.nextTick(__pushMessages);
+            } else {
+              return da.resolve();
+            }
+        }, function (err) {
+          console.log('Error saving new notice');
+          console.log(err.stack);
+        });
       } else {
-        return da.resolve();
+        
+        if (listOfRecpt.length) {
+          process.nextTick(__pushMessages);
+        } else {
+          return da.resolve();
+        }
       }
+
+
+      console.log('sent to: ' + task.userId.email);
     }
 
-    if (doc.listOfRecpt.length === 0) {
+    if (listOfRecpt.length === 0) {
       da.resolve([]);
     } else {
       try {
@@ -421,6 +435,12 @@ noticeFn = {
 
     return ifn.promise;
   },
+
+  /**
+   * [poppedMedFac description]
+   * @param  {[type]} obj [description]
+   * @return {[type]}     [description]
+   */
   poppedMedFac: function poppedMedFac (obj) {
    console.log('Adding Med Facilities to Object'); 
     var poper = Q.defer(), newObj = [];

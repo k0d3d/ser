@@ -194,7 +194,9 @@ jQuery(document).ready(function() {
          jQuery('.searchform').insertBefore('.header-right');
       }
    }
-   
+   $(document).on('click', '.toggle-UAN', function (e) {
+      e.stopPropagation();
+   });
 
 
 });

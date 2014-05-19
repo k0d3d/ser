@@ -22,7 +22,11 @@ module.exports.routes = function(app, login) {
   });
 
   //Displays one item page
-  app.get('/a/drugs/:drugId/item', function (req, res, next) {
+  app.get('/a/drugs/:drugId/item', function (req, res) {
+    res.render('index');   
+  });
+  //Displays one item page
+  app.get('/a/users/:userId/drugs/:drugId/item', function (req, res) {
     res.render('index');   
   });
 
@@ -51,6 +55,11 @@ module.exports.routes = function(app, login) {
     });    
   })  //Updates the drug item
   .put(function(req, res, next) {
+    //TODO::
+    //check if the currently logged in user
+    //has permission to make changes to this item.
+    // if (req.user._id.toString() !== req.body.supplier.supplierId) return res.json(401, 'not permitted to modify');
+    // return false;
     drugs.updateItem( req.params.drugId, req.body)
     .then(function () {
       res.json(200, { message: 'saved'});

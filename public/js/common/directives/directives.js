@@ -4,122 +4,68 @@
   *
   * Description
   */
-  angular.module('directives', []);
-  angular.module('directives').directive('onFinish',function($timeout){
-    return {
-      restrict: 'A',
-      link: function(scope, element, attr){
-        if(scope.$last === true){
-          $timeout(function(){
-            switch (attr.onFinish){
-              case "panorama":
-                $('.panorama').panorama({
-                   //nicescroll: false,
-                   showscrollbuttons: false,
-                   keyboard: true,
-                   parallax: false
-                });
-              break;
-              case "tableheader":
-                $('table.table').fixedHeader();
-              break;
-              case "checkViewState":
-                scope.$emit('onFinishLoaded', true);
-              break;
-              default:
-              break;
-            }
-          });
-          
-        }
-      }
-    };
-  });
-  angular.module('directives').directive('modalbox', [function(){
-    return {
-      link: function($scope, iElm, iAttrs, controller) {
-        $(iElm).on('click',function(){
-          $('#mopop').modal('show');
-        });
-      }
-    };
-  }]);
-  /**
-  * directives Module
-  *
-  * Description
-  */
-  angular.module('directives').directive('toggleActiveList', [function(){
-    // Runs during compile
-    return {
-      link: function($scope, iElm, iAttrs, controller) {
-        iElm.on('click','li',function(e){
-          e.preventDefault();
-          $('ul.list-block li').removeClass('active');
-          $(e.currentTarget).addClass('active');
-        });
-      }
-    };
-  }]);
-  angular.module('directives').directive('orderActionButton', function(ordersService){
-    function getStatus (status){
-        var d;
-        switch(status){
-          case 'pending order':
-            d = 'supplied';
-            //scope.orders[attrs.thisIndex].next ="Supplied";
-          break;
-          case 'supplied':
-            d = 'paid';
-            //scope.orders[attrs.thisIndex].next ="Paid";
-          break;
-          case 'paid':
-           d = 'Complete';
-          break;
-          default:
-          break;
-        }
-        return d;
-    }
+var app = angular.module('directives', []);
 
-    return {
-      link: function(scope, element, attrs, controller){
-        var invoiceNo, index;
-        //Observe index
-        attrs.$observe('index', function(newValue){
-          index = newValue;
-          scope.kush.next = getStatus(scope.kush.orderStatus);
-          //bindEmAll(index, scope, element);
-          //console.log(scope.kush);
-        });
-
-        //Bind to 
-        element.on('click', function(e){
-          e.preventDefault();
-
-          var o ={
-            status : getStatus(scope.kush.orderStatus),
-            itemData : scope.kush.itemData[0],
-            amount : scope.kush.orderAmount,
-            order_id : scope.kush._id,
-            invoiceno : scope.kush.orderInvoice,
-            amountSupplied: scope.kush.amountSupplied
+app.directive('onFinish',function($timeout){
+  return {
+    restrict: 'A',
+    link: function(scope, element, attr){
+      if(scope.$last === true){
+        $timeout(function(){
+          switch (attr.onFinish){
+            case "panorama":
+              $('.panorama').panorama({
+                 //nicescroll: false,
+                 showscrollbuttons: false,
+                 keyboard: true,
+                 parallax: false
+              });
+            break;
+            case "tableheader":
+              $('table.table').fixedHeader();
+            break;
+            case "checkViewState":
+              scope.$emit('onFinishLoaded', true);
+            break;
+            default:
+            break;
           }
-          //scope.$apply();
-          ordersService.updateOrder(o, function(r){
-            scope.kush.orderStatus = r.result;
-            scope.kush.next = getStatus(r.result);
-            console.log(r);
-          });
         });
-      },
-      scope : {
-        kush : "="
+        
       }
-    };
-  });
+    }
+  };
+});
 
-angular.module('directives').directive('tooltips', function () {
+app.directive('modalbox', [function(){
+  return {
+    link: function($scope, iElm, iAttrs, controller) {
+      $(iElm).on('click',function(){
+        $('#mopop').modal('show');
+      });
+    }
+  };
+}]);
+
+/**
+* directives Module
+*
+* Description
+*/
+app.directive('toggleActiveList', [function(){
+  // Runs during compile
+  return {
+    link: function($scope, iElm, iAttrs, controller) {
+      iElm.on('click','li',function(e){
+        e.preventDefault();
+        $('ul.list-block li').removeClass('active');
+        $(e.currentTarget).addClass('active');
+      });
+    }
+  };
+}]);
+
+app.directive('tooltips', function () {
   return {
     restrict: 'C',
     link: function (element, attrs) {
@@ -130,24 +76,55 @@ angular.module('directives').directive('tooltips', function () {
   };
 });
 
-  angular.module('directives').directive('scrollBar', function(){
-      return {
-          link: function(scope, element, attrs){
-            //if(attrs.activate)
-              $(element).on('scrollbar', function(){
-                  if(element.height() >= attrs.maxContainerHeight){
-                      element.slimScroll({
-                          height: attrs.maxContainerHeight+'px',
-                          distance: '0'
-                      });
-                  }
-              });
-          }
-      };
-  });
+app.directive('scrollBar', function(){
+    return {
+        link: function(scope, element, attrs){
+          //if(attrs.activate)
+            $(element).on('scrollbar', function(){
+                if(element.height() >= attrs.maxContainerHeight){
+                    element.slimScroll({
+                        height: attrs.maxContainerHeight+'px',
+                        distance: '0'
+                    });
+                }
+            });
+        }
+    };
+});
 
+app.directive('pagination', [function(){
+  function link(scope, element, attrs){
+    scope.pageno = 0;
+    scope.limit = 10;
+    $('button.prevbtn', element).on('click', function(e){
+      var page = scope.pageno - 1;
+      if(scope.pageno === 1) return false;
+      scope.pageTo({pageNo: page, limit: scope.limit, cb: function(r){
+        if(r) scope.pageno--;
+      }});
+    });
+    $('button.nextbtn', element).on('click', function(e){
+      var page = scope.pageno + 1;
+      scope.pageTo({pageNo: page, limit: scope.limit, cb: function(r){
+        if(r) scope.pageno++;
+      }});
+    });
+    scope.pagelimit = function(limit){
+      scope.pageTo({pageNo: scope.pageno, limit: limit, cb: function(r){
+        if(r) scope.limit = limit;
+      }});        
+    };
+  }
+  return {
+    link: link,
+    scope: {
+      pageTo: '&'
+    },
+    templateUrl: '/templates/pagination'
+  };
+}]);
 
-angular.module('directives').directive('equals', function() {
+app.directive('equals', function() {
   return {
     restrict: 'A', // only activate on element attribute
     require: '?ngModel', // get a hold of NgModelController

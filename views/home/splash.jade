@@ -1,7 +1,54 @@
 extends ../layouts/splash
 
 block bodyContent
-    main#top.masthead(role='main')
+    .navbar.navbar-default.navbar-fixed-top(ng-controller="userController")
+        .container
+            .navbar-header
+              button.navbar-toggle(type='button', data-toggle='collapse', data-target='#navbar-main')
+                span.icon-bar
+                span.icon-bar
+                span.icon-bar
+              a.navbar-brand(href='#') DrugStoc
+            center
+              #navbar-main.navbar-collapse.collapse
+                -if (false)
+                  ul.nav.navbar-nav
+                    li.active
+                      a(href='#') Link
+                    li
+                      a(href='#') Link
+                    li
+                      a(href='#') Link
+                    li
+                      a(href='#') Link
+                    li
+                      a(href='#') Link
+                    li.dropdown
+                      a.dropdown-toggle(href='#', data-toggle='dropdown')
+                        | Dropdown
+                        b.caret
+                      ul.dropdown-menu
+                        li
+                          a(href='#') Action
+                        li
+                          a(href='#') Another action
+                        li
+                          a(href='#') Something else here
+                        li.divider
+                        li
+                          a(href='#') Separated link
+                        li.divider
+                        li
+                          a(href='#') One more separated link
+                form.navbar-form.navbar-right(name="signin_form", ng-submit="send_login()")
+                  .form-group
+                    input.form-control(type='text', placeholder='Username or email', ng-model="form.email", ng-keyup="auth_message =''", autofocus, required)
+                  .form-group
+                    input.form-control(type='password', placeholder='Password', ng-model="form.password", required)
+                  button.btn.btn-default(type='submit', ng-click="rdir = true") Sign In
+                  a.btn.btn-warning(href="/signup", target="_blank") Register
+  
+    main#top.masthead(role='main', ng-controller="orderAddController")
       .container
         .logo
           a(href='#')

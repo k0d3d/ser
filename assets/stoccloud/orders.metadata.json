@@ -1,0 +1,1 @@
+{ "indexes" : [ { "v" : 1, "key" : { "_id" : 1 }, "ns" : "stoccloud.orders", "name" : "_id_" }, { "v" : 1, "key" : { "orderId" : 1 }, "unique" : true, "ns" : "stoccloud.orders", "name" : "orderId_1", "background" : true, "safe" : null } ] }

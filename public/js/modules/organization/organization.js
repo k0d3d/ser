@@ -136,7 +136,7 @@ angular.module('organization', [])
 .factory('organizeStaffService', ['$http', 'Notification', 'Language', function ($http, N, L) {
   return {
     inviteStaff : function (form) {
-      return $http.post('/api/organization/invites', form)
+      return $http.post('/api/internal/organization/invites', form)
       .then(function (r) {
         N.notifier({
           title: L[L.set].titles.success,
@@ -154,7 +154,7 @@ angular.module('organization', [])
       });
     },
     loadInvites : function () {
-      return $http.get('/api/organization/invites')
+      return $http.get('/api/internal/organization/invites')
       .then(function (r) {
         return r.data;
       }, function (err) {
@@ -163,7 +163,7 @@ angular.module('organization', [])
     },
     activateStaff : function (data) {
       console.log(data);
-      return $http.put('/api/organization/invites?activation=1', data)
+      return $http.put('/api/internal/organization/invites?activation=1', data)
       .then(function (r) {
         N.notifier({
           title: L[L.set].titles.success,
@@ -175,7 +175,7 @@ angular.module('organization', [])
     },
     cancelStaff : function (data) {
       console.log(data);
-      return $http.put('/api/organization/invites?activation=0', data)
+      return $http.put('/api/internal/organization/invites?activation=0', data)
       .then(function (r) {
         N.notifier({
           title: L[L.set].titles.success,
@@ -188,7 +188,7 @@ angular.module('organization', [])
     //fetch the list of people having a 
     //specific account type
     getMyPeople : function (options) {
-      return $http.get('/api/organization/people/' + options.account_type)
+      return $http.get('/api/internal/organization/people/' + options.account_type)
       .then(function (r) {
         return r.data;
       }, function (err) {
@@ -196,7 +196,7 @@ angular.module('organization', [])
       });
     },
     getPersonProfile : function (options) {
-      return $http.get('/api/organization/people/' + options.userId + '/staff/' + options.account_type)
+      return $http.get('/api/internal/organization/people/' + options.userId + '/staff/' + options.account_type)
       .then(function (r) {
         return r.data;
       }, function (err) {
@@ -207,7 +207,7 @@ angular.module('organization', [])
     //logged in user. 
     getMyWorkForce : function (kind) {
       kind = kind || 'employees';
-      return $http.get('/api/organization/workforce?direction=' + kind)
+      return $http.get('/api/internal/organization/workforce?direction=' + kind)
       .then(function (r) {
         return r.data;
       }, function (err) {
@@ -218,7 +218,7 @@ angular.module('organization', [])
     //fetches the list of lga for the selected
     //state
     getLGA : function getLGA (stateId) {
-      return $http.get('/api/organization/states/' + stateId + '/lga')
+      return $http.get('/api/internal/organization/states/' + stateId + '/lga')
       .then(function (lgas) {
         return lgas.data;
       }, function () {
@@ -228,7 +228,7 @@ angular.module('organization', [])
     //fetches the list of lga for the selected
     //state
     getMedFac : function getMedFac (stateId) {
-      return $http.get('/api/organization/states/' + stateId + '/facility')
+      return $http.get('/api/internal/organization/states/' + stateId + '/facility')
       .then(function (f) {
         return f.data;
       }, function () {
@@ -236,7 +236,7 @@ angular.module('organization', [])
       });
     },
     addLgaToStaff: function addLgaToStaff (tag, staffId) {
-      return $http.put('/api/organization/people/' + staffId + '/tag?' +  $.param({tagType: 1, tag: tag}))
+      return $http.put('/api/internal/organization/people/' + staffId + '/tag?' +  $.param({tagType: 1, tag: tag}))
       .then(function (done) {
         return done.data;
       });
