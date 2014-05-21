@@ -1,8 +1,8 @@
 .contentpanel(data-user-id="{{userProfile.userId._id || 'Empty'}}")
     .row
-        .col-sm-3
+        .col-sm-3(ng-init="userProfile.image = 'default-avatar.jpg'")
           
-          img.thumbnail.img-responsive.profile-img(ng-src='/images/{{ userProfile.image || "default-avatar.jpg" }}' , alt='')
+          img.thumbnail.img-responsive.profile-img(dropzone, ng-src='/images/profile-images/{{ userProfile.image }}?dim=200x200' , alt='', post-url="/upload/profile", post-param="profileImage", ng-model="userProfile.image")
           .mb30
           h5.subtitle About
           p.mb10.x-editable(data-type="textarea", onbeforesave="update_profile($data, $editable.name)", editable-textarea="userProfile.summary")
@@ -147,3 +147,5 @@ include ../widgets/profile/activate-hospital
 append scripts
 script(src='/js/jquery.prettyPhoto.js')
 script(src='/js/holder.js')
+script(src='/js/dropzone.min.js')
+//- script(src='/js/modules/user/profile.js')

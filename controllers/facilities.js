@@ -125,19 +125,19 @@ HospitalController.prototype.searchGovtRegister = function searchGovtRegister (u
       if (!query.state && !user.coverage) {
         options = {};
       }
-      console.log(options);
       Govt.find(options)
       .regex('facilityName',new RegExp(query.name, 'i'))
-      .limit(50)
+      .skip(query.page || 0)
+      .limit(query.limit || 50)
       .execQ()
       .then(function (i) {
-        console.log(i);
         return t.resolve(i);
       })
       .fail(function (err) {
         if (err) {
           return t.reject(err);
         }        
+
       })
       .done();
 

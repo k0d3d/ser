@@ -23,14 +23,24 @@ angular.module('drug', [])
       $scope._pending =  [];
       $scope._request = [];
       //current Page for Pagination
-      $scope.currentPage = 1;
-      $scope.totalItems =($scope.currentPage + 1) * 20;
+      $scope.currentPage = 0;
+      $scope.pageLimit = 20;
 
-      ds.fetchAll({page: 1, limit: 20})
-      .then(function (r) {
-        $scope._drugs = r;
-      });
 
+      //function does the 
+      $scope.getPageItems = function (currentPage, pageLimit) {
+
+        ds.fetchAll({page: currentPage, limit: pageLimit})
+        .then(function (r) {
+          if (!_.isEmpty(r)) {
+            $scope._drugs = r;
+          }
+        });
+
+      };      
+
+      // get the first page
+      $scope.getPageItems($scope.currentPage, $scope.pageLimit);
       //get all stock Request
       //
       //get stock down request
@@ -167,9 +177,10 @@ angular.module('drug', [])
       });
     };
 
-    $scope.page_changed = function () {
-      console.log($scope.currentPage);
-    };
+    $scope.$watch('currentPage', function () {
+      $scope.getPageItems($scope.currentPage, $scope.pageLimit);
+    });
+
   }])
   .controller('drugAddController', ['$scope', 'drugService', function ($scope, ds) {
     //Init the add item form model and 

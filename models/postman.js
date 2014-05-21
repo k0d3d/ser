@@ -456,12 +456,13 @@ noticeFn = {
    * @return {[type]}            [description]
    */
   findUserNotices: function findUserNotices (userId, noticeData) {
+    console.log('Finding user notices...');
     var ri = Q.defer();
-
     ActivityNotification.find({
       ownerId: userId
     })
     .lean()
+    // .populate('meta.itemId', 'itemName itemPackaging', 'drug')
     .exec(function (err, i) {
       if (err) {
         return ri.reject(err);
@@ -477,43 +478,64 @@ noticeFn = {
   /**
    * [poppedMedFac description]
    * @param  {[type]} obj [description]
+   * @param {string} key a string value used to select
+   * the field on obj to be used in querying userId 
+   * on the facility collection.
    * @return {[type]}     [description]
    */
-  poppedMedFac: function poppedMedFac (obj) {
+  poppedMedFac: function poppedMedFac (obj, key) {
    console.log('Adding Med Facilities to Object'); 
     var poper = Q.defer(), newObj = [];
     //console.log(obj);
 
     function __curios () {
       var task = obj.pop();
-      console.log(task);
-      try {
-        staffUtils.getMeMyModel(5)
-        .findOne({
-          userId: task.meta.hospitalId
-        }, 'name')
-        .lean()
-        .exec(function (err, i) {
-          //console.log(err, i);
-          if (err) {
-            return poper.reject(err);
-          }
+      //some times, the meta information stored
+      //might already be populated with, relevant
+      //fields, we want to check , if we have
+      //an objectId or populated object
+      if (u.testIfObjId(u.strToObj(task, key))) {
 
-          if (i) {
-            task.hospital = i;
-            newObj.push(task);
-            if (obj.length) {
-              __curios();
-            } else {
-              return poper.resolve(newObj);
+        try {
+          staffUtils.getMeMyModel(5)
+          .findOne({
+            userId: u.strToObj(task, key)
+          }, 'name')
+          .lean()
+          .exec(function (err, i) {
+            //console.log(err, i);
+            if (err) {
+              return poper.reject(err);
             }
-          } else {
-            return poper.reject(new Error('cant find hospitals'));
-          }
 
-        });
-      } catch (e) {
-        console.log(e);
+            if (i) {
+              task.hospital = i;
+              newObj.push(task);
+              if (obj.length) {
+                __curios();
+              } else {
+                return poper.resolve(newObj);
+              }
+            } else {
+              return poper.reject(new Error('cant find hospitals'));
+            }
+
+          });
+        } catch (e) {
+          console.log(e);
+        }
+      } else {
+        //we have an object most likely.
+        //we'll just attach the populated data to a 
+        //hospital property and push in the task object all
+        //the same..
+        task.hospital = u.strToObj(task, key);
+        newObj.push(task);
+        if (obj.length) {
+          __curios();
+        } else {
+          return poper.resolve(newObj);
+        }        
       }
     }
 
@@ -529,15 +551,15 @@ noticeFn = {
   __getPlaced:   function __getPlaced (doc) {
     var mine = Q.defer();
     console.log('Getting placed orders...');
-    var options = {};
+    // var options = {};
 
-    if (doc.hospitalId) {
-      options.hospitalId = doc.hospitalId;
-    }
+    // if (doc.hospitalId) {
+    //   options.hospitalId = doc.hospitalId;
+    // }
 
-    if (doc.supplierId) {
-      options.supplierId = doc.supplierId;
-    }
+    // if (doc.supplierId) {
+    //   options.supplierId = doc.supplierId;
+    // }
 
     // var obj = _.extend(options, doc);
     // console.log(doc, obj);
@@ -545,16 +567,23 @@ noticeFn = {
       //Create activity entries
       noticeFn.findUserNotices(doc.userId, doc.noticeData)
       .then(function (v) {
-        // console.log(v);
-        //lets populate the hospital data
-        noticeFn.poppedMedFac(v)
-        .then(function (poppedResult) {
-          return mine.resolve(poppedResult);
-        }, function (err) {
-          //Some error populating hospitals
-          return mine.reject(err);
-        })
-        .catch(noticeFn.logError);
+        
+        return mine.resolve(v);
+        // if (doc.noticeData.alertType === 'order') {
+        //   //lets populate the hospital data
+        //   noticeFn.poppedMedFac(v, 'meta.hospitalId')
+        //   .then(function (poppedResult) {
+
+        //     return mine.resolve(poppedResult);
+        //   }, function (err) {
+        //     console.log(err.stack);
+        //     //Some error populating hospitals
+        //     return mine.reject(err);
+        //   })
+        //   .catch(noticeFn.logError);
+        // }
+
+
       }, function (err) {
         return mine.reject(err);
       })
@@ -592,7 +621,6 @@ PostmanController.prototype.myOrderNotices = function (userId, accountType) {
     noticeData = {
       alertType: 'order',
     };
-
   //order notices for account level 5
   //i.e. hospitals
   if (accountType > 4) {
@@ -621,7 +649,6 @@ PostmanController.prototype.myOrderNotices = function (userId, accountType) {
       accountType: accountType
     })
     .then(function (id) {
-      console.log(id.employer);
       //user = ;
       try {
 

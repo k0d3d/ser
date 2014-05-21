@@ -36,6 +36,7 @@ angular.module('user', [])
   US.fetchProfile()
   .then(function (i) {
     $scope.userProfile = i;
+    $scope.userProfile.image = i.image || 'default-avatar.jpg';
     // angular.extend($scope.userProfile, i);
   });
 
@@ -135,6 +136,16 @@ angular.module('user', [])
       $scope.userProfile.drugs.splice(index, 1);
     });
   };
+
+  //watches for changes to the userProfile image and saves 
+  //to the db
+  $scope.$watch('userProfile.image', function (n) {
+    if (!n) return false;
+    US.updateProfile({name : 'image', value: n})
+    .then(function () {
+
+    });
+  });
 
 }])
 .filter('territory', function () {

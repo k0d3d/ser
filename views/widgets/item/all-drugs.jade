@@ -43,7 +43,8 @@ mixin allDrugs()
            
                   button.btn.btn-sm.btn-danger
                     i.fa.fa-times
-    pagination.x-pagination(ng-model="currentPage", ng-change="page_changed()", total-items="totalItems")
+    
+    .x-pagination(pagination="valRes", page-to="getPageItems(currentPage, pageLimit, cb)", current-page="currentPage", page-limit="pageLimit")
 
 mixin allRequest()
   .table-responsive
@@ -100,3 +101,4 @@ mixin allPending()
           td {{tr.status | stockRequestState}}
           td {{tr.referenceId}}
           td
+    .x-pagination(pagination="valRes", page-to="getPageItems(currentPage, pageLimit, cb)", current-page="currentPage", page-limit="pageLimit")            

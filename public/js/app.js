@@ -22,7 +22,7 @@ app.run(function(editableOptions) {
   editableOptions.theme = 'bs3'; // bootstrap3 theme. Can be also 'bs2', 'default'
 });
 
-app.config(function ($routeProvider, $locationProvider, $httpProvider, pagerConfig) {
+app.config(function ($routeProvider, $locationProvider, $httpProvider) {
   $routeProvider
   //.when('/', {templateUrl: '/drug/index', controller: 'drugIndexController'})
   .otherwise({
@@ -30,8 +30,6 @@ app.config(function ($routeProvider, $locationProvider, $httpProvider, pagerConf
     });
   $locationProvider.html5Mode(true);
   $httpProvider.interceptors.push('errorNotifier');
-  pagerConfig.itemsPerPage = 20;
-  pagerConfig.boundaryLinks = true;
 
 });
 
@@ -154,15 +152,21 @@ app.directive('dropzone', [function () {
   return {
     link : function (scope, element, attrs) {
       $(element).dropzone({ 
-        url: '/upload-doc',
-        paramName: 'itemImage',
+        url: attrs.postUrl,
+        paramName: attrs.postParam,
         maxFiles : 5,
         clickable: true,
+        previewsContainer: attrs.previews || false,
         //uploadMultiple: true,
         autoProcessQueue: true,
         init : function () {
           this.on('success', function (file, name) {
-            scope.ngModel.push(name);
+            if (typeof scope.ngModel === 'object') {
+              scope.ngModel.push(name);
+            } else {
+              scope.ngModel = name;
+            }
+            scope.$apply();
           });
         }
       });

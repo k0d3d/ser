@@ -1,5 +1,6 @@
 var Order = require('./order/order.js').Order,
   OrderStatus = require('./order/order.js').OrderStatus,
+  Item = require('./item/drug.js').drug,
   _ = require('underscore'),
   //Hospital = require('./organization/hospital.js') ,
   Q = require('q'),
@@ -395,6 +396,17 @@ OrderController.prototype.distUpdateOrder = function(orderData, userId, accountT
       }
     };
 
+  // var noticeData = {
+  //   alertType: 'order',
+  //   meta : _.extend(
+  //   {
+  //     hospitalId: orderData.hospitalId.userId,
+  //     itemId: orderData.itemId._id
+  //   }, 
+  //     _.omit(orderData, ['hospitalId', 'itemId'])
+  //   )
+  // };
+
   //if the currently logged in user
   //is a staff and is confirming or disputing an order
   // if (parseInt(__body.status) < 4 && accountType === parseInt(4)) {
@@ -420,47 +432,72 @@ OrderController.prototype.distUpdateOrder = function(orderData, userId, accountT
       'orderId': orderData.orderId
     }, options)
     .exec(function (err, i) {
-      console.log(err, i);
       if (err) {
         return law.reject(err);
       }
 
       if (i > 0) {
-        // if order has been updates, notify
-        // concerned..i.e. hospital
-        postman.noticeFn.getConcernedStaff({
-          userId: orderData.hospitalId.userId,
-          accountType: 5,
-          operation: 'user'
-        })
-        .then(function (listOfRecpt) {
-          var tom;
-          if (__body.status !== 3) {
-            tom = 'quotation_request_replied';
-          } else {
-            tom = 'quotation_request_updated'; 
-          }          
-          return postman.noticeFn.deliveryAgent({
-            listOfRecpt: listOfRecpt, 
-            typeOfMessage: tom
-          });          
-        })
-        .then(function () {
 
-          // postman.noticeFn.checkIfNotified([d], userId, noticeData)
-          // .then(function (done) {
-          //   //use done to send email and sms
-          //   return procs.resolve(d);
-          // }, function (err) {
-          //   return procs.reject(err);
-          // });          
-          return law.resolve(__body);
+        //populate hospitalId,
+        staffUtils.getMeMyModel(5)
+        .findOne({
+          userId: orderData.hospitalId.userId,
+        }, 'userId name')
+        .execQ()
+        .then(function (facility_model) {
+          orderData.hospitalId = facility_model;
+
+          //populate itemId
+          return Item.findOne({
+            _id: orderData.itemId._id
+          }, 'itemName itemPackaging')
+          .execQ();
+
+        })
+        .then(function (item_model) {
+          //added the populated itemId
+          orderData.itemId = item_model;
+
+          var noticeData = {
+            alertType: 'order',
+            meta : orderData
+          };
+
+          // if order has been updates, notify
+          // concerned..i.e. hospital
+          postman.noticeFn.getConcernedStaff({
+            userId: orderData.hospitalId.userId,
+            accountType: 5,
+            operation: 'user'
+          })
+          .then(function (listOfRecpt) {
+            var tom;
+            if (__body.status === 2) {
+              tom = 'quotation_request_replied';
+            } else {
+              tom = 'quotation_request_updated'; 
+            }
+            // console.log(noticeData);
+            return postman.noticeFn.deliveryAgent(
+              listOfRecpt, 
+              tom,
+              noticeData
+            );          
+          })
+          .then(function () {
+        
+            return law.resolve(__body);
+          })
+          .catch(function (err) {
+            console.log(err.stack);
+            return law.reject(err);          
+          })
+          .done();
         })
         .catch(function (err) {
           console.log(err.stack);
-          return law.reject(err);          
-        });
-        
+        })       
+        .done();
       }
 
       if (i === 0) {
@@ -540,19 +577,19 @@ var count = function(req, res){
 };
 
 
-/**
- * [suppliersTypeahead description]
- * @method suppliersTypeahead
- * @param  {[type]} req [description]
- * @param  {[type]} res [description]
- * @return {[type]}     [description]
- */
-var suppliersTypeahead = function(req, res){
-  Supplier.autocomplete(req.param('query'), function(err, suppliers){
-    if (err) return res.render('500');
-     res.json(suppliers);
-  });
-};
+// /**
+//  * [suppliersTypeahead description]
+//  * @method suppliersTypeahead
+//  * @param  {[type]} req [description]
+//  * @param  {[type]} res [description]
+//  * @return {[type]}     [description]
+//  */
+// var suppliersTypeahead = function(req, res){
+//   Supplier.autocomplete(req.param('query'), function(err, suppliers){
+//     if (err) return res.render('500');
+//      res.json(suppliers);
+//   });
+// };
 
 /**
  * [removeOrder description]
@@ -609,31 +646,57 @@ OrderController.prototype.requestItemQuotation = function requestItemQuotation (
     //or findOne query, lastUpdate is a virtual.
     d.lastUpdate = Date.now();
 
-    var noticeData = {
-      alertType: 'order',
-      meta : d
-    };
+    //populate hospitalId,
+    staffUtils.getMeMyModel(5)
+    .findOne({
+      userId: orderOwner
+    }, 'userId name')
+    .execQ()
+    .then(function (facility_model) {
+      orderData.hospitalId = facility_model;
 
-    postman.noticeFn.getConcernedStaff({
-      userId: orderData.owner.userId,
-      accountType: orderData.owner.account_type,
-      operation: 'organization'
-    })
-    .then(function (listOfRecpt) {
+      //populate itemId
+      return Item.findOne({
+        _id: orderData.itemId
+      }, 'itemName itemPackaging')
+      .execQ();
 
-      return postman.noticeFn.deliveryAgent(
-        listOfRecpt, 
-        'new_quotation_request',
-        noticeData
-      );
     })
-    .then(function () {
-      return procs.resolve(d);
+    .then(function (item_model) {
+      //added the populated itemId
+      orderData.itemId = item_model;
+
+      var noticeData = {
+        alertType: 'order',
+        meta : orderData
+      };
+
+      postman.noticeFn.getConcernedStaff({
+        userId: orderData.owner.userId,
+        accountType: orderData.owner.account_type,
+        operation: 'organization'
+      })
+      .then(function (listOfRecpt) {
+
+        return postman.noticeFn.deliveryAgent(
+          listOfRecpt, 
+          'new_quotation_request',
+          noticeData
+        );
+      })
+      .then(function () {
+        return procs.resolve(d);
+      })
+      .catch(function (err) {
+        console.log(err.stack);
+        return procs.reject(err);
+      });      
     })
     .catch(function (err) {
       console.log(err.stack);
-      return procs.reject(err);
-    });
+    })
+    .done();
+
 
 
     // then return promise which should send messages and 
@@ -671,64 +734,101 @@ OrderController.prototype.addressQuotation = function addressQuotation (order, s
     orderId : order.orderId
   })
   // .populate('orderCharge', 'email', 'User')
-  .exec(function (err, i) {
+  .exec(function (err, order_model) {
     if (err) {
       return ot.reject(err);
     }  
-    if (!i) {
+    if (!order_model) {
       return ot.reject(new Error('order update failed'));
     }
     //if the current order status is greater
     //than the next status, reject the request
-    if (i.status > status && status !== -1) {
+    if (order_model.status > status && status !== -1) {
       return ot.reject(new Error('invalid transaction'));
     }
 
-    i.status = status;
-    i.statusLog.push({
+    order_model.status = status;
+    order_model.statusLog.push({
       orderStatus: status,
-      orderCharge : i.orderCharge,
+      orderCharge : order_model.orderCharge,
       date: Date.now()
     });
 
-    i.save(function (err, i) {
-      // if order has been updates, notify
-      // concerned..i.e. sales staff,
-      // by now, a sales staff should be incharge of the order
-      postman.noticeFn.getConcernedStaff({
-        userId: i.orderCharge || i.orderSupplier.supplierId,
-        accountType: (i.orderCharge) ? 4 : 2,
-        operation: (i.orderCharge) ? 'user' : 'organization'
-      })
-      .then(function (listOfRecpt) {
-        var tom;
-        if (status === 2) {
-          tom = 'quotation_accepted';
-        } else if (status === -1) {
-          tom = 'order_cancelled'; 
-        }
-        return postman.noticeFn.deliveryAgent({
-          listOfRecpt: listOfRecpt, 
-          typeOfMessage: tom
-        });          
-      })
-      .then(function () {
+    order_model.save(function (err, saved_order_model) {
 
-        // postman.noticeFn.checkIfNotified([d], userId, noticeData)
-        // .then(function (done) {
-        //   //use done to send email and sms
-        //   return procs.resolve(d);
-        // }, function (err) {
-        //   return procs.reject(err);
-        // });          
-        return ot.resolve(i);
-      })
-      .catch(function (err) {
-        console.log(err.stack);
-        return ot.reject(err);          
-      });
+        saved_order_model = saved_order_model.toObject();
 
-      return ot.resolve(i);
+        //populate hospitalId,
+        staffUtils.getMeMyModel(5)
+        .findOne({
+          userId: saved_order_model.hospitalId,
+        }, 'userId name')
+        .execQ()
+        .then(function (facility_model) {
+          saved_order_model.hospitalId = facility_model;
+
+          //populate itemId
+          return Item.findOne({
+            _id: saved_order_model.itemId
+          }, 'itemName itemPackaging')
+          .execQ();
+
+        })
+        .then(function (item_model) {
+          //added the populated itemId
+          saved_order_model.itemId = item_model;
+          var noticeData = {
+            alertType: 'order',
+            meta : saved_order_model
+          };
+
+          // if order has been updates, notify
+          // concerned..i.e. sales staff,
+          // by now, a sales staff should be incharge of the order
+          postman.noticeFn.getConcernedStaff({
+            userId: saved_order_model.orderCharge || saved_order_model.orderSupplier.supplierId,
+            accountType: (saved_order_model.orderCharge) ? 4 : 2,
+            operation: (saved_order_model.orderCharge) ? 'user' : 'organization'
+          })
+          .then(function (listOfRecpt) {
+            var tom;
+            if (status === 2) {
+              tom = 'quotation_accepted';
+            } else if (status === -1) {
+              tom = 'order_cancelled'; 
+            }
+            return postman.noticeFn.deliveryAgent(
+              listOfRecpt, 
+              tom,
+              noticeData
+            );          
+          })
+          .then(function () {
+
+            // postman.noticeFn.checkIfNotified([d], userId, noticeData)
+            // .then(function (done) {
+            //   //use done to send email and sms
+            //   return procs.resolve(d);
+            // }, function (err) {
+            //   return procs.reject(err);
+            // });          
+            return ot.resolve(saved_order_model);
+          })
+          .catch(function (err) {
+            console.log(err.stack);
+            return ot.reject(err);          
+          })
+          .done();
+
+
+
+        })
+        .catch(function (err) {
+          console.log(err.stack);
+        })       
+        .done();
+
+      // return ot.resolve(saved_order_model);
     });
 
 

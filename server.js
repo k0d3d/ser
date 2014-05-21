@@ -22,6 +22,7 @@ var express = require('express'),
     session = require('express-session'),
     favicon = require('static-favicon'),
     compress = require('compression'),
+    multer = require('multer'),
     helpers = require('view-helpers');
 var MongoStore = require('connect-mongo')(session);
 
@@ -92,6 +93,12 @@ function afterResourceFilesLoad() {
 
     app.use(bodyParser());
     app.use(methodOverride());
+    app.use('/upload/doc', multer({
+      dest: './public/images/item-images'
+    }));
+    app.use('/upload/profile', multer({
+      dest: './public/images/profile-images'
+    }));
 
     // setup session management
     console.log('setting up session management, please wait...');

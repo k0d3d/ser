@@ -1,7 +1,7 @@
 /**
  * Module dependencies.
  */
-var mongoose = require('mongoose'),
+var mongoose = require('mongoose-q')(),
     Schema = mongoose.Schema;
 
 var HospitalSchema =  new Schema({

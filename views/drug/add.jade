@@ -89,7 +89,7 @@
                 input.form-control(type="number", ng-model="add_item_form.packageQty")
             .form-group
               label.col-sm-3.control-label Upload Image
-              .col-sm-6.dropzone(dropzone, ng-model="add_item_form.images")
+              .col-sm-6.dropzone(dropzone, ng-model="add_item_form.images", post-url="/upload/doc", post-param="itemImage", previews="true")
                   input(name='itemImage', type='file', multiple='multiple', style="display: none")     
                   span.help-text 
                     | Add an image for this item. You can click here or drag and drop file right here, easy!                           

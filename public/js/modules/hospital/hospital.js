@@ -22,14 +22,15 @@ hospital.config(['$routeProvider', function ($routeProvider){
 
 hospital.controller('hospitalIndexController', ['$scope', 'facilityServices', function indexController($scope, facilityService){
   $scope.$parent.headerTitle = 'Hospitals';
-
+  $scope.currentPage = 0;
+  $scope.pageLimit = 20;
   //Request hospitals within the 
   //currently logged in users
   //coverage
-  facilityService.searchFacility({page: 0})
-  .then(function(r){
-    $scope.valRes = r;
-  });
+  // facilityService.searchFacility({page: 0, limit: 20})
+  // .then(function(r){
+  //   $scope.valRes = r;
+  // });
 
   $scope.remove = function(index){
     facilityService.remove($scope.hospitals[index]._id,$scope.hospitals[index].user, function(r){
@@ -49,6 +50,21 @@ hospital.controller('hospitalIndexController', ['$scope', 'facilityServices', fu
     });
   };
 
+  $scope.getPageItems = function (currentPage, pageLimit) {
+    facilityService.searchFacility({page: currentPage, limit: pageLimit})
+    .then(function (res) {
+      if (!_.isEmpty(res)) {
+        $scope.valRes = res;
+      } 
+    });
+  };
+
+  $scope.$watch('currentPage', function () {
+    $scope.getPageItems($scope.currentPage, $scope.pageLimit);
+  });
+
+  //loads the initial table / page
+  $scope.getPageItems($scope.currentPage, $scope.pageLimit);
 }]);
 
 hospital.controller('hospitalAddController', ['$scope', 'facilityServices', function indexController($scope, hs){

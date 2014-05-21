@@ -698,7 +698,6 @@ DrugController.prototype.checkUpdate = function(since, cb){
 };
 
 DrugController.prototype.fetchAllMyDrugs = function (options, userId, accountType) {
-  console.log(arguments);
   var d = Q.defer();
   //if you are not a distributor,
   //lets your employers id
