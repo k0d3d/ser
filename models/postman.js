@@ -101,6 +101,7 @@ noticeFn = {
   getConcernedStaff: function getConcernedStaff (doc) {
     var dfr = Q.defer();
     var listOfRecpt = [];
+    
     console.log('Getting concerned staff...');
     if (doc.operation === 'organization') {    //list of employees
           staffUtils.getMyPeople(doc.userId, doc.accountType)
@@ -112,8 +113,6 @@ noticeFn = {
               _.each(peps.managers, function (v) {
                 listOfRecpt.push({
                   userId: v.userId, 
-                  allowedNotifications: v.allowedNotifications, 
-                  approvedNotices: v.approvedNotices,
                   name: v.name,
                   phone: v.phone
                 });
@@ -125,8 +124,6 @@ noticeFn = {
               _.each(peps.staff, function (v) {
                 listOfRecpt.push({
                   userId: v.userId, 
-                  allowedNotifications: v.allowedNotifications, 
-                  approvedNotices: v.approvedNotices,
                   name: v.name,
                   phone: v.phone
                 });
@@ -138,7 +135,7 @@ noticeFn = {
             .findOne({
               userId: doc.userId
             })
-            .populate('userId', 'email account_type', 'User')
+            .populate('userId', 'email account_type allowedNotifications approvedNotices', 'User')
             // .lean()
             .exec(function (err, md) {
               if (err) {
@@ -148,10 +145,8 @@ noticeFn = {
     
               listOfRecpt.push({
                   userId: md.userId, 
-                  allowedNotifications: md.allowedNotifications, 
                   name: md.name,
                   phone: md.phone,            
-                  approvedNotices: md.approvedNotices
                 });
               return dfr.resolve(listOfRecpt);
             });
@@ -211,6 +206,12 @@ noticeFn = {
     var da = Q.defer();
     da.longStackSupport = true;
     var self = this;
+    // var allowed_defaults = {
+    //   email : {type: Boolean, default: true},
+    //   sms : {type: Boolean, default: false},
+    //   portal: {type: Boolean, default: true},
+    //   mobile: {type: Boolean, default: false}        
+    // };    
     // console.log(doc);
     // da.resolve();
     // return da.promise;
@@ -220,12 +221,22 @@ noticeFn = {
     function __pushMessages () {
 
       var task = listOfRecpt.pop();
-      console.log(task);
+
+      var allowedEmail = ( typeof task.userId.allowedNotifications.email !== 'undefined') ? 
+        task.userId.allowedNotifications.email : 
+        true;
+      var allowedSMS = ( typeof task.userId.allowedNotifications.sms !== 'undefined') ? 
+        task.userId.allowedNotifications.sms : 
+        false;
+      var allowedPortal = ( typeof task.userId.allowedNotifications.portal !== 'undefined') ? 
+        task.userId.allowedNotifications.portal : 
+        true;
+
       //task here is a user object.
       //
       //lets try sending an email. if the 
       //user allows emails.
-      if (task.allowedNotifications.email) {
+      if (allowedEmail) {
 
         //if his email is on file.. 
         //just a check.. he def has 
@@ -254,7 +265,7 @@ noticeFn = {
 
       } 
       //try sending sms
-      if (task.allowedNotifications.sms) {
+      if (allowedSMS) {
         if (task.phone) {
           
           sendSms.sendSMS(messageStrings(typeOfMessage + '.sms.message', noticeData.meta), task.phone)
@@ -269,10 +280,12 @@ noticeFn = {
         }
       }
 
-      if (task.allowedNotifications.portal) {
+      if (allowedPortal) {
         noticeData.alertDescription = messageStrings(typeOfMessage + '.portal.message', noticeData.meta);
         self.addUserNotice(task.userId._id, noticeData)
         .then(function () {
+            console.log('sent to: ' + task.userId.email);
+
             if (listOfRecpt.length) {
               process.nextTick(__pushMessages);
             } else {
@@ -284,6 +297,8 @@ noticeFn = {
         });
       } else {
         
+        console.log('sent to: ' + task.userId.email);
+
         if (listOfRecpt.length) {
           process.nextTick(__pushMessages);
         } else {
@@ -292,7 +307,6 @@ noticeFn = {
       }
 
 
-      console.log('sent to: ' + task.userId.email);
     }
 
     if (listOfRecpt.length === 0) {
@@ -435,47 +449,93 @@ noticeFn = {
 
     return ifn.promise;
   },
+  /**
+   * finds all notifications belonging to a user. 
+   * @param  {[type]} userId     [description]
+   * @param  {[type]} noticeData [description]
+   * @return {[type]}            [description]
+   */
+  findUserNotices: function findUserNotices (userId, noticeData) {
+    console.log('Finding user notices...');
+    var ri = Q.defer();
+    ActivityNotification.find({
+      ownerId: userId
+    })
+    .lean()
+    // .populate('meta.itemId', 'itemName itemPackaging', 'drug')
+    .exec(function (err, i) {
+      if (err) {
+        return ri.reject(err);
+      }
+      if (i) {
+        return ri.resolve(i);
+      }
+    });
+
+    return ri.promise;
+  },
 
   /**
    * [poppedMedFac description]
    * @param  {[type]} obj [description]
+   * @param {string} key a string value used to select
+   * the field on obj to be used in querying userId 
+   * on the facility collection.
    * @return {[type]}     [description]
    */
-  poppedMedFac: function poppedMedFac (obj) {
+  poppedMedFac: function poppedMedFac (obj, key) {
    console.log('Adding Med Facilities to Object'); 
     var poper = Q.defer(), newObj = [];
     //console.log(obj);
 
     function __curios () {
       var task = obj.pop();
-      console.log(task);
-      try {
-        staffUtils.getMeMyModel(5)
-        .findOne({
-          userId: task.hospitalId
-        }, 'name')
-        .lean()
-        .exec(function (err, i) {
-          //console.log(err, i);
-          if (err) {
-            return poper.reject(err);
-          }
+      //some times, the meta information stored
+      //might already be populated with, relevant
+      //fields, we want to check , if we have
+      //an objectId or populated object
+      if (u.testIfObjId(u.strToObj(task, key))) {
 
-          if (i) {
-            task.hospital = i;
-            newObj.push(task);
-            if (obj.length) {
-              __curios();
-            } else {
-              return poper.resolve(newObj);
+        try {
+          staffUtils.getMeMyModel(5)
+          .findOne({
+            userId: u.strToObj(task, key)
+          }, 'name')
+          .lean()
+          .exec(function (err, i) {
+            //console.log(err, i);
+            if (err) {
+              return poper.reject(err);
             }
-          } else {
-            return poper.reject(new Error('cant find hospitals'));
-          }
 
-        });
-      } catch (e) {
-        console.log(e);
+            if (i) {
+              task.hospital = i;
+              newObj.push(task);
+              if (obj.length) {
+                __curios();
+              } else {
+                return poper.resolve(newObj);
+              }
+            } else {
+              return poper.reject(new Error('cant find hospitals'));
+            }
+
+          });
+        } catch (e) {
+          console.log(e);
+        }
+      } else {
+        //we have an object most likely.
+        //we'll just attach the populated data to a 
+        //hospital property and push in the task object all
+        //the same..
+        task.hospital = u.strToObj(task, key);
+        newObj.push(task);
+        if (obj.length) {
+          __curios();
+        } else {
+          return poper.resolve(newObj);
+        }        
       }
     }
 
@@ -491,43 +551,43 @@ noticeFn = {
   __getPlaced:   function __getPlaced (doc) {
     var mine = Q.defer();
     console.log('Getting placed orders...');
-    var options = {};
+    // var options = {};
 
-    if (doc.hospitalId) {
-      options.hospitalId = doc.hospitalId;
-    }
+    // if (doc.hospitalId) {
+    //   options.hospitalId = doc.hospitalId;
+    // }
 
-    if (doc.supplierId) {
-      options.supplierId = doc.supplierId;
-    }
+    // if (doc.supplierId) {
+    //   options.supplierId = doc.supplierId;
+    // }
 
     // var obj = _.extend(options, doc);
     // console.log(doc, obj);
 
-    noticeFn.getOrderStatuses(options)
-    .then(function (distOrders) {
       //Create activity entries
-      noticeFn.checkIfNotified(distOrders, doc.userId, doc.noticeData)
+      noticeFn.findUserNotices(doc.userId, doc.noticeData)
       .then(function (v) {
-        // console.log(v);
-        //lets populate the hospital data
-        noticeFn.poppedMedFac(v)
-        .then(function (poppedResult) {
-          return mine.resolve(poppedResult);
-        }, function (err) {
-          //Some error populating hospitals
-          return mine.reject(err);
-        })
-        .catch(noticeFn.logError);
+        
+        return mine.resolve(v);
+        // if (doc.noticeData.alertType === 'order') {
+        //   //lets populate the hospital data
+        //   noticeFn.poppedMedFac(v, 'meta.hospitalId')
+        //   .then(function (poppedResult) {
+
+        //     return mine.resolve(poppedResult);
+        //   }, function (err) {
+        //     console.log(err.stack);
+        //     //Some error populating hospitals
+        //     return mine.reject(err);
+        //   })
+        //   .catch(noticeFn.logError);
+        // }
+
+
       }, function (err) {
         return mine.reject(err);
       })
       .catch(noticeFn.logError);
-
-    })
-    .catch(function (err) {
-      console.log(err);
-    });
 
     return mine.promise;
   },
@@ -560,16 +620,12 @@ PostmanController.prototype.myOrderNotices = function (userId, accountType) {
   var mine = Q.defer(),
     noticeData = {
       alertType: 'order',
-      timeStamp: 'lastUpdate',
-      meta : ['orderId', 'hospitalId']
     };
-
   //order notices for account level 5
   //i.e. hospitals
   if (accountType > 4) {
     console.log('bcos no orders for u');
     noticeFn.__getPlaced({
-      hospitalId: userId,
       userId: userId,
       noticeData: noticeData
     })
@@ -593,12 +649,10 @@ PostmanController.prototype.myOrderNotices = function (userId, accountType) {
       accountType: accountType
     })
     .then(function (id) {
-      console.log(id.employer);
       //user = ;
       try {
 
         noticeFn.__getPlaced({
-          distributorId: id.employer.employerId,
           userId: userId,
           noticeData: noticeData
         })
@@ -621,7 +675,6 @@ PostmanController.prototype.myOrderNotices = function (userId, accountType) {
     });
   } else if (accountType === 2) {
     noticeFn.__getPlaced({
-      distributorId: userId,
       userId: userId,
       noticeData: noticeData
     })

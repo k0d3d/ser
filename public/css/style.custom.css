@@ -286,3 +286,30 @@ select.editable-has-buttons {
 .sr-ol i:hover {
   color: #D9534F;
 }
+.act-spr-img {
+  background-image: url(../images/order-status-sprite.png);
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+.act-spr-img.a0 {
+  background-position: 112px 0;
+}
+.act-spr-img.a1 {
+  background-position: 96px 0;
+}
+.act-spr-img.a3 {
+  background-position: 80px 0;
+}
+.act-spr-img.a2 {
+  background-position: 64px 0;
+}
+.act-spr-img.a4 {
+  background-position: 32px 0;
+}
+.act-spr-img.a5 {
+  background-position: 16px 0;
+}
+.act-spr-img.a6 {
+  background-position: 48px 0;
+}

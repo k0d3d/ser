@@ -20,23 +20,54 @@ hospital.config(['$routeProvider', function ($routeProvider){
   });
 }]);
 
-hospital.controller('hospitalIndexController', ['$scope', 'hospitalService', function indexController($scope, hs){
+hospital.controller('hospitalIndexController', ['$scope', 'facilityServices', function indexController($scope, facilityService){
   $scope.$parent.headerTitle = 'Hospitals';
-
-  //Request hospitals
-  // hs.all({page: 0}, function(r){
-  //   $scope.hospitals = r;
+  $scope.currentPage = 0;
+  $scope.pageLimit = 20;
+  //Request hospitals within the 
+  //currently logged in users
+  //coverage
+  // facilityService.searchFacility({page: 0, limit: 20})
+  // .then(function(r){
+  //   $scope.valRes = r;
   // });
 
-  $scope.removeh = function(index){
-    hs.remove($scope.hospitals[index]._id,$scope.hospitals[index].user, function(r){
+  $scope.remove = function(index){
+    facilityService.remove($scope.hospitals[index]._id,$scope.hospitals[index].user, function(r){
       $scope.hospitals.splice(index, 1);
     });
   };
 
+  $scope.search_gvt = function (data) {
+    facilityService.searchFacility(data)
+    .then(function (res) {
+      if (!_.isEmpty(res)) {
+        $scope.valRes = res;
+      } else {
+        $scope.valRes.length = 0;
+      }
+      
+    });
+  };
+
+  $scope.getPageItems = function (currentPage, pageLimit) {
+    facilityService.searchFacility({page: currentPage, limit: pageLimit})
+    .then(function (res) {
+      if (!_.isEmpty(res)) {
+        $scope.valRes = res;
+      } 
+    });
+  };
+
+  $scope.$watch('currentPage', function () {
+    $scope.getPageItems($scope.currentPage, $scope.pageLimit);
+  });
+
+  //loads the initial table / page
+  $scope.getPageItems($scope.currentPage, $scope.pageLimit);
 }]);
 
-hospital.controller('hospitalAddController', ['$scope', 'hospitalService', function indexController($scope, hs){
+hospital.controller('hospitalAddController', ['$scope', 'facilityServices', function indexController($scope, hs){
   function init () {
     $scope.form = {};
   }
@@ -50,7 +81,7 @@ hospital.controller('hospitalAddController', ['$scope', 'hospitalService', funct
   };
 
 }]);
-hospital.controller('hospitalDeetsController', ['$scope', 'hospitalService', '$routeParams', function indexController($scope, hs, $routeParams){
+hospital.controller('hospitalDeetsController', ['$scope', 'facilityServices', '$routeParams', function indexController($scope, hs, $routeParams){
   function init () {
     $scope.form = {};
 
@@ -64,7 +95,7 @@ hospital.controller('hospitalDeetsController', ['$scope', 'hospitalService', '$r
 
 }]);
 
-hospital.factory('hospitalService',['$http', 'Notification', 'Language',  function($http, N, Lang){
+hospital.factory('facilityServices',['$http', 'Notification', 'Language',  function($http, N, Lang){
   var h = {};
 
   //Get the list of register hospitals
@@ -92,8 +123,14 @@ hospital.factory('hospitalService',['$http', 'Notification', 'Language',  functi
         type: 'error'
       });      
     });
-  }
+  };
 
+  h.searchFacility = function searchFacility (data) {
+    return $http.get('/api/internal/facilities/search?type=facilty&' + $.param(data))
+    .then(function (r) {
+      return r.data;
+    });
+  };
 
   //Send a new registration request
   h.register = function(post, callback){

@@ -6,9 +6,9 @@ var _ = require('lodash');
 //currently logged in user..
 function howWhoGetsNotified (accountType)  {
   var list = {
-    '2' : ['myOrderNotices', 'userStockNotices'],
-    '3' : ['myOrderNotices', 'userStockNotices'],
-    '4' : ['myOrderNotices', 'userStockNotices'],
+    '2' : ['myOrderNotices'],
+    '3' : ['myOrderNotices'],
+    '4' : ['myOrderNotices'],
     '5' : ['myOrderNotices']
   };
 

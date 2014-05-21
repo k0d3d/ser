@@ -23,14 +23,24 @@ angular.module('drug', [])
       $scope._pending =  [];
       $scope._request = [];
       //current Page for Pagination
-      $scope.currentPage = 1;
-      $scope.totalItems =($scope.currentPage + 1) * 20;
+      $scope.currentPage = 0;
+      $scope.pageLimit = 20;
 
-      ds.fetchAll({page: 1, limit: 20})
-      .then(function (r) {
-        $scope._drugs = r;
-      });
 
+      //function does the 
+      $scope.getPageItems = function (currentPage, pageLimit) {
+
+        ds.fetchAll({page: currentPage, limit: pageLimit})
+        .then(function (r) {
+          if (!_.isEmpty(r)) {
+            $scope._drugs = r;
+          }
+        });
+
+      };      
+
+      // get the first page
+      $scope.getPageItems($scope.currentPage, $scope.pageLimit);
       //get all stock Request
       //
       //get stock down request
@@ -96,7 +106,7 @@ angular.module('drug', [])
 
 
     $scope.add_to_list = function (item) {
-      ds.addToMyList({drugId: item._id})
+      oss.addToMyList({drugId: item._id})
       .then(function (r) {
         
       });      
@@ -167,9 +177,10 @@ angular.module('drug', [])
       });
     };
 
-    $scope.page_changed = function () {
-      console.log($scope.currentPage);
-    };
+    $scope.$watch('currentPage', function () {
+      $scope.getPageItems($scope.currentPage, $scope.pageLimit);
+    });
+
   }])
   .controller('drugAddController', ['$scope', 'drugService', function ($scope, ds) {
     //Init the add item form model and 
@@ -325,16 +336,6 @@ angular.module('drug', [])
       });
     };
 
-    d.addToMyList = function (data) {
-      return $http.post('/api/internal/organization/staff/drugs/', data)
-      .then(function (r) {
-        return r.data;
-      }, function (err) {
-        console.log(err);
-        return err;
-      });
-    };
-
     d.fetchAll = function (options)  {
       options = options || {};
       return $http.get('/api/internal/drugs?' + $.param(options))
@@ -451,7 +452,7 @@ angular.module('drug', [])
       });      
     };
 
-    d.getPendingStock = function (action) {
+    d.getPendingStock = function getPendingStock (action) {
       return $http.get('/api/internal/drugs/history?action=' + action)
       .then(function (res) {
         return res.data;

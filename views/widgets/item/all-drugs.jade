@@ -12,7 +12,7 @@ mixin allDrugs()
       tbody
         tr(ng-repeat="d in _drugs")
           td 
-            -if (userData.account_type === 2 )
+            -if (userData.account_type === 2 || userData.account_type === 4)
               a(ng-href='/a/users/{{d.supplier.supplierId}}/drugs/{{d._id}}/item') {{d.itemName}}
             -else
               a(ng-href='/a/drugs/{{d._id}}/item') {{d.itemName}}
@@ -43,7 +43,8 @@ mixin allDrugs()
            
                   button.btn.btn-sm.btn-danger
                     i.fa.fa-times
-    pagination.x-pagination(ng-model="currentPage", ng-change="page_changed()", total-items="totalItems")
+    
+    .x-pagination(pagination="valRes", page-to="getPageItems(currentPage, pageLimit, cb)", current-page="currentPage", page-limit="pageLimit")
 
 mixin allRequest()
   .table-responsive
@@ -100,3 +101,4 @@ mixin allPending()
           td {{tr.status | stockRequestState}}
           td {{tr.referenceId}}
           td
+    .x-pagination(pagination="valRes", page-to="getPageItems(currentPage, pageLimit, cb)", current-page="currentPage", page-limit="pageLimit")            

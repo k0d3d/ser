@@ -135,7 +135,7 @@ angular.module('organization', [])
 }])
 .factory('organizeStaffService', ['$http', 'Notification', 'Language', function ($http, N, L) {
   return {
-    inviteStaff : function (form) {
+    inviteStaff : function inviteStaff (form) {
       return $http.post('/api/internal/organization/invites', form)
       .then(function (r) {
         N.notifier({
@@ -153,7 +153,7 @@ angular.module('organization', [])
         //return err;
       });
     },
-    loadInvites : function () {
+    loadInvites : function loadInvites () {
       return $http.get('/api/internal/organization/invites')
       .then(function (r) {
         return r.data;
@@ -161,7 +161,7 @@ angular.module('organization', [])
         return err;
       });
     },
-    activateStaff : function (data) {
+    activateStaff : function activateStaff (data) {
       console.log(data);
       return $http.put('/api/internal/organization/invites?activation=1', data)
       .then(function (r) {
@@ -173,7 +173,7 @@ angular.module('organization', [])
         return r.data;
       });
     },
-    cancelStaff : function (data) {
+    cancelStaff : function cancelStaff (data) {
       console.log(data);
       return $http.put('/api/internal/organization/invites?activation=0', data)
       .then(function (r) {
@@ -187,7 +187,7 @@ angular.module('organization', [])
     },
     //fetch the list of people having a 
     //specific account type
-    getMyPeople : function (options) {
+    getMyPeople : function getMyPeople (options) {
       return $http.get('/api/internal/organization/people/' + options.account_type)
       .then(function (r) {
         return r.data;
@@ -195,7 +195,7 @@ angular.module('organization', [])
         return err;
       });
     },
-    getPersonProfile : function (options) {
+    getPersonProfile : function getPersonProfile (options) {
       return $http.get('/api/internal/organization/people/' + options.userId + '/staff/' + options.account_type)
       .then(function (r) {
         return r.data;
@@ -205,7 +205,7 @@ angular.module('organization', [])
     },
     //get the list of people employed under the currently 
     //logged in user. 
-    getMyWorkForce : function (kind) {
+    getMyWorkForce : function getMyWorkForce (kind) {
       kind = kind || 'employees';
       return $http.get('/api/internal/organization/workforce?direction=' + kind)
       .then(function (r) {
@@ -240,6 +240,31 @@ angular.module('organization', [])
       .then(function (done) {
         return done.data;
       });
-    }
+    },
+    addToMyList : function addToMyList (data) {
+      return $http.post('/api/internal/organization/staff/drugs', data)
+      .then(function (r) {
+        N.notifier({
+          title: 'Welldone',
+          text: 'Drug added to list',
+          class_name: 'growl-success'
+        });        
+        return r.data;
+      }, function (err) {
+        console.log(err);
+        return err;
+      });
+    },    
+    removeMyDrug : function removeMyDrug (drugId) {
+      return $http.delete('/api/internal/organization/staff/drugs?drugId='+drugId)
+      .then(function () {
+        N.notifier({
+          title: 'Welldone',
+          text: 'Drug removed from list',
+          class_name: 'growl-success'
+        });
+        return true;
+      });
+    }    
   };
 }]);

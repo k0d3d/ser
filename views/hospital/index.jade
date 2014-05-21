@@ -1,13 +1,19 @@
 .contentpanel
-    .btn-group
-      a.btn.btn-small(href='/a/facilities/add') Add a Facility  
-    .panel.panel-default(ng-show="true")
-        .panel-body
-            | No Hospitals listed
-    .panel.panel-default(ng-show="false")
-        .panel-heading
-          .panel-btns
-          h4.panel-title Hospitals
+    .panel.panel-default()
+        .panel-heading(style="height: 70px")
+          .col-md-3
+            h4.panel-title Hospitals
+          .col-md-9
+            form.form-horizontal(ng-submit="search_gvt(__temp)", )
+              .form-group
+                label.control-label.col-sm-4.col-md-4 Hospital Name
+                .col-sm-5.col-md-5
+                  input.form-control(type="text", ng-model="__temp.name", required)
+                  span.help-text 
+                .col-sm-3.col-md-3
+                  button.btn.btn-small.btn-white(ng-disabled="") Search
+                  button.btn.btn-small.btn-lightblue(type="reset" ng-click="__temp.name = ''; search_gvt({})") Reset
+
         .panel-body
           .row
             .col-md-12
@@ -18,23 +24,23 @@
                       th
                         | Hospital Name
                       th
-                        | Contact Person
+                        | LGA
                       th
-                        | Phone Number
+                        | Ward
                       th
-                        | Location
+                        | Type
                       th
-                        | Action
+                        | Ownership
                   tbody
-                    tr.h_row(ng-repeat="h in hospitals", ng-click="commons.href('hospitals/' + h.user)")
+                    tr.h_row(ng-repeat="h in valRes", ng-click="commons.href('hospitals/' + h.user)")
                       td
-                        | {{h.name}}
+                        | {{h.facilityName}}
                       td
-                        | {{h.personel}}
+                        | {{h.lga}}
                       td
-                        | {{h.phonenumber}}
+                        | {{h.lga_ward}}
                       td
-                        | {{h.location}}
+                        | {{h.facilityType}}
                       td
-                        button.btn.btn-xs.btn-primary Edit
-                        button.btn.btn-xs.btn-danger(ng-click="removeh($index)") Remove
+                        | {{h.ownership}}
+                .x-pagination(pagination="valRes", page-to="getPageItems(currentPage, pageLimit, cb)", current-page="currentPage", page-limit="pageLimit")

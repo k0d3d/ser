@@ -537,7 +537,7 @@ config(['$routeProvider',function($routeProvider){
       return 'paid';
       break;
       default:
-      return 'unknown';
+      return 'archived';
       break;
     }
   }

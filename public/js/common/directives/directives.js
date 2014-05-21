@@ -37,6 +37,37 @@ app.directive('onFinish',function($timeout){
   };
 });
 
+app.directive('alertMessage', ['$interpolate', '$sce', function ($interpolate, $sce) {
+  //passing in the status for different 
+  //alert type and stages. this function
+  //return the right sentence, and html
+  //formating to be displayed
+  function gramar (alertType, alertDesc,  status) {
+    var words = {
+      'order': {
+        '-1' : ' {{meta.orderAmount}} {{meta.itemId.itemPackaging}} of {{meta.itemId.itemName}} ' + alertDesc + ' {{meta.hospitalId.name}}',
+        '0' : alertDesc + ' from <a href="">{{meta.hospitalId.name}}</a> for {{meta.orderAmount}} {{meta.itemId.itemPackaging}} of {{meta.itemId.itemName}}',
+        '1' : '{{meta.orderAmount}} {{meta.itemId.itemPackaging}} of {{meta.itemId.itemName}}' + alertDesc ,
+      }
+    };
+
+    status = (status > 1) ? 1 : status;
+
+    return words[alertType][status];
+  }
+
+  return {
+    link: function (scope) {
+      var phrase = $interpolate(gramar(scope.act.alertType, scope.act.alertDescription, scope.act.meta.status || 0))(scope.act);
+      scope.phrase = $sce.trustAsHtml(phrase);
+    },
+    scope: {
+      act: '=alertMessage' 
+    },
+    template: '<strong ng-bind-html="phrase"></strong>'
+  };
+}]);
+
 app.directive('modalbox', [function(){
   return {
     link: function($scope, iElm, iAttrs, controller) {
@@ -94,31 +125,44 @@ app.directive('scrollBar', function(){
 
 app.directive('pagination', [function(){
   function link(scope, element, attrs){
-    scope.pageno = 0;
-    scope.limit = 10;
+    scope.currentPage = 0;
+    // scope.limit = 10;
     $('button.prevbtn', element).on('click', function(e){
-      var page = scope.pageno - 1;
-      if(scope.pageno === 1) return false;
-      scope.pageTo({pageNo: page, limit: scope.limit, cb: function(r){
-        if(r) scope.pageno--;
-      }});
+      if(scope.currentPage === 0) return false;
+      scope.currentPage--;
+      scope.$apply();
+
+      // var page = scope.pageno - 1;
+      // scope.pageTo({pageNo: page, limit: scope.limit, cb: function(r){
+      //   if(r) scope.pageno--;
+      // }});
     });
     $('button.nextbtn', element).on('click', function(e){
-      var page = scope.pageno + 1;
-      scope.pageTo({pageNo: page, limit: scope.limit, cb: function(r){
-        if(r) scope.pageno++;
-      }});
+      scope.currentPage++;
+      scope.$apply();
+      // var page = scope.pageno + 1;
+      // scope.pageTo({pageNo: page, limit: scope.limit, cb: function(r){
+      //   if(r) scope.pageno++;
+      // }});
     });
-    scope.pagelimit = function(limit){
-      scope.pageTo({pageNo: scope.pageno, limit: limit, cb: function(r){
-        if(r) scope.limit = limit;
-      }});        
+    scope.pagelimit = function(pageLimit){
+      scope.pageTo({
+        currentPage: scope.currentPage, 
+        pageLimit: pageLimit, 
+        cb: function(r){
+          if(r) scope.pageLimit = pageLimit;
+        }
+      });  
+      //quick hack!! should suffice for now
+      scope.pageLimit = pageLimit;      
     };
   }
   return {
     link: link,
     scope: {
-      pageTo: '&'
+      pageTo: '&',
+      currentPage: '=',
+      pageLimit: '='
     },
     templateUrl: '/templates/pagination'
   };
