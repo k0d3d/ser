@@ -12,7 +12,7 @@ mixin allDrugs()
       tbody
         tr(ng-repeat="d in _drugs")
           td 
-            -if (userData.account_type === 2 )
+            -if (userData.account_type === 2 || userData.account_type === 4)
               a(ng-href='/a/users/{{d.supplier.supplierId}}/drugs/{{d._id}}/item') {{d.itemName}}
             -else
               a(ng-href='/a/drugs/{{d._id}}/item') {{d.itemName}}

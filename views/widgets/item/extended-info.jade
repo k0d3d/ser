@@ -36,7 +36,7 @@ mixin loadItemExtendedInfo(editable)
           .col-sm-6
             p.text-area(onbeforesave="updateItem($data, $editable.name)", editable-textarea="item.dosage")
               | {{item.dosage || 'Empty'}}
-        .row
+        //.row
           .col-sm-3 Upload Image
           .col-sm-6.dropzone(dropzone, ng-model="add_item_form.images")
               input(name='itemImage', type='file', multiple='multiple', style="display: none")     

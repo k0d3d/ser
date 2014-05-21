@@ -1,5 +1,4 @@
-var easyimg = require('easyimage'),
-    gm = require("gm").subClass({ imageMagick: true });
+var easyimg = require('easyimage');
 
 
 
@@ -8,9 +7,9 @@ module.exports = function(app) {
     app.post('/upload/doc', function (req, res) {
       easyimg.rescrop(
         {
-           src:'/public/images/item-images/' + req.files.itemImage.name, dst:'/public/images/item-images/thumb-' + req.files.itemImage.name,
-           width:500, height:500,
-           cropwidth:128, cropheight:128,
+           src: process.cwd() + '/public/images/item-images/' + req.files.itemImage.name, dst: process.cwd() + '/public/images/item-images/thumb-' + req.files.itemImage.name,
+           width:250, height:250,
+           cropwidth:200, cropheight:200,
            x:0, y:0
            },
         function(err) {
@@ -25,8 +24,8 @@ module.exports = function(app) {
       easyimg.rescrop(
         {
            src: process.cwd() + '/public/images/profile-images/' + req.files.profileImage.name, dst: process.cwd() + '/public/images/profile-images/thumb-' + req.files.profileImage.name,
-           width:500, height:500,
-           cropwidth:128, cropheight:128,
+           width:250, height:250,
+           cropwidth:200, cropheight:200,
            x:0, y:0
            },
         function(err) {
