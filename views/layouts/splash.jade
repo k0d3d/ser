@@ -12,6 +12,7 @@ html(lang='en',ng-app="stocPublic")
       script(src='/js/respond.min.js')
     link(rel='shortcut icon', href='/images/favicon.html')
     link(href='http://fonts.googleapis.com/css?family=Open+Sans:300,600', rel='stylesheet', type='text/css')
+    link(href='http://fonts.googleapis.com/css?family=Dosis:400,600|Cabin:400,500|Oswald|Roboto+Condensed' rel='stylesheet' type='text/css')
     style.
       a.list-group-item {
           height:auto;
@@ -25,7 +26,17 @@ html(lang='en',ng-app="stocPublic")
       }   
       li {
         text-align: left;
-      }   
+      }
+      a.navbar-brand {
+        font-family: 'Oswald', sans-serif;
+        font-size: 24px;
+      }
+      .logo h2 {
+        font-family: 'Oswald', sans-serif;
+        font-size: 70px;
+        color: white;
+
+      }
   body()
       block bodyContent
     script(src='/js/jquery.js')

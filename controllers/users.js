@@ -40,7 +40,8 @@ module.exports.routes = function(app, passport, login, people){
 
   //Handle Public user registration
   app.route('/users')
-  .post(login.ensureLoggedIn('/signin'), function (req, res){
+  .post(function (req, res){
+    // return console.log(req.body);
     users.create(req.body, function (r){
       if (util.isError(r)) {
         res.json(400, {message: r.message});

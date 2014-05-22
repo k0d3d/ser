@@ -8,7 +8,7 @@
  passport = require('passport'),
  //Organization = require('./organization.js').Staff,
  staffUtils = require('./staff_utils.js'),
- sendEmail = require('../lib/email/sendMail.js').sendMail,
+ sendEmail = require('../lib/email/sendMail.js').sendHTMLMail,
 Orders = require('./order.js'),
 
 UserController = function (){
@@ -121,6 +121,17 @@ UserController.prototype.create = function(body, callback) {
     if(err){
       callback(err);
     }else{
+      sendEmail({
+              to: 'michael.rhema@gmail.com', // list of receivers
+              subject: 'DrugStoc Registeration', // Subject line
+          }, 'views/templates/email-templates/sign-up.jade')
+          .then(function () {
+              
+              
+          })
+          .catch(function () {
+              
+          });      
       callback(user);
     }
   });
