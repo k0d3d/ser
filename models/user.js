@@ -271,7 +271,7 @@ UserController.prototype.getProfile = function (userId, account_type) {
   staffUtils.getMeMyModel(account_type).findOne({
     userId: userId
   })
-  .populate('drugs.drug', 'itemName', 'drug')
+  .populate('drugs.drug', 'itemName images', 'drug')
   .lean()
   .exec(function (err, user_profile) {
     if (err) {

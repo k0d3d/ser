@@ -50,7 +50,7 @@ mixin loadDrugPages()
               .row
                 .col-sm-9.col-md-9
                   a.pull-left(href='#')
-                    img.media-object(src='holder.js/100x125.html', alt='')
+                    img.media-object(ng-src='/images/item-images/thumb-{{drug.drug.images[drug.drug.images.length -1] || "item-avatar.jpg"}}', alt='', style="width: 50px")
                   .media-body
                     h3.follower-name {{drug.drug.itemName}}
                     .profile-location

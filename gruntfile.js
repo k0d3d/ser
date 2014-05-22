@@ -65,12 +65,37 @@ module.exports = function(grunt) {
             test: {
                 NODE_ENV: 'test'
             }
+        },
+        jade: {
+            debug:{            
+                options: {
+                    pretty: true,
+                    data: {
+                        debug: true
+                    }
+                },
+                files:{
+
+                }
+            },
+            release: {
+                options: {
+                    pretty: true,
+                    data: {
+                        debug: false
+                    }
+                },
+                files: {
+                  "release.html": "test.jade"
+                }
+            }            
         }
     });
 
     //Load NPM tasks 
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks('grunt-contrib-jade');
     grunt.loadNpmTasks('grunt-mocha-test');
     grunt.loadNpmTasks('grunt-nodemon');
     grunt.loadNpmTasks('grunt-concurrent');
