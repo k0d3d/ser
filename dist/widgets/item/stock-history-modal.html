@@ -1,0 +1,40 @@
+
+<div id="stock-history-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" class="modal fade in">
+  <div style="width: 90%" class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><span ng-class="" ng-show="modal.statusText" class="label">{{modal.statusText}}</span>
+        <button type="button" data-dismiss="modal" aria-hidden="true" class="close">×</button>
+        <h4 id="myModalLabel" class="modal-title">Item Stock History</h4>
+      </div>
+      <div class="modal-body">
+        <div class="or-ch row">
+          <table class="table table-stripped">
+            <thead>
+              <tr>
+                <th>Source</th>
+                <th>Amount</th>
+                <th>Date </th>
+                <th>Last Update</th>
+                <th>Current Status</th>
+                <th>Reference</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="tr in stockLog">
+                <td>{{tr.itemId.itemName}}</td>
+                <td>{{tr.amount}}</td>
+                <td>{{tr.dateInitiated | date: 'short'}}</td>
+                <td><strong>Status: </strong>{{tr.statusLog[0].code | stockRequestState}}, <em> {{tr.statusLog[0].dateStated | date: 'medium'}} </em></td>
+                <td>{{tr.status | stockRequestState}}</td>
+                <td>{{tr.referenceId}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" data-dismiss="modal" ng-click="__temp = ''" class="btn btn-default">Close          </button>
+      </div>
+    </div>
+  </div>
+</div>

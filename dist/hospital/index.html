@@ -1,0 +1,53 @@
+
+<div class="contentpanel">
+  <div class="panel panel-default">
+    <div style="height: 70px" class="panel-heading">
+      <div class="col-md-3">
+        <h4 class="panel-title">Hospitals</h4>
+      </div>
+      <div class="col-md-9">
+        <form ng-submit="search_gvt(__temp)" class="form-horizontal">
+          <div class="form-group">
+            <label class="control-label col-sm-4 col-md-4">Hospital Name</label>
+            <div class="col-sm-5 col-md-5">
+              <input type="text" ng-model="__temp.name" required="required" class="form-control"/><span class="help-text"></span>
+            </div>
+            <div class="col-sm-3 col-md-3">
+              <button ng-disabled="" class="btn btn-small btn-white">Search</button>
+              <button type="reset" ng-click="__temp.name = ''; search_gvt({})" class="btn btn-small btn-lightblue">Reset</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="box-widget">
+            <table class="table paper-tbl-theme table-bordered responsive table-paper">
+              <thead>
+                <tr>
+                  <th>Hospital Name</th>
+                  <th>LGA</th>
+                  <th>Ward</th>
+                  <th>Type</th>
+                  <th>Ownership</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="h in valRes" ng-click="commons.href('hospitals/' + h.user)" class="h_row">
+                  <td>{{h.facilityName}}</td>
+                  <td>{{h.lga}}</td>
+                  <td>{{h.lga_ward}}</td>
+                  <td>{{h.facilityType}}</td>
+                  <td>{{h.ownership}}</td>
+                </tr>
+              </tbody>
+            </table>
+            <div pagination="valRes" page-to="getPageItems(currentPage, pageLimit, cb)" current-page="currentPage" page-limit="pageLimit" class="x-pagination"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

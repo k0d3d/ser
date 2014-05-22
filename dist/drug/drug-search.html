@@ -1,0 +1,79 @@
+
+<div class="contentpanel">
+  <div class="row">
+    <div class="col-sm-4 col-md-3">
+      <form ng-submit="search(item_query)" name="searchItemForm" class="form">
+        <div class="form-group">
+          <input type="text" placeholder="Search for Drugs..." ng-model="item_query.s" class="form-control"/>
+        </div>
+        <div class="mb20"></div>
+        <div class="form-group">
+          <label class="control-label">Search by:</label>
+          <select ng-model="item_query.param" required="required" class="form-control">
+            <option value="itemName">Brand Name</option>
+            <option value="sciName">Composition</option>
+          </select>
+          <label class="control-label">Filter by:</label>
+          <select ng-model="item_query.filter" ng-init="item_query.filter = 'Price'" class="form-control">
+            <option>Proximity</option>
+            <option>Price</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <button type="submit" ng-disabled="searchItemForm.$invalid" class="btn btn-primary btn-sm">Search</button>
+        </div>
+      </form><br/>
+    </div>
+    <!--col-sm-4 
+    -->
+    <div class="col-sm-8 col-md-9">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <ul ng-show="false" class="pagination nomargin pull-right">
+            <li class="disabled"><a href="#"><i class="fa fa-angle-left"></i></a></li>
+            <li><a href="#">1</a></li>
+            <li class="active"><a href="#">2</a></li>
+            <li><a href="#">3</a></li>
+            <li><a href="#">4</a></li>
+            <li><a href="#">5</a></li>
+            <li><a href="#"><i class="fa fa-angle-right"></i></a></li>
+          </ul>
+          <h4 class="panel-title">Search results for {{searchedItems.s}}</h4>
+          <p>About {{searchedItems.drug.length + searchedItems.ndl.length}} results <a href="#" ng-click="show_ndl = !show_ndl" ng-init="show_ndl == false">{{show_ndl | showHide}} remaining {{searchedItems.ndl.length}}</a></p>
+        </div>
+        <!--panel-heading 
+        -->
+        <div class="panel-body">
+          <div class="results-list">
+            <div ng-repeat="drugItem in searchedItems.drug" class="media">
+              <div class="row">
+                <div class="col-sm-9"><a href="#" class="pull-left"><img alt="" src="images/photos/media1.jpg" class="media-object drug-search-img"/></a>
+                  <div class="media-body">
+                    <h4 class="filename text-primary">{{drugItem.itemName}}</h4><small class="text-muted">Composition: {{drugItem.sciName}}</small><br/><small class="text-muted">Current Price: N{{drugItem.currentPrice.retail}}</small><br/>
+                  </div>
+                </div>
+                <div class="col-sm-2">
+                  <div class="form-group">
+                    <input type="number" placeholder="Amount" ng-model="drugItem.amount" required="required" class="form-control"/>
+                  </div>
+                  <button ng-click="addToCart(drugItem)" ng-disabled="drugItem.amount == 0 || !drugItem.amount" class="btn btn-primary">Order this</button>
+                </div>
+              </div>
+            </div>
+            <div ng-show="show_ndl" class="ndl-list">
+              <div ng-repeat="drugItem in searchedItems.ndl" class="media"><a href="#" class="pull-left"><img alt="" src="images/photos/media1.jpg" class="media-object drug-search-img"/></a>
+                <div class="media-body">
+                  <h4 class="filename text-primary">{{drugItem.productName}}</h4><small class="text-muted">Composition: {{drugItem.composition}}</small><br/>
+                </div>
+                <div class="col-sm-8 col-sm-offset-5">
+                  <input type="number"/>
+                  <button ng-click="addToCart(drugItem)" class="btn btn-primary">Order this</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,40 @@
+
+<link rel="stylesheet" href="/css/table-fixed-header.css"/>
+<div class="row-fluid row-break">
+  <div class="col-md-10">
+    <div class="row-fluid fixed-table">
+      <div class="col-md-12">
+        <div ng-show="supplierList.length &gt; 0" class="table-content">
+          <table id="list-suppliers" class="table table-fixed-header">
+            <thead class="header">
+              <tr>
+                <th>Supplier Name</th>
+                <th>Address</th>
+                <th>Phone Numbers</th>
+                <th>Contact Person</th>
+                <th>Supplier Since</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="supplier in supplierList" on-finish="tableheader">
+                <td>{{supplier.supplierName}}</td>
+                <td>{{supplier.address}}</td>
+                <td>{{supplier.phoneNumber}}</td>
+                <td>{{supplier.contactPerson}}</td>
+                <td>{{supplier.addedOn | date: 'medium'}}</td>
+                <td>
+                  <button ng-click="viewMore($index)" class="btn btn-primary btn-mini">More</button>
+                  <button ng-click="removeSupplier($index)" class="btn btn-danger btn-mini">Delete</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div pagination="pagination" page-to="page(pageNo, limit, cb)" class="x-pagination"></div>
+        <h2 ng-show="supplierList.length == 0">No Suppliers Added</h2>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="js/table-fixed-header.js">               </script>

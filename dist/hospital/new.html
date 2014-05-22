@@ -1,0 +1,66 @@
+
+<div class="contentpanel">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <div class="panel-btns"></div>
+      <h4 class="panel-title">Add new facility</h4>
+    </div>
+    <div class="panel-body">
+      <div class="row">
+        <div class="col-md-10 widget-module">
+          <div class="square-widget widget-collapsible">
+            <div class="widget-container">
+              <form novalidate="novalidate" ng-submit="regnew()" name="newreg" class="form-horizontal">
+                <div class="form-group">
+                  <label class="col-lg-2 control-label">Hospital Name</label>
+                  <div class="col-lg-5">
+                    <input type="text" name="name" ng-model="form.name" required="required" class="form-control"/>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-lg-2 control-label">Email</label>
+                  <div class="col-sm-5">
+                    <input type="email" name="email" ng-model="form.email" required="required" class="form-control"/>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-lg-2 control-label">Password</label>
+                  <div class="col-lg-5">
+                    <input type="password" placeholder="Leave blank to generate a password" name="password" ng-model="form.password" class="form-control"/>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-lg-2 control-label">Contact Personel</label>
+                  <div class="col-lg-5">
+                    <input type="text" ng-model="form.personel" name="personel" class="form-control"/>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-lg-2 control-label">Hospital Address</label>
+                  <div class="col-lg-5">
+                    <textarea type="text" ng-model="form.address" name="address" class="form-control">  </textarea>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-lg-2 control-label">Hospital Phone Number</label>
+                  <div class="col-sm-5">
+                    <input type="tel" ng-model="form.phonenumber" name="phonenumber" class="form-control"/>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-lg-2 control-label"> </label>
+                  <div class="col-lg-10">
+                    <div class="form-actions">
+                      <button type="submit" ng-disabled="newreg.$invalid" class="btn btn-primary">Save changes</button>
+                      <button type="button" ng-click="commons.backBtn()" class="btn">Cancel</button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

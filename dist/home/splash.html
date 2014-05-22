@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="stocPublic">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <title>Drugstoc</title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/startup.css" rel="stylesheet">
+    <!--if lt IE 9
+    script(src='/js/html5shiv.js')
+    script(src='/js/respond.min.js')
+    -->
+    <link rel="shortcut icon" href="/images/favicon.html">
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans:300,600" rel="stylesheet" type="text/css">
+    <style>
+      a.list-group-item {
+          height:auto;
+          min-height:220px;
+      }
+      a.list-group-item.active small {
+          color:#fff;
+      }
+      .stars {
+          margin:20px auto 1px;    
+      }   
+      li {
+        text-align: left;
+      }   
+    </style>
+  </head>
+  <body>
+    <div ng-controller="userController" class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" data-toggle="collapse" data-target="#navbar-main" class="navbar-toggle"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><a href="#" class="navbar-brand">DrugStoc</a>
+        </div>
+        <center>
+          <div id="navbar-main" class="navbar-collapse collapse">
+            <form name="signin_form" ng-submit="send_login()" class="navbar-form navbar-right">
+              <div class="form-group">
+                <input type="text" placeholder="Username or email" ng-model="form.email" ng-keyup="auth_message =''" autofocus required class="form-control">
+              </div>
+              <div class="form-group">
+                <input type="password" placeholder="Password" ng-model="form.password" required class="form-control">
+              </div>
+              <button type="submit" ng-click="rdir = true" class="btn btn-default">Sign In</button><a href="/signup" target="_blank" class="btn btn-warning">Register</a>
+            </form>
+          </div>
+        </center>
+      </div>
+    </div>
+    <section ng-controller="orderAddController">
+      <main id="top" role="main" class="masthead">
+        <div class="container">
+          <div class="logo"><a href="#"><img src="/images/startup-template-logo.png" alt="startup-logo"></a></div>
+          <h1>The Most <span data-typer-targets="Easy,Efficient,Secure,Simple"> Efficient</span> and <strong>Safe Way</strong><br>to<strong> Order</strong> your Drugs</h1>
+          <div class="row">
+            <div class="col-md-12 col-sm-12 col-md-offset-2 subscribe">
+              <form id="subscribeForm" role="form" class="form-horizontal">
+                <div class="form-group">
+                  <div class="col-md-7 col-sm-6 col-sm-offset-0 col-md-offset-0">
+                    <div class="input-group">
+                      <input id="address" style="height: 52px" name="text" placeholder="Search By Brand Name, Composition, NAFDAC No" required="required" ng-model="item_query.s" class="form-control input-lg">
+                      <div class="input-group-btn">
+                        <button ng-init="view_param = 'Brand Name'; item_query.param = 'itemName'" type="button" data-toggle="dropdown" style="background-color: white;border: solid 0px white;border-left: solid 1px #A5A5A5;" class="btn btn-default dropdown-toggle btn-lg">Search by: {{view_param}} <span class="caret"></span></button>
+                        <ul role="menu" class="dropdown-menu pull-right">
+                          <li><a href="#" ng-click="item_query.param = 'itemName'; view_param = 'Brand Name'">Brand Name</a></li>
+                          <li><a href="#" ng-click="item_query.param = 'composition'; view_param = 'Composition'">Composition</a></li>
+                          <li><a href="#" ng-click="item_query.param = 'manufacturer'; view_param = 'Manufacturer'">Manufacturer </a></li>
+                          <li><a href="#" ng-click="item_query.param = 'manufacturer'; view_param = 'Location'">Location                       </a></li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-1 col-sm-1">
+                    <button type="submit" ng-click="search(item_query)" class="btn btn-success btn-lg">Search Now</button>
+                  </div>
+                </div>
+              </form><span id="result" class="alertMsg"></span>
+            </div>
+          </div><a href="#explore" class="scrollto">
+            <p>SCROLL DOWN TO EXPLORE</p>
+            <p class="scrollto--arrow"><img src="/images/scroll_down.png" alt="scroll down arrow"></p></a>
+        </div>
+      </main>
+      <div class="highlight">
+        <div id="search-results" ng-show="searchedItems.drug || searchedItems.ndl" class="container">
+          <div class="row">
+            <div style="border: none" class="well">
+              <h1 class="text-center">We've found something for you!</h1>
+              <div class="list-group"><a ng-repeat="drugItem in searchedItems.drug" class="list-group-item active">
+                  <div class="media col-md-3">
+                    <figure class="pull-left"><img src="http://placehold.it/350x250" alt="placehold.it/350x250" class="media-object img-rounded img-responsive"></figure>
+                  </div>
+                  <div class="col-md-6">
+                    <h4 class="list-group-item-heading"> {{drugItem.itemName}}</h4>
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th>Composition</th>
+                          <th>Manufacturer </th>
+                          <th>Current Price                                                       </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>{{drugItem.sciName}}</td>
+                          <td>{{drugItem.pharma.pharmaName}}                        </td>
+                          <td>Login to see</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="col-md-3 text-center">
+                    <h2>14240<small> votes </small></h2>
+                    <button type="button" class="btn btn-default btn-lg btn-block"> Vote Now! </button>
+                    <div class="stars"><span class="glyphicon glyphicon-star"></span><span class="glyphicon glyphicon-star"></span><span class="glyphicon glyphicon-star"></span><span class="glyphicon glyphicon-star"></span><span class="glyphicon glyphicon-star-empty"></span></div>
+                    <p>Average 4.5<small> / </small>5</p>
+                  </div></a><a ng-repeat="drugItem in searchedItems.ndl" class="list-group-item active">
+                  <div class="media col-md-3">
+                    <figure class="pull-left"><img src="http://placehold.it/350x250" alt="placehold.it/350x250" class="media-object img-rounded img-responsive"></figure>
+                  </div>
+                  <div class="col-md-6">
+                    <h4 class="list-group-item-heading"> {{drugItem.productName}} </h4>
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th>Composition</th>
+                          <th>Manufacturer </th>
+                          <th>Current Price                                                       </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>{{drugItem.composition}}</td>
+                          <td>{{drugItem.man_imp_supp}} </td>
+                          <td>Login to see                       </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="col-md-3 text-center">
+                    <h2>14240<small> votes </small></h2>
+                    <button type="button" class="btn btn-default btn-lg btn-block"> Vote Now! </button>
+                    <div class="stars"><span class="glyphicon glyphicon-star"></span><span class="glyphicon glyphicon-star"></span><span class="glyphicon glyphicon-star"></span><span class="glyphicon glyphicon-star"></span><span class="glyphicon glyphicon-star-empty"></span></div>
+                    <p>Average 4.5<small> / </small>5</p>
+                  </div></a></div>
+            </div>
+          </div>
+          <div class="section-title">
+            <h2>{{searchedItems.drug.length + searchedItems.ndl.length}} Found.</h2>
+            <h4>Sign up or Log-in to View all search results. </h4>
+          </div>
+        </div>
+      </div>
+    </section>
+    <div id="explore" class="container">
+      <section class="row heroimg breath">
+        <div class="col-md-12 text-center"><img src="/images/flat-mockup-template.png" alt="flat-mockup-template"></div>
+      </section>
+      <div class="section-title">
+        <h2>Some great features of DrugStoc</h2>
+        <h4>With our advanced features, you'll fall in love with</h4>
+      </div>
+      <section class="row features">
+        <div class="col-sm-6 col-md-3">
+          <div class="thumbnail"><img src="/images/flat-feature-icon-1.png" alt="analytics-icon">
+            <div class="caption">
+              <h3>Advanced analytics</h3>
+              <p>Browse and analyze detailed statistics of each of your orders. </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-md-3">
+          <div class="thumbnail"><img src="/images/flat-feature-icon-2.png" alt="analytics-icon">
+            <div class="caption">
+              <h3>Competitive Pricing</h3>
+              <p>Get competitive Market Pricing when you get on our platform. </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-md-3">
+          <div class="thumbnail"><img src="/images/flat-feature-icon-3.png" alt="analytics-icon">
+            <div class="caption">
+              <h3>Convenient and Secure</h3>
+              <p>Experience convenience when ordering drugs. </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-md-3">
+          <div class="thumbnail"><img src="/images/flat-feature-icon-4.png" alt="analytics-icon">
+            <div class="caption">
+              <h3>Genuine Products and Support</h3>
+              <p>From the source to the user. No adulteratiomn</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <div class="section-title">
+        <h2>We partner with the best</h2>
+        <h4>We are partners with world's trusted brands. </h4>
+      </div>
+      <section class="row clientlogo breath">
+        <div class="col-md-12 text-center"><img src="/images/client-logos.png" alt="client-logos"></div>
+      </section>
+    </div>
+    <div class="highlight testimonials">
+      <div class="container">
+        <div class="section-title">
+          <h2>What our customers said</h2>
+          <h4>Don't take our word. See our testimonials </h4>
+        </div>
+        <section class="row breath">
+          <div class="col-md-6">
+            <div class="testblock"></div>
+            <div class="clientblock"><img src="/images/customer-img-1.jpg" alt=".">
+              <p><strong>Paul</strong><br><a href="#"></a></p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="testblock">I like this platform.</div>
+            <div class="clientblock"><img src="/images/customer-img-2.jpg" alt=".">
+              <p><strong>Michael Slats</strong><br>Project Lead at<a href="#">Airbnb.com</a></p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+    <div class="container">
+      <div class="section-title">
+        <h2>Honest pricing. No surprises.</h2>
+        <h4>No contract. No risk. No credit card required. </h4>
+      </div>
+      <section class="row breath planpricing">
+        <div class="col-md-4">
+          <div class="pricing color1">
+            <div class="planname">Personal</div>
+            <div class="price"><span class="curr">$</span>14<span class="per">/MO</span></div>
+            <div class="billing">Billed Annually</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="pricing color2">
+            <div class="planname">Agency</div>
+            <div class="price"><span class="curr">$</span>49<span class="per">/MO</span></div>
+            <div class="billing">Billed Annually</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="pricing color3">
+            <div class="planname">Enterprise</div>
+            <div class="price"><span class="curr">$</span>99<span class="per">/MO</span></div>
+            <div class="billing">Billed Annually</div>
+          </div>
+        </div>
+      </section>
+      <div class="section-title">
+        <h5>Frequently Asked Questions</h5>
+      </div>
+      <section class="row faq breath">
+        <div class="col-md-6">
+          <h6>How does the free trial work?</h6>
+          <p>Our 10 day trial is 100% free and does not require credit card information to start. If at the end of your trial you would like to upgrade, great. If not, you can cancel your account altogether, or let us mark it as inactive for you to come back to later.</p>
+          <h6>Can I switch plans later?</h6>
+          <p>Absolutely. You can switch between our paid plans, or cancel your account altogether, whenever you like. We will adjust any payments accordingly.</p>
+        </div>
+        <div class="col-md-6">
+          <h6>Do I need to choose a plan now?</h6>
+          <p>No. You get the full featured, unlimited version of Startup completely free for 10 days. Once you're ready to upgrade, you may choose a plan which suits your needs.</p>
+          <h6>What payment types do you accept?</h6>
+          <p>We accept payments from MasterCard, Visa, Visa Debit and American Express. We do not accept PayPal. Remember, you do not need to supply card details to start your free trial.</p>
+        </div>
+      </section>
+    </div>
+    <main role="main" class="footercta">
+      <div class="container">
+        <h1>The Most Simple & Yet<strong>Powerful Way</strong><br>to<strong>launch</strong>your startup</h1>
+        <div class="row">
+          <div class="col-md-12 breath text-center"><a href="#top" class="btn btn-success btn-lg gototop">GET EARLY ACCESS</a></div>
+        </div>
+      </div>
+    </main>
+    <div class="container">
+      <section class="row breath">
+        <div class="col-md-12 footerlinks"><a href="#">About</a><a href="#">Pricing</a><a href="#">Blog</a><a href="#">Help</a><a href="#">Contact</a><a href="#">Privacy</a><a href="#">Terms</a>
+          <p>© 2014 Startup. All Rights Reserved</p>
+        </div>
+      </section>
+    </div>
+  </body>
+  <script src="/js/jquery.js">
+    <script src="/js/pace.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/easing.js"></script>
+    <script src="/js/typer.js"></script>
+    <script src="/js/nicescroll.js"></script>
+    <script src="/js/ketchup.all.js"></script>
+    <script src="/js/startup.js"></script>
+    <script src="/js/angular.min.js"></script>
+    <script src="/js/angular-route.min.js">     </script>
+    <script src="/js/modules/public.js"></script>
+    <script src="/js/modules/lang.js"></script>
+    <script src="/js/modules/order/order.js"></script>
+    <script src="/js/modules/drug/drug.js"></script>
+    <script src="/js/common/services/services.js"></script>
+  </script>
+</html>
