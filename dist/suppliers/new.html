@@ -1,0 +1,53 @@
+
+<link rel="stylesheet" href="/css/table-fixed-header.css"/>
+<div class="row-fluid row-break">
+  <div ng-controller="supplierAddController" class="col-md-5 offset1">
+    <h3>New Supplier Entry Form</h3>
+    <form name="newsupplier" novalidate="novalidate" class="newsupplier">
+      <div class="form-group">
+        <label class="control-label">Supplier Name</label>
+        <div class="controls">
+          <input type="text" name="patientname" ng-model="supplierForm.supplierName" required="required" class="input-medium form-control"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label">Address</label>
+        <div class="controls">
+          <textarea type="text" name="company" ng-model="supplierForm.address" required="required" class="input-medium form-control"></textarea>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label">Phone Number</label>
+        <div class="controls">
+          <input type="tel" name="phoneNumber" ng-model="supplierForm.phoneNumber" required="required" class="input-medium form-control"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label">Other Contact</label>
+        <div class="controls">
+          <textarea type="text" name="otherContact" ng-model="supplierForm.otherContact" class="input-medium form-control"></textarea>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label">Email Address</label>
+        <div class="controls">
+          <input type="email" name="email" ng-model="supplierForm.email" class="input-medium form-control"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label">Contact Person</label>
+        <div class="controls">
+          <input type="text" name="contactPerson" ng-model="supplierForm.contactPerson" required="required" class="input-large form-control"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label">Contact Person Phone</label>
+        <div class="controls">
+          <input type="tel" name="contactPersonPhone" ng-model="supplierForm.contactPersonPhone" required="required" class="input-large form-control"/>
+        </div>
+      </div>
+      <button ng-click="addSupplier()" ng-init="saveButtonText='Save'" ng-disabled="newsupplier.$invalid" class="btn btn-primary">{{saveButtonText}}</button>
+    </form>
+  </div>
+</div>
+<script src="js/table-fixed-header.js">               </script>

@@ -1,0 +1,125 @@
+
+<div class="contentpanel">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <div class="panel-btns"></div>
+      <h4 class="panel-title">Add new item</h4>
+    </div>
+    <div class="panel-body panel-body-nopadding">
+      <form ng-submit="add_drug(add_item_form)" novalidate="novalidate" name="addItemForm" class="form-horizontal form-bordered">
+        <div class="form-group">
+          <label class="col-sm-3 control-label">NAFDAC Reg No.</label>
+          <div class="col-sm-2">
+            <input type="text" placeholder="XX-XXXX" ng-model="add_item_form.nafdacRegNo" class="form-control"/><a ng-click="search_by_reg_no(add_item_form.nafdacRegNo)" ng-disabled="add_item_form.nafdacRegNo.length &lt; 6 || !add_item_form.nafdacRegNo" class="btn btn-default btn-small"><i class="fa fa-search"></i></a>
+          </div>
+          <label style="width: 100px" class="col-sm-2 control-label">Brand Name</label>
+          <div class="col-sm-3">
+            <input type="text" placeholder="" ng-model="add_item_form.itemName" required="required" type-ahead="autoCompleteItemName(result)" name="item-name" remote="/api/internal/items/typeahead?query=%QUERY" class="form-control item-name"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-3 control-label">Composition</label>
+          <div class="col-sm-6">
+            <input type="text" placeholder="" ng-model="add_item_form.sciName" class="form-control"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-3 control-label">Category</label>
+          <div class="col-sm-6">
+            <select type="text" placeholder="" ng-model="add_item_form.category" ng-options="c for c in itemCategory" class="form-control"></select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-3 control-label">Tags</label>
+          <div class="col-sm-6">
+            <tags-input type="text" placeholder="" ng-model="add_item_form.drugTags" class="form-control"></tags-input>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-3 control-label">Manufacturer</label>
+          <div class="col-sm-6">
+            <input type="text" placeholder="" ng-model="add_item_form.pharma.pharmaName" class="form-control"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-3 control-label">Price</label>
+          <div class="col-sm-3">
+            <input type="number" placeholder="Retail" ng-model="add_item_form.currentPrice.retail" class="form-control"/>
+            <input type="number" placeholder="Institution" ng-model="add_item_form.currentPrice.institution" class="form-control"/>
+            <input type="number" placeholder="Wholesale" ng-model="add_item_form.currentPrice.wholesale" class="form-control"/>
+          </div>
+          <label class="col-sm-1 control-label">Instant Quote</label>
+          <div class="col-sm-2">
+            <select ng-model="add_item_form.instantQuote" class="form-control">
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-3 control-label">Item Form</label>
+          <div class="col-sm-3">
+            <select type="number" placeholder="" ng-model="add_item_form.itemForm" class="form-control">
+              <option value="?" selected="selected"></option>
+              <option>Amples</option>
+              <option>Caplets</option>
+              <option>Capsules</option>
+              <option>Cream</option>
+              <option>Drops</option>
+              <option>Emugels</option>
+              <option>Gels</option>
+              <option>Lotion</option>
+              <option>Ointments</option>
+              <option>Powder</option>
+              <option>Sheet</option>
+              <option>Solutions</option>
+              <option>Sprays</option>
+              <option>Suppositories</option>
+              <option>Suspensions</option>
+              <option>Syrup</option>
+              <option>Tablets</option>
+              <option>Vials                  </option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-3 control-label">Item Packaging</label>
+          <div class="col-sm-3">
+            <select placeholder="" ng-model="add_item_form.itemPackaging" class="form-control">
+              <option value="?" selected="selected"></option>
+              <option>Bags</option>
+              <option>Bottles</option>
+              <option>Box</option>
+              <option>Carton</option>
+              <option>Gallon</option>
+              <option>Packet</option>
+              <option>Pieces</option>
+              <option>Roll</option>
+              <option>Sachet</option>
+              <option>Tin</option>
+              <option>Tube</option>
+            </select>
+          </div>
+          <label class="col-sm-1 control-label">Package Quantity </label>
+          <div class="col-sm-2">
+            <input type="number" ng-model="add_item_form.packageQty" class="form-control"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-3 control-label">Upload Image</label>
+          <div dropzone="dropzone" ng-model="add_item_form.images" post-url="/upload/doc" post-param="itemImage" previews="true" class="col-sm-6 dropzone">
+            <input name="itemImage" type="file" multiple="multiple" style="display: none"/><span class="help-text">Add an image for this item. You can click here or drag and drop file right here, easy!                           </span>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-sm-6 col-sm-offset-3">
+            <button type="submit" ng-disabled="addItemForm.$invalid" ng-click="nextAction = 'listPage'" class="btn btn-primary">Submit</button>
+            <button type="submit" ng-disabled="addItemForm.$invalid" ng-click="nextAction = 'newAddition'" class="btn btn-primary">Submit and Add Another</button>
+            <button type="reset" class="btn btn-default">Cancel</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script src="/js/dropzone.min.js"></script>

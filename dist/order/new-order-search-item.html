@@ -1,0 +1,132 @@
+
+<div ng-show="searchedItems" class="contentpanel">
+  <div class="row">
+    <div class="col-sm-4 col-md-3">
+      <form ng-submit="search(item_query)" name="searchItemForm" class="form">
+        <div class="form-group">
+          <input type="text" placeholder="Search for Drugs..." ng-model="item_query.s" class="form-control"/>
+        </div>
+        <div class="mb20"></div>
+        <div class="form-group">
+          <label class="control-label">Search by:</label>
+          <select ng-model="item_query.param" required="required" class="form-control">
+            <option value="itemName">Brand Name</option>
+            <option value="sciName">Composition</option>
+            <option value="manufacturer">Manufacturer</option>
+            <option value="nafdacRegNo">NAFDAC Reg Number</option>
+          </select>
+          <label class="control-label">Filter by:</label>
+          <select ng-model="item_query.filter" ng-init="item_query.filter = 'Price'" class="form-control">
+            <option>Proximity</option>
+            <option>Price</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <button type="submit" ng-disabled="searchItemForm.$invalid" class="btn btn-primary btn-sm">Search</button>
+        </div>
+      </form><br/>
+    </div>
+    <!--col-sm-4 
+    -->
+    <div class="col-sm-8 col-md-9">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <ul ng-show="false" class="pagination nomargin pull-right">
+            <li class="disabled"><a href="#"><i class="fa fa-angle-left"></i></a></li>
+            <li><a href="#">1</a></li>
+            <li class="active"><a href="#">2</a></li>
+            <li><a href="#">3</a></li>
+            <li><a href="#">4</a></li>
+            <li><a href="#">5</a></li>
+            <li><a href="#"><i class="fa fa-angle-right"></i></a></li>
+          </ul>
+          <h4 class="panel-title">Search results for {{searchedItems.s}}</h4>
+          <p>About {{searchedItems.drug.length + searchedItems.ndl.length}} results <a href="#" ng-click="show_ndl = !show_ndl" ng-init="show_ndl == false">{{show_ndl | showHide}} remaining {{searchedItems.ndl.length}}</a></p>
+        </div>
+        <!--panel-heading 
+        -->
+        <div class="panel-body">
+          <div class="item-result-list">
+            <div ng-repeat="drugItem in searchedItems.drug" class="media">
+              <div class="row">
+                <div class="col-sm-12 col-md-12"><a href="#" class="pull-left"><img alt="" ng-src="/images/item-images/{{drugItem.images[0] || &quot;default/item-avatar-small.jpg&quot;}}" class="media-object drug-search-img"/></a>
+                  <div class="media-body">
+                    <h4 class="filename text-primary">{{drugItem.itemName}}</h4>
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th>Composition</th>
+                          <th>Manufacturer </th>
+                          <th>Current Price                                                       </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>{{drugItem.sciName}}</td>
+                          <td>{{drugItem.pharma.pharmaName}}                        </td>
+                          <td>{{drugItem.instantQuote | instantQuote }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-4"><span style="display: inline-block" class="label label-info"> <strong>Supplier: </strong> {{drugItem.owner.name}}                          </span></div>
+                <div class="col-sm-8">
+                  <div class="pull-right"> 
+                    <div style="width: 150px; float: left; margin-left: 5px" ng-show="drugItem.sentRequest == 'input'"><span style="text-align: center; display: block">{{drugItem.packageQty}} \ {{drugItem.itemPackaging || '--'}}</span><span style="text-align: center; display: block"><strong>Total items :</strong> {{drugItem.packageQty * drugItem.packageCount || 0}}</span></div>
+                    <div style="width: 70px; float: left; margin-left: 5px" ng-show="drugItem.sentRequest == 'input'">
+                      <input type="number" ng-model="drugItem.packageCount" required="required" ng-init="drugItem.packageCount = 0" placeholder="number of packages" class="form-control"/>
+                    </div>
+                    <div style="float: left; margin-left: 5px">
+                      <button type="button" ng-show="!drugItem.sentRequest || drugItem.sentRequest == 'no'" ng-click="drugItem.sentRequest = 'input'" class="btn btn-default dropdown-toggle">Request Quote</button>
+                    </div>
+                    <div style="width: 150px; float: left; margin-left: 5px" ng-show="drugItem.sentRequest == 'sent'">
+                      <button type="button" disabled="disabled" class="btn btn-success-alt dropdown-toggle">Request Sent</button>
+                    </div>
+                    <div style="width: 150px; float: left; margin-left: 5px">
+                      <button ng-click="add_to_cart(drugItem)" ng-show="drugItem.sentRequest == 'input'" class="btn btn-default dropdown-toggle pull-right">Send Request</button>
+                    </div>
+                    <div style="width: 50px; float: left; margin-left: 5px" ng-show="drugItem.sentRequest == 'input'" ng-click="drugItem.sentRequest = 'no'" class="sr-ol"><i class="fa fa-times-circle"></i></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div ng-show="show_ndl" style="border-top: solid 1px #1489A0;padding-top: 20px;" class="ndl-list">
+            <div ng-repeat="drugItem in searchedItems.ndl" class="media"><a href="#" class="pull-left"><img alt="" src="" class="media-object drug-search-img"/></a>
+              <div class="media-body">
+                <h4 class="filename text-primary">{{drugItem.productName}}</h4><small class="text-muted">Composition: {{drugItem.composition}}</small><br/>
+              </div>
+              <div class="col-sm-8 col-sm-offset-5"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div ng-hide="searchedItems" class="contentpanel">
+  <div class="row">
+    <p class="text-center"><img src="/images/search-icon.png" style="width: 190px"/></p>
+  </div>
+  <div class="row">
+    <div class="col-xs-8 col-xs-offset-2">
+      <div class="input-group">
+        <div class="input-group-btn search-panel">
+          <button type="button" data-toggle="dropdown" class="btn btn-default dropdown-toggle"><span id="search_concept">Search by</span><span class="caret"></span></button>
+          <ul role="menu" ng-init="item_query.param = 'itemName'" class="dropdown-menu">
+            <li><a href="" ng-click="item_query.param == 'itemName'">Brand Name</a></li>
+            <li><a href="" ng-click="item_query.param == 'sciName'">Composition</a></li>
+            <li><a href="" ng-click="item_query.param == 'manufacturer'">Manufacturer </a></li>
+            <li><a href="" ng-click="item_query.param == 'nafdacRegNo'">NAFDAC Reg Number</a></li>
+          </ul>
+        </div>
+        <input type="text" name="x" placeholder="Search term..." ng-model="item_query.s" autofocus="autofocus" class="form-control"/><span class="input-group-btn">
+          <button type="button" ng-click="search(item_query)" ng-disabled="item_query.s == 0" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button></span>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="/js/modules/order/google-search.js"></script>

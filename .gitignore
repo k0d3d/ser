@@ -5,3 +5,5 @@ node_modules/**/*
 !node_modules/connect-mongo/
 public/lib
 config/development.json
+public/images/profile-images
+public/images/item-images

@@ -1,0 +1,13 @@
+
+<button ng-disabled="currentPage == 0" class="btn btn-success prevbtn">Previous</button>
+<div class="btn-group dropup">
+  <button type="button" style="border-radius: 0" class="btn pageNo btn-bell btn-small"> {{currentPage}}  </button>
+  <button data-toggle="dropdown" style="border-radius: 0" class="btn dropdown-toggle"><span class="caret"></span></button>
+  <ul role="menu" style="text-transform: capitalize;z-index: 99999" class="dropdown-menu alt-text">
+    <li><a ng-click="pagelimit(10)">10</a></li>
+    <li><a ng-click="pagelimit(20)">20</a></li>
+    <li><a ng-click="pagelimit(50)">50</a></li>
+    <li><a ng-click="pagelimit(100)">100</a></li>
+  </ul>
+</div>
+<button class="btn btn-success nextbtn">Next</button>
