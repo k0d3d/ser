@@ -8,6 +8,7 @@
  passport = require('passport'),
  //Organization = require('./organization.js').Staff,
  staffUtils = require('./staff_utils.js'),
+ sendEmail = require('../lib/email/sendMail.js').sendMail,
 Orders = require('./order.js'),
 
 UserController = function (){

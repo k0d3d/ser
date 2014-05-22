@@ -74,9 +74,13 @@ module.exports = function(grunt) {
                         debug: true
                     }
                 },
-                files:{
-
-                }
+                files: [{ 
+                  expand: true, 
+                  src: "**/*.jade", 
+                  dest: "dist/", 
+                  cwd: "views", 
+                  ext: '.html'
+                }]
             },
             release: {
                 options: {
@@ -85,11 +89,31 @@ module.exports = function(grunt) {
                         debug: false
                     }
                 },
-                files: {
-                  "release.html": "test.jade"
-                }
+                files: [{ 
+                  expand: true, 
+                  src: "**/*.jade", 
+                  dest: "dist/", 
+                  cwd: "views", 
+                  ext: '.html'
+                }]
             }            
-        }
+        },
+        compile: {
+            options: {
+                pretty: true,
+                data: {
+                    debug: false
+                }
+            },
+            files: [{ 
+              expand: true, 
+              src: "**/*.jade", 
+              dest: "dist/", 
+              cwd: "views", 
+              ext: '.html'
+            }]
+        }            
+        
     });
 
     //Load NPM tasks 
@@ -106,6 +130,7 @@ module.exports = function(grunt) {
 
     //Default task(s).
     grunt.registerTask('default', ['jshint', 'concurrent']);
+    // grunt.registerTask('jade', ['jade']);
 
     //Test task.
     grunt.registerTask('test', ['env:test', 'mochaTest']);

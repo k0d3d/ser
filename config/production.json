@@ -12,5 +12,27 @@
     },
     "app": {
         "name": "Integra StocCloud"
-    }
+    },
+    "mail" : {
+        "defaultService": "sendgrid",
+        "defaultSenderName" : "DrugStoc Mails",
+        "defaultSenderEmail" : "mailer@drugstoc.ng",
+        "debug": true,
+        "domain": {
+            "username": "mailer@drugstoc.ng",
+            "password": "O=*Rdf9F?KxU",
+            "host": "standard7.doveserver.com"
+        },
+        "sendGrid":{
+            "username": "michael.rhema",
+            "password": "As12terix.",
+            "host": "smtp.sendgrid.net"
+        }
+    },
+    "sms" : {
+        "owneremail" : "koded730@yahoo.com",
+        "subacct" : "EMAIL2SMS",
+        "subacctpwd" : "login60",
+        "sender" : "DrugStoc"
+    }    
 }

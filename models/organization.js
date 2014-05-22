@@ -85,7 +85,7 @@ staffFunctions = {
 
     PreAccount.findOne({
       activationToken: options.activationToken,
-      employerId: options.employerId,
+      // employerId: options.employerId,
       $or : [
         {email: options.email},
         {phone: options.phone}
