@@ -122,7 +122,7 @@ UserController.prototype.create = function(body, callback) {
       callback(err);
     }else{
       sendEmail({
-              to: 'michael.rhema@gmail.com', // list of receivers
+              to: body.email, // list of receivers
               subject: 'DrugStoc Registeration', // Subject line
           }, 'views/templates/email-templates/sign-up.jade')
           .then(function () {
