@@ -61,7 +61,7 @@ module.exports = function(app, passport) {
     },
     {
       name: 'Med. Facilities',
-      roles: [4],
+      roles: [0],
       icon:'',
       url: '/a/facilities'
     },
