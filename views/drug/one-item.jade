@@ -3,7 +3,7 @@
       .col-sm-3
         //input.start-edit(type="checkbox", checked, data-label-text="Edit item")
         .mb30
-        img.thumbnail.img-responsive(dropzone, src='/images/item-images/thumb-{{item.images[0] || "item-avatar.jpg"}}' , alt='', post-url="/upload/doc", post-param="itemImage", ng-model="item.images")
+        img.thumbnail.img-responsive(dropzone, src='/images/item-images/thumb-{{item.images[item.images.length -1] || "item-avatar.jpg"}}' , alt='', post-url="/upload/doc", post-param="itemImage", ng-model="item.images", post-cb="change_profile_photo(name)")
         .mb30
         .row
           h5.subtitle Drug Name

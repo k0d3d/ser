@@ -137,15 +137,9 @@ angular.module('user', [])
     });
   };
 
-  //watches for changes to the userProfile image and saves 
-  //to the db
-  $scope.$watch('userProfile.image', function (n) {
-    if (!n) return false;
-    US.updateProfile({name : 'image', value: n})
-    .then(function () {
-
-    });
-  });
+  $scope.change_profile_photo = function (name) {
+    return US.updateProfile({name : 'image', value: name});   
+  };
 
 }])
 .filter('territory', function () {

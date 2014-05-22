@@ -167,12 +167,17 @@ app.directive('dropzone', [function () {
               scope.ngModel = name;
             }
             scope.$apply();
+            scope.postCb({name: scope.ngModel})
+            .then(function () {
+
+            }); 
           });
         }
       });
     },
     scope: {
-      ngModel: '='
+      ngModel: '=',
+      postCb: '&'
     },
     require: 'ngModel'
   };

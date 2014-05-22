@@ -2,7 +2,7 @@
     .row
         .col-sm-3()
           
-          img.thumbnail.img-responsive.profile-img(dropzone, ng-src='/images/profile-images/thumb-{{ userProfile.image }}' , alt='', post-url="/upload/profile", post-param="profileImage", ng-model="userProfile.image")
+          img.thumbnail.img-responsive.profile-img(dropzone, ng-src='/images/profile-images/thumb-{{ userProfile.image }}' , alt='', post-url="/upload/profile", post-param="profileImage", ng-model="userProfile.image", post-cb="change_profile_photo(name)")
           .mb30
           h5.subtitle About
           p.mb10.x-editable(data-type="textarea", onbeforesave="update_profile($data, $editable.name)", editable-textarea="userProfile.summary")

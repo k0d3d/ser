@@ -189,7 +189,7 @@ angular.module('drug', [])
       images: [],
       pharma: {},
       distributor: []
-    }
+    };
 
     $scope.autoCompleteItemName = function (result) {
       $scope.add_item_form.itemName = result.productName;
@@ -251,6 +251,10 @@ angular.module('drug', [])
         var field = val.split('.');
         return ds.updateOne($routeParams.drugId, {'name' : field[1] + '.' + field[2], 'value': data });
       };
+
+      $scope.change_profile_photo = function (name) {
+        return ds.updateOne($routeParams.drugId, {name : 'images', value: name});  
+      };      
   }])
   .filter('stockRequestState', function () {
     var states = {
