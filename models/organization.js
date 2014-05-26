@@ -169,7 +169,7 @@ staffFunctions = {
       if (i) {
 
         if (i.employer.employerId) {      //account found and has employer / manager
-          return addingEmpl.reject(new Error('user is already attached to a manager')); 
+          return addingEmpl.reject(new Error('user is already attached to an employer')); 
         } else {
           //if a profile has been found without 
           //an employer / manager.. we'll just add 
@@ -179,7 +179,7 @@ staffFunctions = {
             if (err) {
               return addingEmpl.reject(err);
             } else {
-              return addingEmpl.resolve(i);
+              return addingEmpl.resolve(doc);
             }          
           });        
         }       
@@ -193,7 +193,7 @@ staffFunctions = {
           if (err) {
             return addingEmpl.reject(err);
           } else {
-            return addingEmpl.resolve(i);
+            return addingEmpl.resolve(doc);
           }          
         });
       }      
@@ -234,7 +234,7 @@ staffFunctions = {
             if (err) {
               return addingEmpl.reject(err);
             } else {
-              return addingEmpl.resolve(i);
+              return addingEmpl.resolve(doc);
             }          
           });        
         }       
@@ -248,7 +248,7 @@ staffFunctions = {
           if (err) {
             return addingEmpl.reject(err);
           } else {
-            return addingEmpl.resolve(i);
+            return addingEmpl.resolve(doc);
           }          
         });
       } 
@@ -571,6 +571,7 @@ Staff.prototype.activateAccount = function activateAccount (activationToken, ema
   //Expects the an object containing the 
   //activation token.
   .then (function (doc) {
+    console.log(doc);
     console.log('Remove Preaccount');
     //Remove the preaccount / activation record associateds with this user
     staffFunctions.removePreAccount(doc)

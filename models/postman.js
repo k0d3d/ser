@@ -227,7 +227,7 @@ noticeFn = {
         true;
       var allowedSMS = ( typeof task.userId.allowedNotifications.sms !== 'undefined') ? 
         task.userId.allowedNotifications.sms : 
-        false;
+        true;
       var allowedPortal = ( typeof task.userId.allowedNotifications.portal !== 'undefined') ? 
         task.userId.allowedNotifications.portal : 
         true;
