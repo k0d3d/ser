@@ -244,12 +244,14 @@ config(['$routeProvider',function($routeProvider){
   $scope.search = function(queryObj){
     // $scope.ds = '';
     // var page = p || 0;
+    // 
+    // cons
     
     ordersService.searchCmp(queryObj)
     .then(function (r) {
-      angular.forEach(r.drug, function (v, i) {
-        r.drug[i].packageQty = 1;
-      });
+      // angular.forEach(r.drug, function (v, i) {
+      //   r.drug[i].packageQty = v.pa;
+      // });
       $scope.searchedItems = r;
       $scope.searchedItems.s = queryObj.s;
       
