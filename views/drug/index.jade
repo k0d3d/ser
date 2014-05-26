@@ -1,16 +1,21 @@
 .contentpanel
   .col-md-12
     .panel.panel-default
-      .panel-heading(ng-init="ds = 'drugs'")
-        button.btn.drug-panel-buttons.btn-success(ng-class="", toggle-active-button="drug-panel-buttons", ng-click="ds = 'drugs'") 
-          | Current Inventory 
-          span.label.label-default {{_drugs.length}}
-        button.btn.drug-panel-buttons(ng-class="", toggle-active-button="drug-panel-buttons", ng-click="ds = 'request'") 
-          | Incoming Request 
-          span.label.label-default {{_request.length}}
-        button.btn.drug-panel-buttons(ng-class="", toggle-active-button="drug-panel-buttons", ng-click="ds = 'pending'") 
-          | Pending Transfers      
-          span.label.label-default {{_pending.length}}
+      .col-md-8
+        .panel-heading(ng-init="ds = 'drugs'")
+          button.btn.drug-panel-buttons.btn-success(ng-class="", toggle-active-button="drug-panel-buttons", ng-click="ds = 'drugs'") 
+            | Current Inventory 
+            span.label.label-default {{_drugs.length}}
+          button.btn.drug-panel-buttons(ng-class="", toggle-active-button="drug-panel-buttons", ng-click="ds = 'request'") 
+            | Incoming Request 
+            span.label.label-default {{_request.length}}
+          button.btn.drug-panel-buttons(ng-class="", toggle-active-button="drug-panel-buttons", ng-click="ds = 'pending'") 
+            | Pending Transfers      
+            span.label.label-default {{_pending.length}}
+      .col-md-4
+        form.form
+          .form-group(style="padding-top: 15px")
+            input.form-control(type="text", ng-model="itemFilter", placeholder="Quick search by brand name or composition")
 
       include ../widgets/item/all-drugs
 

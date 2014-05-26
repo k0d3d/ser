@@ -10,7 +10,7 @@ mixin allDrugs()
           th In Stock (~)
           th
       tbody
-        tr(ng-repeat="d in _drugs")
+        tr(ng-repeat="d in _drugs | filter: itemFilter")
           td 
             -if (userData.account_type === 2 || userData.account_type === 4)
               a(ng-href='/a/users/{{d.supplier.supplierId}}/drugs/{{d._id}}/item') {{d.itemName}}

@@ -745,6 +745,7 @@ DrugController.prototype.fetchAllMyDrugs = function (options, userId, accountTyp
       .limit(options.limit)
       .skip(options.limit * options.page)
       .lean()
+      .sort('-itemName')
       .exec(function (err, i) {
         if (err) {
           return d.reject(err);
@@ -772,6 +773,7 @@ DrugController.prototype.fetchAllMyDrugs = function (options, userId, accountTyp
       .limit(options.limit)
       .skip(options.limit * options.page)
       .lean()
+      .sort('-itemName')
       .exec(function (err, i) {
         if (err) {
           return d.reject(err);
