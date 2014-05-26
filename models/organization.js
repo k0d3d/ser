@@ -161,6 +161,42 @@ staffFunctions = {
       if (err) {
         return addingEmpl.reject(err);
       }
+      //if we find a profile, we check if its 
+      //all got a manager or employer, if it has one
+      //we throw back an error/
+      //else we add one to it 
+      //
+      if (i) {
+
+        if (i.employer.employerId) {      //account found and has employer / manager
+          return addingEmpl.reject(new Error('user is already attached to a manager')); 
+        } else {
+          //if a profile has been found without 
+          //an employer / manager.. we'll just add 
+          //one right in        
+          i.employer = {employerId : doc.employerId, dateAdded: Date.now()};
+          i.save(function (err, i) {
+            if (err) {
+              return addingEmpl.reject(err);
+            } else {
+              return addingEmpl.resolve(i);
+            }          
+          });        
+        }       
+      }
+      //if no profile found, create
+      else {
+        var ac = new staffUtils.getMeMyModel(doc.account_type)();
+        ac.employer = {employerId : doc.employerId, dateAdded: Date.now()};
+        ac.userId = doc.userId;
+        ac.save(function (err, i) {
+          if (err) {
+            return addingEmpl.reject(err);
+          } else {
+            return addingEmpl.resolve(i);
+          }          
+        });
+      }      
 
     });
 
