@@ -180,7 +180,7 @@ angular.module('drug', [])
     $scope.remove_item = function (id, index) {
       ds.removeItem(id)
       .then(function () {
-        $scope.drugs.slice(index, 1);
+        $scope._drugs.splice(index, 1);
       });
     };
 
@@ -209,16 +209,11 @@ angular.module('drug', [])
     $scope.add_drug = function (data) {
       ds.addNewDrug(data)
       .then(function (r) {
-        if (r instanceof Error) {
-          console.log(r);
-        } else {
           if ($scope.nextAction === 'newAddition') {
             $scope.add_item_form = '';
           } else if ($scope.nextAction === 'listPage') {
             $scope.commons.href('/a/drugs');
           }
-          
-        }
       });
     };
     $scope.search_by_reg_no = function(regNo){

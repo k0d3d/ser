@@ -26,7 +26,7 @@ var UserSchema = new Schema({
     isTempPassword: {type: Boolean, default: true},
     allowedNotifications: {
         email : {type: Boolean, default: true},
-        sms : {type: Boolean, default: false},
+        sms : {type: Boolean, default: true},
         portal: {type: Boolean, default: true},
         mobile: {type: Boolean, default: false}
     },

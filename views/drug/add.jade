@@ -19,11 +19,11 @@
             .form-group
               label.col-sm-3.control-label Composition
               .col-sm-6
-                input.form-control(type='text', placeholder='', ng-model="add_item_form.sciName")
+                input.form-control(type='text', placeholder='', ng-model="add_item_form.sciName", required)
             .form-group
               label.col-sm-3.control-label Category
               .col-sm-6
-                select.form-control(type='text', placeholder='', ng-model="add_item_form.category", ng-options="c for c in itemCategory")
+                select.form-control(type='text', placeholder='', ng-model="add_item_form.category", ng-options="c for c in commons.categories")
             .form-group
               label.col-sm-3.control-label Tags
               .col-sm-6
@@ -36,7 +36,7 @@
             .form-group
               label.col-sm-3.control-label Price
               .col-sm-3
-                input.form-control(type='number', placeholder='Retail', ng-model="add_item_form.currentPrice.retail")
+                input.form-control(type='number', placeholder='Retail', ng-model="add_item_form.currentPrice.retail", required)
                 input.form-control(type='number', placeholder='Institution', ng-model="add_item_form.currentPrice.institution")
                 input.form-control(type='number', placeholder='Wholesale', ng-model="add_item_form.currentPrice.wholesale")
               label.col-sm-1.control-label Instant Quote
@@ -86,7 +86,7 @@
                   option Tube
               label.col-sm-1.control-label Package Quantity 
               .col-sm-2
-                input.form-control(type="number", ng-model="add_item_form.packageQty")
+                input.form-control(type="number", ng-model="add_item_form.packageQty", required)
             .form-group
               label.col-sm-3.control-label Upload Image
               .col-sm-6.dropzone(dropzone, ng-model="add_item_form.images", post-url="/upload/doc", post-param="itemImage", previews="true")
