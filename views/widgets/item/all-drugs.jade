@@ -41,7 +41,7 @@ mixin allDrugs()
                       li
                         a(href='#', ng-click="add_to_list(d)") Add to My List
            
-                  button.btn.btn-sm.btn-danger
+                  button.btn.btn-sm.btn-danger(ng-click="remove_drug(d._id, $index)")
                     i.fa.fa-times
     
     .x-pagination(pagination="valRes", page-to="getPageItems(currentPage, pageLimit, cb)", current-page="currentPage", page-limit="pageLimit")
