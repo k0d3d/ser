@@ -84,6 +84,7 @@ module.exports = function(grunt) {
             ],
             //application template css
             'public/css/theme.min.css': [
+              'public/css/bootstrap-override.css',
               'public/css/style.default.css',
               'public/css/style.custom.css'
             ],
@@ -101,6 +102,7 @@ module.exports = function(grunt) {
             //images
             'img/**/*',
             'images/**/*',
+            'css/images/**/*',
             //fonts fav txt
             'fonts/**/*',
             'favicon.ico',
@@ -117,6 +119,7 @@ module.exports = function(grunt) {
             'css/jquery-ui-1.10.3.css',
             'css/dropzone.css',
             'css/xeditable.css',          // 
+            'css/bootstrap-override.css',
             // 'css/.css',
             // Template CSS
             'css/style.custom.css',
@@ -148,6 +151,8 @@ module.exports = function(grunt) {
             "js/xeditable.min.js",
             "js/ui-bootstrap-custom-tpls-0.10.0.min.js",
             'js/ketchup.all.js',
+            "js/dropzone.min.js",
+            'js/tooltip.js',
             // Splash Template JS
             'js/startup.js',
             "js/modules/public.js",
@@ -219,7 +224,8 @@ module.exports = function(grunt) {
                 "public/js/xeditable.min.js",
                 "public/js/ui-bootstrap-custom-tpls-0.10.0.min.js",
                 // "public/js/jquery.prettyPhoto.js",
-                "public/js/dropzone.min.js"
+                "public/js/dropzone.min.js",
+                "public/js/tooltipjs",
               ],
               //application ng modules
               'public/js/modules.min.js': [

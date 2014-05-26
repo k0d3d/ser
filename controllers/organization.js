@@ -8,6 +8,10 @@ var staff_model = require('../models/organization.js'),
 module.exports.routes = function (app, login) {
   var staff = new staff_model.Staff();
 
+  app.get('/user/activation', function (req, res) {
+    res.render('index');
+  });
+
   app.get('/a/organization',login.ensureLoggedIn('/signin'), function (req, res) {
 
     res.render('index', {

@@ -6,6 +6,11 @@ var mongoose = require('mongoose'),
     crypto = require('crypto'),
     _ = require('underscore');
 
+
+function toLower (v) {
+    console.log(v.toLowerCase());
+  return v.toLowerCase();
+}
 /**
  * User Schema
  */
@@ -13,7 +18,9 @@ var UserSchema = new Schema({
     email: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        get: toLower,
+        set: toLower
     },
     phone: {
         type: String
@@ -34,19 +41,31 @@ var UserSchema = new Schema({
 
 });
 
+UserSchema.set('toObject', { getters: true, virtuals: true });
+UserSchema.set('toJSON', { getters: true, virtuals: true });
+
 var clientSchema = new Schema({
     clientId: {type: String}
 });
 
 /**
  * Virtuals
- */
+ */ 
 UserSchema.virtual('password').set(function(password) {
     this._password = password;
     this.salt = this.makeSalt();
     this.hashed_password = this.encryptPassword(password);
 }).get(function() {
     return this._password;
+});
+
+
+/**
+ * getters
+ */
+UserSchema.path('email').get(function (value) {
+    console.log(value);
+    return value.toLowerCase();
 });
 
 /**

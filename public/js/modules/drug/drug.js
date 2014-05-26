@@ -177,13 +177,6 @@ angular.module('drug', [])
       });
     };
 
-    $scope.remove_drug = function (id, index) {
-      ds.removeDrug(id)
-      .then(function () {
-        $scope.drugs.splice(index, 1);
-      });
-    };
-
     $scope.$watch('currentPage', function () {
       $scope.getPageItems($scope.currentPage, $scope.pageLimit);
     });
@@ -346,20 +339,6 @@ angular.module('drug', [])
         return err;
       });
     };
-
-    d.removeDrug = function (id) {
-      return $http.delete('/api/internal/drugs/' + id )
-      .then(function () {
-        return true;
-      }, function (err) {
-        N.notifier({
-          title : 'Oops!',
-          text: 'Removing this item failed',
-          class_name: 'growl-danger'
-        });          
-      })
-
-    }
 
     d.fetchAll = function (options)  {
       options = options || {};
