@@ -1,11 +1,13 @@
-script(src="/js/jquery-1.10.2.min.js")
-script(src="/js/angular.min.js")
-script(src="/js/angular-route.min.js")
-script(src="/js/jquery-migrate-1.2.1.min.js")
-script(src="/js/bootstrap.min.js")
-script(src="/js/modernizr.min.js")
-script(src="/js/retina.min.js")
+script(src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js")
+script.
+  window.jQuery || document.write('<script src="js/jquery-2.1.1.min.js">\x3C/script>')
+script(src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/js/bootstrap.min.js")
+script.
+  $.fn.modal || document.write('<script src="Script/bootstrap.min.js">\x3C/script>')  
+script(src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular.min.js")
+  window.angular || document.write('<script src="js/angular.min.js">\x3C/script>') 
+script(src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js")
+  
+script(src="/js/public-vendor.min.js")
 
-script(src="/js/chosen.jquery.min.js")
-
-script(src="/js/custom.js")
+script(src="/js/public-module.min.js")

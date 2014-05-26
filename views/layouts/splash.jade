@@ -39,18 +39,14 @@ html(lang='en',ng-app="stocPublic")
       }
   body()
       block bodyContent
-    script(src='/js/jquery.js')
-    script(src='/js/pace.js')
-    script(src='/js/bootstrap.min.js')
-    script(src='/js/easing.js')
-    script(src='/js/typer.js')
-    script(src='/js/nicescroll.js')
-    script(src='/js/ketchup.all.js')
-    script(src='/js/startup.js')
-    script(src="/js/angular.min.js")
+    script(src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js")
+    script.
+      window.jQuery || document.write('<script src="js/jquery-2.1.1.min.js">\x3C/script>')
+    script(src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/js/bootstrap.min.js")
+    script.
+      $.fn.modal || document.write('<script src="Script/bootstrap.min.js">\x3C/script>')  
+    script(src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular.min.js")
+      window.jQuery || document.write('<script src="js/angular.min.js">\x3C/script>')
     script(src="/js/angular-route.min.js")      
-    script(src="/js/modules/public.js")
-    script(src="/js/modules/lang.js")
-    script(src="/js/modules/order/order.js")
-    script(src="/js/modules/drug/drug.js")
-    script(src="/js/common/services/services.js")
+    script(src='/js/public-module.min.js')
+

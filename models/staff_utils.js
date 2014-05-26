@@ -45,6 +45,41 @@ module.exports = {
 
     },
     /**
+     * gets the name and description for a specific account type
+     * @param  {Number} accountType A number representing the specific account level. 
+     * @return {[type]}             [description]
+     */
+    getAccountName: function getAccountName (accountType) {
+      accountType = parseInt(accountType);
+
+      if (!accountType) {
+        throw new Error('account type can not be empty');
+      }
+
+      if (accountType === 4) {
+        return 'Staff';
+      }  
+
+      if (accountType === 0) {
+        return 'Pharmaceutical Company';
+      }
+
+      if (accountType === 3) {
+        return 'Distributor Company Manager';
+      }
+      if (accountType === 1) {
+        return 'Pharmaceutical Company Manager';
+      }
+      if (accountType === 2) {
+        return 'Distributor';
+      }
+      if (accountType === 5) {
+        return 'Medical Facility';
+      }
+
+      return 'DrugStoc User';
+    },
+    /**
      * fetches the employees under a manager or a distributor.
      * if the userId has an account type 
      * @param  {objectId} userId     userId of the user being queried

@@ -1,4 +1,4 @@
-var mongoose = require('mongoose'),
+var mongoose = require('mongoose-q')(),
     Schema = mongoose.Schema,
 
 preAccountSchema = new Schema ({
@@ -9,8 +9,8 @@ preAccountSchema = new Schema ({
   created: {type: Date, default: Date.now},
   account_type: {type: String, required: true},
   password: {type: String},
-  employerId: {type: Schema.ObjectId}
-
+  employerId: {type: Schema.ObjectId},
+  employer_accountType: {type: Number}
 });
 
 
