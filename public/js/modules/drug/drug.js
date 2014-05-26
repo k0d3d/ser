@@ -81,27 +81,27 @@ angular.module('drug', [])
     __init();
 
     //ds.search
-    $scope.searchcmp = function () {
-      $scope.summary = $scope.newprice = '';
-      ds.search($scope.drugname, 0, function (r) {
-        $scope.drugs = r;
-      });
-    };
+    // $scope.searchcmp = function () {
+    //   $scope.summary = $scope.newprice = '';
+    //   ds.search($scope.drugname, 0, function (r) {
+    //     $scope.drugs = r;
+    //   });
+    // };
 
-    $scope.more = function (index) {
-      ds.moreInfo($scope.drugs[index]._id, function(r){
-        $scope.summary = r;
-        $scope.summary.index = index;
-      });
-    };
+    // $scope.more = function (index) {
+    //   ds.moreInfo($scope.drugs[index]._id, function(r){
+    //     $scope.summary = r;
+    //     $scope.summary.index = index;
+    //   });
+    // };
 
-    $scope.up = function (id, price, index) {
-      console.log(price);
-      ds.updatePrice(id, price, function () {
-        $scope.drugs[index].currentPrice = price;
-        $scope.newprice = '';
-      });
-    };
+    // $scope.up = function (id, price, index) {
+    //   console.log(price);
+    //   ds.updatePrice(id, price, function () {
+    //     $scope.drugs[index].currentPrice = price;
+    //     $scope.newprice = '';
+    //   });
+    // };
 
 
 
@@ -174,6 +174,13 @@ angular.module('drug', [])
       ds.cancelRequest(item.itemId._id, item.transactionId, nextStatus)
       .then(function (done) {
         item.status = done.status;
+      });
+    };
+
+    $scope.remove_item = function (id, index) {
+      ds.removeItem(id)
+      .then(function () {
+        $scope.drugs.slice(index, 1);
       });
     };
 
@@ -339,6 +346,18 @@ angular.module('drug', [])
         return err;
       });
     };
+
+    d.removeItem = function (id) {
+      return $http.delete('/api/internal/drugs/' + id + '/item')
+      .then(function () {
+        N.notifier({
+          title: 'Welldone!',
+          text: 'You have removed one item from your inventory',
+          class_name: 'growl-success'
+        });
+        return true;
+      })
+    }
 
     d.fetchAll = function (options)  {
       options = options || {};

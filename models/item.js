@@ -107,6 +107,32 @@
 
         return d.promise;        
       },
+      /**
+       * removes a drug item, expect an object containing
+       * the item id, the userid who added the item, It returns a promise
+       * @param {Object} doc object containing item props and user info
+       */
+      removeItem : function removeItem (doc) {
+        var d = Q.defer();
+
+        Drug.remove({
+          _id: doc.itemId,
+          "supplier.supplierId": doc.owner
+        })
+        .exec(function (err, i) {
+          if (err) {
+            return d.reject(err);
+          } else {
+            if (i < 0) {
+              d.reject(new Error('can not remove item'));
+            } else {
+              return d.resolve(i);
+            }
+          }
+        });
+
+        return d.promise;        
+      },
       createPrimaryStockRecord: function createPrimaryStockRecord (doc) {
         var loot = Q.defer();
         console.log(doc);
@@ -1296,7 +1322,12 @@ DrugController.prototype.stockRequest = function stockRequest (userId, accountTy
   return loot.promise;  
 };
 
-
+/**
+ * finds a drug by using the nafdac registration number 
+ * supplied as an argument
+ * @param  {[type]} query [description]
+ * @return {[type]}       [description]
+ */
 DrugController.prototype.fetchByRegNo = function(query){
   console.log(query);
   var loot = Q.defer();
@@ -1314,6 +1345,24 @@ DrugController.prototype.fetchByRegNo = function(query){
 
   return loot.promise; 
 };
+
+DrugController.prototype.removeItem = function (drugId, owner) {
+  var d = Q.defer();
+
+  drugsFunctions.removeItem({
+    itemId: drugId,
+    owner: owner
+  })
+  .then(function () {
+    d.resolve(true);
+  })
+  .fail(function(err) {
+    d.reject(err); 
+  })
+  .done();
+  
+  return d.promise;
+}
 
 module.exports.Drug = DrugController;
 module.exports.drugsFunctions = drugsFunctions;

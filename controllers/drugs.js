@@ -66,6 +66,18 @@ module.exports.routes = function(app, login) {
     }, function (err) {
       next(err);
     });
+  })
+  .delete(function (req, res) {
+    //deletes, an item added by a user / distributor
+    if (req.user.account_type !== 2) {
+      res.json(401, 'you can not delete this item! :(');
+    }
+    drugs.removeItem(req.params.drugId, req.user._id)
+    .then(function () {
+      res.json(200, true);
+    }, function (err) {
+      res.json(400, err.message);
+    });
   });
 
   //Search for nafdac reg drugs by category
