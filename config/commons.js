@@ -86,7 +86,7 @@ module.exports = {
     'Anti Hemorroid Preparations', 
     'Anti Helminitics', 
     'Anti Histamines', 
-    'Anti Malrials', 
+    'Anti Malarials', 
     'Anti Migraine Drugs', 
     'Anti Muscarinic', 
     'Anti Neoplastic & Immunomodulating Agents', 

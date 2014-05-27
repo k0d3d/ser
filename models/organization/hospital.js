@@ -32,7 +32,8 @@ var HospitalSchema =  new Schema({
     facilityNoCode: {type: String}
   },
   contactPerson: {type: String},
-  contactPersonPhone: {type: String}
+  contactPersonPhone: {type: String},
+  alt_email: {type: String}
 });
 
 // HospitalSchema.virtual('stateName').get

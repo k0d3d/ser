@@ -7,7 +7,8 @@ var ActivityNotification = require('./activity/notification.js'),
     _ = require('underscore'),
     u = require('../lib/utils.js'),
     Q = require('q'),
-    sendEmail = require('../lib/email/sendMail.js').sendMail,
+    config = require('config'),
+    sendEmail = require('../lib/email/sendMail.js').sendHTMLMail,
     sendSms = require('../lib/sms/smsSend.js'),
     messageStrings = require('../lib/message-strings.js'),
     lingua = require('lingua'),
@@ -221,7 +222,7 @@ noticeFn = {
     function __pushMessages () {
 
       var task = listOfRecpt.pop();
-
+      console.log(task);
       var allowedEmail = ( typeof task.userId.allowedNotifications.email !== 'undefined') ? 
         task.userId.allowedNotifications.email : 
         true;
@@ -237,6 +238,20 @@ noticeFn = {
       //lets try sending an email. if the 
       //user allows emails.
       if (allowedEmail) {
+        var to =  function (email, alt_email) {
+          //if the primary email address 
+          //is a drugstoc email address
+          if (email.indexOf("@drugstoc.ng") > 0) {
+            //check if user has an alternative email address
+            if (alt_email) {
+              return alt_email;
+            } else {
+              return config.mail.defaultNoEmail;
+            }
+          } else {
+            return email;
+          }
+        };
 
         //if his email is on file.. 
         //just a check.. he def has 
@@ -244,13 +259,13 @@ noticeFn = {
         if (task.userId.email) {
           //send an email.
           sendEmail({
-            to: task.userId.email,
+            to: to(task.userId.email, task.alt_email) ,
             // to: task.userId.email,
             // subject: "new quotation request",
-            subject: messageStrings(typeOfMessage + '.email.subject', noticeData.meta),
+            subject: messageStrings(typeOfMessage + '.email.subject', {meta: noticeData.meta, user: task, statuses: config.app.statuses}),
             // text: "you have received a new quotation request"
-            text: messageStrings(typeOfMessage + '.email.message', noticeData.meta)
-          })
+            // text: messageStrings(typeOfMessage + '.email.message', {meta: noticeData.meta, user: task})
+          }, 'views/templates/email-templates/order-note.jade', {meta: noticeData.meta, user: task, statuses: config.app.statuses})
           .then(function (done) {
             //just wanna log to console for now..
             //TODO:: log to file 
@@ -268,7 +283,7 @@ noticeFn = {
       if (allowedSMS) {
         if (task.phone) {
           
-          sendSms.sendSMS(messageStrings(typeOfMessage + '.sms.message', noticeData.meta), task.phone)
+          sendSms.sendSMS(messageStrings(typeOfMessage + '.sms.message', {meta: noticeData.meta, user: task}), task.phone)
           .then(function (done) {
             //just wanna log to console for now..
             //TODO:: log to file 
@@ -281,7 +296,7 @@ noticeFn = {
       }
 
       if (allowedPortal) {
-        noticeData.alertDescription = messageStrings(typeOfMessage + '.portal.message', noticeData.meta);
+        noticeData.alertDescription = messageStrings(typeOfMessage + '.portal.message', {meta: noticeData.meta, user: task});
         self.addUserNotice(task.userId._id, noticeData)
         .then(function () {
             console.log('sent to: ' + task.userId.email);

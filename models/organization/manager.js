@@ -20,7 +20,8 @@ ManagerSchema = new Schema({
   drugs: [{
     drug: {type: Schema.ObjectId},
     notes: {type: String, default: ''}
-  }]
+  }],
+  alt_email: {type: String}
 });
 
 mongoose.model('Manager', ManagerSchema);

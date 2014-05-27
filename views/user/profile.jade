@@ -9,6 +9,11 @@
             | {{userProfile.summary || 'Empty'}}
           a(href='#') Show More
           .mb10        
+          h5.subtitle Alternative Email
+          ul.profile-social-list
+            li
+              i.fa.fa-envelope-o
+              a.x-editable(href='#', data-type="text", onbeforesave="update_profile($data, $editable.name)", editable-text="userProfile.alt_email") {{userProfile.alt_email || 'Empty'}}
           h5.subtitle Connect
           ul.profile-social-list
             li
@@ -17,7 +22,7 @@
             li
               i.fa.fa-facebook
               a.x-editable(href='#', data-type="text", onbeforesave="update_profile($data, $editable.name)", editable-text="userProfile.facebook") {{userProfile.facebook || 'Empty'}}
-
+            
           .mb30
           h5.subtitle Office Address
           address.x-editable(data-type="textarea", onbeforesave="update_profile($data, $editable.name)", editable-textarea="userProfile.address", data-defaultValue="Address")

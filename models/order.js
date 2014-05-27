@@ -84,7 +84,7 @@ var orderManager = {
     // .where(doc.where, doc.whrVal)
     .populate('itemId', 'itemName images pharma instantQuote', 'drug')
     // .populate('statusLog', '')
-    .lean()
+    // .lean()
     //.limit(perPage)
     //.skip(perPage * page)
     .exec(function(err, o) {
@@ -92,7 +92,10 @@ var orderManager = {
       if (err){
         return gt.reject(err);
       }else{
-        return gt.resolve(o);
+
+        return gt.resolve(_.map(o, function (v) {
+          return v.toObject();
+        }));
       }
     });
     
@@ -641,6 +644,11 @@ OrderController.prototype.requestItemQuotation = function requestItemQuotation (
   var order = _.omit(orderData, '_id');
   orderManager.cartOrder(order)
   .then(function (d) {
+    //return here makes sure , no notices are 
+    //sent.. pilot version hack
+    return procs.resolve(d);
+
+
     //simple hack to ensure i have the 
     //lastUpdate property. Usually with a find
     //or findOne query, lastUpdate is a virtual.
@@ -690,7 +698,9 @@ OrderController.prototype.requestItemQuotation = function requestItemQuotation (
       .catch(function (err) {
         console.log(err.stack);
         return procs.reject(err);
-      });      
+      }); 
+
+
     })
     .catch(function (err) {
       console.log(err.stack);

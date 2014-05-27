@@ -150,6 +150,7 @@ module.exports = {
 
       function __pop() {
         var task = doc.pop();
+        // task = task.toObject();
 
         if (_.isNumber(accountType)) {
           at = accountType;

@@ -3,7 +3,9 @@
  * Module dependencies.
  */
 var mongoose = require('mongoose'),
-    Schema = mongoose.Schema;
+    Schema = mongoose.Schema,
+    xInStr = require('../../lib/utils.js').xInStr;
+
 
 
 var OrderStatusSchema = new Schema({
@@ -62,7 +64,22 @@ var OrderSchema = new Schema({
 
 OrderSchema.virtual('lastUpdate')
 .get(function () {
-  return this.statusLog[this.statusLog.length - 1].date;
+  if (this.statusLog) {
+    return this.statusLog[this.statusLog.length - 1].date;
+  }
+});
+OrderSchema.virtual('idmask')
+.get(function () {
+  if (this.orderId) {
+    return xInStr(this.orderId);
+  }
+});
+
+OrderSchema.set('toObject' , {
+  getters: true
+});
+OrderSchema.set('toJSON' , {
+  getters: true
 });
 
 /**

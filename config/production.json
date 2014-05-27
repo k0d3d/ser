@@ -11,12 +11,14 @@
         "secret": "yfhgU&^%@N>YS!!~HJS&JDHGDbvjhg7509"
     },
     "app": {
-        "name": "Integra StocCloud"
+        "name": "Integra StocCloud",
+        "server": "localhost:3011"
     },
     "mail" : {
         "defaultService": "sendgrid",
         "defaultSenderName" : "DrugStoc Mails",
         "defaultSenderEmail" : "mailer@drugstoc.ng",
+        "defaultNoEmail": "no-email@drugstoc.ng",
         "debug": true,
         "domain": {
             "username": "mailer@drugstoc.ng",

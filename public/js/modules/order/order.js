@@ -326,13 +326,6 @@ config(['$routeProvider',function($routeProvider){
           class_name: 'growl-success'
         });
         return r.data;
-      }, function (err) {
-        // N.notifier({
-        //   title:  L[L.set].titles.error,
-        //   text:  err,
-        //   class_name: 'growl-danger'
-        // });
-        //return err;
       });
     };
 
