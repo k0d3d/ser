@@ -225,13 +225,13 @@ noticeFn = {
       console.log(task);
       var allowedEmail = ( typeof task.userId.allowedNotifications.email !== 'undefined') ? 
         task.userId.allowedNotifications.email : 
-        true;
+        false;
       var allowedSMS = ( typeof task.userId.allowedNotifications.sms !== 'undefined') ? 
         task.userId.allowedNotifications.sms : 
-        true;
+        false;
       var allowedPortal = ( typeof task.userId.allowedNotifications.portal !== 'undefined') ? 
         task.userId.allowedNotifications.portal : 
-        true;
+        false;
 
       //task here is a user object.
       //

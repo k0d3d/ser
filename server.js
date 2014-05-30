@@ -38,6 +38,8 @@ function afterResourceFilesLoad() {
 
     console.log('configuring application, please wait...');
 
+    // set logging level - dev for now, later change for production
+    app.use(logger());
 
     console.log('Loading passport config...');
     try {
@@ -45,7 +47,6 @@ function afterResourceFilesLoad() {
     } catch(e) {
       console.log(e);
     }
-    
 
     app.set('showStackError', true);
 
@@ -77,9 +78,6 @@ function afterResourceFilesLoad() {
       path: __dirname + '/config/i18n'
     }));
 
-
-    // set logging level - dev for now, later change for production
-    app.use(logger('dev'));
 
 
     // expose package.json to views
