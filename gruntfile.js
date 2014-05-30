@@ -225,7 +225,7 @@ module.exports = function(grunt) {
                 "public/js/ui-bootstrap-custom-tpls-0.10.0.min.js",
                 // "public/js/jquery.prettyPhoto.js",
                 "public/js/dropzone.min.js",
-                "public/js/tooltipjs",
+                "public/js/tooltip.js",
               ],
               //application ng modules
               'public/js/modules.min.js': [
