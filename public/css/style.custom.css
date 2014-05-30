@@ -313,3 +313,10 @@ select.editable-has-buttons {
 .act-spr-img.a6 {
   background-position: 48px 0;
 }
+
+[ng-cloak].splash {
+    display: block !important;
+}
+.splash {
+    display: none;
+}

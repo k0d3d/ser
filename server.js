@@ -41,6 +41,23 @@ function afterResourceFilesLoad() {
     // set logging level - dev for now, later change for production
     app.use(logger());
 
+    // set compression on responses
+    // app.use(compress({
+    //   filter: function (req, res) {
+    //     return /json|text|javascript|css/.test(res.getHeader('Content-Type'));
+    //   },
+    //   level: 9
+    // }));
+    app.use(compress());
+
+    // make everything in the public folder publicly accessible - do this high up as possible
+    app.use(express.static(__dirname + '/public', {
+      maxAge: 86400000
+    }));
+    
+    // efficient favicon return - will enable when we have a favicon
+    app.use(favicon('public/images/favicon.ico'));
+
     console.log('Loading passport config...');
     try {
       require('./lib/passport.js')(passport);
@@ -49,21 +66,6 @@ function afterResourceFilesLoad() {
     }
 
     app.set('showStackError', true);
-
-
-    // make everything in the public folder publicly accessible - do this high up as possible
-    app.use(express.static(__dirname + '/public'));
-
-    // set compression on responses
-    app.use(compress({
-      filter: function (req, res) {
-        return /json|text|javascript|css/.test(res.getHeader('Content-Type'));
-      },
-      level: 9
-    }));
-
-    // efficient favicon return - will enable when we have a favicon
-    app.use(favicon('public/images/favicon.ico'));
 
 
     app.locals.layout = false;
