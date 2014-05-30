@@ -117,6 +117,7 @@ UserController.prototype.create = function(body, callback) {
   console.log('Creating User Account');
   console.log(body);
   var user = new User(body);
+  user.email = body.email.toLowerCase();
   user.save(function(err) {
     if(err){
       callback(err);

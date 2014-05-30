@@ -1,9 +1,10 @@
+
 var Q = require('q'),
     utilities = require('../lib/utils'),
     PreAccount = require('./user/pre-account'),
     staffUtils = require('./staff_utils.js'),
     _ = require('underscore'),
-    //sendMail = require('../../lib/sendmail'),
+    sendMail = require('../lib/email/sendMail.js'),
     util = require('util'),
     User = require('./user.js').User,
 
@@ -56,10 +57,22 @@ staffFunctions = {
 
     return d.promise;
   },
-  sendActivationEmail : function sendActivationEmail (options) {
+  sendActivationEmail : function sendActivationEmail (doc) {
+    console.log('sending activation email..');
     var d = Q.defer();
 
-    d.resolve({status :'sent'});
+    sendMail.sendHTMLMail({
+      to: doc.email,
+      subject: 'You have been invited to use DrugStoc'
+    }, 'views/templates/email-templates/invite-template.jade', doc)
+    .then(function () {
+      d.resolve({status :'sent'});
+    })
+    .fail(function (err) {
+      console.log(err);
+    })
+    .done();
+ 
 
     return d.promise;
   },
@@ -458,7 +471,7 @@ Staff.prototype.createStaff =  function (email, account_type, password) {
 };
 
 
-Staff.prototype.inviteStaff =  function (email, phone, account_type, password, employerId) {
+Staff.prototype.inviteStaff =  function (email, phone, account_type, password, employer) {
   var d = Q.defer();
 
   staffFunctions.inviteOneStaff({
@@ -466,10 +479,35 @@ Staff.prototype.inviteStaff =  function (email, phone, account_type, password, e
     account_type : account_type,
     phone: phone,
     password : password,
-    employerId : employerId
-
+    employerId : employer.id,
+    employer_accountType: employer.accountType
   })
-  .then(staffFunctions.sendActivationEmail())
+  .then(function (doc) {
+    var sendDoc = doc.toJSON();
+    // get employer profile
+    staffUtils.getMeMyModel(doc.employer_accountType)
+    .findOne({
+      userId: doc.employerId
+    }, 'name')
+    .lean()
+    .execQ()
+    .then(function (emp_doc) {
+      
+      if (emp_doc) {
+        sendDoc.employer = emp_doc;
+      } else {
+        sendDoc.employer = [];
+      }
+      return staffFunctions.sendActivationEmail(sendDoc);
+    })
+    .then(function (r) {
+      return d.resolve(r);
+    })
+    .fail(function (err) {
+      return d.reject(err);
+    })
+    .done();
+  })
   .then(function (r) {
     return d.resolve(r);
   }, function (err) {

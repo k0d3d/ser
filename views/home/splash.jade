@@ -91,7 +91,7 @@ block bodyContent
             p.scrollto--arrow
               img(src='/images/scroll_down.png', alt='scroll down arrow')
       .highlight
-        #search-results.container(ng-show="searchedItems.drug.length || searchedItems.ndl.length")
+        #search-results.container(ng-show="searchedItems.ndl.length > 0 || searchedItems.drug.length > 0")
           .row
               .well(style="border: none")
                 h1.text-center We've found something for you!

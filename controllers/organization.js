@@ -8,6 +8,10 @@ var staff_model = require('../models/organization.js'),
 module.exports.routes = function (app, login) {
   var staff = new staff_model.Staff();
 
+  app.get('/user/activation', function (req, res) {
+    res.render('index');
+  });
+
   app.get('/a/organization',login.ensureLoggedIn('/signin'), function (req, res) {
 
     res.render('index', {
@@ -207,7 +211,7 @@ module.exports.routes = function (app, login) {
       res.json(200, req.query.tag);
     }, function (err) {
       console.log(err);
-      res.json(400, err);
+      res.json(400, err.message);
     });
   });
 
@@ -215,12 +219,14 @@ module.exports.routes = function (app, login) {
 
     //var password = (!req.body.password) ? utilities.uid(8) : req.body.password;
     var password = req.body.password || utilities.uid(8);
-    var employerId = req.user._id;
-    staff.inviteStaff(req.body.email, req.body.phone, req.body.account_type, password, employerId)
+    var employer = {id: req.user._id, accountType: req.user.account_type};
+
+    staff.inviteStaff(req.body.email, req.body.phone, req.body.account_type, password, employer)
     .then(function (r) {
       res.json(200, r);
     }, function (err) {
-      res.json(400, err);
+      console.log(err.stack);
+      res.json(400, err.message);
     });
   });
   app.post('/api/internal/organization/staff',login.ensureLoggedIn('/signin') , function (req, res) {
@@ -231,7 +237,7 @@ module.exports.routes = function (app, login) {
     .then(function (r) {
       res.json(200, r);
     }, function (err) {
-      res.json(400, err);
+      res.json(400, err.message);
     });
   });
 
