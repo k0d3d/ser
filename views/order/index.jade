@@ -58,7 +58,7 @@
                       -if (userData.account_type !== 5)
                         button.btn.btn-warning.btn-xs(ng-click="toggleModal('manage-order-modal', cmp, $index);") Manage this      
                       button.btn.btn-info.btn-xs(ng-click="get_status_updates(cmp); toggleModal('manage-order-updates', cmp.statusLog, $index)") Tracking      
-              .x-pagination(pagination="orders", page-to="page(pageNo, limit, cb)")
+              //- .x-pagination(pagination="orders", page-to="page(pageNo, limit, cb)")
 include ../widgets/order/manage-order-modal
 include ../widgets/order/manage-order-updates
 +manageOrderModal(userData.account_type)

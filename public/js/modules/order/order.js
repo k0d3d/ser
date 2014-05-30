@@ -16,7 +16,8 @@ config(['$routeProvider',function($routeProvider){
   'ordersService', 
   '$rootScope', 
   'Notification', 
-  function($scope, $http, ordersService, $rootScope, N) {
+  '$route',
+  function($scope, $http, ordersService, $rootScope, N, $route) {
   $scope.$parent.headerTitle = 'Pending Quotations';
   $scope.orderCart = [];
 
@@ -53,6 +54,7 @@ config(['$routeProvider',function($routeProvider){
     .then(function () {
       $scope.orderCart.splice(index, 1);
       $scope.my_quotation.splice(index, 1);
+      $route.reload();
     });
   };
 
@@ -61,6 +63,7 @@ config(['$routeProvider',function($routeProvider){
     .then(function (){
       $scope.orderCart.splice(index, 1);
       $scope.my_quotation.splice(index, 1);
+      $route.reload();
     });
   };
 
@@ -73,7 +76,8 @@ config(['$routeProvider',function($routeProvider){
   '$routeParams', 
   'ordersService', 
   'organizeStaffService', 
-  function ($scope, $http, $location, $routeParams, ordersService, organizeStaffService) {
+  '$route',
+  function ($scope, $http, $location, $routeParams, ordersService, organizeStaffService, $route) {
   $scope.$parent.headerTitle = 'Orders';
  
   $scope.ordersfilter = {
@@ -82,13 +86,13 @@ config(['$routeProvider',function($routeProvider){
 
   $scope.orderStatusFilter =  function orderStatusFilter (item) {
     var state = $scope.orderFilter.status;
-    if (state == 2) {
+    if (state === parseInt(2)) {
       return (item.status < 2)? true : false;
     }
-    if (state == 3) {
+    if (state === parseInt(3)) {
       return (item.status >= 2 && item.status < 5) ? true : false;
     }
-    if (state == 6) {
+    if (state === parseInt(6)) {
       return (item.status >= 5 && item.status <= 6)? true : false;
     }
     return false;
@@ -101,20 +105,20 @@ config(['$routeProvider',function($routeProvider){
     
     ordersService.orders(7, 'full')
     .then(function(r){
-      angular.forEach(r, function(v, i){
+      angular.forEach(r, function(v){
         //v.nextStatus = v.orderStatus + 1;
         $scope.orders.push(v);
       });
       switch($routeParams.type){
         case 'invoices':
-        $scope.ordersfilter.orderStatus = "Supplied";
+        $scope.ordersfilter.orderStatus = 'Supplied';
         break;
         case 'order':
         console.log('message');
-        $scope.ordersfilter.orderStatus = "Pending Order";
+        $scope.ordersfilter.orderStatus = 'Pending Order';
         break;
         default:
-        $scope.ordersfilter.orderStatus = "";
+        $scope.ordersfilter.orderStatus = '';
         break;
       }
     });
@@ -127,7 +131,7 @@ config(['$routeProvider',function($routeProvider){
     var orderId = $scope.orders[index].orderId;
     
     ordersService.hideOrderItem(orderId)
-    .then(function(o){
+    .then(function(){
       $scope.orders.splice(index, 1);
     });
   };
@@ -186,6 +190,7 @@ config(['$routeProvider',function($routeProvider){
     .then(function () {
       $scope.orders[index] = order;      
       $('#manage-order-modal').modal('hide');
+      $route.reload();
     });
   };
   $scope.cancel_order = function (order, index) {
@@ -244,14 +249,12 @@ config(['$routeProvider',function($routeProvider){
   $scope.search = function(queryObj){
     // $scope.ds = '';
     // var page = p || 0;
-    // 
-    // cons
     
     ordersService.searchCmp(queryObj)
     .then(function (r) {
-      // angular.forEach(r.drug, function (v, i) {
-      //   r.drug[i].packageQty = v.pa;
-      // });
+      angular.forEach(r.drug, function (v, i) {
+        r.drug[i].packageQty = 1;
+      });
       $scope.searchedItems = r;
       $scope.searchedItems.s = queryObj.s;
       
@@ -326,6 +329,13 @@ config(['$routeProvider',function($routeProvider){
           class_name: 'growl-success'
         });
         return r.data;
+      }, function (err) {
+        // N.notifier({
+        //   title:  L[L.set].titles.error,
+        //   text:  err,
+        //   class_name: 'growl-danger'
+        // });
+        //return err;
       });
     };
 
