@@ -73,18 +73,23 @@ module.exports = function(grunt) {
             'public/css/splash.css': ['public/css/splash.css'],
             //vendor css for application
             'public/css/vendor.min.css': [
+              'public/css/bootstrap-override.css',
+              'public/css/jquery-ui-1.10.3.css',
+              'public/css/animate.min.css',
+              'public/css/animate.delay.css',
+              'public/css/toggles.css',
+              'public/css/chosen.css',
+              'public/css/lato.css',
               'public/css/bootstrap-editable.css',
               'public/css/jquery.datatables.css',
               'public/css/bootstrap-switch.min.css',
               'public/css/dropzone.css',
               'public/css/jquery.gritter.css',
               'public/css/ng-tags-input.min.css',
-              'public/css/jquery-ui-1.10.3.css',
-              'public/css/xeditable.css'
+              'public/css/xeditable.css',
             ],
             //application template css
             'public/css/theme.min.css': [
-              'public/css/bootstrap-override.css',
               'public/css/style.default.css',
               'public/css/style.custom.css'
             ],
@@ -247,7 +252,7 @@ module.exports = function(grunt) {
                 'public/js/modules/stock/stock.js',
                 'public/js/modules/user/user.js',
                 'public/js/modules/organization/organization.js',
-                "public/js/custom.js"
+                'public/js/custom.js'
               ],
               //public vendor js
               'public/js/public-vendor.min.js': [

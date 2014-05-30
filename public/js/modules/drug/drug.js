@@ -81,27 +81,27 @@ angular.module('drug', [])
     __init();
 
     //ds.search
-    // $scope.searchcmp = function () {
-    //   $scope.summary = $scope.newprice = '';
-    //   ds.search($scope.drugname, 0, function (r) {
-    //     $scope.drugs = r;
-    //   });
-    // };
+    $scope.searchcmp = function () {
+      $scope.summary = $scope.newprice = '';
+      ds.search($scope.drugname, 0, function (r) {
+        $scope.drugs = r;
+      });
+    };
 
-    // $scope.more = function (index) {
-    //   ds.moreInfo($scope.drugs[index]._id, function(r){
-    //     $scope.summary = r;
-    //     $scope.summary.index = index;
-    //   });
-    // };
+    $scope.more = function (index) {
+      ds.moreInfo($scope.drugs[index]._id, function(r){
+        $scope.summary = r;
+        $scope.summary.index = index;
+      });
+    };
 
-    // $scope.up = function (id, price, index) {
-    //   console.log(price);
-    //   ds.updatePrice(id, price, function () {
-    //     $scope.drugs[index].currentPrice = price;
-    //     $scope.newprice = '';
-    //   });
-    // };
+    $scope.up = function (id, price, index) {
+      console.log(price);
+      ds.updatePrice(id, price, function () {
+        $scope.drugs[index].currentPrice = price;
+        $scope.newprice = '';
+      });
+    };
 
 
 
@@ -177,13 +177,6 @@ angular.module('drug', [])
       });
     };
 
-    $scope.remove_item = function (id, index) {
-      ds.removeItem(id)
-      .then(function () {
-        $scope._drugs.splice(index, 1);
-      });
-    };
-
     $scope.$watch('currentPage', function () {
       $scope.getPageItems($scope.currentPage, $scope.pageLimit);
     });
@@ -209,11 +202,16 @@ angular.module('drug', [])
     $scope.add_drug = function (data) {
       ds.addNewDrug(data)
       .then(function (r) {
+        if (r instanceof Error) {
+          console.log(r);
+        } else {
           if ($scope.nextAction === 'newAddition') {
             $scope.add_item_form = '';
           } else if ($scope.nextAction === 'listPage') {
             $scope.commons.href('/a/drugs');
           }
+          
+        }
       });
     };
     $scope.search_by_reg_no = function(regNo){
@@ -341,18 +339,6 @@ angular.module('drug', [])
         return err;
       });
     };
-
-    d.removeItem = function (id) {
-      return $http.delete('/api/internal/drugs/' + id + '/item')
-      .then(function () {
-        N.notifier({
-          title: 'Welldone!',
-          text: 'You have removed one item from your inventory',
-          class_name: 'growl-success'
-        });
-        return true;
-      })
-    }
 
     d.fetchAll = function (options)  {
       options = options || {};

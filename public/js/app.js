@@ -111,10 +111,6 @@ app.controller('MainController', [
       $('#' + modalId).modal('toggle');
     };
 
-    $scope.$on('$routeChangeStart', function () {
-      $('.modal-backdrop').remove();
-    });
-
 
 }]);
 app.filter('moment', function(){
