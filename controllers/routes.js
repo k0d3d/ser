@@ -174,11 +174,15 @@ module.exports = function(app, passport) {
 
   //Home route
   app.route('/')
-  .get(function(req, res){
-    res.render('home/splash',{
-      title: 'Dashboard'
-    });
+  .get(login.ensureLoggedIn('/signin'), function(req, res){
+    res.render('index');
   });
+  // app.route('/')
+  // .get(function(req, res){
+  //   res.render('home/splash',{
+  //     title: 'Dashboard'
+  //   });
+  // });
 
   // app.route('/home/index')
   // .get(login.ensureLoggedIn('/signin'), function(req, res){
