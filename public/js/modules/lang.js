@@ -12,7 +12,7 @@ angular.module('language', [])
 		},
 		"items": {
 			"save": {
-				"success":"You've succesfully added an order. Note: Items placed with invoice numbers and stock amounts will have their current stock updated. To add another item, close this dialog or return to the dashboard",
+				"success":"You have  succesfully added an items.",
 				"error": "Something went wrong while carrying out your last request. If it's nothing serious, you can try again. If this error happens again, please inform the Admin"
 			},
 			"autocomplete":{
