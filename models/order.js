@@ -803,7 +803,8 @@ OrderController.prototype.addressQuotation = function addressQuotation (order, s
           .then(function (listOfRecpt) {
             var tom;
             if (status === 2) {
-              tom = 'quotation_accepted';
+              tom = 'new_quotation_request';
+              // tom = 'quotation_accepted';
             } else if (status === -1) {
               tom = 'order_cancelled'; 
             }

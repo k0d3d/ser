@@ -24,7 +24,7 @@ app.run(function(editableOptions) {
 
 app.config(function ($routeProvider, $locationProvider, $httpProvider) {
   $routeProvider
-  // .when('/', {templateUrl: '/user/signin', controller: 'drugIndexController'})
+  //.when('/', {templateUrl: '/drug/index', controller: 'drugIndexController'})
   .otherwise({
       redirectTo: '/a/profile'
     });

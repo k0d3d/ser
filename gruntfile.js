@@ -8,7 +8,7 @@ module.exports = function(grunt) {
           options: {
             livereload: true,
           },
-        },
+        },            
         js: {
           files: ['public/js/**', 'app/**/*.js'],
           tasks: ['jshint'],
@@ -29,6 +29,36 @@ module.exports = function(grunt) {
           }
         }
       },
+      fingerprint: {
+        default: {
+          src: [
+            'public/css/splash.css',
+            'public/css/vendor.min.css',
+            'public/css/theme.min.css',
+            'public/css/public.min.css',
+            'public/js/public-module.min.js',
+            'public/js/default-vendor.min.js',
+            'public/js/modules.min.js',
+            'public/js/public-vendor.min.js'
+          ],
+          filename: 'fingerprint.txt',
+        },
+      },   
+      bump: {
+        options: {
+          files: ['package.json'],
+          updateConfigs: [],
+          commit: true,
+          commitMessage: 'Release v%VERSION%',
+          commitFiles: ['package.json'],
+          createTag: true,
+          tagName: 'v%VERSION%',
+          tagMessage: 'Version %VERSION%',
+          push: false,
+          pushTo: 'origin',
+          gitDescribeOptions: '--tags --always --abbrev=1 --dirty=-d'
+        }
+      },       
       jshint: {
         all: ['gruntfile.js', 'public/js/**/*.js', 'test/**/*.js', 'app/**/*.js']
       },
@@ -133,34 +163,34 @@ module.exports = function(grunt) {
             'js/jquery-2.1.1.min.js',
             'js/pace.js',
             'js/bootstrap.min.js',
-            "js/angular.min.js",
-            "js/angular-route.min.js",      
+            'js/angular.min.js',
+            'js/angular-route.min.js',      
             'js/easing.js',
             'js/typer.js',
             'js/nicescroll.js',
-            "js/jquery-ui-1.10.3.min.js",
-            "js/jquery-migrate-1.2.1.min.js",
-            "js/modernizr.min.js",
-            "js/retina.min.js",
-            "js/toggles.min.js",
-            "js/chosen.jquery.min.js",
-            "js/bootstrap-editable.min.js",
-            "js/typeahead.bundle.js",
-            "js/moment.js",
-            "js/bootstrap-switch.min.js ",
-            "js/underscore-min.js ",
-            "js/jquery.gritter.min.js",
-            "js/ng-tags-input.min.js",
-            "js/angular-dragdrop.min.js",
-            "js/jquery.slimscroll.min.js",
-            "js/xeditable.min.js",
-            "js/ui-bootstrap-custom-tpls-0.10.0.min.js",
+            'js/jquery-ui-1.10.3.min.js',
+            'js/jquery-migrate-1.2.1.min.js',
+            'js/modernizr.min.js',
+            'js/retina.min.js',
+            'js/toggles.min.js',
+            'js/chosen.jquery.min.js',
+            'js/bootstrap-editable.min.js',
+            'js/typeahead.bundle.js',
+            'js/moment.js',
+            'js/bootstrap-switch.min.js ',
+            'js/underscore-min.js ',
+            'js/jquery.gritter.min.js',
+            'js/ng-tags-input.min.js',
+            'js/angular-dragdrop.min.js',
+            'js/jquery.slimscroll.min.js',
+            'js/xeditable.min.js',
+            'js/ui-bootstrap-custom-tpls-0.10.0.min.js',
             'js/ketchup.all.js',
-            "js/dropzone.min.js",
+            'js/dropzone.min.js',
             'js/tooltip.js',
             // Splash Template JS
             'js/startup.js',
-            "js/modules/public.js",
+            'js/modules/public.js',
             //Application Init JS
             'js/app.js',
             'js/modules/lang.js',    
@@ -180,127 +210,126 @@ module.exports = function(grunt) {
             'js/modules/stock/stock.js',
             'js/modules/user/user.js',
             'js/modules/organization/organization.js',
-            "js/custom.js",
+            'js/custom.js',
             ],
             dest: 'public/',
             expand: true
-          }
-        }, 
-        clean:{
-          build:{
-            src:['public']
-          }
-        }, 
-        uglify : {     
-          build:{
-            options:{
-              mangle: false
-            },
-            files:{
-              //Splash / Home page
-              'public/js/public-module.min.js': [
-                'public/js/pace.js',
-                'public/js/easing.js',
-                'public/js/typer.js',
-                'public/js/nicescroll.js',
-                'public/js/ketchup.all.js',
-                'public/js/startup.js',
-                "public/js/modules/public.js",
-                "public/js/modules/lang.js",
-                "public/js/modules/order/order.js",
-                "public/js/modules/drug/drug.js",
-                "public/js/common/services/services.js",
-              ],
-              //application vendor js
-              'public/js/default-vendor.min.js': [
-                "public/js/modernizr.min.js",
-                "public/js/retina.min.js",
-                "public/js/toggles.min.js",
-                "public/js/chosen.jquery.min.js",
-                "public/js/bootstrap-editable.min.js",
-                "public/js/typeahead.bundle.js",
-                "public/js/moment.js",
-                "public/js/bootstrap-switch.min.js ",
-                "public/js/underscore-min.js ",
-                "public/js/jquery.gritter.min.js",
-                "public/js/ng-tags-input.min.js",
-                "public/js/angular-dragdrop.min.js",
-                "public/js/jquery.slimscroll.min.js",
-                "public/js/xeditable.min.js",
-                "public/js/ui-bootstrap-custom-tpls-0.10.0.min.js",
-                // "public/js/jquery.prettyPhoto.js",
-                "public/js/dropzone.min.js",
-                "public/js/tooltip.js",
-              ],
-              //application ng modules
-              'public/js/modules.min.js': [
-                'public/js/app.js',
-                'public/js/modules/lang.js',
-                'public/js/common/services/services.js',
-                'public/js/common/filters/filters.js',
-                'public/js/common/directives/directives.js',
-                'public/js/common/directives/checklist-model.js',
-                'public/js/modules/hospital/hospital.js',
-                'public/js/modules/dashboard/dashboard.js',
-                'public/js/modules/order/order.js',
-                'public/js/modules/reports/reports.js',
-                'public/js/modules/drug/drug.js',
-                'public/js/modules/bills/bills.js',
-                'public/js/modules/dispense/dispense.js',
-                'public/js/modules/supplier/supplier.js',
-                'public/js/modules/admin/admin.js',
-                'public/js/modules/stock/stock.js',
-                'public/js/modules/user/user.js',
-                'public/js/modules/organization/organization.js',
-                'public/js/custom.js'
-              ],
-              //public vendor js
-              'public/js/public-vendor.min.js': [
-                // 'public/js/jquery-1.10.2.min.js',
-                // 'public/js/angular.min.js',
-                'public/js/angular-route.min.js',
-                // 'public/js/jquery-migrate-1.2.1.min.js',
-                // 'public/js/bootstrap.min.js',
-                'public/js/modernizr.min.js',
-                'public/js/retina.min.js',
-                'public/js/chosen.jquery.min.js',
-
-                'public/js/custom.js',
-              ]
-            }
-          }
-        },                  
-        jade: {
-          debug:{            
-            options: {
-              pretty: true,
-              data: {
-                debug: true
-              }
-            },
-            files: [{ 
-              expand: true, 
-              src: "**/*.jade", 
-              dest: "dist/", 
-              cwd: "views", 
-              ext: '.html'
-            }]
+        }
+      }, 
+      clean:{
+        build:{
+          src:['public']
+        }
+      }, 
+      uglify: {
+        build:{
+          options:{
+            mangle: false
           },
-          release: {
-            options: {
-              pretty: true,
-              data: {
-                debug: false
-              }
-            },
-            files: [{ 
-              expand: true, 
-              src: "**/*.jade", 
-              dest: "dist/", 
-              cwd: "views", 
-              ext: '.html'
-            }]
-          }            
+          files:{
+            //Splash / Home page
+            'public/js/public-module.min.js': [
+              'public/js/pace.js',
+              'public/js/easing.js',
+              'public/js/typer.js',
+              'public/js/nicescroll.js',
+              'public/js/ketchup.all.js',
+              'public/js/startup.js',
+              'public/js/modules/public.js',
+              'public/js/modules/lang.js',
+              'public/js/modules/order/order.js',
+              'public/js/modules/drug/drug.js',
+              'public/js/common/services/services.js',
+            ],
+            //application vendor js
+            'public/js/default-vendor.min.js': [
+              'public/js/modernizr.min.js',
+              'public/js/retina.min.js',
+              'public/js/toggles.min.js',
+              'public/js/chosen.jquery.min.js',
+              'public/js/bootstrap-editable.min.js',
+              'public/js/typeahead.bundle.js',
+              'public/js/moment.js',
+              'public/js/bootstrap-switch.min.js ',
+              'public/js/underscore-min.js ',
+              'public/js/jquery.gritter.min.js',
+              'public/js/ng-tags-input.min.js',
+              'public/js/angular-dragdrop.min.js',
+              'public/js/jquery.slimscroll.min.js',
+              'public/js/xeditable.min.js',
+              'public/js/ui-bootstrap-custom-tpls-0.10.0.min.js',
+              // 'public/js/jquery.prettyPhoto.js',
+              'public/js/dropzone.min.js',
+              'public/js/tooltip.js',
+            ],
+            //application ng modules
+            'public/js/modules.min.js': [
+              'public/js/app.js',
+              'public/js/modules/lang.js',
+              'public/js/common/services/services.js',
+              'public/js/common/filters/filters.js',
+              'public/js/common/directives/directives.js',
+              'public/js/common/directives/checklist-model.js',
+              'public/js/modules/hospital/hospital.js',
+              'public/js/modules/dashboard/dashboard.js',
+              'public/js/modules/order/order.js',
+              'public/js/modules/reports/reports.js',
+              'public/js/modules/drug/drug.js',
+              'public/js/modules/bills/bills.js',
+              'public/js/modules/dispense/dispense.js',
+              'public/js/modules/supplier/supplier.js',
+              'public/js/modules/admin/admin.js',
+              'public/js/modules/stock/stock.js',
+              'public/js/modules/user/user.js',
+              'public/js/modules/organization/organization.js',
+              'public/js/custom.js'
+            ],
+            //public vendor js
+            'public/js/public-vendor.min.js': [
+              // 'public/js/jquery-1.10.2.min.js',
+              // 'public/js/angular.min.js',
+              'public/js/angular-route.min.js',
+              // 'public/js/jquery-migrate-1.2.1.min.js',
+              // 'public/js/bootstrap.min.js',
+              'public/js/modernizr.min.js',
+              'public/js/retina.min.js',
+              'public/js/chosen.jquery.min.js',
+
+              'public/js/custom.js',
+            ]
+          }
+        }
+      },                  
+      jade: {
+        debug:{            
+          options: {
+            pretty: true,
+            data: {
+              debug: true
+            }
+          },
+          files: [{ 
+            expand: true, 
+            src: '**/*.jade', 
+            dest: 'dist/', 
+            cwd: 'views', 
+            ext: '.html'
+          }]
+        },
+        release: {
+          options: {
+            pretty: true,
+            data: {
+              debug: false
+            }
+          },
+          files: [{ 
+            expand: true, 
+            src: '**/*.jade', 
+            dest: 'dist/', 
+            cwd: 'views', 
+            ext: '.html'
+          }]           
         },
         compile: {
           options: {
@@ -311,14 +340,15 @@ module.exports = function(grunt) {
           },
           files: [{ 
             expand: true, 
-            src: "**/*.jade", 
-            dest: "dist/", 
-            cwd: "views", 
+            src: '**/*.jade', 
+            dest: 'dist/', 
+            cwd: 'views', 
             ext: '.html'
           }]
-        }            
+        }  
+      }          
 
-      });
+    });
 
     //Load NPM tasks 
     grunt.loadNpmTasks('grunt-contrib-watch');
@@ -328,17 +358,20 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-nodemon');
     grunt.loadNpmTasks('grunt-concurrent');
     grunt.loadNpmTasks('grunt-env');
-    grunt.loadNpmTasks("grunt-contrib-copy");
+    grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-contrib-clean');    
+    grunt.loadNpmTasks('grunt-fingerprint');
+    grunt.loadNpmTasks('grunt-bump');
+
 
     //Making grunt default to force in order not to break the project.
     grunt.option('force', true);
 
     //Default task(s).
     grunt.registerTask('default', ['jshint', 'concurrent']);
-    grunt.registerTask('build', ['clean', 'copy', 'uglify', 'cssmin']);
+    grunt.registerTask('build', ['clean', 'copy', 'bump:patch', 'uglify', 'cssmin']);
 
     //Test task.
     grunt.registerTask('test', ['env:test', 'mochaTest']);
