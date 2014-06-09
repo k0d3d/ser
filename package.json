@@ -65,7 +65,8 @@
     "string-format": "~0.2.1",
     "mongoose-q": "0.0.10",
     "multer": "0.0.7",
-    "easyimage": "~0.1.6"
+    "easyimage": "~0.1.6",
+    "twilio": "~1.6.0"
   },
   "devDependencies": {
     "supertest": "latest",
