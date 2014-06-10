@@ -8,6 +8,7 @@ var Order = require('./order/order.js').Order,
   //EventRegister = require('../lib/event_register').register,
   staffUtils = require('./staff_utils.js'),
   postman = require('./postman'),
+  processSMS = require('../lib/sms/process-sms.js'),
   utils = require('util');
 
 
@@ -891,6 +892,34 @@ OrderController.prototype.getUserOrders = function getUserOrders (userId, accoun
   }
 
   return gini.promise;
+};
+
+/**
+ * processes an incoming sms request.
+ * received an object as argument containing properties
+ * to be used in updating an order.
+ * 
+ *
+ * @param  {[type]} body [description]
+ * @return {[type]}      [description]
+ */
+OrderController.prototype.processSMSRequest = function processSMSRequest (body) {
+  var bot = Q.defer();
+
+  //find the profile and employer if 
+  //its a staff making update
+  //
+  
+  //
+  //find the order via the order number
+  //
+  //check if is hospital or staff or distributor
+  //
+  //update order, 
+  //
+  //send sms confirmation
+
+  return bot.promise;
 };
 
 module.exports = OrderController;

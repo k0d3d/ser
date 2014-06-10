@@ -4,7 +4,9 @@
  */
 var mongoose = require('mongoose'),
     Schema = mongoose.Schema,
+    textSearch = require('mongoose-text-search');
     xInStr = require('../../lib/utils.js').xInStr;
+
 
 
 
@@ -118,6 +120,9 @@ OrderSchema.statics = {
     q.exec(cb);
   }
 };
+
+OrderSchema.plugin(textSearch);
+OrderSchema.index({orderId: 'text'});
 
 
 mongoose.model('Order', OrderSchema);
