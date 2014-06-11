@@ -8,6 +8,8 @@ var Order = require('./order/order.js').Order,
   //EventRegister = require('../lib/event_register').register,
   staffUtils = require('./staff_utils.js'),
   postman = require('./postman'),
+  ProcessSMS = require('../lib/sms/process-sms.js'),
+  sendEmail = require('../lib/email/sendMail.js'),
   utils = require('util');
 
 
@@ -42,6 +44,32 @@ var orderManager = {
     });
 
     return or.promise;
+  },
+  /**
+   * finds all orders that match orderId. 
+   * @param  {String | Numbers} orderId the last four digits of the
+   * orderId.
+   * @return {[type]}         [description]
+   */
+  findOrderById: function findOrderById (orderId) {
+    console.log('Checking order by id...');
+    // var doing = Q.defer();
+
+    var rgx = new RegExp('/.*' + orderId + '$/', "i");
+
+    return Order.find({
+      orderId: rgx
+    })
+    .execQ()
+    .then(function (res) {
+      return res;
+    })
+    .fail(function (err) {
+      return err;
+    })
+    .done();
+
+    // return doing.promise;
   },
   getOrders: function getOrders (doc) {
     console.log('Attempting to get orders..');
@@ -892,6 +920,49 @@ OrderController.prototype.getUserOrders = function getUserOrders (userId, accoun
   }
 
   return gini.promise;
+};
+
+/**
+ * processes an incoming sms request.
+ * received an object as argument containing properties
+ * to be used in updating an order.
+ * 
+ *
+ * @param  {[type]} body [description]
+ * @return {[type]}      [description]
+ */
+OrderController.prototype.processSMSRequest = function processSMSRequest (body) {
+  var bot = Q.defer();
+  // prcs = new ProcessSMS(body.Body);
+
+  //find the profile and employer if 
+  //its a staff making update
+  //
+  sendEmail.sendMail({
+                to: 'michael.rhema@gmail.com', // list of receivers
+                subject: 'DrugStoc Test SMS', // Subject line
+                text: JSON.stringify(body) // plaintext body
+            })
+            .then(function () {
+                
+                return bot.resolve({status: 'sent'});
+                
+            })
+            .catch(function (err) {
+                    
+              return bot.reject(err);
+            });
+  
+  //
+  //find the order via the order number
+  //
+  //check if is hospital or staff or distributor
+  //
+  //update order, 
+  //
+  //send sms confirmation
+
+  return bot.promise;
 };
 
 module.exports = OrderController;

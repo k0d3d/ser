@@ -1,8 +1,9 @@
-var mongoose = require('mongoose'),
+var mongoose = require('mongoose-q')(),
     Schema = mongoose.Schema,
+    textSearch = require('mongoose-text-search');
 
 
-StaffSchema = new Schema({
+var StaffSchema = new Schema({
   userId: {type: Schema.ObjectId, ref: 'User'},
   name : {type: String},
   coverage: [{type: String, unique: true}],
@@ -28,6 +29,9 @@ StaffSchema = new Schema({
   }],
   alt_email: {type: String}
 });
+
+StaffSchema.plugin(textSearch);
+StaffSchema.index({phone: 'text'});
 
 mongoose.model('Staff', StaffSchema);
 
