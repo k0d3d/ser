@@ -44,6 +44,14 @@ var orderManager = {
 
     return or.promise;
   },
+
+  findOrderById: function findOrderById (orderId) {
+    console.log('Checking order by id...');
+    var doing = Q.defer();
+
+
+    return doing.promise;
+  },
   getOrders: function getOrders (doc) {
     console.log('Attempting to get orders..');
     console.log(doc);
