@@ -940,11 +940,11 @@ OrderController.prototype.processSMSRequest = function processSMSRequest (body) 
   sendEmail.sendMail({
                 to: 'michael.rhema@gmail.com', // list of receivers
                 subject: 'DrugStoc Test SMS', // Subject line
-                text: body // plaintext body
+                text: JSON.stringify(body) // plaintext body
             })
             .then(function () {
                 
-                return bot.resolve(1);
+                return bot.resolve({status: 'sent'});
                 
             })
             .catch(function (err) {
