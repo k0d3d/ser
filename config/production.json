@@ -53,6 +53,9 @@
                 "accountSID" : "ACee9332ba9fa2eb4becb6eb25e8a9f1eb",
                 "accountToken": "bda3517430f468419934d1ea054675a8"
             }
-        }
+        },
+        "delimeter": {
+            "accepted": "#"
+        }        
     }
 }
