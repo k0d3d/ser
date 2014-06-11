@@ -60,10 +60,12 @@ var orderManager = {
     // console.log(rgx);
 
     Order.findOne({
-      // "orderSupplier.supplierId": distributorId
+      "orderSupplier.supplierId": distributorId
     })
     // .regex('orderId', new RegExp(orderId, "i"))
     .regex('orderId', new RegExp(orderId, 'i'))
+    .populate('hospitalId', null, 5)
+    .lean()
     .execQ()
     .then(function (res) {
       return doing.resolve(res);
@@ -943,6 +945,7 @@ OrderController.prototype.processSMSRequest = function processSMSRequest (body) 
   var  
       found_orders = [], 
       bad_orders = [];
+  var self = this;
 
   //checks for validity and also makes
   //the necessary updates
@@ -954,21 +957,41 @@ OrderController.prototype.processSMSRequest = function processSMSRequest (body) 
 
     //find the order via the order number
     //prcs.user should be set by checkPhoneNUmber
-    orderManager.findOrdersById(task)
+    orderManager.findOrdersById(task, prcs.user.employer.employerId)
     .then(function (orders) {
+      console.log(orders);
       if (orders) {
-        found_orders.push(orders);
+        orders.status = 5;
+        self.distUpdateOrder(orders, prcs.user.userId, 4)
+        .then(function (done) {
+
+          found_orders.push(orders);
+
+          if (orderIds.length) {
+            __mamaSaid();
+          } else {
+            return bot.resolve({
+              valid: found_orders,
+              invalid: bad_orders
+            });
+          }  
+        });
+
+
       } else {
         bad_orders.push(task);
+
+        if (orderIds.length) {
+          __mamaSaid();
+        } else {
+          return bot.resolve({
+            valid: found_orders,
+            invalid: bad_orders
+          });
+        }
       }
-      if (orderIds.length) {
-        __mamaSaid();
-      } else {
-        return bot.resolve({
-          valid: found_orders,
-          invalid: bad_orders
-        });
-      }
+
+
 
 
     });
@@ -984,7 +1007,7 @@ OrderController.prototype.processSMSRequest = function processSMSRequest (body) 
     //we're checking if the orders a valid,
     //and if the user sending the sms is 
     //also allowed to..
-    //
+    // console.log(prcs.user);
     __mamaSaid();
     // .then(function (prod) {
     //   bot.resolve(prod);
