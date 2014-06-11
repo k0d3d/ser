@@ -6,15 +6,15 @@ describe('Process sms spec', function() {
   var textBody = '#RffZnr #S9UwCj #S9UwCj';
   var sender = '08126488955';
 
-  xit('should process a text string ', function() {
+  it('should process a text string ', function() {
 
-    // var prcs = new Prcs(textBody);
+    var prcs = new Prcs(textBody);
 
-    // console.log(prcs.parse());
+    console.log(prcs.parse());
 
-    // expect(prcs.parse().orderNo).toBeDefined();
+    expect(prcs.parse().length).toBeGreaterThan(0);
 
-    expect(true).toBe(true);
+    // expect(true).toBe(true);
   });
 
   it("should validate the phone number belongs to a registered account", function (done) {
