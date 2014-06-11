@@ -6,7 +6,7 @@ describe('Process sms spec', function() {
   var textBody = '#RffZnr #S9UwCj #S9UwCj';
   var sender = '+2348126488955';
 
-  xit('should process a text string ', function() {
+  it('should process a text string ', function() {
 
     var prcs = new Prcs(textBody);
 
@@ -17,7 +17,7 @@ describe('Process sms spec', function() {
     // expect(true).toBe(true);
   });
 
-  it("should validate the phone number belongs to a registered account", function (done) {
+  xit("should validate the phone number belongs to a registered account", function (done) {
     var prcs = new Prcs(textBody);
 
     db.open()

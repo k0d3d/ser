@@ -51,15 +51,16 @@ var orderManager = {
    * orderId.
    * @return {[type]}         [description]
    */
-  findOrderById: function findOrderById (orderId) {
+  findOrderById: function findOrderById (orderId, distributorId) {
     console.log('Checking order by id...');
     // var doing = Q.defer();
 
-    var rgx = new RegExp('/.*' + orderId + '$/', "i");
+    // var rgx = new RegExp('/.*' + orderId + '$/', "i");
 
-    return Order.find({
-      orderId: rgx
+    return Order.findOne({
+      "orderSupplier.supplierId": distributorId
     })
+    .regex('orderId', new RegExp('/.*' + orderId + '$/', "i"))
     .execQ()
     .then(function (res) {
       return res;
@@ -932,30 +933,41 @@ OrderController.prototype.getUserOrders = function getUserOrders (userId, accoun
  * @return {[type]}      [description]
  */
 OrderController.prototype.processSMSRequest = function processSMSRequest (body) {
-  var bot = Q.defer();
-  // prcs = new ProcessSMS(body.Body);
+  var bot = Q.defer(),
+  prcs = new ProcessSMS(body.Body);
+
+  var __mamaSaid = function __mamaSaid () {
+    var task = prcs.parse();
+
+    //
+    //find the order via the order number
+    //
+    orderManager.findOrdersById(ids)
+    .then(function (orders) {
+
+    })
+  };
 
   //find the profile and employer if 
   //its a staff making update
   //
-  sendEmail.sendMail({
-                to: 'michael.rhema@gmail.com', // list of receivers
-                subject: 'DrugStoc Test SMS', // Subject line
-                text: JSON.stringify(body) // plaintext body
-            })
-            .then(function () {
-                
-                return bot.resolve({status: 'sent'});
-                
-            })
-            .catch(function (err) {
-                    
-              return bot.reject(err);
-            });
+  prcs.checkPhoneNumber(body.From)
+  .then(function (userOb) {
+    
+    __mamaSaid()
+    .then(function (prod) {
+
+    })
+    .fail(function (err) {
+      bot.reject(err);
+    })
+    .done();
+
+  }, function (err) {
+    bot.reject(err);
+  })
+  .done();
   
-  //
-  //find the order via the order number
-  //
   //check if is hospital or staff or distributor
   //
   //update order, 
