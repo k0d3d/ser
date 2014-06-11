@@ -312,7 +312,7 @@ noticeFn = {
         });
       } else {
         
-        console.log('sent to: ' + task.userId.email);
+        console.log('processed for: ' + task.userId.email);
 
         if (listOfRecpt.length) {
           process.nextTick(__pushMessages);

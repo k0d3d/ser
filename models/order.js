@@ -64,7 +64,8 @@ var orderManager = {
     })
     // .regex('orderId', new RegExp(orderId, "i"))
     .regex('orderId', new RegExp(orderId, 'i'))
-    .populate('hospitalId', null, 5)
+    // .populate('hospitalId', null, 'User')
+    .populate('itemId', null, 'drug')
     .lean()
     .execQ()
     .then(function (res) {
@@ -478,7 +479,7 @@ OrderController.prototype.distUpdateOrder = function(orderData, userId, accountT
         //populate hospitalId,
         staffUtils.getMeMyModel(5)
         .findOne({
-          userId: orderData.hospitalId.userId,
+          userId: (utilz.testIfObjId(orderData.hospitalId)) ? orderData.hospitalId : orderData.hospitalId.userId ,
         }, 'userId name')
         .execQ()
         .then(function (facility_model) {
@@ -503,7 +504,7 @@ OrderController.prototype.distUpdateOrder = function(orderData, userId, accountT
           // if order has been updates, notify
           // concerned..i.e. hospital
           postman.noticeFn.getConcernedStaff({
-            userId: orderData.hospitalId.userId,
+            userId: orderData.hospitalId.userId || orderData.hospitalId._id,
             accountType: 5,
             operation: 'user'
           })
@@ -959,7 +960,6 @@ OrderController.prototype.processSMSRequest = function processSMSRequest (body) 
     //prcs.user should be set by checkPhoneNUmber
     orderManager.findOrdersById(task, prcs.user.employer.employerId)
     .then(function (orders) {
-      console.log(orders);
       if (orders) {
         orders.status = 5;
         self.distUpdateOrder(orders, prcs.user.userId, 4)

@@ -2,6 +2,7 @@ describe('Process sms spec', function() {
   
   var Prcs = require('../../lib/sms/process-sms.js'),
       Order = require('../../models/order.js'),
+      User = require('../../models/user/user.js'),
       db = require('../../lib/db.js');
 
   var textBody = '#RffZnr #S9UwCj #S9UwCj';
@@ -17,7 +18,7 @@ describe('Process sms spec', function() {
               "FromState":"",
               "SmsStatus":"received",
               "FromCity":"",
-              "Body":"#RffZnr #zTWNQM #ZBUyKQ",
+              "Body":"#npzkui",
               "FromCountry":"NG",
               "To":"+12086960938",
               "ToZip":"83647",
@@ -67,7 +68,6 @@ describe('Process sms spec', function() {
       
       order.processSMSRequest(body)
       .then(function (rdoc) {
-        console.log(rdoc);
         expect(rdoc).toBeDefined();
         done();
       }, function (err) {

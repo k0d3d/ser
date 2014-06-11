@@ -2,7 +2,7 @@
 /**
  * Module dependencies.
  */
-var mongoose = require('mongoose'),
+var mongoose = require('mongoose-q')(),
     Schema = mongoose.Schema,
     textSearch = require('mongoose-text-search');
     xInStr = require('../../lib/utils.js').xInStr;
