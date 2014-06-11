@@ -51,26 +51,29 @@ var orderManager = {
    * orderId.
    * @return {[type]}         [description]
    */
-  findOrderById: function findOrderById (orderId, distributorId) {
+  findOrdersById: function findOrderById (orderId, distributorId) {
     console.log('Checking order by id...');
-    // var doing = Q.defer();
+    var doing = Q.defer();
 
-    // var rgx = new RegExp('/.*' + orderId + '$/', "i");
+    // var rgx = '/(.*' + orderId + '$)/';
 
-    return Order.findOne({
-      "orderSupplier.supplierId": distributorId
+    // console.log(rgx);
+
+    Order.findOne({
+      // "orderSupplier.supplierId": distributorId
     })
-    .regex('orderId', new RegExp('/.*' + orderId + '$/', "i"))
+    // .regex('orderId', new RegExp(orderId, "i"))
+    .regex('orderId', new RegExp(orderId, 'i'))
     .execQ()
     .then(function (res) {
-      return res;
+      return doing.resolve(res);
     })
     .fail(function (err) {
-      return err;
+      return doing.reject(err);
     })
     .done();
 
-    // return doing.promise;
+    return doing.promise;
   },
   getOrders: function getOrders (doc) {
     console.log('Attempting to get orders..');
@@ -933,35 +936,63 @@ OrderController.prototype.getUserOrders = function getUserOrders (userId, accoun
  * @return {[type]}      [description]
  */
 OrderController.prototype.processSMSRequest = function processSMSRequest (body) {
+  console.log('Processing sms...');
   var bot = Q.defer(),
-  prcs = new ProcessSMS(body.Body);
+  prcs = new ProcessSMS(body.Body),
+  orderIds = _.clone(prcs.parse());
+  var  
+      found_orders = [], 
+      bad_orders = [];
 
-  var __mamaSaid = function __mamaSaid () {
-    var task = prcs.parse();
+  //checks for validity and also makes
+  //the necessary updates
+  var __mamaSaid = function () {
+    console.log('WOrkin on mama said...');
 
-    //
+
+    var task = orderIds.pop();
+
     //find the order via the order number
-    //
-    orderManager.findOrdersById(ids)
+    //prcs.user should be set by checkPhoneNUmber
+    orderManager.findOrdersById(task)
     .then(function (orders) {
+      if (orders) {
+        found_orders.push(orders);
+      } else {
+        bad_orders.push(task);
+      }
+      if (orderIds.length) {
+        __mamaSaid();
+      } else {
+        return bot.resolve({
+          valid: found_orders,
+          invalid: bad_orders
+        });
+      }
 
-    })
+
+    });
   };
 
   //find the profile and employer if 
   //its a staff making update
   //
   prcs.checkPhoneNumber(body.From)
-  .then(function (userOb) {
-    
-    __mamaSaid()
-    .then(function (prod) {
-
-    })
-    .fail(function (err) {
-      bot.reject(err);
-    })
-    .done();
+  .then(function () {
+    //calling __mamaSaid(), should check 
+    //our orderIds sent in the sms body.
+    //we're checking if the orders a valid,
+    //and if the user sending the sms is 
+    //also allowed to..
+    //
+    __mamaSaid();
+    // .then(function (prod) {
+    //   bot.resolve(prod);
+    // })
+    // .fail(function (err) {
+    //   bot.reject(err);
+    // })
+    // .done();
 
   }, function (err) {
     bot.reject(err);

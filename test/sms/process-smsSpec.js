@@ -1,12 +1,33 @@
 describe('Process sms spec', function() {
   
   var Prcs = require('../../lib/sms/process-sms.js'),
+      Order = require('../../models/order.js'),
       db = require('../../lib/db.js');
 
   var textBody = '#RffZnr #S9UwCj #S9UwCj';
   var sender = '+2348126488955';
+  var body = {
+              "ToCountry":"US",
+              "ToState":"ID",
+              "SmsMessageSid":"SMb4a4cbb1c31985bb429ee30a199e4f63",
+              "NumMedia":"0",
+              "ToCity":"MT HOME",
+              "FromZip":"",
+              "SmsSid":"SMb4a4cbb1c31985bb429ee30a199e4f63",
+              "FromState":"",
+              "SmsStatus":"received",
+              "FromCity":"",
+              "Body":"#RffZnr #zTWNQM #ZBUyKQ",
+              "FromCountry":"NG",
+              "To":"+12086960938",
+              "ToZip":"83647",
+              "MessageSid":"SMb4a4cbb1c31985bb429ee30a199e4f63",
+              "AccountSid":"ACee9332ba9fa2eb4becb6eb25e8a9f1eb",
+              "From":"+2348126488955",
+              "ApiVersion":"2010-04-01"
+            }
 
-  it('should process a text string ', function() {
+  xit('should process a text string ', function() {
 
     var prcs = new Prcs(textBody);
 
@@ -37,4 +58,24 @@ describe('Process sms spec', function() {
     });
 
   }, 20000);
+
+  it('should check if a request string contains a valid order update and process it ', function(done) {
+    var order = new Order();
+
+    db.open()
+    .then(function () {
+      
+      order.processSMSRequest(body)
+      .then(function (rdoc) {
+        console.log(rdoc);
+        expect(rdoc).toBeDefined();
+        done();
+      }, function (err) {
+        console.log(err);
+        expect(err).toBeDefined();
+        done();
+      });
+
+    });    
+  });
 });
