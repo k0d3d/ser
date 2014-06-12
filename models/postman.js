@@ -164,20 +164,26 @@ noticeFn = {
       .findOne({
         userId: doc.userId
       })
-      .populate('userId', 'email', 'User')
+      .populate('userId', 'email account_type allowedNotifications approvedNotices', 'User')
+      .lean()
       .exec(function (err, i) {
         if (err) {
           return dfr.reject(err);
         }
 
         if (i) {
+          // listOfRecpt.push({
+          //   userId: i.userId, 
+          //   allowedNotifications: i.allowedNotifications, 
+          //   name: i.name,
+          //   phone: i.phone,            
+          //   approvedNotices: i.approvedNotices
+          // });
           listOfRecpt.push({
-            userId: i.userId, 
-            allowedNotifications: i.allowedNotifications, 
-            name: i.name,
-            phone: i.phone,            
-            approvedNotices: i.approvedNotices
-          });
+              userId: i.userId, 
+              name: i.name,
+              phone: i.phone,            
+            });          
 
           dfr.resolve(listOfRecpt);
         } else {
@@ -278,7 +284,9 @@ noticeFn = {
 
 
 
-      } 
+      } else {
+        console.log('email not sent: %s', task.userId.email);
+      }
       //try sending sms
       if (allowedSMS) {
         if (task.phone) {
@@ -293,6 +301,8 @@ noticeFn = {
             console.log(err.stack);
           });          
         }
+      } else {
+        console.log('sms not sent: %s', task.userId.email);
       }
 
       if (allowedPortal) {
@@ -311,25 +321,33 @@ noticeFn = {
           console.log(err.stack);
         });
       } else {
-        
-        console.log('processed for: ' + task.userId.email);
-
-        if (listOfRecpt.length) {
-          process.nextTick(__pushMessages);
-        } else {
-          return da.resolve();
-        }
+        console.log('portal not sent for: ' + task.userId.email);
       }
 
-
+      //when all is done, let see if
+      //we can continue or we'll just end..
+      if (listOfRecpt.length) {
+        process.nextTick(__pushMessages);
+      } else {
+        return da.resolve();
+      }
     }
 
+    //INIT / START sending
+    //if there are no recepients,
+    //lets send back an empty object.
+    //before starting
     if (listOfRecpt.length === 0) {
       da.resolve([]);
     } else {
+      //OK lets start since we have recepients
+      //
       try {
         __pushMessages();
       } catch (e) {
+        //anything goes wrong.
+        //we end and reject the 
+        //promise.
         da.reject(e);
         console.log(e.stack);
       }

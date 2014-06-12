@@ -69,6 +69,8 @@ var orderManager = {
     .lean()
     .execQ()
     .then(function (res) {
+      console.log('Found Order');
+      // console.log(res);
       return doing.resolve(res);
     })
     .fail(function (err) {
@@ -80,7 +82,7 @@ var orderManager = {
   },
   getOrders: function getOrders (doc) {
     console.log('Attempting to get orders..');
-    console.log(doc);
+    // console.log(doc);
     var query = {
       orderVisibility: true,
       //orderStatus: doc.orderStatus,
@@ -951,7 +953,7 @@ OrderController.prototype.processSMSRequest = function processSMSRequest (body) 
   //checks for validity and also makes
   //the necessary updates
   var __mamaSaid = function () {
-    console.log('WOrkin on mama said...');
+    console.log('Checking order validity...');
 
 
     var task = orderIds.pop();

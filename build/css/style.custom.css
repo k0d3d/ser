@@ -320,3 +320,17 @@ select.editable-has-buttons {
 .splash {
     display: none;
 }
+
+.toggle-UAN {
+  background-color: #000;
+  font-weight: normal;
+}
+.toggle-UAN:active, .toggle-UAN.active {
+  background-color: #3276B1;
+  font-weight: bold;
+}
+.dropdown-menu .divider {
+  background-color: rgba(255, 255, 255, 0.19);
+  display: block;
+  margin: 10px 0;  
+}

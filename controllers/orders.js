@@ -80,6 +80,7 @@ module.exports.routes = function(app, login){
   app.post('/api/sms-point', function (req, res) {
     order.processSMSRequest(req.body)
     .then(function(r){
+      console.log(r);
       res.json(200, r);
     }, function (err) {
       res.json(400, err.message);

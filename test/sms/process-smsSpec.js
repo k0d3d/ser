@@ -4,7 +4,8 @@ describe('Process sms spec', function() {
       Order = require('../../models/order.js'),
       User = require('../../models/user/user.js'),
       db = require('../../lib/db.js');
-
+      require('../../models/staff_utils.js');
+      
   var textBody = '#RffZnr #S9UwCj #S9UwCj';
   var sender = '+2348126488955';
   var body = {

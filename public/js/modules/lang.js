@@ -12,7 +12,7 @@ angular.module('language', [])
 		},
 		"items": {
 			"save": {
-				"success":"You have  succesfully added an items.",
+				"success":"You have successfully added an item.",
 				"error": "Something went wrong while carrying out your last request. If it's nothing serious, you can try again. If this error happens again, please inform the Admin"
 			},
 			"autocomplete":{
