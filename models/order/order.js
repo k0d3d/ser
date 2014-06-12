@@ -78,10 +78,12 @@ OrderSchema.virtual('idmask')
 });
 
 OrderSchema.set('toObject' , {
-  getters: true
+  getters: true,
+  virtuals: true
 });
 OrderSchema.set('toJSON' , {
-  getters: true
+  getters: true,
+  virtuals: true
 });
 
 /**

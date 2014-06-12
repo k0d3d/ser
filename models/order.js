@@ -66,12 +66,16 @@ var orderManager = {
     .regex('orderId', new RegExp(orderId, 'i'))
     // .populate('hospitalId', null, 'User')
     .populate('itemId', null, 'drug')
-    .lean()
+    // .lean()
     .execQ()
     .then(function (res) {
-      console.log('Found Order');
+      // console.log('Found Order');
       // console.log(res);
-      return doing.resolve(res);
+      if (res) {
+        return doing.resolve(res.toObject());
+      } else {
+        return doing.resolve(false);
+      }
     })
     .fail(function (err) {
       return doing.reject(err);
@@ -466,17 +470,18 @@ OrderController.prototype.distUpdateOrder = function(orderData, userId, accountT
   //if the order has been confirmed.. it cannot be 
   //replace again, or confirmed again
   //if(__body.status)
-
   try {
     Order.update({
       'orderId': orderData.orderId
     }, options)
     .exec(function (err, i) {
+      console.log(err);
       if (err) {
         return law.reject(err);
       }
 
       if (i > 0) {
+      console.log('message');
 
         //populate hospitalId,
         staffUtils.getMeMyModel(5)
@@ -963,19 +968,21 @@ OrderController.prototype.processSMSRequest = function processSMSRequest (body) 
     orderManager.findOrdersById(task, prcs.user.employer.employerId)
     .then(function (orders) {
       if (orders) {
-        orders.status = 5;
+        orders.status = 2;
         self.distUpdateOrder(orders, prcs.user.userId, 4)
-        .then(function (done) {
+        .then(function () {
 
           found_orders.push(orders);
 
           if (orderIds.length) {
             __mamaSaid();
           } else {
-            return bot.resolve({
+            var r = {
               valid: found_orders,
               invalid: bad_orders
-            });
+            };
+            prcs.sendFeedBack(r);
+            return bot.resolve(r);
           }  
         });
 
@@ -986,10 +993,12 @@ OrderController.prototype.processSMSRequest = function processSMSRequest (body) 
         if (orderIds.length) {
           __mamaSaid();
         } else {
-          return bot.resolve({
+          var r = {
             valid: found_orders,
             invalid: bad_orders
-          });
+          };
+          prcs.sendFeedBack(r);
+          return bot.resolve(r);
         }
       }
 
