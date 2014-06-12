@@ -519,6 +519,8 @@ OrderController.prototype.distUpdateOrder = function(orderData, userId, accountT
             var tom;
             if (__body.status === 2) {
               tom = 'quotation_request_replied';
+            } else if (__body.status === 3) {
+              tom = 'quotation_request_confirmed'; 
             } else {
               tom = 'quotation_request_updated'; 
             }
@@ -968,7 +970,7 @@ OrderController.prototype.processSMSRequest = function processSMSRequest (body) 
     orderManager.findOrdersById(task, prcs.user.employer.employerId)
     .then(function (orders) {
       if (orders) {
-        orders.status = 2;
+        orders.status = 3;
         self.distUpdateOrder(orders, prcs.user.userId, 4)
         .then(function () {
 

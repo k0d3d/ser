@@ -165,7 +165,7 @@ noticeFn = {
         userId: doc.userId
       })
       .populate('userId', 'email account_type allowedNotifications approvedNotices', 'User')
-      .lean()
+      // .lean()
       .exec(function (err, i) {
         if (err) {
           return dfr.reject(err);
