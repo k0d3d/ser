@@ -79,4 +79,6 @@ describe('Process sms spec', function() {
 
     });    
   });
+
+  it('should send a f')
 });
