@@ -214,11 +214,20 @@ module.exports = function(grunt) {
             ],
             dest: 'public/',
             expand: true
+        },
+        mobile: {
+          cwd: 'build',
+          src: [],
+          dest: 'mobile/',
+          expand: true
         }
       }, 
       clean:{
         build:{
           src:['public']
+        },
+        mobile: {
+          src: ['mobile']
         }
       }, 
       uglify: {
@@ -345,7 +354,59 @@ module.exports = function(grunt) {
             cwd: 'views', 
             ext: '.html'
           }]
-        }  
+        },
+        mobile: {
+            options: {
+                pretty: true,
+                data: {
+                    debug: false,
+                    userData: {
+                      account_type: 4,
+                      email: "nouser@drugstoc.ng"
+                    },
+                    people: ["Staff"],
+                    isPermitted: function (permission) {
+                      // var permits = _.intersection(permission, [
+                      //   'activity-count', 
+                      //   'view-activity', 
+                      //   'view-drug-pages', 
+                      //   'employer', 
+                      //   'coverage', 
+                      //   'profile-activity', 
+                      //   'manager'
+                      //   ]);
+                      // if (permits.length > 0) {
+                      //   return true;
+                      // }
+                      return true;
+                    },
+                    hasRole: function () {
+                      return true;
+                    },
+                    navs: [
+                      {
+                        name : "Dashboard",
+                        roles : [],
+                        icon: '',
+                        url: '/'
+                      },
+                      {
+                        name: "Orders",
+                        roles: ['*'],
+                        icon: '',
+                        url: '/a/orders'
+                      }
+                    ]
+                }
+            },
+            files: [{
+                expand: true,
+                src: ['order/**/*.jade', '!user/signup.jade', 'user/**/*.jade', 'index.jade'],
+                cwd: 'views',
+                dest: 'mobile/',
+                ext: '.html'
+            }]
+        }
       }          
 
     });
@@ -372,6 +433,7 @@ module.exports = function(grunt) {
     //Default task(s).
     grunt.registerTask('default', ['jshint', 'concurrent']);
     grunt.registerTask('build', ['clean', 'copy', 'bump:patch', 'uglify', 'cssmin']);
+    grunt.registerTask('mobile', ['clean:mobile', 'jade:mobile']);
 
     //Test task.
     grunt.registerTask('test', ['env:test', 'mochaTest']);
