@@ -1,0 +1,154 @@
+
+<div class="contentpanel">
+  <div class="panel panel-default">
+    <div class="col-md-12">
+      <div class="panel panel-default">
+        <div ng-init="orderFilter = {}; orderFilter.status = 2" style="height: 70px" class="panel-heading"> 
+          <div class="col-md-8">
+            <button ng-class="" toggle-active-button="drug-panel-buttons" ng-click="orderFilter.status = 2" class="btn drug-panel-buttons btn-success">Pending Quotations
+            </button>
+            <button ng-class="" toggle-active-button="drug-panel-buttons" ng-click="orderFilter.status = 3" class="btn drug-panel-buttons">Confirmed Orders 
+            </button>
+            <button ng-class="" toggle-active-button="drug-panel-buttons" ng-click="orderFilter.status = 6" class="btn drug-panel-buttons">Supplied Orders    
+            </button>
+          </div>
+          <div class="col-md-3">
+            <div style="margin-bottom: 30px" class="form-content">
+              <form name="searchform" novalidate="novalidate" class="form-inline">
+                <div class="form-group">
+                </div>
+              </form>
+            </div>
+          </div>
+          <div class="col-md-1">Showing {{funnel.length}} Order(s)                        </div>
+        </div>
+        <div class="panel-body">
+          <table style="margin-top: 30px" class="table table-hover table-bordered">
+            <thead>
+              <tr>
+                <th>Drug Name</th>
+                <th>Amount</th>
+                <th>Date / Time</th>
+                <th>Status</th>
+                <th>Hospital</th>
+                <th>ETA</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="cmp in funnel = (orders | filter:orderStatusFilter)">
+                <td><a ng-href="/a/drugs/{{cmp.itemId._id}}/item">{{cmp.itemId.itemName}}</a></td>
+                <td>{{cmp.orderAmount}}</td>
+                <td>{{cmp.orderDate | date:medium}}</td>
+                <td>{{cmp.status | orderState}}</td>
+                <td><a ng-href="/a/organization/people/{{cmp.hospitalId.userId}}/person/5">{{cmp.hospitalId.name}}</a></td>
+                <td><span ng-show="cmp.eta" style="font-size: 11px">{{cmp.eta | etaMoment}}</span><span ng-show="cmp.eta" class="label label-success pull-right">{{cmp.eta | moment}}</span></td>
+                <td>
+                  <button ng-click="toggleModal('manage-order-modal', cmp, $index);" class="btn btn-warning btn-xs">Manage this      </button>
+                  <button ng-click="get_status_updates(cmp); toggleModal('manage-order-updates', cmp.statusLog, $index)" class="btn btn-info btn-xs">Tracking      </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="manage-order-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" class="modal fade in">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><span ng-class="" ng-show="modal.statusText" class="label">{{modal.statusText}}</span>
+        <button type="button" data-dismiss="modal" aria-hidden="true" class="close">×</button>
+        <h4 id="myModalLabel" class="modal-title">Order Details</h4>
+      </div>
+      <div class="modal-body">
+        <div class="or-ch">
+          <form ng-submit="update_order(__modal_data, __modal_index)" class="form-horizontal">
+            <div class="form-group">
+              <label class="control-label col-sm-3 col-md-3">ETA</label>
+              <div class="col-sm-5 col-md-5">
+                <input type="date" ng-model="__modal_data.eta" ng-required="!__modal_data.eta" class="form-control"/><span style="font-size: 9px; color: #999" class="help-text">{{__modal_data.eta | date:'medium'}}</span>
+              </div>
+            </div>
+            <div ng-show="__isEnabled(__modal_data.status, 'resolution')" ng-disabled="__modal_data.status &lt;= 1" class="form-group">
+              <label class="control-label col-sm-3 col-md-3">Resolution</label>
+              <div class="col-sm-5 col-md-5">
+                <select type="date" ng-model="__modal_data.status" class="form-control">
+                  <option value="3" ng-disabled="!__isEnabled(__modal_data.status, 'option_r_confirm')">Confirm</option>
+                  <option value="4" ng-disabled="!__isEnabled(__modal_data.status, 'option_r_in_transit')">In Transit</option>
+                  <option value="5" ng-disabled="!__isEnabled(__modal_data.status, 'option_r_supplied')">Supplied</option>
+                  <option value="6" ng-disabled="!__isEnabled(__modal_data.status, 'option_r_paid')">Paid</option>
+                </select>
+              </div>
+            </div>
+            <div ng-show="__isEnabled(__modal_data.status, 'comment')" class="form-group">
+              <label class="control-label col-sm-3 col-md-3">Reason</label>
+              <div class="col-sm-5 col-md-5">
+                <textarea ng-model="__modal_data.reason" class="form-control"></textarea>
+              </div>
+            </div>
+            <div ng-show="__isEnabled(__modal_data.status, 'change_price')" class="form-group">
+              <label class="control-label col-sm-3 col-md-3">Change Price</label>
+              <div class="col-sm-5 col-md-5">                       
+                <input type="number" ng-model="__modal_data.perItemPrice" class="form-control"/>
+              </div>
+            </div>
+            <div ng-show="__isEnabled(__modal_data.status, 'change_qty')" class="form-group">
+              <label class="control-label col-sm-3 col-md-3">Change Quanity to supply</label>
+              <div class="col-sm-5 col-md-5">                       
+                <input type="number" ng-model="__modal_data.orderAmount" class="form-control"/>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-3 col-md-3"></div>
+              <div class="col-sm-3 col-md-3">
+                <button type="submit" ng-show="__isEnabled(__modal_data.status, 'update_order')" class="btn btn-info">Update Order </button>
+              </div>
+              <div class="col-sm-3 col-md-3">
+                <button ng-click="cancel_order(__modal_data)" type="submit" ng-show="__isEnabled(__modal_data.status, 'update_order')" class="btn btn-danger">Cancel Order           </button><a ng-disabled="__modal_data.eta.length == 0 || !__modal_data.eta" ng-show="__isEnabled(__modal_data.status, 'send_quotation_button')" ng-click="__modal_data.status = 1; update_order(__modal_data)" class="btn btn-info">Send Quote  </a>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" data-dismiss="modal" class="btn btn-default">Close</button>
+      </div>
+    </div>
+    <!--modal-content 
+    -->
+  </div>
+  <!--
+  modal-dialog     
+  
+  -->
+</div>
+<div id="manage-order-updates" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" class="modal fade in">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><span ng-class="" ng-show="modal.statusText" class="label">{{modal.statusText}}</span>
+        <button type="button" data-dismiss="modal" aria-hidden="true" class="close">×</button>
+        <h4 id="myModalLabel" class="modal-title">Order Updates</h4>
+      </div>
+      <div class="modal-body">
+        <div class="or-ch">               
+          <div ng-repeat="status in __modal_data" class="status-row row">
+            <div class="col-md-3"><strong class="status-title">Status </strong>{{status.orderStatus | orderState}}</div>
+            <div class="col-md-3"><strong class="status-title">Time</strong>
+              <p data-placement="left" data-toggle="tooltip" data-title="{{status.date | moment}}" class="tooltips">{{status.date | date: 'medium'}}</p>
+            </div>
+            <div class="col-md-3"><strong class="status-title">Staff in charge</strong>{{status.orderCharge.name}}</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" data-dismiss="modal" class="btn btn-default">Close</button>
+      </div>
+    </div>
+    <!--modal-content 
+    -->
+  </div>
+  <!--modal-dialog     
+  -->
+</div>

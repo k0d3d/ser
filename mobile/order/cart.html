@@ -1,0 +1,72 @@
+
+<div class="contentpanel">
+  <div class="col-md-12">
+    <div ng-show="!orderCart || orderCart.length == 0" class="panel panel-default">
+      <div class="panel-body">No Items in your cart</div>
+    </div>
+    <div ng-show="orderCart.length &gt; 0" class="panel panel-default">
+      <div class="panel-heading">
+        <div class="panel-btns">
+        </div>
+        <div class="panel-title"></div>
+      </div>
+      <div class="panel-body">
+            <div ng-controller="orderCartController" class="table-responsive">
+              <table class="table table-bordered mb30 cart-table">
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th>Quantity</th>
+                    <th>Price (N)</th>
+                    <th class="noprint">Order Date</th>
+                    <th class="noprint">Status</th>
+                    <th class="noprint">Supplier</th>
+                    <th class="noprint">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-repeat="or in orderCart">
+                    <td><img ng-src="/images/item-images/{{or.itemId.images[0] || 'default/item-avatar-small.jpg'}}" class="item-image"/>{{or.itemId.itemName}}</td>
+                    <td>{{or.orderAmount}}</td>
+                    <td> {{or.viewPrice}}</td>
+                    <td class="noprint">{{or.orderDate | moment}}</td>
+                    <td style="font-size: 11px" class="noprint">{{or.status | orderState}}</td>
+                    <td class="noprint">{{or.orderSupplier.name}}</td>
+                    <td class="noprint">
+                      <button ng-click="toggleModal('accept-quote-modal', or, $index)" ng-disabled="!or.canGo" class="btn btn-xs btn-info btn-bell"><i class="fa fa-check"></i> Accept Quote </button>
+                      <button ng-click="removeFromCart($index)" class="btn btn-xs btn-danger btn-bell"><i class="fa fa-times"></i>Cancel</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <!--table-responsive 
+            -->
+      </div>
+    </div>
+  </div>
+</div>
+<div id="accept-quote-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" class="modal fade in">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" data-dismiss="modal" aria-hidden="true" class="close">×</button>
+        <h4 id="myModalLabel" class="modal-title">Please confirm</h4>
+      </div>
+      <div class="modal-body">
+        <div class="or-ch">           
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" data-dismiss="modal" ng-click="order_this(__modal_data, __modal_index);" class="btn btn-success">Accept Quotation</button>
+        <button type="button" data-dismiss="modal" class="btn btn-white">Close</button>
+      </div>
+    </div>
+    <!--modal-content 
+    -->
+  </div>
+  <!--
+  modal-dialog     
+  
+  -->
+</div>

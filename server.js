@@ -23,6 +23,7 @@ var express = require('express'),
     favicon = require('static-favicon'),
     compress = require('compression'),
     multer = require('multer'),
+    // cors = require('cors'),
     helpers = require('view-helpers');
 var MongoStore = require('connect-mongo')(session);
 
@@ -93,6 +94,10 @@ function afterResourceFilesLoad() {
 
     app.use(bodyParser());
     app.use(methodOverride());
+
+    //
+    // app.use(cors());
+
     app.use('/upload/doc', multer({
       dest: './public/images/item-images'
     }));

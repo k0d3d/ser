@@ -1,0 +1,76 @@
+{
+    "db": {
+        "server": "localhost",
+        "database": "stoccloud",
+        "port": 27017,
+        "user": "",
+        "pass": ""
+    },
+    "express":{
+        "secret": "BOr*S^swLz0VPrh~^k4l]Wgg&S3?4C2|cKYM@ZHFzqgJz4$JeR=Xq3kaJ>7xLu0",
+        "cors" : {
+          "options" : {
+            "origin": "http://localhost:8100",
+            "methods": [
+              "GET",
+              "POST",
+              "PUT",
+              "DELETE"
+            ],
+            "credentials": true,
+            "maxAge": 3600            
+          }
+        }
+    },
+    "app": {
+        "name": "Integra StocCloud",
+        "server": "localhost:3011",
+        "statuses": {
+            "-1": "cancelled",
+            "0": "requesting quote",
+            "1": "replied quote",
+            "2":"order accepted",
+            "3":"confirmed",
+            "4" :"in transit",
+            "5": "supplied",
+            "6" :"paid"          
+        }
+    },
+    "mail" : {
+        "defaultService": "sendgrid",
+        "defaultSenderName" : "DrugStoc Mails",
+        "defaultSenderEmail" : "mailer@drugstoc.ng",
+        "defaultNoEmail": "no-email@drugstoc.ng",
+        "debug": false,
+        "domain": {
+            "username": "mailer@drugstoc.ng",
+            "password": "O=*Rdf9F?KxU",
+            "host": "standard7.doveserver.com"
+        },
+        "sendGrid":{
+            "username": "michael.rhema",
+            "password": "As12terix.",
+            "host": "smtp.sendgrid.net"
+        }
+    },
+    "sms" : {
+        "accounts" : {
+            "smslive" : {
+                "owneremail" : "koded730@yahoo.com",
+                "subacct" : "EMAIL2SMS",
+                "subacctpwd" : "login60",
+                "sender" : "DrugStoc"
+            },    
+            "twilio" : {
+                "accountSID" : "ACf84b0e66680f730edd639741d8879a89",
+                "accountToken": "fe8f201a6244729e2ea8eb0bd595c054"
+            }
+        },
+        "delimeter": {
+            "accepted": "#"
+        },
+        "general" : {
+            "sender" : "DrugStoc"
+        }
+    }
+}

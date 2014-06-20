@@ -1,0 +1,65 @@
+
+<div class="row-fluid row-break">
+  <div class="col-md-9">
+    <div class="row"> 
+      <div class="col-md-11 offset1">
+        <div class="col-md-7">
+          <div class="row">
+            <h3>Place New Order</h3>
+            <form id="form-new-order" name="searchform" novalidate="novalidate" ng-submit="searchcmp()">
+              <label for="itemtype" class="control-label">Drug Composition</label>
+              <input type="search" ng-model="drugcmp" class="input-large form-control"/>
+              <button type="submit" class="btn btn-primary">Search Composition</button>
+            </form>
+            <div ng-show="cmps.length &gt; 0" class="result">
+              <table class="table table-hover table-bordered">
+                <thead>
+                  <tr>
+                    <th>Drug Name</th>
+                    <th>Composition</th>
+                    <th>Price / Packaging</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-repeat="cmp in cmps" ng-click="more($index)">
+                    <td>{{cmp.productName}}</td>
+                    <td>{{cmp.composition}}</td>
+                    <td>{{cmp.currentPrice}}</td>
+                  </tr>
+                </tbody>
+              </table>
+              <div pagination="pagination" page-to="searchcmp(pageNo, cb)" class="x-pagination"></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 col-md-offset-1">
+          <div class="row">
+            <div id="item-summary" class="open-summary">
+              <h3>Drug Summary</h3>
+              <div class="summary">
+                <dl>
+                  <dt>Name</dt>
+                  <dd>{{ds.productName}}</dd>
+                  <dt>Composition</dt>
+                  <dd>{{ds.composition}}</dd>
+                  <dt>Manufacturer / Supplier</dt>
+                  <dd>{{ds.man_imp_supp}}</dd>
+                  <dt>Current Price</dt>
+                  <dd>{{ds.currentPrice}}</dd>
+                  <dt>Category</dt>
+                  <dd>{{ds.category}}</dd>
+                  <dt>Last Updated</dt>
+                  <dd>{{ds.lastUpdated | date:medium}}</dd>
+                  <dt></dt>
+                  <dd>
+                    <button ng-disabled="!ds" ng-click="orderthis()" class="btn btn-mini btn-success">Order this</button>
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,289 @@
+
+<div data-user-id="{{userProfile.userId._id || 'Empty'}}" class="contentpanel">
+  <div class="row">
+    <div class="col-sm-3"><img dropzone="dropzone" ng-src="/images/profile-images/thumb-{{ userProfile.image }}" alt="" post-url="/upload/profile" post-param="profileImage" ng-model="userProfile.image" post-cb="change_profile_photo(name)" class="thumbnail img-responsive profile-img"/>
+      <div class="mb30"></div>
+      <h5 class="subtitle">About</h5>
+      <p data-type="textarea" onbeforesave="update_profile($data, $editable.name)" editable-textarea="userProfile.summary" class="mb10 x-editable">{{userProfile.summary || 'Empty'}}</p><a href="#">Show More</a>
+      <div class="mb10">       </div>
+      <h5 class="subtitle">Alternative Email</h5>
+      <ul class="profile-social-list">
+        <li><i class="fa fa-envelope-o"></i><a href="#" data-type="text" onbeforesave="update_profile($data, $editable.name)" editable-text="userProfile.alt_email" class="x-editable">{{userProfile.alt_email || 'Empty'}}</a></li>
+      </ul>
+      <h5 class="subtitle">Connect</h5>
+      <ul class="profile-social-list">
+        <li><i class="fa fa-twitter"></i><a href="#" data-type="text" onbeforesave="update_profile($data, $editable.name)" editable-text="userProfile.twitter" class="x-editable">{{userProfile.twitter || 'Empty'}}</a></li>
+        <li><i class="fa fa-facebook"></i><a href="#" data-type="text" onbeforesave="update_profile($data, $editable.name)" editable-text="userProfile.facebook" class="x-editable">{{userProfile.facebook || 'Empty'}}</a></li>
+      </ul>
+      <div class="mb30"></div>
+      <h5 class="subtitle">Office Address</h5>
+      <address data-type="textarea" onbeforesave="update_profile($data, $editable.name)" editable-textarea="userProfile.address" data-defaultValue="Address" class="x-editable">{{userProfile.address || 'Empty'}}</address>
+      <h5 class="subtitle">Telephone</h5>
+      <p title="Phone" data-type="text" onbeforesave="update_profile($data, $editable.name)" editable-text="userProfile.phone" data-default-value="Your Phone Number" class="x-editable">{{userProfile.phone || 'Empty'}}</p>
+      <div class="mb20">   </div>
+      <div class="panel panel-default">
+        <div class="panel-body"><a href="#">{{workForce[2].length || 0}} Distributors </a></div>
+      </div>
+      <div class="mb20">   </div>
+      <div class="panel panel-default">
+        <div class="panel-body"><a href="#">{{workForce[1].length + workForce[3].length || 0}} Managers</a></div>
+      </div>
+      <div class="mb20">   </div>
+      <div class="panel panel-default">
+        <div class="panel-body"><a href="#">{{workForce[4].length || 0}} Staff</a></div>
+      </div>
+    </div>
+    <!--col-sm-3 
+    -->
+    <div class="col-sm-9">
+      <div class="profile-header">
+        <h2 onbeforesave="update_profile($data, $editable.name)" editable-text="userProfile.name" data-type="text" data-default-value="Full Name or Company Name" class="profile-name x-editable">{{userProfile.name || 'Empty'}}</h2>
+        <div class="profile-location"><span style="display: block" title="Your Coverage / Territory"><i class="fa fa-map-marker"></i>Coverage</span><span>{{userProfile.coverage || 'None' | territory}}</span></div>
+        <div class="profile-position"><i class="fa fa-briefcase"></i><span onbeforesave="update_profile($data, $editable.name)" editable-text="userProfile.position" data-type="text" title="Position" data-default-value="Position" class="x-editable">{{userProfile.position || 'Empty'}} </span><span style="margin: 0 2px;">at </span><a href="/a/organization/people/{{userProfile.employer.userId || 'Empty'}}/person/2">{{userProfile.employer.name || 'Empty'}} </a></div>
+        <div class="profile-position"><span style="margin: 0 2px;">under </span><a href="/a/organization/people/{{userProfile.manager.userId || 'Empty'}}/person/3">{{userProfile.manager.name || 'Empty'}} </a></div>
+        <div class="mb20"></div><a class="btn btn-white"><i class="fa fa-envelope-o"></i>Order              </a>
+        <button class="btn btn-success mr5 start-edit"><i class="fa fa-user"></i>Edit Profile</button>
+        <button class="btn btn-white"><i class="fa fa-envelope-o"></i>Message</button>
+      </div>
+      <!--profile-header 
+      -->
+      <!--Nav tabs 
+      -->
+      <ul class="nav nav-tabs nav-justified nav-profile">
+        <li class="active"><a href="#" data-target="#activities" data-toggle="tab"><strong>Activities</strong></a></li>
+        <li><a href="#" data-target="#drug-pages" data-toggle="tab"><strong>My Drugs</strong></a></li>
+        <li><a href="#" data-target="#calendar" data-toggle="tab"><strong>Calendar</strong></a></li>
+        <li><a href="#" data-target="#prospects" data-toggle="tab"><strong>Prospects</strong></a></li>
+        <li><a href="#" data-target="#prospects" data-toggle="tab"><strong>Map</strong></a></li>
+      </ul>
+      <!--Tab panes 
+      -->
+      <div class="tab-content">
+                <div id="activities" class="tab-pane active">
+                  <div ng-repeat="act in activity | orderBy: 'created': true" class="activity-list">
+                    <div class="media act-media"><a href="#" class="pull-left"><i ng-class="'a' + act.meta.status" class="act-spr-img"></i></a>
+                      <div class="media-body act-media-body">
+                        <div class="row">
+                          <div class="col-md-9">
+                            <p alert-message="act"></p><span class="label label-default">{{act.meta.status | orderState}}</span><small title="{{act.created | date: 'medium'}}" class="text-muted tooltips"> {{act.created | moment}}</small>
+                          </div>
+                          <div class="col-md-3"><a href="" ng-click="hide_activity($index)" class="btn btn-xs pull-right">hide</a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!--activity-list 
+                  -->
+                  <button class="btn btn-white btn-block">Show More</button>
+                </div>
+                <div id="drug-pages" class="tab-pane">
+                  <div class="follower-list">
+                    <div class="panel-heading">
+                      <div style="float: left" class="col-title">
+                        <h4>Found {{userProfile.drugs.length || 0}} Drugs / Medical Items</h4>
+                      </div>
+                      <div class="clearfix"></div>
+                    </div>
+                    <div class="panel-body">
+                      <div ng-repeat="drug in userProfile.drugs | filter: quickOrderFilter" class="media">
+                        <div class="row">
+                          <div class="col-sm-9 col-md-9"><a href="#" class="pull-left"><img ng-src="/images/item-images/thumb-{{drug.drug.images[drug.drug.images.length -1] || &quot;item-avatar.jpg&quot;}}" alt="" style="width: 50px" class="media-object"/></a>
+                            <div class="media-body">
+                              <h3 class="follower-name">{{drug.drug.itemName}}</h3>
+                              <div class="profile-location">{{drug.drug.sciName}}</div>
+                              <div class="profile-position">{{drug.drug.category}}</div>
+                              <div class="mb20"></div>
+                            </div>
+                          </div>
+                          <div class="col-sm-2 col-md-2">
+                            <div class="pull-right">
+                              <div class="row">
+                                <button style="padding: 2px 8px;border-radius: 15px;" ng-click="remove_my_drug(drug.drug._id, $index)" class="btn btn-xs btn-danger"><i style="margin: 0" class="fa fa-times"></i></button>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="clearfix"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div id="calendar" class="tab-pane">
+                  <div class="activity-list">
+                    <div class="media act-media"><a href="#" class="pull-left"><img src="images/photos/user2.png" alt="" class="media-object act-thumb"/></a>
+                      <div class="media-body act-media-body"><strong>Chris Anthemum</strong>liked a photos<br/><small class="text-muted">Today at 12:30pm</small>
+                        <ul class="uploadphoto-list">
+                          <li><a href="images/photos/media5.png" data-rel="prettyPhoto"><img src="images/photos/media5.png" alt="" class="img-responsive"/></a></li>
+                          <li><a href="images/photos/media4.png" data-rel="prettyPhoto"><img src="images/photos/media4.png" alt="" class="img-responsive"/></a></li>
+                        </ul>
+                      </div>
+                    </div>
+                    <!--media 
+                    -->
+                    <div class="media act-media"><a href="#" class="pull-left"><img src="images/photos/user1.png" alt="" class="media-object act-thumb"/></a>
+                      <div class="media-body act-media-body"><strong>Ray Sin</strong>is now following to<strong>Chris Anthemum</strong>.<br/><small class="text-muted">Yesterday at 1:30pm</small></div>
+                    </div>
+                    <!--media 
+                    -->
+                    <div class="media act-media"><a href="#" class="pull-left"><img src="images/photos/user4.png" alt="" class="media-object act-thumb"/></a>
+                      <div class="media-body act-media-body"><strong>Frank Furter</strong>is now following to<strong>Ray Sin</strong>.<br/><small class="text-muted">3 days ago at 1:30pm</small></div>
+                    </div>
+                    <!--media 
+                    -->
+                    <div class="media act-media"><a href="#" class="pull-left"><img src="images/photos/user2.png" alt="" class="media-object act-thumb"/></a>
+                      <div class="media-body act-media-body"><strong>Chris Anthemum</strong>liked a photos<br/><small class="text-muted">5 days ago at 12:30pm</small>
+                        <ul class="uploadphoto-list">
+                          <li><a href="images/photos/media6.png" data-rel="prettyPhoto"><img src="images/photos/media6.png" alt="" class="img-responsive"/></a></li>
+                          <li><a href="images/photos/media7.png" data-rel="prettyPhoto"><img src="images/photos/media7.png" alt="" class="img-responsive"/></a></li>
+                          <li><a href="images/photos/media2.png" data-rel="prettyPhoto"><img src="images/photos/media2.png" alt="" class="img-responsive"/></a></li>
+                        </ul>
+                      </div>
+                    </div>
+                    <!--media 
+                    -->
+                    <div class="media act-media"><a href="#" class="pull-left"><img src="images/photos/user1.png" alt="" class="media-object act-thumb"/></a>
+                      <div class="media-body act-media-body"><strong>Nusja Nawancali</strong>is now following to<strong>Zaham Sindilmaca</strong>.<br/><small class="text-muted">December 25 at 1:30pm</small></div>
+                    </div>
+                    <!--media 
+                    -->
+                    <div class="media act-media"><a href="#" class="pull-left"><img src="images/photos/user4.png" alt="" class="media-object act-thumb"/></a>
+                      <div class="media-body act-media-body"><strong>Frank Furter</strong>is now following to<strong>Zaham Sindilmaca</strong>.<br/><small class="text-muted">December 24 at 1:30pm</small></div>
+                    </div>
+                    <!--media 
+                    -->
+                    <div class="media act-media"><a href="#" class="pull-left"><img src="images/photos/user3.png" alt="" class="media-object act-thumb"/></a>
+                      <div class="media-body act-media-body"><strong>Nusja NawanCali</strong>posted a new blog.<br/><small class="text-muted">December 23 at 3:18pm</small>
+                        <div class="media blog-media"><a href="#" class="pull-left"><img src="images/photos/media3.png" alt="" class="media-object"/></a>
+                          <div class="media-body">
+                            <h4 class="media-title"><a href="#">Ut Enim Ad Minim Veniam</a></h4>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat...<a href="#">Read more</a></p>
+                          </div>
+                        </div>
+                        <!--media 
+                        -->
+                      </div>
+                    </div>
+                    <!--media 
+                    -->
+                    <div class="media act-media"><a href="#" class="pull-left"><img src="images/photos/user4.png" alt="" class="media-object act-thumb"/></a>
+                      <div class="media-body act-media-body"><strong>Mark Zonsion</strong>is now following to<strong>Weno Carasbong</strong>.<br/><small class="text-muted">December 23 at 1:30pm</small></div>
+                    </div>
+                    <!--media 
+                    -->
+                    <div class="media act-media"><a href="#" class="pull-left"><img src="images/photos/user4.png" alt="" class="media-object act-thumb"/></a>
+                      <div class="media-body act-media-body"><strong>Frank Furter</strong>is now following to<strong>Weno Carasbong</strong>.<br/><small class="text-muted">December 20 at 4:30pm</small></div>
+                    </div>
+                    <!--media 
+                    -->
+                  </div>
+                  <!--activity-list 
+                  -->
+                  <button class="btn btn-white btn-block">Show More</button>
+                </div>
+                <div id="prospects" class="tab-pane">
+                  <div class="events">
+                    <h5 class="subtitle">Upcoming Events</h5>
+                    <div class="row">
+                      <div class="col-sm-6">
+                        <div class="media"><a href="#" class="pull-left"><img src="holder.js/100x120.html" alt="" class="media-object"/></a>
+                          <div class="media-body event-body">
+                            <h4 class="event-title"><a href="#">Free Living Trust Seminar</a></h4><small class="text-muted"><i class="fa fa-map-marker"></i>Silicon Valley, San Francisco, CA</small><small class="text-muted"><i class="fa fa-calendar"></i>Sunday, January 15, 2014 at 11:00am</small>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor...</p>
+                          </div>
+                        </div>
+                        <!--media 
+                        -->
+                      </div>
+                      <!--col-sm-6 
+                      -->
+                      <div class="col-sm-6">
+                        <div class="media"><a href="#" class="pull-left"><img src="holder.js/100x120.html" alt="" class="media-object"/></a>
+                          <div class="media-body event-body">
+                            <h4 class="event-title"><a href="#">Serious Games Seminar</a></h4><small class="text-muted"><i class="fa fa-map-marker"></i>New York City</small><small class="text-muted"><i class="fa fa-calendar"></i>Monday, January 14, 2014 at 8:00am</small>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor...</p>
+                          </div>
+                        </div>
+                        <!--media 
+                        -->
+                      </div>
+                      <!--col-sm-6 
+                      -->
+                      <div class="col-sm-6">
+                        <div class="media"><a href="#" class="pull-left"><img src="holder.js/100x120.html" alt="" class="media-object"/></a>
+                          <div class="media-body event-body">
+                            <h4 class="event-title"><a href="#">Travel & Adventure Show</a></h4><small class="text-muted"><i class="fa fa-map-marker"></i>Los Angeles, CA</small><small class="text-muted"><i class="fa fa-calendar"></i>Friday, January 12, 2014 at 8:00am</small>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor...</p>
+                          </div>
+                        </div>
+                        <!--media 
+                        -->
+                      </div>
+                      <!--col-sm-6 
+                      -->
+                      <div class="col-sm-6">
+                        <div class="media"><a href="#" class="pull-left"><img src="holder.js/100x120.html" alt="" class="media-object"/></a>
+                          <div class="media-body event-body">
+                            <h4 class="event-title"><a href="#">Mobile Games Summit</a></h4><small class="text-muted"><i class="fa fa-map-marker"></i>Bay Area, San Francisco</small><small class="text-muted"><i class="fa fa-calendar"></i>Saturday, January 10, 2014 at 8:00am</small>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor...</p>
+                          </div>
+                        </div>
+                        <!--media 
+                        -->
+                      </div>
+                      <!--col-sm-6 
+                      -->
+                    </div><br/>
+                    <h5 class="subtitle">Past Events</h5>
+                    <div class="row">
+                      <div class="col-sm-6">
+                        <div class="media"><a href="#" class="pull-left"><img src="holder.js/100x120.html" alt="" class="media-object"/></a>
+                          <div class="media-body event-body">
+                            <h4 class="event-title"><a href="#">Free Living Trust Seminar</a></h4><small class="text-muted"><i class="fa fa-map-marker"></i>Silicon Valley, San Francisco, CA</small><small class="text-muted"><i class="fa fa-calendar"></i>Sunday, January 15, 2014 at 11:00am</small>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor...</p>
+                          </div>
+                        </div>
+                        <!--media 
+                        -->
+                      </div>
+                      <!--col-sm-6 
+                      -->
+                      <div class="col-sm-6">
+                        <div class="media"><a href="#" class="pull-left"><img src="holder.js/100x120.html" alt="" class="media-object"/></a>
+                          <div class="media-body event-body">
+                            <h4 class="event-title"><a href="#">Serious Games Seminar</a></h4><small class="text-muted"><i class="fa fa-map-marker"></i>New York City</small><small class="text-muted"><i class="fa fa-calendar"></i>Monday, January 14, 2014 at 8:00am</small>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor...</p>
+                          </div>
+                        </div>
+                        <!--media 
+                        -->
+                      </div>
+                      <!--col-sm-6 
+                      -->
+                      <div class="col-sm-6">
+                        <div class="media"><a href="#" class="pull-left"><img src="holder.js/100x120.html" alt="" class="media-object"/></a>
+                          <div class="media-body event-body">
+                            <h4 class="event-title"><a href="#">Travel & Adventure Show</a></h4><small class="text-muted"><i class="fa fa-map-marker"></i>Los Angeles, CA</small><small class="text-muted"><i class="fa fa-calendar"></i>Friday, January 12, 2014 at 8:00am</small>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor...</p>
+                          </div>
+                        </div>
+                        <!--media 
+                        -->
+                      </div>
+                      <!--col-sm-6 
+                      -->
+                      <div class="col-sm-6">
+                        <div class="media"><a href="#" class="pull-left"><img src="holder.js/100x120.html" alt="" class="media-object"/></a>
+                          <div class="media-body event-body">
+                            <h4 class="event-title"><a href="#">Mobile Games Summit</a></h4><small class="text-muted"><i class="fa fa-map-marker"></i>Bay Area, San Francisco</small><small class="text-muted"><i class="fa fa-calendar"></i>Saturday, January 10, 2014 at 8:00am</small>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor...</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+      </div>
+    </div>
+  </div>
+</div>
