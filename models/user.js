@@ -9,6 +9,7 @@
  //Organization = require('./organization.js').Staff,
  staffUtils = require('./staff_utils.js'),
  sendEmail = require('../lib/email/sendMail.js').sendHTMLMail,
+ BasicStrategy = require('passport-http').BasicStrategy,
 Orders = require('./order.js'),
 
 UserController = function (){
@@ -103,7 +104,8 @@ UserController.prototype.session = function(req, res, next) {
 /**
  * Session
  */
-UserController.prototype.apiSession = function(req, res) {
+UserController.prototype.apiToken = function(req, res) {
+
   res.json(202, true);
 };
 
@@ -187,8 +189,6 @@ UserController.prototype.findOrCreate = function (doc) {
  * @return {[type]}            [description]
  */
 UserController.prototype.update = function update (id, body, account_type) {
-
-  console.log(id, body, account_type);
   var d = Q.defer();
 
   if (account_type) {  

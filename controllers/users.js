@@ -108,7 +108,7 @@ module.exports.routes = function(app, passport, login, people){
     failureRedirect: '/signin',
     failureFlash: 'Invalid email or password.'
   }), users.session);
-  app.route('/api/session').get(passport.authenticate('basic', {session: false}), users.apiSession);
+  // app.route('/api/session').get(passport.authenticate('basic', {session: false}), users.apiSession);
 
 
   //Finish with setting up the userId param

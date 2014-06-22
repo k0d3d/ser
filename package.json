@@ -25,7 +25,7 @@
     "connect-flash": "latest",
     "crypto": "latest",
     "passport": "latest",
-    "passport-http": "latest",
+    "passport-http": "~0.2.2",
     "passport-local": "latest",
     "passport-facebook": "latest",
     "passport-twitter": "latest",
