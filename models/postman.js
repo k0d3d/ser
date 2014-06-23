@@ -423,6 +423,8 @@ noticeFn = {
       ActivityNotification.findOne({
         referenceId: str
       })
+      .limit(50)
+      .sort('-created')
       .exec(function (err, eventNotice){
         console.log('After notice check');
         if (err) {
@@ -494,6 +496,8 @@ noticeFn = {
     ActivityNotification.find({
       ownerId: userId
     })
+    .sort('-created')
+    .limit(50)
     .lean()
     // .populate('meta.itemId', 'itemName itemPackaging', 'drug')
     .exec(function (err, i) {
