@@ -4,7 +4,9 @@
 node_modules/**/*
 !node_modules/connect-mongo/
 !node_modules/express-jwt/
-public/lib
+public
+#public/lib
 config/development.json
-public/images/profile-images
-public/images/item-images
+#public/images/profile-images
+#public/images/item-images
+mobile
