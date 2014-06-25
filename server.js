@@ -23,6 +23,7 @@ var express = require('express'),
     favicon = require('static-favicon'),
     compress = require('compression'),
     multer = require('multer'),
+    maps = require('googlemaps'),
     // cors = require('cors'),
     helpers = require('view-helpers');
 var MongoStore = require('connect-mongo')(session);
@@ -144,7 +145,10 @@ function afterResourceFilesLoad() {
     });
 
     // our router
-    //app.use(app.router);
+    console.log('Registering google maps....');
+    maps.config({
+      'google-client-id' : config.mapApiKey
+    });
 
 
     // test route - before anything else

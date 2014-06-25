@@ -12,10 +12,10 @@ var GovtFacSchema = new Schema({
   facilityTypeCode: {type: Number},
   ownershipCode: {type: Number},
   facilityNoCode: {type: String},
-  geo: {
-    lat: {type: Number},
-    lng: {type: Number}
-  }
+  geo: [{
+      lat: {type: Number},
+      lng: {type: Number}
+    }]
 });
 
 GovtFacSchema.statics = {

@@ -22,7 +22,7 @@
             "4" :"in transit",
             "5": "supplied",
             "6" :"paid"          
-        }        
+        }
     },
     "mail" : {
         "defaultService": "sendgrid",
@@ -60,5 +60,6 @@
         "general" : {
             "sender" : "DrugStoc"
         }        
-    }
+    },
+    "mapApiKey" : "911858101470-o0vui8q6s3ur9ec2e6971ffh7nhtfs3b.apps.googleusercontent.com"
 }

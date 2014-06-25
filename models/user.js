@@ -9,7 +9,6 @@
  //Organization = require('./organization.js').Staff,
  staffUtils = require('./staff_utils.js'),
  sendEmail = require('../lib/email/sendMail.js').sendHTMLMail,
- BasicStrategy = require('passport-http').BasicStrategy,
 Orders = require('./order.js'),
 
 UserController = function (){

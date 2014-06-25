@@ -6,7 +6,9 @@ var expressJWT = require('express-jwt'),
     _ = require('lodash'),
     passport = require('passport'),
     cors = require('cors'),
-    Order = require('../../models/order.js'),
+    Order = require('../../models/order'),
+    maps = require('googlemaps'),
+    MedFac = require('../../models/facility'),
     util = require('util');    
 
 module.exports.routes = function (app) {
@@ -32,7 +34,7 @@ module.exports.routes = function (app) {
     } else {
       console.log('esle');
       if (req.headers.authorization) {      
-        expressJWT({secret: appConfig.secret, skip: ['/api/v1/users/session']})
+        expressJWT({secret: appConfig.secret, skip: ['/api/v1/users/session', '/api/v1/routetest']})
         .call(null, req, res, next);
       } else {
         res.json(401, {status: 'not authd'});
@@ -52,9 +54,13 @@ module.exports.routes = function (app) {
 
   //Authentication Api Routes
   app.route('/api/v1/users/session').post(passport.authenticate('local', { session: false }), function (req, res) {
-    res.json({
-      authorizationToken: jwt.sign(req.user, appConfig.secret, {expiresInMinutes: 60 * 30})
-    });
+    if (req.user.account_type === 4) {    
+      res.json({
+        authorizationToken: jwt.sign(req.user, appConfig.secret, {expiresInMinutes: 60 * 30})
+      });
+    } else {
+      res.json(401, {message: 'Authorized Staffs only.'});
+    }
   });
   
   app.get('/api/v1/routetest', function (req, res) {
@@ -125,4 +131,38 @@ module.exports.routes = function (app) {
       res.json(400, err);
     });
   });  
+
+  //Check ins and Check Out
+  app.get('/api/v1/users/checkin', function (req, res, next) {
+    if (req.query.supl === 'get-location-marks') {
+
+      if (!req.query.longitude || !req.query.latitude) {
+        return res.json(400, {message: "latitude or longitude missing from query"});
+      } else {
+        console.log(req.query);
+        console.log(req.query.latitude + ',' + req.query.longitude);
+        maps.reverseGeocode(req.query.latitude + ',' + req.query.longitude, function (err, data) {
+          console.log(err);
+        // // maps.reverseGeocode('6.6035647,3.3470857', function (err, data) {
+        //   console.log(data);
+        //   res.json(200, data);
+
+          var medfacs = new MedFac();
+          var address = _.pluck(data.results[0].address_components, 'short_name');
+          medfacs.searchGovtRegister(req.user._id, req.user.account_type, {
+            limit: 200, 
+            address : address,
+            name: req.query.name,
+            geo: {
+              lat: req.query.latitude,
+              lng: req.query.longitude
+            }
+          })
+          .then(function (med_fac_list) {
+            res.json(200, {noGeo: med_fac_list, geo: []});
+          });
+        });
+      }
+    }
+  });
 };
