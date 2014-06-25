@@ -57,6 +57,9 @@ module.exports.routes = function (app) {
     });
   });
   
+  app.get('/api/v1/routetest', function (req, res) {
+    res.json(200, true);
+  });
 
   //
   //Activities 

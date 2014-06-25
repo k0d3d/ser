@@ -11,7 +11,11 @@ var GovtFacSchema = new Schema({
   lgaCode: {type: Number},
   facilityTypeCode: {type: Number},
   ownershipCode: {type: Number},
-  facilityNoCode: {type: String}
+  facilityNoCode: {type: String},
+  geo: {
+    lat: {type: Number},
+    lng: {type: Number}
+  }
 });
 
 GovtFacSchema.statics = {
