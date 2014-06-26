@@ -133,6 +133,9 @@ module.exports.routes = function (app) {
   });  
 
   //Check ins and Check Out
+  //
+  //Find Medical Facilities using the users current geo-location
+  //or using his coverage area as fallback.
   app.get('/api/v1/users/checkin', function (req, res, next) {
     if (req.query.supl === 'get-location-marks') {
 
@@ -159,10 +162,21 @@ module.exports.routes = function (app) {
             }
           })
           .then(function (med_fac_list) {
-            res.json(200, {noGeo: med_fac_list, geo: []});
+            res.json(200, med_fac_list);
           });
         });
       }
     }
+  });
+
+  //save and tag a geo-coordinate to a medical facility
+  app.post('/api/v1/facilities/:facId/geo-tag', function (req, res) {
+    var medfacs = new MedFac();
+    medfacs.saveGeoLocation(req.params.facId, req.body.latitude, req.body.longitude)
+    .then(function () {
+      res.json(200, true);
+    }, function (err) {
+      res.json(400, err.message);
+    });
   });
 };
