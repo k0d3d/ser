@@ -130,7 +130,7 @@ MedFac.prototype.fetchOne = function (userId, cb) {
  * @return {[type]}             Promise
  */
 MedFac.prototype.searchGovtRegister = function searchGovtRegister (userId, accountType, query) {
-  var t = Q.defer(), options = null;
+  var t = Q.defer(), options = null, rslt = {};
 
   // if (query.state) {
   //   
@@ -146,7 +146,7 @@ MedFac.prototype.searchGovtRegister = function searchGovtRegister (userId, accou
       if (user.coverage && !query.state) {
         options = {
           lga: {
-            '$in': _.invoke(_.union(query.address || [], user.coverage), function () {
+            '$in': _.invoke(query.address || user.coverage, function () {
               var str = new RegExp(this, 'gi');
               return str;
             }) 
@@ -163,15 +163,7 @@ MedFac.prototype.searchGovtRegister = function searchGovtRegister (userId, accou
       if (!query.state && !user.coverage) {
         options = {};
       }
-
-      //lets add the query for 
-      //geo Tagged facilities
-      if (query.geo) {
-        options.geo = {
-          '$near': [query.geo.lng, query.geo.lat]
-        };
-      }      
-
+   
       return facManager.findFacByName({query: query, options: options});
       // .then(function )
       // Govt.find(options)
@@ -192,27 +184,37 @@ MedFac.prototype.searchGovtRegister = function searchGovtRegister (userId, accou
 
     })
     .then(function (ob) {
+      rslt.noGeo = ob;
+
+      //lets add the query for 
+      //geo Tagged facilities
+      if (query.geo) {
+        options.geo = {
+          '$near': [query.geo.lng, query.geo.lat]
+        };
+      }   
+
+      return facManager.findFacByName({query: query, options: options});
+
+
+    })
+    .then(function (ob) {
+      rslt.geo = ob;
       //filter out geo results
       //from none geo results
-      console.log(ob);
-      console.log(_.filter(ob, function (o) {
-            return _.isUndefined(o.geo);
+      // return t.resolve({
 
-        }));
+      //   noGeo: _.filter(ob, function (o) {
+      //       // return _.isUndefined(o.geo);
+      //       return o.geo.length === 0;
+      //   }),
+      //   geo: _.filter(ob, function (o) {
+      //       return o.geo.length > 0;
 
+      //   })
 
-      return t.resolve({
-
-        noGeo: _.filter(ob, function (o) {
-            return _.isUndefined(o.geo)  || _.isEmpty(o.geo);
-
-        }),
-        geo: _.filter(ob, function (o) {
-            return o.geo || o.geo.length > 0;
-
-        })
-
-      });
+      // });
+      return t.resolve(rslt);
     })
     .catch(function (err) {
       if (err) {

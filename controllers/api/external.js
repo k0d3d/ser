@@ -130,25 +130,22 @@ module.exports.routes = function (app) {
     }, function (err) {
       res.json(400, err);
     });
-  });  
+  }); 
+
+  
 
   //Check ins and Check Out
   //
   //Find Medical Facilities using the users current geo-location
   //or using his coverage area as fallback.
-  app.get('/api/v1/users/checkin', function (req, res, next) {
+  app.get('/api/v1/users/checkin', function (req, res) {
     if (req.query.supl === 'get-location-marks') {
 
       if (!req.query.longitude || !req.query.latitude) {
         return res.json(400, {message: "latitude or longitude missing from query"});
       } else {
-        console.log(req.query);
-        console.log(req.query.latitude + ',' + req.query.longitude);
         maps.reverseGeocode(req.query.latitude + ',' + req.query.longitude, function (err, data) {
           console.log(err);
-        // // maps.reverseGeocode('6.6035647,3.3470857', function (err, data) {
-        //   console.log(data);
-        //   res.json(200, data);
 
           var medfacs = new MedFac();
           var address = _.pluck(data.results[0].address_components, 'short_name');

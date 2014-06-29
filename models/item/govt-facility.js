@@ -4,7 +4,7 @@ var mongoose = require('mongoose-q')(),
 var GovtFacSchema = new Schema({
   lga: {type: String},
   lga_ward: {type: String},
-  facilityName: {type: String},
+  facilityName: {type: String, index: true},
   facilityType: {type: String},
   ownership: {type: String},
   stateCode: {type: Number},
