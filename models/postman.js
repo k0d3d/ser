@@ -1,4 +1,5 @@
 var ActivityNotification = require('./activity/notification.js'),
+    CheckIn = require('./activity/checkin'),
     Order = require('./order/order.js').Order,
     OrderStatus = require('./order/order.js').OrderStatus,
     staffUtils = require('./staff_utils.js'),
@@ -636,6 +637,22 @@ noticeFn = {
   },
   logError: function logError (err){
     console.trace(err);
+  },
+  saveCheckIn : function saveCheckIn (doc) {
+    var checkIn = new CheckIn(doc);
+
+    checkIn.checkIn.timeStamp = Date.now();
+    checkIn.checkIn.purpose = doc.purpose;
+
+    return checkIn.saveQ();
+    // .then(function (savedDoc, affectedRows) {
+
+    // })
+    // .fail(function (err) {
+
+    // })
+    // .done();
+
   }
 
 },
@@ -872,7 +889,7 @@ PostmanController.prototype.userStockNotices = function (userId, accountType) {
       _.each(notices, function (val) {
         ntx.push(val);
       });
-      oops.resolve(ntx)      ;
+      oops.resolve(ntx);
     })
     .catch(function (err) {
       oops.reject(err);
@@ -892,6 +909,41 @@ PostmanController.prototype.userStockNotices = function (userId, accountType) {
   
   return oops.promise;
 
+};
+
+PostmanController.prototype.checkInStaff = function checkInStaff (userId, geoCoords, purpose) {
+  var cis = Q.defer(), recpt;
+
+  //find the concerned staff
+  noticeFn.getConcernedStaff({
+    operation: 'user',
+    userId: userId,
+    accountType: 2 
+  })
+  .then(function (v) {
+    //we should have a list of concerned staff now,
+    //lets just save it to the recpt var.
+    recpt = v;
+    
+    //now we wanna save the checkIn.
+    //
+    noticeFn.saveCheckIn({
+      purpose: purpose
+    })
+    .then(function (rslt) {
+      //now lets send notifications to
+      //employer and manager.
+      
+    })
+    .fail(function (err) {
+      return cis.reject(err);
+    })
+    .done();
+  })
+  .done();
+
+
+  return cis.promise;
 };
 
 module.exports.noticeFn = noticeFn;

@@ -167,7 +167,7 @@ module.exports = function(app, passport) {
     var fileupload = require('./upload');
     fileupload(app, login);
 
-    var externalApi = require('./api/external.js');
+    var externalApi = require('./external.js');
     externalApi.routes(app);
     
   } catch (e) {
