@@ -81,27 +81,6 @@ angular.module('drug', [])
     __init();
 
     //ds.search
-    $scope.searchcmp = function () {
-      $scope.summary = $scope.newprice = '';
-      ds.search($scope.drugname, 0, function (r) {
-        $scope.drugs = r;
-      });
-    };
-
-    $scope.more = function (index) {
-      ds.moreInfo($scope.drugs[index]._id, function(r){
-        $scope.summary = r;
-        $scope.summary.index = index;
-      });
-    };
-
-    $scope.up = function (id, price, index) {
-      console.log(price);
-      ds.updatePrice(id, price, function () {
-        $scope.drugs[index].currentPrice = price;
-        $scope.newprice = '';
-      });
-    };
 
 
 
@@ -176,13 +155,19 @@ angular.module('drug', [])
         item.status = done.status;
       });
     };
+    $scope.remove_item = function (id, index) {
+      ds.removeItem(id)
+      .then(function () {
+        $scope._drugs.splice(index, 1);
+      });
+    };    
 
     $scope.$watch('currentPage', function () {
       $scope.getPageItems($scope.currentPage, $scope.pageLimit);
     });
 
   }])
-  .controller('drugAddController', ['$scope', 'drugService', function ($scope, ds) {
+  .controller('drugAddController', ['$scope', 'drugService', '$location', function ($scope, ds, $location) {
     //Init the add item form model and 
     //the images field array
     $scope.add_item_form = {
@@ -208,7 +193,8 @@ angular.module('drug', [])
           if ($scope.nextAction === 'newAddition') {
             $scope.add_item_form = '';
           } else if ($scope.nextAction === 'listPage') {
-            $scope.commons.href('/a/drugs');
+            // $scope.commons.href();
+            $location.path('/a/drugs');
           }
           
         }
@@ -337,6 +323,18 @@ angular.module('drug', [])
           class_name: 'growl-danger'
         });        
         return err;
+      });
+    };
+
+    d.removeItem = function (id) {
+      return $http.delete('/api/internal/drugs/' + id + '/item')
+      .then(function () {
+        N.notifier({
+          title: 'Welldone!',
+          text: 'You have removed one item from your inventory',
+          class_name: 'growl-success'
+        });
+        return true;
       });
     };
 
