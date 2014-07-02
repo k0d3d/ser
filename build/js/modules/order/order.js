@@ -16,7 +16,8 @@ config(['$routeProvider',function($routeProvider){
   'ordersService', 
   '$rootScope', 
   'Notification', 
-  function($scope, $http, ordersService, $rootScope, N) {
+  '$route',
+  function($scope, $http, ordersService, $rootScope, N, $route) {
   $scope.$parent.headerTitle = 'Pending Quotations';
   $scope.orderCart = [];
 
@@ -53,6 +54,7 @@ config(['$routeProvider',function($routeProvider){
     .then(function () {
       $scope.orderCart.splice(index, 1);
       $scope.my_quotation.splice(index, 1);
+      $route.reload();
     });
   };
 
@@ -61,6 +63,7 @@ config(['$routeProvider',function($routeProvider){
     .then(function (){
       $scope.orderCart.splice(index, 1);
       $scope.my_quotation.splice(index, 1);
+      $route.reload();
     });
   };
 
@@ -73,7 +76,8 @@ config(['$routeProvider',function($routeProvider){
   '$routeParams', 
   'ordersService', 
   'organizeStaffService', 
-  function ($scope, $http, $location, $routeParams, ordersService, organizeStaffService) {
+  '$route',
+  function ($scope, $http, $location, $routeParams, ordersService, organizeStaffService, $route) {
   $scope.$parent.headerTitle = 'Orders';
  
   $scope.ordersfilter = {
@@ -105,18 +109,6 @@ config(['$routeProvider',function($routeProvider){
         //v.nextStatus = v.orderStatus + 1;
         $scope.orders.push(v);
       });
-      switch($routeParams.type){
-        case 'invoices':
-        $scope.ordersfilter.orderStatus = "Supplied";
-        break;
-        case 'order':
-        console.log('message');
-        $scope.ordersfilter.orderStatus = "Pending Order";
-        break;
-        default:
-        $scope.ordersfilter.orderStatus = "";
-        break;
-      }
     });
 
 
@@ -186,6 +178,7 @@ config(['$routeProvider',function($routeProvider){
     .then(function () {
       $scope.orders[index] = order;      
       $('#manage-order-modal').modal('hide');
+      $route.reload();
     });
   };
   $scope.cancel_order = function (order, index) {
@@ -194,6 +187,7 @@ config(['$routeProvider',function($routeProvider){
     .then(function () {
       $scope.orders[index] = order;
       $('#manage-order-modal').modal('hide');
+      $route.reload();
     });
   };
 

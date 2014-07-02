@@ -155,6 +155,7 @@ module.exports = function(grunt) {
             'css/dropzone.css',
             'css/xeditable.css',          // 
             'css/bootstrap-override.css',
+            'css/lato.css',
             // 'css/.css',
             // Template CSS
             'css/style.custom.css',

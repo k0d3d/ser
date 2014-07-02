@@ -231,7 +231,7 @@ module.exports = function(app, passport) {
 
   //Home route
   app.route('/')
-  .get(login.ensureLoggedIn('/signin'), function(req, res){
+  .get(login.ensureLoggedIn(), function(req, res){
     res.render('index');
   });
 
