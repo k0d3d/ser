@@ -11,7 +11,7 @@
         "secret": "yfhgU&^%@N>YS!!~HJS&JDHGDbvjhg7509",
         "cors" : {
           "options" : {
-            "origin": "http://localhost:8100",
+            "origin": "*",
             "methods": [
               "GET",
               "POST",
