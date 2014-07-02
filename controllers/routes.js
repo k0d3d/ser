@@ -38,7 +38,8 @@ module.exports = function(app, passport) {
     {
       name: 'Profile',
       roles: ['*'],
-      url: '/a/profile'
+      url: '/a/profile',
+      menu: false
     },
     {
       name : "Dashboard",
@@ -126,8 +127,12 @@ module.exports = function(app, passport) {
       var account_type = req.user.account_type;
       var this_nav = (isChild) ? nav[parent].child[index] : nav[index];
 
-      if (_.indexOf(this_nav.roles, account_type) > -1 || this_nav.roles[0] === '*' || this_nav.roles.menu) {
-        return true;
+      if (_.indexOf(this_nav.roles, account_type) > -1 || this_nav.roles[0] === '*' ) {
+        if (this_nav.menu) {
+          return true;
+        } else {
+          return false;
+        }
       } else {
         return false;
       }
