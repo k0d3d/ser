@@ -1,7 +1,7 @@
 {
   "name": "Integra-Core-Server",
   "description": "Online, Health, Medical, Orders, Suppliers, Dashboard, Management",
-  "version": "0.3.20",
+  "version": "0.3.21",
   "private": true,
   "author": "Michael RHema",
   "repository": {
