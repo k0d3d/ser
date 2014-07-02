@@ -74,7 +74,7 @@ angular.module('organization', [])
   });
 
 }])
-.controller('invitesController', ['$scope', 'organizeStaffService', function ($scope, oss) {
+.controller('invitesController', ['$scope', 'organizeStaffService','$route', function ($scope, oss, $route) {
   //Load all invites
   oss.loadInvites()
   .then(function (r) {
@@ -85,6 +85,7 @@ angular.module('organization', [])
   $scope.create_new_staff = function create_new_staff () {
     oss.inviteStaff($scope.new_staff).then(function (r) {
       $scope.new_staff = {};
+      $route.reload();
     });
   };  
 
@@ -93,6 +94,7 @@ angular.module('organization', [])
     oss.activateStaff($scope.invites[index])
     .then(function (r) {
       $scope.invites.splice(index, 1);
+      $route.reload();
     });
   };
 
@@ -100,6 +102,7 @@ angular.module('organization', [])
     oss.cancelStaff($scope.invites[index])
     .then(function (r) {
       $scope.invites.splice(index, 1);
+      $route.reload();
     });
   };
 

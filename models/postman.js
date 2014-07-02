@@ -495,7 +495,8 @@ noticeFn = {
     console.log('Finding user notices...');
     var ri = Q.defer();
     ActivityNotification.find({
-      ownerId: userId
+      ownerId: userId,
+      seen: false
     })
     .sort('-created')
     .limit(50)
@@ -653,6 +654,53 @@ noticeFn = {
     // })
     // .done();
 
+  },
+  /**
+   * changes a notification document's
+   * 'seen' property to true for a user
+   * 
+   * @param  {[type]} doc [description]
+   * @return {[type]}     [description]
+   */
+  hideNotice: function hideNotice (doc) {
+    var qu = Q.defer();
+
+    ActivityNotification.update({
+      _id: doc.id,
+      ownerId: doc.userId
+    }, {
+      $set: {
+        seen: true
+      }
+    }, function (err, r) {
+      if (err) {
+        return qu.reject(err);
+      }
+      if (r) {
+        return qu.resolve(true);
+      }
+      return qu.reject(new Error('cannot hide notice'));
+    });
+
+    return qu.promise;
+  },
+  deleteNotice: function hideNotice (doc) {
+    var qu = Q.defer();
+
+    ActivityNotification.remove({
+      ownerId: doc.userId,
+      seen: true
+    }, function (err, r) {
+      if (err) {
+        return qu.reject(err);
+      }
+      if (r) {
+        return qu.resolve(true);
+      }
+      return qu.reject(new Error('cannot delete notice'));
+    });
+
+    return qu.promise;
   }
 
 },
@@ -944,6 +992,32 @@ PostmanController.prototype.checkInStaff = function checkInStaff (userId, geoCoo
 
 
   return cis.promise;
+};
+
+/**
+ * hides a notification from a user's feed.
+ * hide a notification so its not 
+ * shown on the user's activity feed.
+ * @param  {[type]} userId   [description]
+ * @param  {[type]} noticeId [description]
+ * @return {[type]}          [description]
+ */
+PostmanController.prototype.hideUserNotice = function hideUserNotice (userId, noticeId) {
+  var nas = Q.defer();
+
+  noticeFn.hideNotice({
+    userId: userId,
+    id: noticeId
+  })
+  .then(function () {
+    return nas.resolve(true);
+  })
+  .fail(function (err) {
+    nas.reject(err);
+  })
+  .done();
+
+  return nas.promise;
 };
 
 module.exports.noticeFn = noticeFn;

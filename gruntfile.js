@@ -3,31 +3,35 @@ module.exports = function(grunt) {
     grunt.initConfig({
       pkg: grunt.file.readJSON('package.json'),
       watch: {
-        jade: {
-          files: ['app/views/**'],
-          options: {
-            livereload: true,
-          },
-        },            
+        // jade: {
+        //   files: ['build/**/*.js','build/**/*.css'],
+        //   options: {
+        //     livereload: true,
+        //   },
+        // },            
         js: {
-          files: ['public/js/**', 'app/**/*.js'],
-          tasks: ['jshint'],
+          files: ['build/**/*.js'],
+          tasks: ['clean:modules', 'copy:modules', 'uglify'],
           options: {
-            livereload: true,
+            spawn: false,
+            event: ['changed']
           },
         },
-        html: {
-          files: ['public/views/**'],
-          options: {
-            livereload: true,
-          },
-        },
-        css: {
-          files: ['public/css/**'],
-          options: {
-            livereload: true
-          }
-        }
+        // html: {
+        //   files: ['public/views/**'],
+        //   options: {
+        //     spawn: false,
+        //     event: ['changed']
+        //   },
+        // },
+        // css: {
+        //   files: ['build/**/*.css'],
+        //   task: ['cssmin'],
+        //   options: {
+        //     spawn: false,
+        //     event: ['changed']
+        //   }
+        // }
       },
       fingerprint: {
         default: {
@@ -216,6 +220,38 @@ module.exports = function(grunt) {
             dest: 'public/',
             expand: true
         },
+        modules: {
+          cwd: 'build',
+          src: [            
+            'js/app.js',
+            'js/modules/lang.js',    
+            'js/common/services/services.js',
+            'js/common/filters/filters.js',
+            'js/common/directives/directives.js',
+            'js/common/directives/checklist-model.js',
+            'js/modules/hospital/hospital.js',
+            'js/modules/dashboard/dashboard.js',
+            'js/modules/order/order.js',
+            'js/modules/reports/reports.js',
+            'js/modules/drug/drug.js',
+            'js/modules/bills/bills.js',
+            'js/modules/dispense/dispense.js',
+            'js/modules/supplier/supplier.js',
+            'js/modules/admin/admin.js',
+            'js/modules/stock/stock.js',
+            'js/modules/user/user.js',
+            'js/modules/organization/organization.js',
+            'js/custom.js'
+            ],
+          dest: 'public/',
+          expand: true
+        },
+        styles: {
+          cwd: 'build',
+          src: [],
+          dest: 'mobile/',
+          expand: true
+        },
         mobile: {
           cwd: 'build',
           src: [],
@@ -229,7 +265,8 @@ module.exports = function(grunt) {
         },
         mobile: {
           src: ['mobile']
-        }
+        },
+        modules: ['public/**/*.js', '!public/js/default-vendor.min.js']
       }, 
       uglify: {
         build:{
@@ -433,7 +470,7 @@ module.exports = function(grunt) {
 
     //Default task(s).
     grunt.registerTask('default', ['jshint', 'concurrent']);
-    grunt.registerTask('build', ['clean', 'copy', 'bump:patch', 'uglify', 'cssmin']);
+    grunt.registerTask('build', ['clean:build', 'copy:build', 'bump:patch', 'uglify:build', 'cssmin:build']);
     grunt.registerTask('mobile', ['clean:mobile', 'jade:mobile']);
 
     //Test task.

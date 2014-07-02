@@ -141,6 +141,15 @@ angular.module('user', [])
     return US.updateProfile({name : 'image', value: name});   
   };
 
+  $scope.hide_activity = function (index) {
+    console.log(index);
+    var id = $scope.activity[index]._id;
+    US.hideActivity({id: id})
+    .then(function () {
+      $scope.activity.splice(index, 1);
+    });
+  };
+
 }])
 .filter('territory', function () {
   return function (arr) {
@@ -192,6 +201,12 @@ angular.module('user', [])
           class_name: 'growl-success'
         });
         return r.data;
+      });
+    },
+    hideActivity : function hideActivity (data) {
+      return $http.delete('/api/internal/activities?id='+ data.id)
+      .then(function () {
+        return true;
       });
     }
   };

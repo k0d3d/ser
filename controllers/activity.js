@@ -54,7 +54,14 @@ module.exports = function (app) {
 
   })
   .delete(function (req, res, next) {
-
+    notify.hideUserNotice(req.user._id, req.query.id) 
+    .then(function (r) {
+      res.json(200, r);
+    })
+    .fail(function (err) {
+      res.json(400, err.message);
+    })
+    .done();
   })
   .put(function (req, res, next) {
 
