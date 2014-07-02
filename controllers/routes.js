@@ -1,5 +1,5 @@
 var login = require('connect-ensure-login'),
-    _ = require("underscore");
+    _ = require("lodash");
 
 /**
  * all API routes must respond to errors with a res.json 400 http status code.
@@ -36,34 +36,44 @@ module.exports = function(app, passport) {
   ];
   var nav = [
     {
+      name: 'Profile',
+      roles: ['*'],
+      url: '/a/profile'
+    },
+    {
       name : "Dashboard",
       roles : [],
       icon: '',
-      url: '/'
+      url: '/',
+      menu: true
     },
     {
       name: "Orders",
       roles: ['*'],
       icon: '',
-      url: '/a/orders'
+      url: '/a/orders',
+      menu: true
     },
     {
       name: 'Suppliers',
       roles: [],
       icon: '',
       url: '/a/suppliers',
+      menu: true
     },
     {
       name: "Drug Pages",
       roles: [0,1,2,3,4],
       icon: '',
-      url: '/a/drugs'
+      url: '/a/drugs',
+      menu: true
     },
     {
       name: 'Med. Facilities',
       roles: [0],
       icon:'',
-      url: '/a/facilities'
+      url: '/a/facilities',
+      menu: true
     },
     {
       name: 'Organization',
@@ -73,30 +83,35 @@ module.exports = function(app, passport) {
         {
           name: 'Distributors',
           roles: [0,1],
-          url: '/a/organization/people/2'
+          url: '/a/organization/people/2',
+          menu: true
         },
         {
           name: 'Managers',
           roles: [0],
-          url: '/a/organization/people/1'
+          url: '/a/organization/people/1',
+          menu: true
         },
         {
           name: 'Managers',
           roles: [0,1,2],
-          url: '/a/organization/people/3'
+          url: '/a/organization/people/3',
+          menu: true
 
         },
         {
           name: 'Staff',
           roles: [0,1,2,3],
-          url: '/a/organization/people/4'              
+          url: '/a/organization/people/4',
+          menu: true
         }
       ]
     },
     {
       name: 'Invitations',
       roles: [0,1,2,3],
-      url: '/a/organization/invitations'
+      url: '/a/organization/invitations',
+      menu: true
     }
   ];
 
@@ -105,19 +120,13 @@ module.exports = function(app, passport) {
   //Sets roles and permissions to be used on 
   //the view templates and widgets
   app.route('*')
-  .get(function (req, res, next) {
-
-    //Minimal middleware that adds 
-    //logged in user details to view
-    if (req.user) {
-      res.locals.userData = req.user;
-    }    
+  .get(function (req, res, next) { 
 
     res.locals.hasRole = function (index, isChild, parent) {
       var account_type = req.user.account_type;
       var this_nav = (isChild) ? nav[parent].child[index] : nav[index];
 
-      if (_.indexOf(this_nav.roles, account_type) > -1 || this_nav.roles[0] === '*') {
+      if (_.indexOf(this_nav.roles, account_type) > -1 || this_nav.roles[0] === '*' || this_nav.roles.menu) {
         return true;
       } else {
         return false;
@@ -136,63 +145,90 @@ module.exports = function(app, passport) {
     res.locals.navs = nav;
     res.locals.people = people;
 
-    next();
+    //Minimal middleware that adds 
+    //logged in user details to view
+    //
+    //checks if the current url is allowed
+    //or viewable by the currently logged in
+    //user.
+    if (req.user) {
+      res.locals.userData = req.user;
+
+      //the next loop flattens my 
+      //sub menus into a the top 
+      //level menu array... so i can
+      //check every single menu, navigation.
+      var children_navs = [];
+      for (var i = 0; i < nav.length; i++) {
+        if (nav[i].child) {
+          for (var x = 0; x < nav[i].child.length; x++) {
+            children_navs.push(nav[i].child[x]);
+          }
+        }
+      }
+
+      var thisUrlRoles = _.find(nav.concat(children_navs), {url: req.url});
+      var isPublicRoute = req.url.indexOf('/p/') > -1;
+
+      //this should help ignore static files..
+      //looking for a better hack.
+      if (_.isUndefined(thisUrlRoles)) {
+        // console.log('is static file: ' + req.url);
+        return next();
+      }
+
+      if (isPublicRoute || _.indexOf(thisUrlRoles.roles, req.user.account_type) > -1 || thisUrlRoles.roles[0] === '*') {
+        next();
+      } else {
+        return res.redirect('/a/profile');
+      }
+      // next();
+    } else {
+      //let other routes / middleware
+      //handle unauthorized actions
+      next();
+    }
+    
+
 
   });
 
   //User Routes
-  try {
-    var users = require('./users'); 
-    users.routes(app, passport, login, people);
+
+  var users = require('./users'); 
+  users.routes(app, passport, login, people);
+  
+  //Hospital Routes
+  var facility = require('./facilities');
+  facility.routes(app, login);
+
+  //Drug Routes
+  var drug = require('./drugs');
+  drug.routes(app, login);
+  //Orders Routes
+  var order = require('./orders');
+  order.routes(app, login);
+  //Organization
+  var organization = require('./organization');
+  organization.routes(app, login);
+
+  //Organization
+  var activity = require('./activity.js');
+  activity(app, login);
+
+  //File upload handler/controller
+  var fileupload = require('./upload');
+  fileupload(app, login);
+
+  var externalApi = require('./external.js');
+  externalApi.routes(app);
     
-    //Hospital Routes
-    var facility = require('./facilities');
-    facility.routes(app, login);
-
-    //Drug Routes
-    var drug = require('./drugs');
-    drug.routes(app, login);
-    //Orders Routes
-    var order = require('./orders');
-    order.routes(app, login);
-    //Organization
-    var organization = require('./organization');
-    organization.routes(app, login);
-
-    //Organization
-    var activity = require('./activity.js');
-    activity(app, login);
-
-    //File upload handler/controller
-    var fileupload = require('./upload');
-    fileupload(app, login);
-
-    var externalApi = require('./external.js');
-    externalApi.routes(app);
-    
-  } catch (e) {
-    console.log(e.stack);
-  }
-
 
   //Home route
   app.route('/')
   .get(login.ensureLoggedIn('/signin'), function(req, res){
     res.render('index');
   });
-  // app.route('/')
-  // .get(function(req, res){
-  //   res.render('home/splash',{
-  //     title: 'Dashboard'
-  //   });
-  // });
-
-  // app.route('/home/index')
-  // .get(login.ensureLoggedIn('/signin'), function(req, res){
-  //   res.render('home/splash',{
-  //     title: 'Dashboard'
-  //   });
-  // });
 
   app.get('/api/internal/commons', function (req, res) {
     res.json(200, require('../config/commons.js'));

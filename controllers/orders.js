@@ -10,31 +10,31 @@ var Order = require('../models/order.js'),
 module.exports.routes = function(app, login){
   var order = new Order();
 
-  app.get('/a/orders', login.ensureLoggedIn('/signin'), function(req, res){
+  app.get('/a/orders', login.ensureLoggedIn(), function(req, res){
       res.render('index',{
         title: 'Place new order'
       });
     }
   );
 
-  app.get('/a/orders/:id', login.ensureLoggedIn('/signin'), function(req, res){
+  app.get('/a/orders/:id', login.ensureLoggedIn(), function(req, res){
       res.render('index',{});
     }
   );
 
-  app.get('/a/orders', login.ensureLoggedIn('/signin'), function(req, res){
+  app.get('/a/orders', login.ensureLoggedIn(), function(req, res){
       res.render('index',{
         title: 'All orders'
       });
     }
   );
   //Show place new order page
-  app.get('/a/orders/new', login.ensureLoggedIn('/signin'), function(req, res){
+  app.get('/a/orders/new', login.ensureLoggedIn(), function(req, res){
     console.log(res.locals.user);
     res.render('index');
   });
   //Show Order Cart page
-  app.get('/a/orders/cart', login.ensureLoggedIn('/signin'), function(req, res){
+  app.get('/a/orders/cart', login.ensureLoggedIn(), function(req, res){
     res.render('index');
   });
 

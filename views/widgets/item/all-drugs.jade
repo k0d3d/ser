@@ -7,7 +7,8 @@ mixin allDrugs()
           th Composition
           th RegNo
           th Current Prices (N)
-          th In Stock (~)
+          -if (false)
+            th In Stock (~)
           th
       tbody
         tr(ng-repeat="d in _drugs | filter: itemFilter")
@@ -22,7 +23,8 @@ mixin allDrugs()
             span.label.label-info(title="Retail Price") {{d.currentPrice.retail}}
             span.label.label-warning(title="Institution Price") {{d.currentPrice.institution}}
             span.label.label-success(title="Wholesale Price") {{d.currentPrice.wholesale}}
-          td {{d.stockCount}}
+          -if (false)
+            td {{d.stockCount}}
           td(style="min-width: 150px")
             .pull-right
               .btn-group.mr5
@@ -31,13 +33,15 @@ mixin allDrugs()
                       span.caret
                       span.sr-only Click
                     ul.dropdown-menu(role='menu')
-                      if (userData.account_type < 4) 
+                      -if (false && userData.account_type < 4) 
                         li
                           a(href='#', ng-click="view_stock_down(d); toggleModal('stock-history-modal')") Stock Down History
-                      li
-                        a(href='#', ng-click="view_stock_up(d); toggleModal('stock-history-modal')") Stock Up History
-                      li
-                        a(href='#', ng-click="item_stock(d); toggleModal('manage-stock-modal');") Stock Operations
+                      -if (false)
+                        li
+                          a(href='#', ng-click="view_stock_up(d); toggleModal('stock-history-modal')") Stock Up History
+                      -if (false)
+                        li
+                          a(href='#', ng-click="item_stock(d); toggleModal('manage-stock-modal');") Stock Operations
                       li
                         a(href='#', ng-click="add_to_list(d)") Add to My List
            

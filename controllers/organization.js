@@ -12,31 +12,31 @@ module.exports.routes = function (app, login) {
     res.render('index');
   });
 
-  app.get('/a/organization',login.ensureLoggedIn('/signin'), function (req, res) {
+  app.get('/a/organization',login.ensureLoggedIn(), function (req, res) {
 
     res.render('index', {
       userData: req.user
     });
   });
-  app.get('/a/organization/people/:accountType',login.ensureLoggedIn('/signin'), function (req, res) {
+  app.get('/a/organization/people/:accountType',login.ensureLoggedIn(), function (req, res) {
 
     res.render('index', {
       userData: req.user
     });
   });
-  app.get('/a/organization/invitations',login.ensureLoggedIn('/signin'), function (req, res) {
+  app.get('/a/organization/invitations',login.ensureLoggedIn(), function (req, res) {
 
     res.render('index', {
       userData: req.user
     });
   });
-  app.get('/a/organization/people/:personId/person/:accountType',login.ensureLoggedIn('/signin'), function (req, res) {
+  app.get('/a/organization/people/:personId/person/:accountType',login.ensureLoggedIn(), function (req, res) {
 
     res.render('index', {
       userData: req.user
     });
   });
-  app.get('/a/organization/profile',login.ensureLoggedIn('/signin'), function (req, res) {
+  app.get('/a/organization/profile',login.ensureLoggedIn(), function (req, res) {
 
     res.render('organization/profile', {
       userData: req.user,

@@ -5,25 +5,25 @@ var user = require('../models/user.js'),
 module.exports.routes = function(app, passport, login, people){
   var users = new user.User();
 
-  app.route('/signin')
+  app.route('/p/signin')
   .get(function (req, res, next){res.locals.people = people; next(); }, users.signin);
 
-  app.route('/login')
+  app.route('/p/login')
   .get(function (req, res, next){res.locals.people = people; next(); }, users.signin);
   
-  app.route('/signup')
+  app.route('/p/signup')
   .get(function (req, res, next){res.locals.people = people; next(); }, users.signup);
   
-  app.route('/signout')
+  app.route('/p/signout')
   .get(users.signout);
 
-  app.route('/user-registered')
+  app.route('/p/user-registered')
   .get(function(req, res) {
     res.render('user/user-registered');
   });
 
   app.route('/a/profile')
-  .get(login.ensureLoggedIn('/signin'), function (req, res) {
+  .get(login.ensureLoggedIn(), function (req, res) {
     //console.log(req.user);
     res.render('index', {
       userData : req.user
@@ -51,7 +51,7 @@ module.exports.routes = function(app, passport, login, people){
     });
   });
   
-  app.route('/api/internal/users', login.ensureLoggedIn('/signin'))
+  app.route('/api/internal/users', login.ensureLoggedIn())
   .put(function (req, res, next) {
     var id = req.user._id;
     var body = {};
@@ -67,7 +67,7 @@ module.exports.routes = function(app, passport, login, people){
     });
   });
 
-  app.route('/api/internal/users/profile', login.ensureLoggedIn('/signin'))
+  app.route('/api/internal/users/profile', login.ensureLoggedIn())
   .get(function (req, res, next) {
     var userId = req.user._id;
     var account_type = req.user.account_type;

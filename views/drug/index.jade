@@ -6,10 +6,12 @@
           button.btn.drug-panel-buttons.btn-success(ng-class="", toggle-active-button="drug-panel-buttons", ng-click="ds = 'drugs'") 
             | Current Inventory 
             span.label.label-default {{_drugs.length}}
-          button.btn.drug-panel-buttons(ng-class="", toggle-active-button="drug-panel-buttons", ng-click="ds = 'request'") 
+          -if (false)
+            button.btn.drug-panel-buttons(ng-class="", toggle-active-button="drug-panel-buttons", ng-click="ds = 'request'") 
             | Incoming Request 
             span.label.label-default {{_request.length}}
-          button.btn.drug-panel-buttons(ng-class="", toggle-active-button="drug-panel-buttons", ng-click="ds = 'pending'") 
+          -if (false)
+            button.btn.drug-panel-buttons(ng-class="", toggle-active-button="drug-panel-buttons", ng-click="ds = 'pending'") 
             | Pending Transfers      
             span.label.label-default {{_pending.length}}
       .col-md-4

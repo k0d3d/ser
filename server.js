@@ -181,8 +181,8 @@ function afterResourceFilesLoad() {
 
       // log it
       // send emails if you want
-      console.error(err);
-      // console.error(err.stack);
+      // console.error(err);
+      console.error(err.stack);
 
       // error page
       //res.status(500).json({ error: err.stack });
