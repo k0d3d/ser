@@ -96,16 +96,16 @@ app.directive('toggleActiveList', [function(){
   };
 }]);
 
-app.directive('tooltips', function () {
-  return {
-    restrict: 'C',
-    link: function (element, attrs) {
-      $(element).tooltip({
-        title : attrs.title
-      });
-    }
-  };
-});
+// app.directive('tooltips', function () {
+//   return {
+//     restrict: 'C',
+//     link: function (element, attrs) {
+//       $(element).tooltip({
+//         title : attrs.title
+//       });
+//     }
+//   };
+// });
 
 app.directive('scrollBar', function(){
     return {

@@ -142,11 +142,11 @@ angular.module('user', [])
   };
 
   $scope.hide_activity = function (index) {
-    console.log(index);
     var id = $scope.activity[index]._id;
     US.hideActivity({id: id})
     .then(function () {
       $scope.activity.splice(index, 1);
+      $scope.$parent.activity--;
     });
   };
 
