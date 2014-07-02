@@ -12,7 +12,7 @@
 Orders = require('./order.js'),
 
 UserController = function (){
-  console.log('Loading User Controller...');
+  // console.log('Loading User Controller...');
 };
 
 UserController.prototype.constructor = UserController;

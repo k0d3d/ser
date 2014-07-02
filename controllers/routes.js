@@ -113,6 +113,11 @@ module.exports = function(app, passport) {
       roles: [0,1,2,3],
       url: '/a/organization/invitations',
       menu: true
+    },
+    {
+      name: 'Admin',
+      roles: ['*'],
+      url:'/x/'
     }
   ];
 

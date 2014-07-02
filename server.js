@@ -108,8 +108,7 @@ function afterResourceFilesLoad() {
 
     // setup session management
     console.log('setting up session management, please wait...');
-    console.log(config.db.server);
-    console.log(config.db.password);
+
     app.use(session({
         secret: config.express.secret,
         store: new MongoStore({
