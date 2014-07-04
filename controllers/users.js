@@ -46,7 +46,10 @@ module.exports.routes = function(app, passport, login, people){
       if (util.isError(r)) {
         res.json(400, {message: r.message});
       } else {
-        res.json(200, {nextUrl: '/user-registered'});
+        // TODO::
+        // block this url from 
+        // direct access. 
+        res.json(200, {nextUrl: '/p/user-registered'});
       }
     });
   });

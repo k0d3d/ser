@@ -11,7 +11,7 @@ module.exports = function(grunt) {
         // },            
         js: {
           files: ['build/**/*.js'],
-          tasks: ['clean:modules', 'copy:modules', 'uglify'],
+          tasks: ['clean:modules', 'copy:modulesjs','copy:vendorjs', 'uglify:js'],
           options: {
             spawn: false,
             event: ['changed']
@@ -220,7 +220,7 @@ module.exports = function(grunt) {
             dest: 'public/',
             expand: true
         },
-        modules: {
+        modulesjs: {
           cwd: 'build',
           src: [            
             'js/app.js',
@@ -246,6 +246,41 @@ module.exports = function(grunt) {
           dest: 'public/',
           expand: true
         },
+        vendorjs: {
+          cwd: 'build',
+          src: [            
+            'js/jquery-2.1.1.min.js',
+            'js/pace.js',
+            'js/bootstrap.min.js',
+            'js/angular.min.js',
+            'js/angular-route.min.js',      
+            'js/easing.js',
+            'js/typer.js',
+            'js/nicescroll.js',
+            'js/jquery-ui-1.10.3.min.js',
+            'js/jquery-migrate-1.2.1.min.js',
+            'js/modernizr.min.js',
+            'js/retina.min.js',
+            'js/toggles.min.js',
+            'js/chosen.jquery.min.js',
+            'js/bootstrap-editable.min.js',
+            'js/typeahead.bundle.js',
+            'js/moment.js',
+            'js/bootstrap-switch.min.js ',
+            'js/underscore-min.js ',
+            'js/jquery.gritter.min.js',
+            'js/ng-tags-input.min.js',
+            'js/angular-dragdrop.min.js',
+            'js/jquery.slimscroll.min.js',
+            'js/xeditable.min.js',
+            'js/ui-bootstrap-custom-tpls-0.10.0.min.js',
+            'js/ketchup.all.js',
+            'js/dropzone.min.js',
+            'js/tooltip.js',
+            ],
+          dest: 'public/',
+          expand: true
+        },
         styles: {
           cwd: 'build',
           src: [],
@@ -266,7 +301,7 @@ module.exports = function(grunt) {
         mobile: {
           src: ['mobile']
         },
-        modules: ['public/**/*.js', '!public/js/default-vendor.min.js']
+        modules: ['public/js/default-vendor.min.js', 'public/js/modules.min.js']
       }, 
       uglify: {
         build:{
@@ -345,7 +380,57 @@ module.exports = function(grunt) {
               'public/js/custom.js',
             ]
           }
-        }
+        },
+        js:{
+          options:{
+            mangle: false
+          },
+          files:{
+            //application vendor js
+            'public/js/default-vendor.min.js': [
+              'public/js/modernizr.min.js',
+              'public/js/retina.min.js',
+              'public/js/toggles.min.js',
+              'public/js/chosen.jquery.min.js',
+              'public/js/bootstrap-editable.min.js',
+              'public/js/typeahead.bundle.js',
+              'public/js/moment.js',
+              'public/js/bootstrap-switch.min.js ',
+              'public/js/underscore-min.js ',
+              'public/js/jquery.gritter.min.js',
+              'public/js/ng-tags-input.min.js',
+              'public/js/angular-dragdrop.min.js',
+              'public/js/jquery.slimscroll.min.js',
+              'public/js/xeditable.min.js',
+              'public/js/ui-bootstrap-custom-tpls-0.10.0.min.js',
+              // 'public/js/jquery.prettyPhoto.js',
+              'public/js/dropzone.min.js',
+              'public/js/tooltip.js',
+            ],
+            //application ng modules
+            'public/js/modules.min.js': [
+              'public/js/app.js',
+              'public/js/modules/lang.js',
+              'public/js/common/services/services.js',
+              'public/js/common/filters/filters.js',
+              'public/js/common/directives/directives.js',
+              'public/js/common/directives/checklist-model.js',
+              'public/js/modules/hospital/hospital.js',
+              'public/js/modules/dashboard/dashboard.js',
+              'public/js/modules/order/order.js',
+              'public/js/modules/reports/reports.js',
+              'public/js/modules/drug/drug.js',
+              'public/js/modules/bills/bills.js',
+              'public/js/modules/dispense/dispense.js',
+              'public/js/modules/supplier/supplier.js',
+              'public/js/modules/admin/admin.js',
+              'public/js/modules/stock/stock.js',
+              'public/js/modules/user/user.js',
+              'public/js/modules/organization/organization.js',
+              'public/js/custom.js'
+            ]
+          }
+        },
       },                  
       jade: {
         debug:{            

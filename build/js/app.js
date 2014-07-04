@@ -15,7 +15,8 @@ var app = angular.module('stocUser', [
   'ngTagsInput',
   'ngDragDrop',
   'xeditable',
-  'checklist-model'
+  'checklist-model',
+  'admin'
   ]);
 
 app.run(function(editableOptions) {
@@ -138,7 +139,7 @@ app.filter('dashed', function () {
 app.filter('acctype', function () {
   
   return function (index) {
-    var accounts = ['Pharmaceutical Company', 'Pharma Manager', 'Distributor', 'Dist. Manager', 'Sales Agent'];
+    var accounts = ['Pharmaceutical Company', 'Pharma Manager', 'Distributor', 'Dist. Manager', 'Sales Agent', 'Medical Facility'];
     return accounts[index];
   };
 });

@@ -116,8 +116,22 @@ module.exports = function(app, passport) {
     },
     {
       name: 'Admin',
-      roles: ['*'],
-      url:'/x/'
+      roles: [0,1,2,3,4,5],
+      menu: true,
+      child: [
+        {
+          name: 'User',
+          roles: ['*'],
+          url: '/x/users',
+          menu: true
+        },
+        {
+          name: 'Orders',
+          roles: ['*'],
+          url: '/x/orders',
+          menu: true
+        }
+      ]
     }
   ];
 
@@ -232,6 +246,9 @@ module.exports = function(app, passport) {
 
   var externalApi = require('./external.js');
   externalApi.routes(app);
+
+  var admin = require('./admin.js');
+  admin.routes(app, login);
     
 
   //Home route

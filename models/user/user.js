@@ -8,7 +8,6 @@ var mongoose = require('mongoose'),
 
 
 function toLower (v) {
-    console.log(v.toLowerCase());
   return v.toLowerCase();
 }
 /**
@@ -29,6 +28,7 @@ var UserSchema = new Schema({
     salt: String,
     account_type: {type: Number, required: true},
     activated : {type: Boolean, default: false},
+    createdDate: {type: Date, default: Date.now},
     activatedDate: {type: Date},
     isTempPassword: {type: Boolean, default: true},
     allowedNotifications: {

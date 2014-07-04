@@ -322,7 +322,26 @@ OrderController.prototype.getOrders = function getOrders (orderStatus, displayTy
   console.log('Checking Orders....');
   var gt = Q.defer(), __orders;
 
+  //get all orders for admin users
+  if (accountType === 'admin') {
+    orderManager.getOrders({
+      displayType: displayType
+    })
+    .then(function (orderList) {
+      if (orderList.length) {
+        __orders = orderList;
 
+        orderManager.getItemSuppliers(__orders)
+        .then(function (populatedOrderList) {
+          return gt.resolve(populatedOrderList);
+        });      
+      } else {
+        return gt.resolve([]);
+      }
+
+      
+    });
+  }
 
   //if account type is a hospital
   if (accountType === 5) {

@@ -738,6 +738,10 @@ DrugController.prototype.fetchAllMyDrugs = function (options, userId, accountTyp
       }
       console.log(user_profile);
 
+      if (!user_profile || !user_profile.employer) {
+        return d.resolve([]);
+      }
+
       var employerId = user_profile.employer.employerId;
 
       Drug.find({'supplier.supplierId': employerId})

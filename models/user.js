@@ -11,6 +11,77 @@
  sendEmail = require('../lib/email/sendMail.js').sendHTMLMail,
 Orders = require('./order.js'),
 
+userManager = {
+  //finds a user using the users email address.
+  //
+  findUserByEmailPhone: function findUserByEmailPhone (doc) {
+    // return User.findOne({
+    //   $or: [
+    //     {email: doc.email},
+    //     {phone: doc.phone}
+    //   ]
+    // })
+    return User.find({
+        email: doc.email,
+        phone: doc.phone
+    })
+    .execQ();
+  },
+  findUserByName: function findUserByName (doc) {
+    var s = [], models = [2,3,4,5], luda = Q.defer();
+
+    function _doItForHiphop () {
+      var task = models.pop();
+      //searching every profile 
+      //till we find the names that 
+      //match out query.
+      staffUtils.getMeMyModel(task)
+      .find({})
+      .regex('name', new RegExp(doc.name, 'i'))
+      .populate('userId', 'email account_type created', 'User' )
+      .exec(function (err, d){
+        if (err) {
+          util.puts(err);
+        }
+        for (var i = 0; i < d.length; i++) {
+          s.push(d[i]);
+        }
+
+        // s.concat(d);
+        if (models.length) {
+          _doItForHiphop();
+        } else {
+          console.log(s);
+          return luda.resolve(s);
+        }
+      });
+
+    }
+
+    _doItForHiphop();
+
+    return luda.promise;
+  },
+  allUsers: function allUsers (doc) {
+    return User.find({}, 'email account_type activated')
+    .lean()
+    .skip(doc.page || 0)
+    .limit(doc.page || 20)
+    .execQ();
+  },
+  //picks the properties necessary
+  //for the object that gets returned 
+  //as a result.
+  _composeResponseUser : function _composeResponseUser (user, profile) {
+    var i = {}, 
+        userInfo = _.pick(user, ['email', 'account_type', '_id']),
+        profileInfo = _.pick(profile, ['name', 'phone', 'image']);
+
+    return _.extend(i, userInfo, profileInfo);
+  }  
+},
+
+
 UserController = function (){
   // console.log('Loading User Controller...');
 };
@@ -355,5 +426,132 @@ UserController.prototype.getProfile = function (userId, account_type) {
 
   return d.promise;
 };
+
+UserController.prototype.findAUser = function findAUser (query) {
+  var cas = Q.defer(),
+      result = [];
+
+
+
+  if (query.email || query.phone) {
+    userManager.findUserByEmailPhone({
+      email: query.email,
+      phone: query.phone
+    })
+    .then(function (f) {
+      //loop over and find the profiles for
+      //each user result found.
+      function _obPop () {
+        var task = f.pop();
+
+        staffUtils.getMeMyModel(task.account_type)
+        .findOne({
+          userId: task._id
+        })
+        .exec(function (err, myProfile) {
+          //create the valid object to
+          //be sent as a response.
+          if (myProfile) {
+            result.push(userManager._composeResponseUser(task, myProfile));
+          } else {
+            result.push(task);
+          }
+
+          if (f.length) {
+            _obPop();
+          } else {
+            return cas.resolve(result);
+          }
+        });
+      }
+
+      //if we have found users
+      //that match
+      if (f.length > 0) {
+        _obPop();
+      } else {
+        return cas.resolve([]);
+      }
+    })
+    .fail(function (err) {
+      return cas.reject(err);
+    })
+    .done();
+  }
+
+  if (query.name) {
+    userManager.findUserByName({
+      name: query.name
+    })
+    .then(function (profiles) {
+      if (!profiles.length) {
+        return cas.resolve([]);
+      }
+
+      for (var i = 0; i < profiles.length; i++) {
+        result.push(userManager._composeResponseUser(profiles[i].userId, profiles[i]));
+      } 
+
+      return cas.resolve(result);
+    }, function (err) {
+      return cas.reject(err);
+    });
+  }
+
+
+  return cas.promise;
+};
+
+UserController.prototype.loadAllUsers = function loadAllUsers (query) {
+  var cas = Q.defer(), result = [];
+
+  userManager.allUsers(query)
+  .then(function (res) {
+
+      //TODO:: should use staffUtils.populateProfile
+      //::its Dry Principle Compliant...Blah
+      //
+      //
+      //loop over and find the profiles for
+      //each user result found.
+      function _obPop () {
+        var task = res.pop();
+
+        staffUtils.getMeMyModel(task.account_type)
+        .findOne({
+          userId: task._id
+        })
+        .exec(function (err, myProfile) {
+          //create the valid object to
+          //be sent as a response.
+          if (myProfile) {
+            result.push(userManager._composeResponseUser(task, myProfile));
+          } else {
+            result.push(task);
+          }
+
+          if (res.length) {
+            _obPop();
+          } else {
+            return cas.resolve(result);
+          }
+        });
+      }
+
+      //if we have found users
+      //that match
+      if (res.length) {
+        _obPop();
+      } else {
+        return cas.resolve([]);
+      }
+  })
+  .fail(function (err) {
+    return cas.reject(err);
+  })
+  .done();
+
+  return cas.promise;
+}
 
 module.exports.User = UserController;

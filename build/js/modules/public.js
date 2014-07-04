@@ -19,7 +19,7 @@ publicModule.controller('userController', [
         if (r.status !== 200) {
           $scope.auth_message = r.data.message;
           if ($scope.rdir) {
-            $window.location.href = '/signin';
+            $window.location.href = '/p/signin';
           }
         } else {
           $window.location.href = r.data.nextUrl;

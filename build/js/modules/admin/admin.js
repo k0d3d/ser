@@ -6,125 +6,122 @@
 angular.module('admin', [])
 
 .config(['$routeProvider', function ($routeProvider){
-  $routeProvider.when('/admin', {templateUrl: '/admin/index', controller: 'adminController'});
-}])
-.controller('adminController', ['$scope', 'billsService', function adminController($scope, biller){
+  $routeProvider.when('/x/users', {
+    templateUrl: '/admin/user', 
+    controller: 'adminUsersCT'
+    })
+  .when('/x/orders', {
+    templateUrl: '/admin/orders', 
+    controller: 'adminOrdersCt'
+    });
+}
+])
 
-    function init(){
-        //Holds the new rule form
-        $scope.newrule = {
-           reference:{}
-        };
+.controller('adminUsersCT', ['$scope', 'adminService','Notification', function ($scope, adminService, N) {
+    $scope.$parent.headerTitle = 'Admin:: Manage Users';
+    $scope.users_list = [];
 
-        //holds the list of all created billing profiles
-        $scope.p = [];
-
-        //Holds the list of select billing profiles
-        $scope.activeProfile = [];
-
-        //Holds the list of visible rules
-        $scope.listrules = [];
-        $scope.l = [];
-
-        $scope.profileInput = {
-            name: '',
-            id: 0
-        };
-
-        //Calls for the list of created profiles
-        biller.profiles(function(r){
-            $scope.profiles = r;
-            angular.forEach(r, function(value, index){
-                $scope.p.push(value.profileName);
-            });
-        });
-    }
-    init();
-
-    function keisha (){
-
-    }
-
-    // //Watch the profile name input field for changes
-    // $scope.$watch("profile_name_input", function(newV, oldV){
-    //     if(newV === oldV) return newV;
-    //     $scope.activeProfile.unshift({
-    //         id: 0,
-    //         name: newV
-    //     });
-    // });
-
-    // Saves a new rule. 
-    $scope.newruleC = function(){
-        biller.newruleR($scope.newrule, function(){
-
+    $scope.load_users = function (page, limit) {
+        adminService.loadUsers({
+            page: page,
+            limit: limit
+        })
+        .then(function (res) {
+            $scope.users_list = res;
         });
     };
 
-    $scope.popRules = function(){
-        biller.allrules(function(r){
-            $scope.rulez =r;
-        });
-    };
-
-    $scope.pushrule = function(index){
-        if(_.indexOf($scope.l, $scope.rulez[index].name) > -1) return false;
-        $scope.l.push($scope.rulez[index].name);
-        $scope.listrules.push($scope.rulez[index]);
-    };
-
-    $scope.$watch('activeProfile', function(n, o){
-        if(n.length === 0) return false;
-        $scope.profileInput.name = n.profileName;
-        $scope.profileInput.id = n._id;
-        biller.brules(n._id, function(r){
-            $scope.l =[];
-            angular.forEach(r, function(value, index){
-                $scope.l.push(value.name);
-            });
-            $scope.listrules =  r;
-        });
-    }, true);
-
-    //Creates a new billing profile
-    $scope.saveProfile = function(){
-        if($scope.profileInput.name.length === 0) return false;
-        if(_.indexOf($scope.p, $scope.profileInput.name) > -1){
-            biller.updateProfile($scope.profileInput, $scope.listrules, function(r){
-
-            });
-        }else{
-            biller.createProfile($scope.profileInput, $scope.listrules, function(r){
-                $scope.p.push($scope.profileInput.name);
-            });
-        }
-    };
-}])
-.directive('propdrug', ["itemsService", function(itemsService){
-  var linker = function(scope, element, attrs){
-    var nx;
-      element.typeahead({
-        source: function(query, process){
-          if(query === "all" || query === "ALL" || query === "All" || query === "*" ) return process(["All"]);
-          return itemsService.getItemName(query,function(results, s){
-            nx = s;
-            return process(results);
-          });
-        },
-        updater: function(name){
-          _.some(nx, function(v,i){
-            if(v.itemName === name){
-              scope.newrule.reference.id = v._id;
-              scope.newrule.reference.name = v.itemName;
-              return true;
+    $scope.search_user = function (q) {
+        adminService.search(q)
+        .then(function(res) {
+            if (res.length) {
+                $scope.users_list = res;
+            } else  {
+                N.notifier({
+                  title: 'Try Something Else',
+                  text: 'We could not find a user based on your search criteria. Try again.',
+                  class_name: 'growl-danger'
+                });
             }
-          });          
-          scope.$apply();
-          return name;
-        }
+        });
+    };
+
+    $scope.manage_user = function (action, userId) {
+        adminService[action](userId)
+        .then(function(r) {
+
+        });
+    };
+
+    //load the users into the scope
+    $scope.load_users(0, 20);
+
+}])
+.controller('adminOrdersCt', ['$scope', 'adminService', function ($scope, adminService) {
+  (function(){
+    $scope.orders = [];
+    $scope.__temp = {};
+    
+    adminService.fetchAllOrders(0, 20)
+    .then(function(r){
+      angular.forEach(r, function(v){
+        //v.nextStatus = v.orderStatus + 1;
+        $scope.orders.push(v);
       });
-  };
-  return {
-    link: linker
-  };
-}]);
+    });
+
+
+  }());    
+}])
+.factory('adminService', function ($http) {
+    return {
+        fetchAllOrders: function fetchAllOrders (page, limit) {
+            return $http({
+                url: '/api/internal/admin/orders',
+                method: 'GET',
+                params: {page: page, limit: limit}
+            })
+            .then(function (r) {
+                return r.data;
+            });
+        },
+        search: function search (q) {
+            return $http({
+                url: '/api/internal/admin/search?',
+                method: 'GET',
+                params: q
+            })
+            .then(function (r) {
+                return r.data;
+            });
+        },
+        loadUsers: function loadUsers (params) {
+            return $http({
+                url: '/api/internal/admin/users?',
+                method: 'GET',
+                params: params
+            })
+            .then(function (r) {
+                return r.data;
+            });
+        },
+        activateUser: function activateUser (userId) {
+            return $http.put('/api/internal/admin/user/' + userId + '?action=activate')
+            .then(function () {
+                return true;
+            });
+        },
+        deactivateUser: function deactivateUser (userId) {
+            return $http.put('/api/internal/admin/user/' + userId + '?action=deactivate')
+            .then(function () {
+                return true;
+            });
+        },
+        deleteUser: function deleteUser (userId) {
+            return $http.delete('/api/internal/admin/user/' + userId )
+            .then(function () {
+                return true;
+            });
+        }
+    };
+});

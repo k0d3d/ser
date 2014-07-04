@@ -53,7 +53,6 @@ module.exports.routes = function (app) {
       } else {
         maps.reverseGeocode(req.query.latitude + ',' + req.query.longitude, function (err, data) {
           console.log(err);
-
           var medfacs = new MedFac();
           var address = _.pluck(data.results[0].address_components, 'short_name');
           medfacs.searchGovtRegister(req.user._id, req.user.account_type, {
