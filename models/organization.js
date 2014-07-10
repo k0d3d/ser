@@ -72,7 +72,7 @@ staffFunctions = {
       console.log(err);
     })
     .done();
- 
+
 
     return d.promise;
   },
@@ -107,7 +107,7 @@ staffFunctions = {
     .exec(function (err, i) {
       if (err) {
         return d.reject(err);
-      } 
+      }
       if (_.isEmpty(i)) {
         return d.reject(new Error('PreAccount not found'));
       } else {
@@ -129,12 +129,12 @@ staffFunctions = {
       console.log(err, i);
       if (err) {
         return d.reject(err);
-      } 
+      }
       if (!i) {
         return d.reject(new Error('PreAccount not removed'));
       } else {
         return d.resolve(options);
-      }          
+      }
     });
 
     return d.promise;
@@ -174,28 +174,28 @@ staffFunctions = {
       if (err) {
         return addingEmpl.reject(err);
       }
-      //if we find a profile, we check if its 
+      //if we find a profile, we check if its
       //all got a manager or employer, if it has one
       //we throw back an error/
-      //else we add one to it 
+      //else we add one to it
       //
       if (i) {
 
         if (i.employer.employerId) {      //account found and has employer / manager
-          return addingEmpl.reject(new Error('user is already attached to an employer')); 
+          return addingEmpl.reject(new Error('user is already attached to an employer'));
         } else {
-          //if a profile has been found without 
-          //an employer / manager.. we'll just add 
-          //one right in        
+          //if a profile has been found without
+          //an employer / manager.. we'll just add
+          //one right in
           i.employer = {employerId : doc.employerId, dateAdded: Date.now()};
           i.save(function (err, i) {
             if (err) {
               return addingEmpl.reject(err);
             } else {
               return addingEmpl.resolve(doc);
-            }          
-          });        
-        }       
+            }
+          });
+        }
       }
       //if no profile found, create
       else {
@@ -207,13 +207,13 @@ staffFunctions = {
             return addingEmpl.reject(err);
           } else {
             return addingEmpl.resolve(doc);
-          }          
+          }
         });
-      }      
+      }
 
     });
 
-    return addingEmpl.promise;        
+    return addingEmpl.promise;
   },
   addNewManager : function addNewManager (doc) {
     console.log('Adding manager');
@@ -228,29 +228,29 @@ staffFunctions = {
       if (err) {
         return addingEmpl.reject(err);
       }
-      
-      //if we find a profile, we check if its 
+
+      //if we find a profile, we check if its
       //all got a manager or employer, if it has one
       //we throw back an error/
-      //else we add one to it 
+      //else we add one to it
       //
       if (i) {
 
         if (i.manager.managerId) {      //account found and has employer / manager
-          return addingEmpl.reject(new Error('user is already attached to a manager')); 
+          return addingEmpl.reject(new Error('user is already attached to a manager'));
         } else {
-          //if a profile has been found without 
-          //an employer / manager.. we'll just add 
-          //one right in        
+          //if a profile has been found without
+          //an employer / manager.. we'll just add
+          //one right in
           i.manager = {managerId : doc.employerId, dateAdded: Date.now()};
           i.save(function (err, i) {
             if (err) {
               return addingEmpl.reject(err);
             } else {
               return addingEmpl.resolve(doc);
-            }          
-          });        
-        }       
+            }
+          });
+        }
       }
       //if no profile found, create
       else {
@@ -262,13 +262,13 @@ staffFunctions = {
             return addingEmpl.reject(err);
           } else {
             return addingEmpl.resolve(doc);
-          }          
+          }
         });
-      } 
+      }
     });
 
 
-    return addingEmpl.promise;        
+    return addingEmpl.promise;
   },
   lookUpPeople : function lookUpPeople(doc) {
     var book = Q.defer(), options;
@@ -279,7 +279,7 @@ staffFunctions = {
     if (doc.employerType === 3) {
       options = {'manager.managerId' : doc.employerId};
     }
-    
+
     staffUtils.getMeMyModel(doc.account_type)
     .find(options)
     .populate('userId', 'email account_type', 'User')
@@ -313,7 +313,7 @@ staffFunctions = {
         return added.resolve(doc);
       } else {
         return added.reject(new Error('update drugs to profile failed'));
-      }          
+      }
     });
 
     return added.promise;
@@ -329,7 +329,7 @@ staffFunctions = {
   ownerProfile : function ownerProfile (ownerId, account_type) {
     var d = Q.defer();
 
-    
+
 
     return d.promise;
   },
@@ -492,7 +492,7 @@ Staff.prototype.inviteStaff =  function (email, phone, account_type, password, e
     .lean()
     .execQ()
     .then(function (emp_doc) {
-      
+
       if (emp_doc) {
         sendDoc.employer = emp_doc;
       } else {
@@ -520,7 +520,7 @@ Staff.prototype.inviteStaff =  function (email, phone, account_type, password, e
 Staff.prototype.lookUpPreAccounts = function (options) {
   var d = Q.defer();
 
-  var limit = options.limit || 20, 
+  var limit = options.limit || 20,
       page = limit * options.page,
       employerId = options.employerId;
 
@@ -578,13 +578,13 @@ Staff.prototype.activateAccount = function activateAccount (activationToken, ema
         var profileData = _.extend(opts, removeUgly);
 
         //Add the userId prop to profileData
-        profileData.userId = usrAccount._id; 
-        return profileData;      
+        profileData.userId = usrAccount._id;
+        return profileData;
       }
 
       //Attach the profile specific information
-      //to the user profile. 
-      //This will create a profile for the user if 
+      //to the user profile.
+      //This will create a profile for the user if
       //one doesnt exist or ammend an existing profile
       if (employerType === 2) {
         staffFunctions.addNewEmployer(prepProfileData(options, r.toJSON()))
@@ -604,9 +604,9 @@ Staff.prototype.activateAccount = function activateAccount (activationToken, ema
         });
       }
 
-      return createOrAmmend.promise;          
+      return createOrAmmend.promise;
   })
-  //Expects the an object containing the 
+  //Expects the an object containing the
   //activation token.
   .then (function (doc) {
     console.log(doc);
@@ -617,7 +617,7 @@ Staff.prototype.activateAccount = function activateAccount (activationToken, ema
       return activator.resolve(r);
     }, function (err) {
       return activator.reject(err);
-    });       
+    });
   })
   .catch(function (err) {
     var errCatcher = Q.defer();
@@ -632,7 +632,7 @@ Staff.prototype.activateAccount = function activateAccount (activationToken, ema
 };
 
 /**
- * this will look up account specific employees or associates 
+ * this will look up account specific employees or associates
  * belonging to a certain employer.
  * @param  {Number} accountType the account type to look up.
  * @param  {ObjectId} employerId       the employerId
@@ -658,7 +658,7 @@ Staff.prototype.lookUpMyPeople = function lookUpMyPeople (accountType, employerI
 /**
  * queries all staff employed by an employer. i.e.
  * queries all staff, manager, distributor accounts below the current signed in user's
- * account level. 
+ * account level.
  * @param  {[type]} employerId  [description]
  * @param  {[type]} accountType [description]
  * @param  {[type]} direction [description]
@@ -685,7 +685,7 @@ Staff.prototype.lookUpWorkForce = function lookUpWorkForce (accountType, employe
       } else {
         return libr.resolve(force);
       }
-      
+
     }, function (err) {
       return libr.reject(err);
     });
@@ -776,7 +776,7 @@ Staff.prototype.getPersonProfile = function getPersonProfile (userId, accountTyp
         .exec(function (err, employerIsh) {
           user_profile.employer = employerIsh;
 
-          //if there is a manager account 
+          //if there is a manager account
           if (user_profile.manager) {
             staffUtils.getMeMyModel(3).findOne({
               userId: user_profile.manager.managerId
@@ -785,11 +785,11 @@ Staff.prototype.getPersonProfile = function getPersonProfile (userId, accountTyp
             .exec(function (err, managerIsh) {
               user_profile.manager = managerIsh;
               return d.resolve(user_profile);
-            }); 
+            });
           } else {
             return d.resolve(user_profile);
           }
-          
+
         });
       } else {
         return d.resolve(user_profile);
@@ -803,9 +803,9 @@ Staff.prototype.getPersonProfile = function getPersonProfile (userId, accountTyp
 };
 
 /**
- * tags a staff by adding a local govt name or facility 
- * to the staffs profile. This is useful to query what staff is 
- * responsible for order originating from a specific location 
+ * tags a staff by adding a local govt name or facility
+ * to the staffs profile. This is useful to query what staff is
+ * responsible for order originating from a specific location
  * or a specific facility.
  * @param  {[type]} staffId [description]
  * @param  {[type]} tagType [description]
@@ -825,7 +825,7 @@ Staff.prototype.tagStaff = function tagStaff (staffId, tagType, tag) {
       return t.resolve(done);
     }, function (err) {
       return t.reject(err);
-    });    
+    });
   }
 
 
@@ -839,16 +839,16 @@ Staff.prototype.tagStaff = function tagStaff (staffId, tagType, tag) {
       return t.resolve(done);
     }, function (err) {
       return t.reject(err);
-    }); 
+    });
   }
 
   return t.promise;
 };
 
 /**
- * untags a staff by removing a local govt name or facility 
- * to the staffs profile. This is useful to query what staff is 
- * responsible for order originating from a specific location 
+ * untags a staff by removing a local govt name or facility
+ * to the staffs profile. This is useful to query what staff is
+ * responsible for order originating from a specific location
  * or a specific facility.
  * @param  {[type]} staffId [description]
  * @param  {[type]} tagType [description]
@@ -868,7 +868,7 @@ Staff.prototype.unTagStaff = function unTagStaff (staffId, tagType, tag) {
       return t.resolve(done);
     }, function (err) {
       return t.reject(err);
-    });    
+    });
   }
 
 
@@ -882,7 +882,7 @@ Staff.prototype.unTagStaff = function unTagStaff (staffId, tagType, tag) {
       return t.resolve(done);
     }, function (err) {
       return t.reject(err);
-    }); 
+    });
   }
 
   return t.promise;

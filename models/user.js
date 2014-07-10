@@ -6,14 +6,22 @@
  Q = require('q'),
  _ = require("underscore"),
  passport = require('passport'),
- //Organization = require('./organization.js').Staff,
+ Organization = require('./organization.js').Staff,
  staffUtils = require('./staff_utils.js'),
  sendEmail = require('../lib/email/sendMail.js').sendHTMLMail,
-Orders = require('./order.js'),
+Orders = require('./order.js');
 
-userManager = {
-  //finds a user using the users email address.
-  //
+/**
+ * all the static methods required for user
+ * model operations.
+ * @type {Object}
+ */
+var userManager = {
+  /**
+   * finds a user using the users email address.
+   * @param  {[type]} doc [description]
+   * @return {[type]}     [description]
+   */
   findUserByEmailPhone: function findUserByEmailPhone (doc) {
     // return User.findOne({
     //   $or: [
@@ -27,13 +35,20 @@ userManager = {
     })
     .execQ();
   },
+  /**
+   * Finds a user by name. Searching through profiles
+   * till it find a match. Every match is saved in an array
+   * and the result is returned in a resolved promise.
+   * @param  {[type]} doc [description]
+   * @return {[type]}     [description]
+   */
   findUserByName: function findUserByName (doc) {
     var s = [], models = [2,3,4,5], luda = Q.defer();
 
     function _doItForHiphop () {
       var task = models.pop();
-      //searching every profile 
-      //till we find the names that 
+      //searching every profile
+      //till we find the names that
       //match out query.
       staffUtils.getMeMyModel(task)
       .find({})
@@ -63,26 +78,40 @@ userManager = {
     return luda.promise;
   },
   allUsers: function allUsers (doc) {
-    return User.find({}, 'email account_type activated')
+    return User.find({}, 'email account_type activated isAdmin')
     .lean()
-    .skip(doc.page || 0)
-    .limit(doc.page || 20)
+    // .skip(doc.page || 0)
+    // .limit(doc.page || 20)
     .execQ();
   },
   //picks the properties necessary
-  //for the object that gets returned 
+  //for the object that gets returned
   //as a result.
   _composeResponseUser : function _composeResponseUser (user, profile) {
-    var i = {}, 
-        userInfo = _.pick(user, ['email', 'account_type', '_id']),
+    var i = {},
+        userInfo = _.pick(user, ['email', 'account_type', '_id', 'activated', 'isAdmin']),
         profileInfo = _.pick(profile, ['name', 'phone', 'image']);
 
     return _.extend(i, userInfo, profileInfo);
-  }  
-},
+  },
+  /**
+   * deletes a user account from the system
+   * @param  {[type]} userId the objectId for the user account
+   * to be removed
+   * @return {[type]}        Promise Object
+   */
+  deleteUser: function deleteUser (userId) {
+    return User.remove({
+      _id: userId
+    })
+    .execQ();
 
 
-UserController = function (){
+  }
+};
+
+
+var UserController = function (){
   // console.log('Loading User Controller...');
 };
 
@@ -148,7 +177,7 @@ UserController.prototype.signout = function(req, res) {
  * gets redirected to after a successful login.
  * The redirect page is based on the account type and
  * roles / permission assigned to that account.
- * 
+ *
  * @param  {[type]} req [description]
  * @param  {[type]} res [description]
  * @return {[type]}     [description]
@@ -199,12 +228,12 @@ UserController.prototype.create = function(body, callback) {
               subject: 'DrugStoc Registeration', // Subject line
           }, 'views/templates/email-templates/sign-up.jade')
           .then(function () {
-              
-              
+
+
           })
           .catch(function () {
-              
-          });      
+
+          });
       callback(user);
     }
   });
@@ -252,16 +281,16 @@ UserController.prototype.findOrCreate = function (doc) {
  * Updates User Profile
  * @param  {ObjectId}   id     the ObjectId to change values for
  * @param  {Object}   body     [description]
- * @param  {Object}   account_type    This refers to the type of account / profile to update. Since 
- * user accounts are global and the model ObjectId is the reference to a profile/account type which 
- * could be Hospital / Facility, Sales Agent, Distributor and Pharma Comp. If the accountType param 
+ * @param  {Object}   account_type    This refers to the type of account / profile to update. Since
+ * user accounts are global and the model ObjectId is the reference to a profile/account type which
+ * could be Hospital / Facility, Sales Agent, Distributor and Pharma Comp. If the accountType param
  * is omitted, the code process the update for the user's account, not his profile.
  * @return {[type]}            [description]
  */
 UserController.prototype.update = function update (id, body, account_type) {
   var d = Q.defer();
 
-  if (account_type) {  
+  if (account_type) {
     staffUtils.getMeMyModel(account_type).update({
       userId : id
     }, {
@@ -284,7 +313,7 @@ UserController.prototype.update = function update (id, body, account_type) {
     }, {
       $set: body
     }, function (err, done) {
-      console.log(err, done);
+
       if (err) {
         return d.reject(err);
       }
@@ -294,7 +323,7 @@ UserController.prototype.update = function update (id, body, account_type) {
       } else {
         return d.reject(new Error('update failed'));
       }
-      
+
     });
     // User.findOne({
     //   _id: id
@@ -304,6 +333,10 @@ UserController.prototype.update = function update (id, body, account_type) {
 
 
   return d.promise;
+};
+
+UserController.prototype.accountUser = function accountUser (userId, props) {
+
 };
 
 /**
@@ -326,7 +359,7 @@ UserController.prototype.me = function(req, res) {
 };
 
 /**
- * Find user by id           
+ * Find user by id
  */
 UserController.prototype.user = function(req, res, next, id) {
   User
@@ -387,19 +420,19 @@ UserController.prototype.getProfile = function (userId, account_type) {
                 }
                 user_profile.manager = managerIsh;
                 return d.resolve(user_profile);
-              });              
+              });
             } else {
               return d.resolve(user_profile);
             }
-            
-          });  
+
+          });
 
         } else {
           return d.resolve(user_profile);
         }
 
       } else {
-          //lets check if the account is 
+          //lets check if the account is
           //a facility account, if it is,
           //we wanna have all the facilities orders
           //summed up into drug item quick list
@@ -413,9 +446,9 @@ UserController.prototype.getProfile = function (userId, account_type) {
             }, function (err) {
               return d.reject(err);
             });
-          } else {            
-            return d.resolve(user_profile);  
-          }        
+          } else {
+            return d.resolve(user_profile);
+          }
       }
     } else {
       //var tree = new staffUtils.getMeMyModel(account_type);
@@ -490,7 +523,7 @@ UserController.prototype.findAUser = function findAUser (query) {
 
       for (var i = 0; i < profiles.length; i++) {
         result.push(userManager._composeResponseUser(profiles[i].userId, profiles[i]));
-      } 
+      }
 
       return cas.resolve(result);
     }, function (err) {
@@ -552,6 +585,40 @@ UserController.prototype.loadAllUsers = function loadAllUsers (query) {
   .done();
 
   return cas.promise;
-}
+};
+
+/**
+ * removes a user account and its associated
+ * profile from the system
+ * @param  {[type]} userId      user id for the user being removed
+ * @return {[type]}             Promise Object
+ */
+UserController.prototype.removeUser = function removeUser (userId) {
+  var x = Q.defer();
+  User.findOne({
+    _id: userId
+  })
+  .exec(function  (err, i) {
+    if (err) {
+      return x.reject(err);
+    }
+    if (!i) {
+      return x.reject(new Error('user not found'));
+    }
+    userManager.deleteUser(userId)
+    .then(function () {
+      return staffUtils.removeUserProfile(userId, i.account_type);
+    })
+    .then(function () {
+      x.resolve(true);
+    })
+    .catch(function (err) {
+      x.reject(err);
+    })
+    .done();
+  });
+
+  return x.promise;
+};
 
 module.exports.User = UserController;

@@ -6,6 +6,7 @@ var app = angular.module('stocUser', [
   'ui.bootstrap',
   'services',
   'directives',
+  'admin',
   'user',
   'organization',
   'drug',
@@ -15,8 +16,7 @@ var app = angular.module('stocUser', [
   'ngTagsInput',
   'ngDragDrop',
   'xeditable',
-  'checklist-model',
-  'admin'
+  'checklist-model'
   ]);
 
 app.run(function(editableOptions) {

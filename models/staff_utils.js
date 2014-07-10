@@ -3,11 +3,11 @@ var Staff = require('./organization/staff.js'),
     Manager = require('./organization/manager.js'),
     Hospital = require('./organization/hospital.js'),
     PharmaComp = require('./organization/pharmacomp.js'),
-    _ = require('underscore'),
+    _ = require('lodash'),
     sysUtils = require('../lib/utils.js'),
     Q = require('q');
 
-module.exports = {
+var staffUtils = {
     /**
      * fetches the model to be queried using the related account level / type.
      * @param  {[type]} account_type [description]
@@ -22,7 +22,7 @@ module.exports = {
 
       if (account_type === 4) {
         return Staff;
-      }  
+      }
 
       if (account_type === 0) {
         return PharmaComp;
@@ -46,7 +46,7 @@ module.exports = {
     },
     /**
      * gets the name and description for a specific account type
-     * @param  {Number} accountType A number representing the specific account level. 
+     * @param  {Number} accountType A number representing the specific account level.
      * @return {[type]}             [description]
      */
     getAccountName: function getAccountName (accountType) {
@@ -58,7 +58,7 @@ module.exports = {
 
       if (accountType === 4) {
         return 'Staff';
-      }  
+      }
 
       if (accountType === 0) {
         return 'Pharmaceutical Company';
@@ -81,7 +81,7 @@ module.exports = {
     },
     /**
      * fetches the employees under a manager or a distributor.
-     * if the userId has an account type 
+     * if the userId has an account type
      * @param  {objectId} userId     userId of the user being queried
      * @param  {[type]} accountType [description]
      * @return {[type]}             [description]
@@ -96,7 +96,7 @@ module.exports = {
         console.log('find my manager');
         var distSearch = Q.defer();
 
-        //Check for managers 
+        //Check for managers
         Manager.find({
           'employer.employerId' : uid
         })
@@ -113,7 +113,7 @@ module.exports = {
         return distSearch.promise;
       }
 
-      //first of all, lets deny any other account (staff, hospital, pharma) from 
+      //first of all, lets deny any other account (staff, hospital, pharma) from
       //getting employees
       if (parseInt(accountType) > 3) {
         book.resolve([]);
@@ -140,7 +140,7 @@ module.exports = {
       }
 
       //if its a distributor account, 2
-      //we have to look for both staffs and managers 
+      //we have to look for both staffs and managers
       //under the distributor.
       if (parseInt(accountType) === 2) {
         __findMyManagers(userId)
@@ -159,21 +159,21 @@ module.exports = {
               people.staff = managedStaff || {};
               return book.resolve(people);
             }
-          });          
+          });
         });
       }
 
       return book.promise;
     },
     /**
-     * this replaces the field(fieldToPop) on each member / property of 
+     * this replaces the field(fieldToPop) on each member / property of
      * the doc Object with the actual collection / row .
-     * 
+     *
      * @param  {Object} doc        the document / object / array containing objects
      * which have a property to be populated.
      * @param  {String} fieldToPop the field on doc to be populated
      * @param  {Number | String} accountType the account level or account type to be
-     * populated. If accountType is a number, its used directly as an argument for 
+     * populated. If accountType is a number, its used directly as an argument for
      * self.getMeMyModel(). If it is a string, it assumes accountType is a field
      * in doc.
      * @return {Object}            Promise Object
@@ -205,7 +205,7 @@ module.exports = {
 
           task[fieldToPop] = i;
           poppedObject.push(task);
-          
+
           if (doc.length) {
             __pop();
           } else {
@@ -222,6 +222,22 @@ module.exports = {
 
 
       return pop.promise;
+    },
+    /**
+     * removes a user profile.
+     * @param  {[type]} userId      the object id of the user account
+     * @param  {[type]} accountType the account type of the user whose profile will
+     * be deleted
+     * @return {[type]}             Returns a promise.
+     */
+    removeUserProfile: function removeUserProfile (userId, accountType) {
+      return this.getMeMyModel(accountType)
+      .remove({
+        userId: userId
+      })
+      .execQ();
     }
 };
 
+// _.bind()
+module.exports = staffUtils;

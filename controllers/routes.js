@@ -116,18 +116,19 @@ module.exports = function(app, passport) {
     },
     {
       name: 'Admin',
-      roles: [0,1,2,3,4,5],
+      roles: ['x'],
       menu: true,
+      forAdmin: true,
       child: [
         {
           name: 'User',
-          roles: ['*'],
+          roles: ['x'],
           url: '/x/users',
           menu: true
         },
         {
           name: 'Orders',
-          roles: ['*'],
+          roles: ['x'],
           url: '/x/orders',
           menu: true
         }
@@ -141,13 +142,21 @@ module.exports = function(app, passport) {
   //the view templates and widgets
   app.route('*')
   .get(function (req, res, next) { 
+    var account_type = (req.user.isAdmin) ? 'x' : req.user.account_type;
 
     res.locals.hasRole = function (index, isChild, parent) {
-      var account_type = req.user.account_type;
       var this_nav = (isChild) ? nav[parent].child[index] : nav[index];
 
+      //check if the currently logged in user 
+      //has the legal role to list this as a menu
+      //item
       if (_.indexOf(this_nav.roles, account_type) > -1 || this_nav.roles[0] === '*' ) {
+        //check if this menu item should
+        //be displaced on the navigation bar
+        
         if (this_nav.menu) {
+          //check if an admin account is 
+          //logged in and show the menu.. if its an admin menu
           return true;
         } else {
           return false;
@@ -158,6 +167,9 @@ module.exports = function(app, passport) {
     };
 
     res.locals.isPermitted = function (permission) {
+      //I used req.user.account_type here cause there is 
+      //no account type in the people->array for people['x'] which equals a 
+      //admin account.
       var permits = _.intersection(permission, people[req.user.account_type].permissions);
       if (permits.length > 0) {
         return true;
@@ -192,8 +204,14 @@ module.exports = function(app, passport) {
       }
 
       var thisUrlRoles = _.find(nav.concat(children_navs), {url: req.url});
+
       var isPublicRoute = req.url.indexOf('/p/') > -1;
 
+      // this should disable none admin users from c
+      // visiting admin pages
+      if (req.url.indexOf('/x/') > -1 && !req.user.isAdmin) {
+        return res.redirect('/a/profile');
+      }
       //this should help ignore static files..
       //looking for a better hack.
       if (_.isUndefined(thisUrlRoles)) {
@@ -201,7 +219,7 @@ module.exports = function(app, passport) {
         return next();
       }
 
-      if (isPublicRoute || _.indexOf(thisUrlRoles.roles, req.user.account_type) > -1 || thisUrlRoles.roles[0] === '*') {
+      if (isPublicRoute || _.indexOf(thisUrlRoles.roles, account_type) > -1 || thisUrlRoles.roles[0] === '*') {
         next();
       } else {
         return res.redirect('/a/profile');

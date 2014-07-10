@@ -17,7 +17,11 @@ angular.module('admin', [])
 }
 ])
 
-.controller('adminUsersCT', ['$scope', 'adminService','Notification', function ($scope, adminService, N) {
+.controller('adminUsersCT', [
+    '$scope', 
+    'adminService',
+    'Notification', 
+    function ($scope, adminService, N) {
     $scope.$parent.headerTitle = 'Admin:: Manage Users';
     $scope.users_list = [];
 
@@ -53,6 +57,18 @@ angular.module('admin', [])
         });
     };
 
+    $scope.toggle_admin = function (index) {
+        adminService.updateUserType($scope.users_list[index]._id, {isAdmin: $scope.users_list[index].isAdmin})
+        .then(function () {
+            //possibly update UI
+            N.notifier({
+              title: 'Awesome!',
+              text: 'You have updated this users account.',
+              class_name: 'growl-success'
+            });
+        });
+    };
+
     //load the users into the scope
     $scope.load_users(0, 20);
 
@@ -75,6 +91,12 @@ angular.module('admin', [])
 }])
 .factory('adminService', function ($http) {
     return {
+        updateUserType: function updateUserType (userId, params) {
+            return $http.post('/api/internal/admin/users/' + userId , params)
+            .then(function () {
+                return true;
+            });
+        },  
         fetchAllOrders: function fetchAllOrders (page, limit) {
             return $http({
                 url: '/api/internal/admin/orders',
@@ -106,19 +128,19 @@ angular.module('admin', [])
             });
         },
         activateUser: function activateUser (userId) {
-            return $http.put('/api/internal/admin/user/' + userId + '?action=activate')
+            return $http.put('/api/internal/admin/users/' + userId + '?action=activate')
             .then(function () {
                 return true;
             });
         },
         deactivateUser: function deactivateUser (userId) {
-            return $http.put('/api/internal/admin/user/' + userId + '?action=deactivate')
+            return $http.put('/api/internal/admin/users/' + userId + '?action=deactivate')
             .then(function () {
                 return true;
             });
         },
         deleteUser: function deleteUser (userId) {
-            return $http.delete('/api/internal/admin/user/' + userId )
+            return $http.delete('/api/internal/admin/users/' + userId )
             .then(function () {
                 return true;
             });

@@ -52,7 +52,7 @@ mixin loadDrugPages()
                   a.pull-left(href='#')
                     img.media-object(ng-src='/images/item-images/thumb-{{drug.drug.images[drug.drug.images.length -1] || "item-avatar.jpg"}}', alt='', style="width: 50px")
                   .media-body
-                    h3.follower-name {{drug.drug.itemName}}
+                    h3.follower-name {{drug.drug.itemName || 'Removed Item'}}
                     .profile-location
                       | {{drug.drug.sciName}}
                     .profile-position

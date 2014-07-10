@@ -27,6 +27,7 @@
               table.table.table-hover.table-bordered(style="margin-top: 30px")
                 thead
                   tr
+                    th OrderId
                     th Drug Name
                     th Amount
                     th Date / Time
@@ -39,6 +40,7 @@
                     th 
                 tbody
                   tr(ng-repeat="cmp in funnel = (orders | filter:orderStatusFilter)")
+                    td {{cmp.idmask}}
                     td 
                       a(ng-href="/a/drugs/{{cmp.itemId._id}}/item") {{cmp.itemId.itemName}}
                     td {{cmp.orderAmount}}

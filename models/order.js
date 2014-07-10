@@ -333,7 +333,10 @@ OrderController.prototype.getOrders = function getOrders (orderStatus, displayTy
 
         orderManager.getItemSuppliers(__orders)
         .then(function (populatedOrderList) {
-          return gt.resolve(populatedOrderList);
+          staffUtils.populateProfile(populatedOrderList, 'hospitalId', 5)
+          .then(function (hPoppedList) {
+            return gt.resolve(hPoppedList);
+          });
         });      
       } else {
         return gt.resolve([]);

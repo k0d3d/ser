@@ -37,7 +37,9 @@ var UserSchema = new Schema({
         portal: {type: Boolean, default: true},
         mobile: {type: Boolean, default: false}
     },
-    approvedNotices: {}
+    approvedNotices: {},
+    isAdmin: {type: Boolean, default: false},
+    lastLogin: {type: Date}
 
 });
 
