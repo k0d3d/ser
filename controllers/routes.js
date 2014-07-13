@@ -138,24 +138,29 @@ module.exports = function(app, passport) {
 
 
 
-  //Sets roles and permissions to be used on 
+  //Sets roles and permissions to be used on
   //the view templates and widgets
   app.route('*')
-  .get(function (req, res, next) { 
-    var account_type = (req.user.isAdmin) ? 'x' : req.user.account_type;
+  .get(function (req, res, next) {
+    var account_type;
+    if (req.user) {
+      account_type = (req.user.isAdmin) ? 'x' : req.user.account_type;
+    } else {
+      account_type = 0;
+    }
 
     res.locals.hasRole = function (index, isChild, parent) {
       var this_nav = (isChild) ? nav[parent].child[index] : nav[index];
 
-      //check if the currently logged in user 
+      //check if the currently logged in user
       //has the legal role to list this as a menu
       //item
       if (_.indexOf(this_nav.roles, account_type) > -1 || this_nav.roles[0] === '*' ) {
         //check if this menu item should
         //be displaced on the navigation bar
-        
+
         if (this_nav.menu) {
-          //check if an admin account is 
+          //check if an admin account is
           //logged in and show the menu.. if its an admin menu
           return true;
         } else {
@@ -167,8 +172,8 @@ module.exports = function(app, passport) {
     };
 
     res.locals.isPermitted = function (permission) {
-      //I used req.user.account_type here cause there is 
-      //no account type in the people->array for people['x'] which equals a 
+      //I used req.user.account_type here cause there is
+      //no account type in the people->array for people['x'] which equals a
       //admin account.
       var permits = _.intersection(permission, people[req.user.account_type].permissions);
       if (permits.length > 0) {
@@ -181,7 +186,7 @@ module.exports = function(app, passport) {
     res.locals.navs = nav;
     res.locals.people = people;
 
-    //Minimal middleware that adds 
+    //Minimal middleware that adds
     //logged in user details to view
     //
     //checks if the current url is allowed
@@ -190,8 +195,8 @@ module.exports = function(app, passport) {
     if (req.user) {
       res.locals.userData = req.user;
 
-      //the next loop flattens my 
-      //sub menus into a the top 
+      //the next loop flattens my
+      //sub menus into a the top
       //level menu array... so i can
       //check every single menu, navigation.
       var children_navs = [];
@@ -230,16 +235,16 @@ module.exports = function(app, passport) {
       //handle unauthorized actions
       next();
     }
-    
+
 
 
   });
 
   //User Routes
 
-  var users = require('./users'); 
+  var users = require('./users');
   users.routes(app, passport, login, people);
-  
+
   //Hospital Routes
   var facility = require('./facilities');
   facility.routes(app, login);
@@ -267,7 +272,7 @@ module.exports = function(app, passport) {
 
   var admin = require('./admin.js');
   admin.routes(app, login);
-    
+
 
   //Home route
   app.route('/')
@@ -290,7 +295,7 @@ module.exports = function(app, passport) {
   .get(function(req, res){
     var parent = req.params.parent;
     var child = req.params.child;
-    res.locals.commons = require('../config/commons.js');    
+    res.locals.commons = require('../config/commons.js');
     res.render(parent+'/'+child, {
       userData: req.user
     });

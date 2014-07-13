@@ -395,6 +395,10 @@ UserController.prototype.getProfile = function (userId, account_type) {
     }
     //if thr is a profile
     if (user_profile) {
+      user_profile = _.filter(user_profile.drugs, function (o) {
+        return o.drug;
+      });
+
       // if the account is not a distributor account
       if (parseInt(account_type) !== 2 && parseInt(account_type) < 5) {
         //lets attach the employer profile
