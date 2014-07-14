@@ -35,11 +35,11 @@ app.config(function ($routeProvider, $locationProvider, $httpProvider) {
 });
 
 app.controller('MainController', [
-  '$scope', 
+  '$scope',
   '$rootScope',
-  '$http', 
-  '$location', 
-  'Notification', 
+  '$http',
+  '$location',
+  'Notification',
   'ordersService',
   'organizeStaffService',
   'appServices',
@@ -59,7 +59,7 @@ app.controller('MainController', [
     $scope.waiting = '';
     $scope.headerTitle = 'Dashboard';
 
-    
+
 
     $scope.appName = 'stocCloud';
 
@@ -82,7 +82,7 @@ app.controller('MainController', [
     });
 
     $scope.$on('newNotification', function (){
-      $.gritter.add(Notification.notice);      
+      $.gritter.add(Notification.notice);
     });
 
     $scope.$on('newEvent', function () {
@@ -127,7 +127,7 @@ app.filter('etaMoment', function(){
     };
 });
 app.filter('dashed', function () {
-  
+
   return function (word) {
     if ('undefined' === typeof(word)) {
       return 'Empty Profile';
@@ -137,14 +137,14 @@ app.filter('dashed', function () {
   };
 });
 app.filter('acctype', function () {
-  
+
   return function (index) {
     var accounts = ['Pharmaceutical Company', 'Pharma Manager', 'Distributor', 'Dist. Manager', 'Sales Agent', 'Medical Facility'];
     return accounts[index];
   };
 });
 app.filter('showHide', function () {
-  
+
   return function (word) {
     return word ? 'Hide' : 'Show';
   };
@@ -152,7 +152,7 @@ app.filter('showHide', function () {
 app.directive('dropzone', [function () {
   return {
     link : function (scope, element, attrs) {
-      $(element).dropzone({ 
+      $(element).dropzone({
         url: attrs.postUrl,
         paramName: attrs.postParam,
         maxFiles : 5,
@@ -170,8 +170,11 @@ app.directive('dropzone', [function () {
             scope.$apply();
             scope.postCb({name: scope.ngModel})
             .then(function () {
-
-            }); 
+              $('.img-is-uploading').hide();
+            });
+          });
+          this.on('uploadprogress', function (file, name) {
+            $('.img-is-uploading').show();
           });
         }
       });
@@ -200,7 +203,7 @@ app.directive('toggleActiveButton', [ function () {
 app.directive('typeAhead', [function () {
   return {
     link : function (scope, element, attrs) {
-   
+
       // constructs the suggestion engine
       var _productName = new Bloodhound({
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('productName'),
@@ -264,7 +267,7 @@ app.directive('linkTo', function () {
           case 'user':
             $(ele).prop('href', '/a/organization/people/' + id+ '/person/' + accountType);
             break;
-          default: 
+          default:
             $(ele).prop('href', '/a/drugs/' + id + '/item');
             break;
         }

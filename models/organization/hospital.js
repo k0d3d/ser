@@ -36,7 +36,11 @@ var HospitalSchema =  new Schema({
   alt_email: {type: String},
   lastActivity: {type: Date, default: Date.now()},
   quotesSince: {type: Number},
-  image: {type: String, default: 'facility-avatar-400.jpg'}
+  image: {type: String, default: 'facility-avatar-400.jpg'},
+  drugs: [{
+    drug: {type: Schema.ObjectId},
+    notes: {type: String, default: ''}
+  }],
 
 });
 

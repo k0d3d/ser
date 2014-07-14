@@ -3,6 +3,7 @@
         .col-sm-3()
 
           img.thumbnail.img-responsive.profile-img(dropzone, ng-src='https://s3-eu-west-1.amazonaws.com/drugstoc-assets/images/uploads/thumb_center_{{ userProfile.image }}' , alt='', post-url="/upload/profile", post-param="profileImage", ng-model="userProfile.image", post-cb="change_profile_photo(name)")
+          i.fa.fa-spin.fa-circle-o-notch.img-is-uploading(style="display: none")
           .mb30
           h5.subtitle About
           p.mb10.x-editable(data-type="textarea", onbeforesave="update_profile($data, $editable.name)", editable-textarea="userProfile.summary")
