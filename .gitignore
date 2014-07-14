@@ -4,7 +4,7 @@
 node_modules/**/*
 !node_modules/connect-mongo/
 !node_modules/express-jwt/
-public
+#public
 #public/lib
 config/development.json
 #public/images/profile-images
