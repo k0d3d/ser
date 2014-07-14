@@ -289,7 +289,7 @@ UserController.prototype.findOrCreate = function (doc) {
  */
 UserController.prototype.update = function update (id, body, account_type) {
   var d = Q.defer();
-
+  console.log(arguments);
   if (account_type) {
     staffUtils.getMeMyModel(account_type).update({
       userId : id
@@ -395,7 +395,7 @@ UserController.prototype.getProfile = function (userId, account_type) {
     }
     //if thr is a profile
     if (user_profile) {
-      user_profile = _.filter(user_profile.drugs, function (o) {
+      user_profile.drugs = _.filter(user_profile.drugs, function (o) {
         return o.drug;
       });
 

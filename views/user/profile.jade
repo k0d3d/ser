@@ -1,14 +1,14 @@
 .contentpanel(data-user-id="{{userProfile.userId._id || 'Empty'}}")
     .row
         .col-sm-3()
-          
-          img.thumbnail.img-responsive.profile-img(dropzone, ng-src='/images/profile-images/thumb-{{ userProfile.image }}' , alt='', post-url="/upload/profile", post-param="profileImage", ng-model="userProfile.image", post-cb="change_profile_photo(name)")
+
+          img.thumbnail.img-responsive.profile-img(dropzone, ng-src='https://s3-eu-west-1.amazonaws.com/drugstoc-assets/images/uploads/thumb_center_{{ userProfile.image }}' , alt='', post-url="/upload/profile", post-param="profileImage", ng-model="userProfile.image", post-cb="change_profile_photo(name)")
           .mb30
           h5.subtitle About
           p.mb10.x-editable(data-type="textarea", onbeforesave="update_profile($data, $editable.name)", editable-textarea="userProfile.summary")
             | {{userProfile.summary || 'Empty'}}
           a(href='#') Show More
-          .mb10        
+          .mb10
           h5.subtitle Alternative Email
           ul.profile-social-list
             li
@@ -22,7 +22,7 @@
             li
               i.fa.fa-facebook
               a.x-editable(href='#', data-type="text", onbeforesave="update_profile($data, $editable.name)", editable-text="userProfile.facebook") {{userProfile.facebook || 'Empty'}}
-            
+
           .mb30
           h5.subtitle Office Address
           address.x-editable(data-type="textarea", onbeforesave="update_profile($data, $editable.name)", editable-textarea="userProfile.address", data-defaultValue="Address")
@@ -51,25 +51,25 @@
               | {{userProfile.validation.facilityNoCode || 'Not Validated'}}
 
           -if (isPermitted(['view-profile-distributors']))
-            .mb20    
+            .mb20
             .panel.panel-default
                 .panel-body
                   a(href="#")
-                    | {{workForce[2].length || 0}} Distributors 
+                    | {{workForce[2].length || 0}} Distributors
           -if (isPermitted(['view-profile-managers']))
-            .mb20    
+            .mb20
             .panel.panel-default
                 .panel-body
                   a(href="#")
                     | {{workForce[1].length + workForce[3].length || 0}} Managers
           -if (isPermitted(['view-profile-staff']))
-            .mb20    
+            .mb20
             .panel.panel-default
                 .panel-body
                   a(href="#")
                     | {{workForce[4].length || 0}} Staff
         //
-           col-sm-3 
+           col-sm-3
         .col-sm-9
           -if (userData.account_type === 5)
             .alert.alert-warning(ng-show="!userProfile.isValidated")
@@ -79,7 +79,7 @@
             h2.profile-name.x-editable(onbeforesave="update_profile($data, $editable.name)", editable-text="userProfile.name", data-type="text", data-default-value="Full Name or Company Name") {{userProfile.name || 'Empty'}}
             - if (isPermitted(['coverage']))
               .profile-location
-                span(style="display: block", title="Your Coverage / Territory") 
+                span(style="display: block", title="Your Coverage / Territory")
                   i.fa.fa-map-marker
                   | Coverage
                 span()
@@ -87,18 +87,18 @@
             - if (isPermitted(['employer']))
               .profile-position
                 i.fa.fa-briefcase
-                span.x-editable(onbeforesave="update_profile($data, $editable.name)", editable-text="userProfile.position", data-type="text", title="Position", data-default-value="Position") {{userProfile.position || 'Empty'}} 
-                span(style="margin: 0 2px;") at 
-                a(href="/a/organization/people/{{userProfile.employer.userId || 'Empty'}}/person/2") {{userProfile.employer.name || 'Empty'}} 
+                span.x-editable(onbeforesave="update_profile($data, $editable.name)", editable-text="userProfile.position", data-type="text", title="Position", data-default-value="Position") {{userProfile.position || 'Empty'}}
+                span(style="margin: 0 2px;") at
+                a(href="/a/organization/people/{{userProfile.employer.userId || 'Empty'}}/person/2") {{userProfile.employer.name || 'Empty'}}
             - if (isPermitted(['manager']))
               .profile-position
-                span(style="margin: 0 2px;") under 
-                a(href="/a/organization/people/{{userProfile.manager.userId || 'Empty'}}/person/3") {{userProfile.manager.name || 'Empty'}} 
+                span(style="margin: 0 2px;") under
+                a(href="/a/organization/people/{{userProfile.manager.userId || 'Empty'}}/person/3") {{userProfile.manager.name || 'Empty'}}
             .mb20
             - if (isPermitted(['place-order']))
               a.btn.btn-white
                 i.fa.fa-envelope-o
-                | Order              
+                | Order
             button.btn.btn-success.mr5.start-edit
               i.fa.fa-user
               | Edit Profile
@@ -107,9 +107,9 @@
                 i.fa.fa-envelope-o
                 | Message
           //
-             profile-header 
+             profile-header
           //
-             Nav tabs 
+             Nav tabs
           ul.nav.nav-tabs.nav-justified.nav-profile
             -if (isPermitted(['view-activity']))
               li.active
@@ -132,7 +132,7 @@
                 a(href="#", data-target='#prospects', data-toggle='tab')
                   strong Map
           //
-             Tab panes 
+             Tab panes
           .tab-content
             include ../widgets/profile/activity
             +loadActivities()
@@ -145,7 +145,7 @@
 
             include ../widgets/profile/prospects
             +loadProspects()
-            
+
 include ../widgets/profile/activate-hospital
 +activateHospital(userData.account_type)
 

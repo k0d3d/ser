@@ -35,7 +35,9 @@ var HospitalSchema =  new Schema({
   contactPersonPhone: {type: String},
   alt_email: {type: String},
   lastActivity: {type: Date, default: Date.now()},
-  quotesSince: {type: Number}
+  quotesSince: {type: Number},
+  image: {type: String, default: 'facility-avatar-400.jpg'}
+
 });
 
 // HospitalSchema.virtual('stateName').get
