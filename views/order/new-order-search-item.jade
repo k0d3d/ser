@@ -111,17 +111,17 @@
           .input-group
             .input-group-btn.search-panel
               button.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown', )
-                span#search_concept Search by
+                span#search_concept Search by: {{item_query.paramName}}
                 span.caret
-              ul.dropdown-menu(role='menu', ng-init="item_query.param = 'itemName'")
+              ul.dropdown-menu(role='menu', ng-init="item_query.param = 'itemName'; item_query.paramName = 'Brand Name'")
                 li
-                  a(href='', ng-click="item_query.param = 'itemName'") Brand Name
+                  a(href='', ng-click="item_query.param = 'itemName'; item_query.paramName = 'Brand Name'") Brand Name
                 li
-                  a(href='', ng-click="item_query.param = 'sciName'") Composition
+                  a(href='', ng-click="item_query.param = 'sciName'; item_query.paramName = 'Composition'") Composition
                 li
-                  a(href='', ng-click="item_query.param = 'manufacturer'") Manufacturer
+                  a(href='', ng-click="item_query.param = 'manufacturer'; item_query.paramName = 'Manufacturer'") Manufacturer
                 li
-                  a(href='', ng-click="item_query.param = 'nafdacRegNo'") NAFDAC Reg Number
+                  a(href='', ng-click="item_query.param = 'nafdacRegNo'; item_query.paramName = 'NAFDAC Reg Number'") NAFDAC Reg Number
             input.form-control(type='text', name='x', placeholder='Search term...', ng-model="item_query.s", autofocus)
             span.input-group-btn
               button.btn.btn-default(type='button', ng-click="search(item_query)", ng-disabled="item_query.s == 0")
