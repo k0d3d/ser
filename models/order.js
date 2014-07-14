@@ -4,6 +4,8 @@ var Order = require('./order/order.js').Order,
   _ = require('underscore'),
   //Hospital = require('./organization/hospital.js') ,
   Q = require('q'),
+  config = require('config'),
+  moment = require('moment'),
   utilz = require('../lib/utils.js'),
   //EventRegister = require('../lib/event_register').register,
   staffUtils = require('./staff_utils.js'),
@@ -13,7 +15,7 @@ var Order = require('./order/order.js').Order,
   utils = require('util');
 
 
-//Underscore mixin to remove 
+//Underscore mixin to remove
 //false values from an object
 _.mixin({
   compactObject: function (o) {
@@ -33,20 +35,20 @@ var orderManager = {
     console.log('cartOrder is working....');
 
     var order = new Order(orderData), or = Q.defer();
-    
+
     order.orderDate = orderData.orderDate || Date.now();
     order.save(function (err, i) {
       if (err) {
         return or.reject(err);
       } else {
-        return or.resolve(i.toJSON()); 
+        return or.resolve(i.toJSON());
       }
     });
 
     return or.promise;
   },
   /**
-   * finds all orders that match orderId. 
+   * finds all orders that match orderId.
    * @param  {String | Numbers} orderId the last four digits of the
    * orderId.
    * @return {[type]}         [description]
@@ -139,7 +141,7 @@ var orderManager = {
         }));
       }
     });
-    
+
     return gt.promise;
   },
   getItemSuppliers : function getItemSuppliers (__orders) {
@@ -179,9 +181,9 @@ var orderManager = {
           } else {
             return gt.resolve(populatedOrderList);
           }
-        });          
+        });
       }
-    
+
     }
 
     if (__orders.length) {
@@ -190,7 +192,7 @@ var orderManager = {
       gt.resolve([]);
     }
 
-    
+
     return gt.promise;
   },
   getEmployerOrder : function getEmployerOrder (doc) {
@@ -206,14 +208,14 @@ var orderManager = {
     .then(function (orderList) {
       staffUtils.populateProfile(orderList, 'hospitalId', 5)
       .then(function (hehe) {
-        return g.resolve(hehe); 
+        return g.resolve(hehe);
       }, function (err) {
         return g.reject(err);
       });
-        // return g.resolve(orderList); 
-    }); 
+        // return g.resolve(orderList);
+    });
 
-    return g.promise;      
+    return g.promise;
   },
   createOrderStatus: function createOrderStatus (doc) {
     var upd = Q.defer();
@@ -232,10 +234,10 @@ var orderManager = {
       } else {
         return upd.resolve(true);
       }
-      
-    });    
 
-    return upd.promise; 
+    });
+
+    return upd.promise;
   },
   getFacilityOrders: function getFacilityOrders (doc) {
     var ht = Q.defer();
@@ -255,6 +257,73 @@ var orderManager = {
     });
 
     return ht.promise;
+  },
+  /**
+   * checks if a user has exceeded their quotation
+   * limits for a certain period of time. The quotation
+   * limits are set in the config file with the "quotationLimit"
+   * property.
+   * @param  {Object} doc Saved order object and the user being checked.
+   * possibly  check the users limit profile. For now, it would use the default
+   * specified in the config file. Will return a promise which
+   * should be resolved with an object that determines if the user gets sent
+   * a quotation if the limit has not be exceeded or the user gets queued for
+   * a call or contact email.
+   * @return {Promise}     [description]
+   */
+  checkQuotationLimits: function checkQuotationLimits (doc) {
+    console.log('checking order limits..');
+    var q = Q.defer(), quotationLimit = config.app.quotationLimit;
+
+    function _addAllCost (arr) {
+      return _.reduce(_.pluck(arr, 'perItemPrice'), function (sum, num) {
+              return sum + num;
+            });
+    }
+
+    //lets find how many
+    Order.find({
+      'orderDate': {
+        '$gte': new Date(moment().subtract('days', quotationLimit.days))
+      },
+      'hospitalId': doc.hospitalId,
+      'status': 0
+    }, 'orderAmount hospitalId perItemPrice orderDate')
+    .execQ()
+    .then(function (i) {
+      if (!i.length) {
+        return q.resolve({
+          request: {
+            count: i.length,
+            flag: false
+          },
+          cost: {
+            count: 0,
+            flag: false
+          },
+          orders: i
+        });
+      } else {
+        return q.resolve({
+          request: {
+            count: i.length,
+            flag: i.length > quotationLimit.request
+          },
+          cost: {
+            count: _addAllCost(i) ,
+            flag: _addAllCost(i) > quotationLimit.cost
+          }
+        });
+      }
+    })
+    .fail(function (err) {
+      console.log(err);
+      q.reject(err);
+    })
+    .done();
+
+
+    return q.promise;
   }
 };
 
@@ -305,14 +374,14 @@ OrderController.prototype.pushOrders = function (body, cb) {
         return true;
       }
     });
-  });  
+  });
 };
 
 
 
 /**
  * queries for orders by the order status order
- * @param  {[type]} orderStatus the order status to return 
+ * @param  {[type]} orderStatus the order status to return
  * @param  {[type]} displayType Full or summary results / fields returned
  * @param  {[type]} userId the user id for the logged in user.
  * @param  {[type]} accountType the user id for the logged in user.
@@ -337,19 +406,19 @@ OrderController.prototype.getOrders = function getOrders (orderStatus, displayTy
           .then(function (hPoppedList) {
             return gt.resolve(hPoppedList);
           });
-        });      
+        });
       } else {
         return gt.resolve([]);
       }
 
-      
+
     });
   }
 
   //if account type is a hospital
   if (accountType === 5) {
     console.log('Detected hospital account');
-    //Fetch orders authored / placed by the 
+    //Fetch orders authored / placed by the
     //logged in hospital.
     orderManager.getOrders({
       orderStatus: (orderStatus > 6) ? undefined : orderStatus,
@@ -364,12 +433,12 @@ OrderController.prototype.getOrders = function getOrders (orderStatus, displayTy
         orderManager.getItemSuppliers(__orders)
         .then(function (populatedOrderList) {
           return gt.resolve(populatedOrderList);
-        });      
+        });
       } else {
         return gt.resolve([]);
       }
 
-      
+
     });
   }
 
@@ -377,12 +446,12 @@ OrderController.prototype.getOrders = function getOrders (orderStatus, displayTy
   //if account type is a staff or manager
   if (accountType === 4 || accountType === 3) {
     console.log('Detected staff or manager account');
-    //Fetch orders authored / placed by the 
+    //Fetch orders authored / placed by the
     //logged in hospital.
     //what we are actually looking for is all orders
-    //placed to distributor employing the currently 
+    //placed to distributor employing the currently
     //logged in user.
-    
+
     //first of all, lets get the employerId.
     staffUtils.getMeMyModel(accountType)
     .findOne({
@@ -403,8 +472,8 @@ OrderController.prototype.getOrders = function getOrders (orderStatus, displayTy
         });
       }
     });
-    
- 
+
+
   }
 
 
@@ -417,22 +486,22 @@ OrderController.prototype.getOrders = function getOrders (orderStatus, displayTy
       orderStatus: orderStatus
     })
     .then(function (orders) {
-      return gt.resolve(orders);     
+      return gt.resolve(orders);
     });
 
-   
+
   }
-  
+
   return gt.promise;
 
 };
 
 /**
- * updates changes to an order. it also updates the 
- * order status entries to record when the order was 
- * updated. this uses the account type to restrict 
+ * updates changes to an order. it also updates the
+ * order status entries to record when the order was
+ * updated. this uses the account type to restrict
  * different user levels from performing certain updates
- * @param  {Object} orderData   the order object containing the 
+ * @param  {Object} orderData   the order object containing the
  * changed, to-be-updated order information. Including the orderId
  * @param  {ObjectId} userId      the userId of the currently logged
  * in user.
@@ -443,10 +512,10 @@ OrderController.prototype.distUpdateOrder = function(orderData, userId, accountT
   console.log('Updating order...');
   //Updates the order statuses, these are useful for order history
   //queries, etc
-  //Updates the order status 
+  //Updates the order status
   var law = Q.defer(),
       __body = _.omit(orderData, ['_id', 'hospitalId', 'itemId', 'statusLog', 'orderSupplier']);
-  
+
       //add the currently logged in
       //user as the person making changes
       //or taking charge of the order.
@@ -468,7 +537,7 @@ OrderController.prototype.distUpdateOrder = function(orderData, userId, accountT
   //   {
   //     hospitalId: orderData.hospitalId.userId,
   //     itemId: orderData.itemId._id
-  //   }, 
+  //   },
   //     _.omit(orderData, ['hospitalId', 'itemId'])
   //   )
   // };
@@ -476,12 +545,12 @@ OrderController.prototype.distUpdateOrder = function(orderData, userId, accountT
   //if the currently logged in user
   //is a staff and is confirming or disputing an order
   // if (parseInt(__body.status) < 4 && accountType === parseInt(4)) {
-  //   // options.$set.orderCharge = 
+  //   // options.$set.orderCharge =
   //   // // options.$push = {
   //   // //   statusLog: {
   //   // //       orderStatus: __body.status,
   //   // //       orderCharge: userId ,
-  //   // //       date: Date.now()     
+  //   // //       date: Date.now()
   //   // //   }
   //   // // };
   // }
@@ -489,7 +558,7 @@ OrderController.prototype.distUpdateOrder = function(orderData, userId, accountT
 
   //TODO:: use fine and Update instead of update
   //to check for current order status
-  //if the order has been confirmed.. it cannot be 
+  //if the order has been confirmed.. it cannot be
   //replace again, or confirmed again
   //if(__body.status)
   try {
@@ -542,30 +611,30 @@ OrderController.prototype.distUpdateOrder = function(orderData, userId, accountT
             if (__body.status === 2) {
               tom = 'quotation_request_replied';
             } else if (__body.status === 3) {
-              tom = 'quotation_request_confirmed'; 
+              tom = 'quotation_request_confirmed';
             } else {
-              tom = 'quotation_request_updated'; 
+              tom = 'quotation_request_updated';
             }
             // console.log(noticeData);
             return postman.noticeFn.deliveryAgent(
-              listOfRecpt, 
+              listOfRecpt,
               tom,
               noticeData
-            );          
+            );
           })
           .then(function () {
-        
+
             return law.resolve(__body);
           })
           .catch(function (err) {
             console.log(err.stack);
-            return law.reject(err);          
+            return law.reject(err);
           })
           .done();
         })
         .catch(function (err) {
           console.log(err.stack);
-        })       
+        })
         .done();
       }
 
@@ -584,7 +653,7 @@ OrderController.prototype.distUpdateOrder = function(orderData, userId, accountT
 };
 
 /**
- * get the status updates and other changes made to 
+ * get the status updates and other changes made to
  * a specific order.
  * we add the userId and account type to protect certain
  * account levels and users from making certain queries.
@@ -618,7 +687,7 @@ OrderController.prototype.getOrderStatuses = function getOrderStatuses (orderId)
     } else {
       return d.resolve(i);
     }
-    
+
   });
 
   return d.promise;
@@ -689,7 +758,7 @@ OrderController.prototype.orderUpdates = function orderUpdates (hospitalId, dayt
 };
 
 /**
- * Places a request for quotation to a distributor. 
+ * Places a request for quotation to a distributor.
  * @param  {[type]} orderData  [description]
  * @param  {[type]} orderOwner the user placing the order
  * @return {[type]}            [description]
@@ -705,17 +774,24 @@ OrderController.prototype.requestItemQuotation = function requestItemQuotation (
   orderData.statusLog = [{
     orderStatus: 0,
     date : Date.now()
-  }];  
+  }];
   orderData.orderId = utilz.uid(32);
   var order = _.omit(orderData, '_id');
   orderManager.cartOrder(order)
   .then(function (d) {
-    //return here makes sure , no notices are 
+    //return here makes sure , no notices are
     //sent.. pilot version hack
-    return procs.resolve(d);
 
+    //check if the user has reached his
+    //quotation limits.
+    orderManager.checkQuotationLimits(d)
+    .then(function (_do) {
+      console.log(_do);
+      return procs.resolve(d);
+    });
 
-    //simple hack to ensure i have the 
+    return;
+    //simple hack to ensure i have the
     //lastUpdate property. Usually with a find
     //or findOne query, lastUpdate is a virtual.
     d.lastUpdate = Date.now();
@@ -724,7 +800,7 @@ OrderController.prototype.requestItemQuotation = function requestItemQuotation (
     staffUtils.getMeMyModel(5)
     .findOne({
       userId: orderOwner
-    }, 'userId name')
+    }, 'userId name phone')
     .execQ()
     .then(function (facility_model) {
       orderData.hospitalId = facility_model;
@@ -753,7 +829,7 @@ OrderController.prototype.requestItemQuotation = function requestItemQuotation (
       .then(function (listOfRecpt) {
 
         return postman.noticeFn.deliveryAgent(
-          listOfRecpt, 
+          listOfRecpt,
           'new_quotation_request',
           noticeData
         );
@@ -764,7 +840,7 @@ OrderController.prototype.requestItemQuotation = function requestItemQuotation (
       .catch(function (err) {
         console.log(err.stack);
         return procs.reject(err);
-      }); 
+      });
 
 
     })
@@ -775,10 +851,10 @@ OrderController.prototype.requestItemQuotation = function requestItemQuotation (
 
 
 
-    // then return promise which should send messages and 
-    // sms and set activity. 
+    // then return promise which should send messages and
+    // sms and set activity.
     // arguments : -  recipient, noticeType
-    // 
+    //
     // postman.noticeFn.checkIfNotified([d], orderOwner, noticeData)
     // .then(function (done) {
     //   //use done to send email and sms
@@ -786,7 +862,7 @@ OrderController.prototype.requestItemQuotation = function requestItemQuotation (
     // }, function (err) {
     //   return procs.reject(err);
     // });
-    
+
   }, function (err) {
     return procs.reject(err);
   });
@@ -798,8 +874,8 @@ OrderController.prototype.requestItemQuotation = function requestItemQuotation (
  * changes the status of an order. An order state can only
  * be increased. An order status cannot reduce or move backwards.
  * meaning newState > oldState. The only excuse would be a cancelled order.
- * @param  {Object} object containing data sent from 
- * the browser. 
+ * @param  {Object} object containing data sent from
+ * the browser.
  * @return {[type]}       [description]
  */
 OrderController.prototype.addressQuotation = function addressQuotation (order, status, userId, accountType) {
@@ -813,7 +889,7 @@ OrderController.prototype.addressQuotation = function addressQuotation (order, s
   .exec(function (err, order_model) {
     if (err) {
       return ot.reject(err);
-    }  
+    }
     if (!order_model) {
       return ot.reject(new Error('order update failed'));
     }
@@ -872,13 +948,13 @@ OrderController.prototype.addressQuotation = function addressQuotation (order, s
               tom = 'new_quotation_request';
               // tom = 'quotation_accepted';
             } else if (status === -1) {
-              tom = 'order_cancelled'; 
+              tom = 'order_cancelled';
             }
             return postman.noticeFn.deliveryAgent(
-              listOfRecpt, 
+              listOfRecpt,
               tom,
               noticeData
-            );          
+            );
           })
           .then(function () {
 
@@ -888,12 +964,12 @@ OrderController.prototype.addressQuotation = function addressQuotation (order, s
             //   return procs.resolve(d);
             // }, function (err) {
             //   return procs.reject(err);
-            // });          
+            // });
             return ot.resolve(saved_order_model);
           })
           .catch(function (err) {
             console.log(err.stack);
-            return ot.reject(err);          
+            return ot.reject(err);
           })
           .done();
 
@@ -902,7 +978,7 @@ OrderController.prototype.addressQuotation = function addressQuotation (order, s
         })
         .catch(function (err) {
           console.log(err.stack);
-        })       
+        })
         .done();
 
       // return ot.resolve(saved_order_model);
@@ -930,7 +1006,7 @@ OrderController.prototype.hideOrderItem = function hideOrderItem (orderId) {
       return aladin.reject(err);
     }
     if (i > 0) {
-      
+
       return aladin.resolve(i);
     }
     if (i === 0) {
@@ -964,7 +1040,7 @@ OrderController.prototype.getUserOrders = function getUserOrders (userId, accoun
  * processes an incoming sms request.
  * received an object as argument containing properties
  * to be used in updating an order.
- * 
+ *
  *
  * @param  {[type]} body [description]
  * @return {[type]}      [description]
@@ -974,8 +1050,8 @@ OrderController.prototype.processSMSRequest = function processSMSRequest (body) 
   var bot = Q.defer(),
   prcs = new ProcessSMS(body.Body),
   orderIds = _.clone(prcs.parse());
-  var  
-      found_orders = [], 
+  var
+      found_orders = [],
       bad_orders = [];
   var self = this;
 
@@ -1007,7 +1083,7 @@ OrderController.prototype.processSMSRequest = function processSMSRequest (body) 
             };
             prcs.sendFeedBack(r);
             return bot.resolve(r);
-          }  
+          }
         });
 
 
@@ -1032,15 +1108,15 @@ OrderController.prototype.processSMSRequest = function processSMSRequest (body) 
     });
   };
 
-  //find the profile and employer if 
+  //find the profile and employer if
   //its a staff making update
   //
   prcs.checkPhoneNumber(body.From)
   .then(function () {
-    //calling __mamaSaid(), should check 
+    //calling __mamaSaid(), should check
     //our orderIds sent in the sms body.
     //we're checking if the orders a valid,
-    //and if the user sending the sms is 
+    //and if the user sending the sms is
     //also allowed to..
     // console.log(prcs.user);
     __mamaSaid();
@@ -1056,10 +1132,10 @@ OrderController.prototype.processSMSRequest = function processSMSRequest (body) 
     bot.reject(err);
   })
   .done();
-  
+
   //check if is hospital or staff or distributor
   //
-  //update order, 
+  //update order,
   //
   //send sms confirmation
 

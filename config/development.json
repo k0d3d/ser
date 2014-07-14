@@ -18,7 +18,7 @@
               "DELETE"
             ],
             "credentials": true,
-            "maxAge": 3600            
+            "maxAge": 3600
           }
         }
     },
@@ -33,7 +33,7 @@
             "3":"confirmed",
             "4" :"in transit",
             "5": "supplied",
-            "6" :"paid"          
+            "6" :"paid"
         }
     },
     "mail" : {
@@ -60,7 +60,7 @@
                 "subacct" : "EMAIL2SMS",
                 "subacctpwd" : "login60",
                 "sender" : "DrugStoc"
-            },    
+            },
             "twilio" : {
                 "accountSID" : "ACf84b0e66680f730edd639741d8879a89",
                 "accountToken": "fe8f201a6244729e2ea8eb0bd595c054"
@@ -73,5 +73,5 @@
             "sender" : "DrugStoc"
         }
     },
-    "mapApiKey" : "911858101470-o0vui8q6s3ur9ec2e6971ffh7nhtfs3b.apps.googleusercontent.com"    
+    "mapApiKey" : "911858101470-o0vui8q6s3ur9ec2e6971ffh7nhtfs3b.apps.googleusercontent.com"
 }

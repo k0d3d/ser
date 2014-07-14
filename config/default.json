@@ -1,16 +1,22 @@
 {
-    "db": {
-        "url": "mongodb://stocCloud:s2Oz7kDTwRuQ@ds063177.mongolab.com:63177/heroku_app23862428",
-        "user": "stocCloud",
-        "password": "s2Oz7kDTwRuQ",
-        "database": "heroku_app23862428",
-        "port": 63177,
-        "server": "ds063177.mongolab.com"
-        },
-    "express":{
-        "secret": "yfhgU&^%@N>YS!!~HJS&JDHGDbvjhg7509"
-    },
     "app": {
-        "name": "Integra StocCloud"
-    }
+        "name": "Integra StocCloud",
+        "server": "localhost:3011",
+        "statuses": {
+            "-1": "cancelled",
+            "0": "requesting quote",
+            "1": "replied quote",
+            "2":"order accepted",
+            "3":"confirmed",
+            "4" :"in transit",
+            "5": "supplied",
+            "6" :"paid"
+        },
+        "quotationLimit" : {
+            "cost" : 22200,
+            "request" : 5,
+            "days": 20
+        }
+    },
+    "mapApiKey" : "911858101470-o0vui8q6s3ur9ec2e6971ffh7nhtfs3b.apps.googleusercontent.com"
 }
