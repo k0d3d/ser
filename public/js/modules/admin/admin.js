@@ -7,20 +7,24 @@ angular.module('admin', [])
 
 .config(['$routeProvider', function ($routeProvider){
   $routeProvider.when('/x/users', {
-    templateUrl: '/admin/user', 
+    templateUrl: '/admin/user',
     controller: 'adminUsersCT'
     })
   .when('/x/orders', {
-    templateUrl: '/admin/orders', 
+    templateUrl: '/admin/orders',
     controller: 'adminOrdersCt'
+    })
+  .when('/x/drugs', {
+    templateUrl: '/admin/item',
+    controller: 'adminItemsCt'
     });
 }
 ])
 
 .controller('adminUsersCT', [
-    '$scope', 
+    '$scope',
     'adminService',
-    'Notification', 
+    'Notification',
     function ($scope, adminService, N) {
     $scope.$parent.headerTitle = 'Admin:: Manage Users';
     $scope.users_list = [];
@@ -74,10 +78,13 @@ angular.module('admin', [])
 
 }])
 .controller('adminOrdersCt', ['$scope', 'adminService', function ($scope, adminService) {
+
+  $scope.orderFilter = {};
+
   (function(){
     $scope.orders = [];
     $scope.__temp = {};
-    
+
     adminService.fetchAllOrders(0, 20)
     .then(function(r){
       angular.forEach(r, function(v){
@@ -87,7 +94,72 @@ angular.module('admin', [])
     });
 
 
-  }());    
+  })();
+
+  $scope.routeFilterParam = function routeFilterParam (item) {
+      //is it after e.g. 5days ago and before today
+      // console.log(moment(item.orderDate, 'MM-DD-YYYY').isAfter(moment($scope.orderFilter.fromDate)));
+      // console.log(moment(item.orderDate, 'MM-DD-YYYY').isBefore(moment($scope.orderFilter.toDate) ));
+      if (moment(item.orderDate).isAfter(moment($scope.orderFilter.fromDate)) &&
+        moment(item.orderDate).isBefore(moment($scope.orderFilter.toDate) )) {
+        return true;
+      } else {
+        return false;
+      }
+  };
+
+
+  $scope.showP = function () {
+    $scope.orderFilter = {
+        fromDate : moment().subtract('days', 5).format('MM-DD-YYYY'),
+        toDate : moment().add('days', 1).format('MM-DD-YYYY')
+    };
+    console.log($scope.orderFilter);
+  };
+
+
+}])
+.controller('adminItemsCt', ['$scope', 'adminService', function ($scope, adminService) {
+
+  $scope.orderFilter = {};
+
+  (function(){
+    $scope.items = [];
+    $scope.__temp = {};
+
+    adminService.fetchAllItems(0, 20)
+    .then(function(r){
+      angular.forEach(r, function(v){
+        //v.nextStatus = v.orderStatus + 1;
+        $scope.items.push(v);
+      });
+    });
+
+
+  })();
+
+  $scope.routeFilterParam = function routeFilterParam (item) {
+      //is it after e.g. 5days ago and before today
+      // console.log(moment(item.orderDate, 'MM-DD-YYYY').isAfter(moment($scope.orderFilter.fromDate)));
+      // console.log(moment(item.orderDate, 'MM-DD-YYYY').isBefore(moment($scope.orderFilter.toDate) ));
+      if (moment(item.orderDate).isAfter(moment($scope.orderFilter.fromDate)) &&
+        moment(item.orderDate).isBefore(moment($scope.orderFilter.toDate) )) {
+        return true;
+      } else {
+        return false;
+      }
+  };
+
+
+  $scope.showP = function () {
+    $scope.orderFilter = {
+        fromDate : moment().subtract('days', 5).format('MM-DD-YYYY'),
+        toDate : moment().add('days', 1).format('MM-DD-YYYY')
+    };
+    console.log($scope.orderFilter);
+  };
+
+
 }])
 .factory('adminService', function ($http) {
     return {
@@ -96,7 +168,17 @@ angular.module('admin', [])
             .then(function () {
                 return true;
             });
-        },  
+        },
+        fetchAllItems: function fetchAllItems (page, limit) {
+            return $http({
+                url: '/api/internal/admin/items',
+                method: 'GET',
+                params: {page: page, limit: limit}
+            })
+            .then(function (r) {
+                return r.data;
+            });
+        },
         fetchAllOrders: function fetchAllOrders (page, limit) {
             return $http({
                 url: '/api/internal/admin/orders',

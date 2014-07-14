@@ -11,11 +11,11 @@ config(['$routeProvider',function($routeProvider){
   .when('/a/orders/cart', {templateUrl: '/order/cart', controller: 'orderCartController'});
 }])
 .controller('orderCartController', [
-  '$scope', 
-  '$http', 
-  'ordersService', 
-  '$rootScope', 
-  'Notification', 
+  '$scope',
+  '$http',
+  'ordersService',
+  '$rootScope',
+  'Notification',
   '$route',
   function($scope, $http, ordersService, $rootScope, N, $route) {
   $scope.$parent.headerTitle = 'Pending Quotations';
@@ -45,7 +45,7 @@ config(['$routeProvider',function($routeProvider){
 
     });
    // $rootScope.my_quotation = i;
-  });  
+  });
 
   //$scope.orderCart = $rootScope.orderCart;
 
@@ -70,21 +70,22 @@ config(['$routeProvider',function($routeProvider){
 
 }])
 .controller('ordersIndexController', [
-  '$scope', 
-  '$http', 
-  '$location', 
-  '$routeParams', 
-  'ordersService', 
-  'organizeStaffService', 
+  '$scope',
+  '$http',
+  '$location',
+  '$routeParams',
+  'ordersService',
+  'organizeStaffService',
   '$route',
   function ($scope, $http, $location, $routeParams, ordersService, organizeStaffService, $route) {
   $scope.$parent.headerTitle = 'Orders';
- 
-  $scope.ordersfilter = {
-    orderStatus : ''
+
+  $scope.orderFilter = {
+    status : 2,
   };
 
   $scope.orderStatusFilter =  function orderStatusFilter (item) {
+
     var state = $scope.orderFilter.status;
     if (state == 2) {
       return (item.status < 2)? true : false;
@@ -99,10 +100,12 @@ config(['$routeProvider',function($routeProvider){
     // console.log(item);
   };
 
+
+
   (function(){
     $scope.orders = [];
     $scope.__temp = {};
-    
+
     ordersService.orders(7, 'full')
     .then(function(r){
       angular.forEach(r, function(v, i){
@@ -114,10 +117,11 @@ config(['$routeProvider',function($routeProvider){
 
   }());
 
+
   //hides an order from being visible on the table
   $scope.hide_order = function(index){
     var orderId = $scope.orders[index].orderId;
-    
+
     ordersService.hideOrderItem(orderId)
     .then(function(o){
       $scope.orders.splice(index, 1);
@@ -135,7 +139,7 @@ config(['$routeProvider',function($routeProvider){
   };
 
   //watch the __temp scope for changes.
-  //make calls for order updates when the scope 
+  //make calls for order updates when the scope
   //changes
   // $scope.$watch('__temp', function (n) {
   //   console.log(n);
@@ -176,7 +180,7 @@ config(['$routeProvider',function($routeProvider){
   $scope.update_order = function (order, index) {
     ordersService.updateOrder(order)
     .then(function () {
-      $scope.orders[index] = order;      
+      $scope.orders[index] = order;
       $('#manage-order-modal').modal('hide');
       $route.reload();
     });
@@ -212,6 +216,8 @@ config(['$routeProvider',function($routeProvider){
     }
   };
 
+
+
 }])
 .controller('orderAddController',function($scope, $http, $location, ordersService, drugService, $routeParams){
   $scope.form = {
@@ -238,7 +244,7 @@ config(['$routeProvider',function($routeProvider){
   $scope.search = function(queryObj){
     // $scope.ds = '';
     // var page = p || 0;
-    
+
     ordersService.searchCmp(queryObj)
     .then(function (r) {
       angular.forEach(r.drug, function (v, i) {
@@ -246,7 +252,7 @@ config(['$routeProvider',function($routeProvider){
       });
       $scope.searchedItems = r;
       $scope.searchedItems.s = queryObj.s;
-      
+
     });
   };
 
@@ -278,7 +284,7 @@ config(['$routeProvider',function($routeProvider){
         $scope.form = '';
     });
 
-    
+
   };
 
 
@@ -328,7 +334,7 @@ config(['$routeProvider',function($routeProvider){
       });
     };
 
-    //post one item to be added to the cart    
+    //post one item to be added to the cart
     f.addToQuotations = function(form){
       return $http.post('/api/internal/orders', form)
       .then(function (r) {
@@ -365,7 +371,7 @@ config(['$routeProvider',function($routeProvider){
           title: L[L.set].titles.error,
           text: L[L.set].order.update.success,
           class_name: 'growl-success'
-        });         
+        });
         return data.data;
       });
     };
@@ -395,7 +401,7 @@ config(['$routeProvider',function($routeProvider){
           title: L[L.set].titles.success,
           text: L[L.set].order.cancel.success,
           class_name: 'growl-success'
-        });         
+        });
         return r.data;
       });
     };
@@ -410,7 +416,7 @@ config(['$routeProvider',function($routeProvider){
       });
     };
 
-    //Request for order statuses and updates for a 
+    //Request for order statuses and updates for a
     //particular order
     f.getOrderStatusUpdates = function getOrderStatusUpdates (orderId) {
       return $http.get('/api/internal/orders/' + orderId + '/statuses')
@@ -446,7 +452,7 @@ config(['$routeProvider',function($routeProvider){
               };
               return true;
             }
-          });          
+          });
           scope.$apply();
           return name;
         }
@@ -475,8 +481,8 @@ config(['$routeProvider',function($routeProvider){
               supplierName: r.suppliers[0].supplierName
             };
             scope.form.nafdacRegNo = r.nafdacRegNo;
-            scope.form.nafdacRegName = r.itemName;            
-            scope.form.orderPrice = r.itemPurchaseRate;            
+            scope.form.nafdacRegName = r.itemName;
+            scope.form.orderPrice = r.itemPurchaseRate;
             scope.summary = r;
           });
           scope.$apply();

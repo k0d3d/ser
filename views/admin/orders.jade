@@ -1,32 +1,37 @@
 .contentpanel
     .panel.panel-default
-      .col-md-12
+      .col-md-2
+        .row
+          .form-content(style="margin-bottom: 30px")
+            form(name="searchform", novalidate, ng-submit="search_orders(search)")
+                .form-group
+                  p.form-control-static Filter Orders
+                .form-group
+                  label.control-label Order Id
+                  input.input-large.form-control(type="search", ng-model="search.orderId", placeholder="orders id...")
+                .form-group
+                  label.control-label Hospital Id
+                  input.input-large.form-control(type="search", ng-model="search.hospitalId", placeholder="hospital name...")
+                .form-group
+                  label.control-label Item Name
+                  input.input-large.form-control(type="search", ng-model="search.itemId.itemName", placeholder="item name...")
+                .form-group
+                  label.control-label Supplier Name
+                  input.input-large.form-control(type="search", ng-model="search.orderSupplier.name", placeholder="Supplier")
+                .form-group
+                  label.control-label Date
+                  input.form-control.input-large(type="date", ng-model="search.orderDate")
+                //- .form-group
+                //-   button.btn.btn-primary(type="submit") Search
+      .col-md-10
         .panel.panel-default()
-            .panel-heading(ng-init="orderFilter = {}; orderFilter.status = 2", style="height: 70px")
+            .panel-heading(style="height: 70px")
               .row
-                .form-content(style="margin-bottom: 30px")
-                  form.form-inline(name="searchform", novalidate, ng-submit="search_orders(search)")
-                    .col-md-2
-                      .form-group
-                        p.form-control-static Search Orders
-                    .col-md-2
-                      .form-group
-                        input.input-large.form-control(type="search", ng-model="search.orderId", placeholder="orders id...")
-                    .col-md-2
-                      .form-group
-                        input.input-large.form-control(type="search", ng-model="search.hospitalId", placeholder="hospital name...")
-                    .col-md-2
-                      .form-group
-                        input.input-large.form-control(type="search", ng-model="search.itemId.itemName", placeholder="item name...")
-                    .col-md-2
-                      .form-group
-                        input.input-large.form-control(type="search", ng-model="search.orderSupplier.name", placeholder="Supplier")
-                    .col-md-2
-                      .form-group
-                        button.btn.btn-primary(type="submit") Search
-              .row
-                div(style="background-color: #ddd; height: 22px;border: solid 1px #BBBBBB;")
-                  .col-md-4
+                .col-md-8
+                  button.btn-white.btn Show All Orders
+                  button.btn-warning.btn(ng-click="showP()") Show Priority Orders
+                .col-md-4
+                  div.pull-right
                     | Showing {{funnel.length}} Order(s)
             .panel-body
               table.table.table-hover.table-bordered(style="margin-top: 30px")
@@ -41,7 +46,7 @@
                     th Hospital
                     th
                 tbody
-                  tr(ng-repeat="cmp in funnel = (orders | filter: search)")
+                  tr(ng-repeat="cmp in funnel = (orders | filter: routeFilterParam)")
                     td {{cmp.idmask}}
                     td
                       a(ng-href="/a/drugs/{{cmp.itemId._id}}/item") {{cmp.itemId.itemName}}

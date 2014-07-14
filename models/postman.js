@@ -90,48 +90,48 @@ noticeFn = {
   },
   /**
    * uses staff_utils.js to query the list of users
-   * connected to an account. Its primarily used to send 
-   * notifications out. For instance, if you query the managers
+   * connected to an account. Its primarily used to send
+   * notifications out. For instance, you can query the managers
    * and staff belonging to a distributor or staffs under a manager.
-   * 
-   * 
-   * @param  {object} doc Object containing userId and accountType 
-   * properties and also an operation property which determines what 
+   *
+   *
+   * @param  {object} doc Object containing userId and accountType
+   * properties and also an operation property which determines what
    * users are concerned (the operation to carry out) .
    * @return {object}     Promise object
    */
   getConcernedStaff: function getConcernedStaff (doc) {
     var dfr = Q.defer();
     var listOfRecpt = [];
-    
+
     console.log('Getting concerned staff...');
     if (doc.operation === 'organization') {    //list of employees
           staffUtils.getMyPeople(doc.userId, doc.accountType)
           .then(function (peps) {
-    
-    
-            //list of managers 
+
+
+            //list of managers
             if (peps.managers) {
               _.each(peps.managers, function (v) {
                 listOfRecpt.push({
-                  userId: v.userId, 
+                  userId: v.userId,
                   name: v.name,
                   phone: v.phone
                 });
               });
             }
-    
-            //list of staffs 
+
+            //list of staffs
             if (peps.staff) {
               _.each(peps.staff, function (v) {
                 listOfRecpt.push({
-                  userId: v.userId, 
+                  userId: v.userId,
                   name: v.name,
                   phone: v.phone
                 });
               });
             }
-    
+
             //get the employers profile
             staffUtils.getMeMyModel(doc.accountType)
             .findOne({
@@ -143,17 +143,17 @@ noticeFn = {
               if (err) {
                 return dfr.reject(err);
               }
-    
-    
+
+
               listOfRecpt.push({
-                  userId: md.userId, 
+                  userId: md.userId,
                   name: md.name,
-                  phone: md.phone,            
+                  phone: md.phone,
                 });
               return dfr.resolve(listOfRecpt);
             });
-    
-    
+
+
             // return procs.resolve(d);
           }, function (err) {
             return dfr.reject(err);
@@ -174,23 +174,23 @@ noticeFn = {
 
         if (i) {
           // listOfRecpt.push({
-          //   userId: i.userId, 
-          //   allowedNotifications: i.allowedNotifications, 
+          //   userId: i.userId,
+          //   allowedNotifications: i.allowedNotifications,
           //   name: i.name,
-          //   phone: i.phone,            
+          //   phone: i.phone,
           //   approvedNotices: i.approvedNotices
           // });
           listOfRecpt.push({
-              userId: i.userId, 
+              userId: i.userId,
               name: i.name,
-              phone: i.phone,            
-            });          
+              phone: i.phone,
+            });
 
           dfr.resolve(listOfRecpt);
         } else {
           dfr.resolve([]);
         }
-      });      
+      });
     }
 
     return dfr.promise;
@@ -199,14 +199,14 @@ noticeFn = {
    * Send out / delivers notifications to individual
    * stoc-cloud users. It uses the 'allowedNotifications'
    * property on the user's profile to determine what mediums to send to.
-   * it second argument also specifies the kind of message 
+   * it second argument also specifies the kind of message
    * to deliver.
-   * 
+   *
    * @param  {Array} listOfRecpt   List of users to send messages to.
    * should contain a populated userId {email, ObjectId and account_type}.
    * All objects must contain 'allowedNotifications' and 'approvedNotices' property.
    * @param  {String} typeOfMessage The type of message to deliver or send out.
-   * @param {Object} noticeData object {alertType, alertDescription, meta} containing the alert type , alert description, 
+   * @param {Object} noticeData object {alertType, alertDescription, meta} containing the alert type , alert description,
    * and meta data (i.e. the object to be used in creating the alert )- properties.
    * @return {Promise}               Returns Promise
    */
@@ -218,8 +218,8 @@ noticeFn = {
     //   email : {type: Boolean, default: true},
     //   sms : {type: Boolean, default: false},
     //   portal: {type: Boolean, default: true},
-    //   mobile: {type: Boolean, default: false}        
-    // };    
+    //   mobile: {type: Boolean, default: false}
+    // };
     // console.log(doc);
     // da.resolve();
     // return da.promise;
@@ -230,23 +230,23 @@ noticeFn = {
 
       var task = listOfRecpt.pop();
       console.log(task);
-      var allowedEmail = ( typeof task.userId.allowedNotifications.email !== 'undefined') ? 
-        task.userId.allowedNotifications.email : 
+      var allowedEmail = ( typeof task.userId.allowedNotifications.email !== 'undefined') ?
+        task.userId.allowedNotifications.email :
         false;
-      var allowedSMS = ( typeof task.userId.allowedNotifications.sms !== 'undefined') ? 
-        task.userId.allowedNotifications.sms : 
+      var allowedSMS = ( typeof task.userId.allowedNotifications.sms !== 'undefined') ?
+        task.userId.allowedNotifications.sms :
         false;
-      var allowedPortal = ( typeof task.userId.allowedNotifications.portal !== 'undefined') ? 
-        task.userId.allowedNotifications.portal : 
+      var allowedPortal = ( typeof task.userId.allowedNotifications.portal !== 'undefined') ?
+        task.userId.allowedNotifications.portal :
         false;
 
       //task here is a user object.
       //
-      //lets try sending an email. if the 
+      //lets try sending an email. if the
       //user allows emails.
       if (allowedEmail) {
         var to =  function (email, alt_email) {
-          //if the primary email address 
+          //if the primary email address
           //is a drugstoc email address
           if (email.indexOf("@drugstoc.ng") > 0) {
             //check if user has an alternative email address
@@ -260,8 +260,8 @@ noticeFn = {
           }
         };
 
-        //if his email is on file.. 
-        //just a check.. he def has 
+        //if his email is on file..
+        //just a check.. he def has
         //to have an email.
         if (task.userId.email) {
           //send an email.
@@ -275,7 +275,7 @@ noticeFn = {
           }, 'views/templates/email-templates/order-note.jade', {meta: noticeData.meta, user: task, statuses: config.app.statuses})
           .then(function (done) {
             //just wanna log to console for now..
-            //TODO:: log to file 
+            //TODO:: log to file
             console.log(done);
           },  function (err) {
             //log to file later
@@ -291,16 +291,16 @@ noticeFn = {
       //try sending sms
       if (allowedSMS) {
         if (task.phone) {
-          
+
           sendSms.sendSMS(messageStrings(typeOfMessage + '.sms.message', {meta: noticeData.meta, user: task}), task.phone)
           .then(function (done) {
             //just wanna log to console for now..
-            //TODO:: log to file 
+            //TODO:: log to file
             console.log(done);
           },  function (err) {
             //log to file later
             console.log(err.stack);
-          });          
+          });
         }
       } else {
         console.log('sms not sent: %s', task.userId.email);
@@ -347,7 +347,7 @@ noticeFn = {
         __pushMessages();
       } catch (e) {
         //anything goes wrong.
-        //we end and reject the 
+        //we end and reject the
         //promise.
         da.reject(e);
         console.log(e.stack);
@@ -355,7 +355,7 @@ noticeFn = {
     }
 
     return da.promise;
-  },  
+  },
   getUpdateDescription: function getUpdateDescription (key, kind) {
     var phrases = {
       order: {
@@ -384,13 +384,13 @@ noticeFn = {
   },
   /**
    * checks if a notification has been generated for an event.
-   * it uses the an event type property, a time stamp, the eventId 
-   * and the currently logged in user as an identification. 
-   * If the event is found, it skips over creating a notification. 
-   * 
+   * it uses the an event type property, a time stamp, the eventId
+   * and the currently logged in user as an identification.
+   * If the event is found, it skips over creating a notification.
+   *
    * Else it creates a new notification.
-   * @param  {Object} obj this is an array of results from a query of 
-   * events.eg. A query for orders placed to a certain supplier. 
+   * @param  {Object} obj this is an array of results from a query of
+   * events.eg. A query for orders placed to a certain supplier.
    * @param  {ObjectId} userId the objectId (userId) of the currently logged
    * in user.
    * @param {Object} noticeData the object containing type of event being checked.
@@ -436,7 +436,7 @@ noticeFn = {
           console.log('found notices..cool');
           //Lets push it in as an event (activity)
           createdNotices.push(eventNotice.toJSON());
-          //Do Nothing, just check if there's 
+          //Do Nothing, just check if there's
           //still a task to run the check for
           if (obj.length) {
             __check();
@@ -486,7 +486,7 @@ noticeFn = {
     return ifn.promise;
   },
   /**
-   * finds all notifications belonging to a user. 
+   * finds all notifications belonging to a user.
    * @param  {[type]} userId     [description]
    * @param  {[type]} noticeData [description]
    * @return {[type]}            [description]
@@ -518,12 +518,12 @@ noticeFn = {
    * [poppedMedFac description]
    * @param  {[type]} obj [description]
    * @param {string} key a string value used to select
-   * the field on obj to be used in querying userId 
+   * the field on obj to be used in querying userId
    * on the facility collection.
    * @return {[type]}     [description]
    */
   poppedMedFac: function poppedMedFac (obj, key) {
-   console.log('Adding Med Facilities to Object'); 
+   console.log('Adding Med Facilities to Object');
     var poper = Q.defer(), newObj = [];
     //console.log(obj);
 
@@ -565,7 +565,7 @@ noticeFn = {
         }
       } else {
         //we have an object most likely.
-        //we'll just attach the populated data to a 
+        //we'll just attach the populated data to a
         //hospital property and push in the task object all
         //the same..
         task.hospital = u.strToObj(task, key);
@@ -574,7 +574,7 @@ noticeFn = {
           __curios();
         } else {
           return poper.resolve(newObj);
-        }        
+        }
       }
     }
 
@@ -606,7 +606,7 @@ noticeFn = {
       //Create activity entries
       noticeFn.findUserNotices(doc.userId, doc.noticeData)
       .then(function (v) {
-        
+
         return mine.resolve(v);
         // if (doc.noticeData.alertType === 'order') {
         //   //lets populate the hospital data
@@ -633,7 +633,7 @@ noticeFn = {
   bulkPost: function bulkNotice (obj, noticeData ) {
     var qu = Q.defer();
 
-    
+
     return qu.promise;
   },
   logError: function logError (err){
@@ -658,7 +658,7 @@ noticeFn = {
   /**
    * changes a notification document's
    * 'seen' property to true for a user
-   * 
+   *
    * @param  {[type]} doc [description]
    * @return {[type]}     [description]
    */
@@ -712,6 +712,25 @@ PostmanController = function () {
 PostmanController.prototype.constructor = PostmanController;
 
 /**
+ * send a formatted sms message
+ * @param  {[type]} doc [description]
+ * @return {[type]}     [description]
+ */
+PostmanController.prototype.sendTmplSMS = function sendTmplSMS (listOfRecpt, typeOfMessage, noticeData) {
+  console.log(listOfRecpt);
+  console.log(noticeData);
+  return sendSms.sendSMS(messageStrings(typeOfMessage + '.sms.message', {meta: noticeData.meta, user: listOfRecpt}), listOfRecpt.phone)
+          // .then(function (done) {
+          //   //just wanna log to console for now..
+          //   //TODO:: log to file
+          //   console.log(done);
+          // },  function (err) {
+          //   //log to file later
+          //   console.log(err.stack);
+          // });
+}
+
+/**
  * get
  * @param  {[type]} userId      [description]
  * @param  {[type]} accountType [description]
@@ -744,7 +763,7 @@ PostmanController.prototype.myOrderNotices = function (userId, accountType) {
 
   if (accountType > 2 && accountType < 5) {
     console.log('staff or manager detected');
-    //lets get the employerId for any account 
+    //lets get the employerId for any account
     //that isnt a staff or distributor manager
     noticeFn.fetchUserEmployer({
       userId: userId,
@@ -771,7 +790,7 @@ PostmanController.prototype.myOrderNotices = function (userId, accountType) {
       } catch (e) {
         console.log(e);
       }
-      
+
     }, function (err) {
       return mine.reject(err);
     });
@@ -788,7 +807,7 @@ PostmanController.prototype.myOrderNotices = function (userId, accountType) {
     })
     .catch(function (err) {
       console.log(err);
-    });    
+    });
   }
 
 
@@ -805,8 +824,8 @@ PostmanController.prototype.userStockNotices = function (userId, accountType) {
 
   //
   //should check if any of these
-  //activity notices has been or 
-  //hasnt been created and return 
+  //activity notices has been or
+  //hasnt been created and return
   //activities that havent been created
   // function __isNotified (obj, alert) {
   //   var koolio = Q.defer();
@@ -831,7 +850,7 @@ PostmanController.prototype.userStockNotices = function (userId, accountType) {
   if (accountType < 4){
     //distributors get stockup request (internally)
     //and stocdown request from managers and staff
-    
+
     df.getUserStockUpRequest({
       userId: userId,
       accountType: accountType
@@ -872,7 +891,7 @@ PostmanController.prototype.userStockNotices = function (userId, accountType) {
 
       return noticeFn.checkIfNotified(done, userId, noticeData);
 
-    })    
+    })
     .then(function (notices) {
 
       _.each(notices, function (val) {
@@ -931,7 +950,7 @@ PostmanController.prototype.userStockNotices = function (userId, accountType) {
 
       return noticeFn.checkIfNotified(done, userId, noticeData);
 
-    })    
+    })
     .then(function (notices) {
 
       _.each(notices, function (val) {
@@ -954,7 +973,7 @@ PostmanController.prototype.userStockNotices = function (userId, accountType) {
   //send out notices
   //
   //
-  
+
   return oops.promise;
 
 };
@@ -966,13 +985,13 @@ PostmanController.prototype.checkInStaff = function checkInStaff (userId, geoCoo
   noticeFn.getConcernedStaff({
     operation: 'user',
     userId: userId,
-    accountType: 2 
+    accountType: 2
   })
   .then(function (v) {
     //we should have a list of concerned staff now,
     //lets just save it to the recpt var.
     recpt = v;
-    
+
     //now we wanna save the checkIn.
     //
     noticeFn.saveCheckIn({
@@ -981,7 +1000,7 @@ PostmanController.prototype.checkInStaff = function checkInStaff (userId, geoCoo
     .then(function (rslt) {
       //now lets send notifications to
       //employer and manager.
-      
+
     })
     .fail(function (err) {
       return cis.reject(err);
@@ -996,7 +1015,7 @@ PostmanController.prototype.checkInStaff = function checkInStaff (userId, geoCoo
 
 /**
  * hides a notification from a user's feed.
- * hide a notification so its not 
+ * hide a notification so its not
  * shown on the user's activity feed.
  * @param  {[type]} userId   [description]
  * @param  {[type]} noticeId [description]

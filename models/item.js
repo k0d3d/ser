@@ -518,6 +518,17 @@
 
 
         return m.promise;
+      },
+      /**
+       * queries all the drugs currently on DrugStoc.
+       * @param  {[type]} doc filter query parameters. For sorting,
+       * limiting , etc.
+       * @return {[type]}     [description]
+       */
+      allDrugs: function allDrugs (doc) {
+        return Drug.find({})
+        .execQ();
+
       }
     };
 
@@ -1368,7 +1379,22 @@ DrugController.prototype.removeItem = function (drugId, owner) {
   .done();
 
   return d.promise;
-}
+};
+
+DrugController.prototype.queryAdminDrugs = function queryAdminDrugs (query) {
+  var q = Q.defer();
+
+  drugsFunctions.allDrugs(query)
+  .then(function (list) {
+    q.resolve(list);
+  })
+  .fail(function (err) {
+    q.reject(err);
+  })
+  .done();
+
+  return q.promise;
+};
 
 module.exports.Drug = DrugController;
 module.exports.drugsFunctions = drugsFunctions;

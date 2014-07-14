@@ -130,6 +130,7 @@ var orderManager = {
     // .lean()
     //.limit(perPage)
     //.skip(perPage * page)
+    .sort('-orderDate')
     .exec(function(err, o) {
       //console.log(err, o);
       if (err){
@@ -787,7 +788,38 @@ OrderController.prototype.requestItemQuotation = function requestItemQuotation (
     orderManager.checkQuotationLimits(d)
     .then(function (_do) {
       console.log(_do);
-      return procs.resolve(d);
+        //send sms as quote
+
+        var noticeData = {
+          alertType: 'send_quote',
+          meta : orderData
+        },
+        sender = new postman.Notify();
+
+        postman.noticeFn.getConcernedStaff({
+          userId: orderData.hospitalId,
+          accountType: 5,
+          operation: 'user'
+        })
+        .then(function (listOfRecpt) {
+
+          return sender.sendTmplSMS(
+            listOfRecpt[0],
+            'send_quote',
+            noticeData
+          );
+        })
+        .then(function () {
+          //send alert about being charged if
+          //true
+          return procs.resolve(d);
+        })
+        .catch(function (err) {
+          console.log(err.stack);
+          return procs.reject(err);
+        });
+
+      // return procs.resolve(d);
     });
 
     return;

@@ -3,17 +3,17 @@
       .col-md-12
         .panel.panel-default()
           -var orderStatus = (userData.account_type !== 5) ? 2 : 3
-            .panel-heading(ng-init="orderFilter = {}; orderFilter.status = #{orderStatus}", style="height: 70px")  
+            .panel-heading(style="height: 70px")
               .col-md-8
                 -if (userData.account_type !== 5)
-                  button.btn.drug-panel-buttons.btn-success(ng-class="", toggle-active-button="drug-panel-buttons", ng-click="orderFilter.status = 2") 
+                  button.btn.drug-panel-buttons.btn-success(ng-class="", toggle-active-button="drug-panel-buttons", ng-click="orderFilter.status = 2")
                     | Pending Quotations
                     //- span.label.label-default {{(orders | filter:orderStatusFilter).length}}
-                button.btn.drug-panel-buttons(ng-class="", toggle-active-button="drug-panel-buttons", ng-click="orderFilter.status = 3") 
-                  | Confirmed Orders 
+                button.btn.drug-panel-buttons(ng-class="", toggle-active-button="drug-panel-buttons", ng-click="orderFilter.status = 3")
+                  | Confirmed Orders
                   //- span.label.label-default {{(orders | filter:orderStatusFilter).length}}
-                button.btn.drug-panel-buttons(ng-class="", toggle-active-button="drug-panel-buttons", ng-click="orderFilter.status = 6") 
-                  | Supplied Orders    
+                button.btn.drug-panel-buttons(ng-class="", toggle-active-button="drug-panel-buttons", ng-click="orderFilter.status = 6")
+                  | Supplied Orders
                   //- span.label.label-default {{(orders | filter:orderStatusFilter).length}}
 
               .col-md-3
@@ -22,7 +22,7 @@
                     .form-group
                       //- input.input-large.form-control(type="search", ng-model="orderFilter.status", placeholder="Search your orders...")
               .col-md-1
-                | Showing {{funnel.length}} Order(s)                        
+                | Showing {{funnel.length}} Order(s)
             .panel-body
               table.table.table-hover.table-bordered(style="margin-top: 30px")
                 thead
@@ -37,20 +37,20 @@
                     -if (userData.account_type !== 5)
                       th Hospital
                     th ETA
-                    th 
+                    th
                 tbody
                   tr(ng-repeat="cmp in funnel = (orders | filter:orderStatusFilter)")
                     td {{cmp.idmask}}
-                    td 
+                    td
                       a(ng-href="/a/drugs/{{cmp.itemId._id}}/item") {{cmp.itemId.itemName}}
                     td {{cmp.orderAmount}}
                     td {{cmp.orderDate | date:medium}}
                     -if (userData.account_type === 5)
-                      td 
+                      td
                         a(ng-href='/a/organization/people/{{cmp.orderSupplier.userId}}/person/2') {{cmp.orderSupplier.name}}
                     td {{cmp.status | orderState}}
                     -if (userData.account_type !== 5)
-                      td 
+                      td
                         a(ng-href='/a/organization/people/{{cmp.hospitalId.userId}}/person/5') {{cmp.hospitalId.name}}
                     td
                       span(ng-show="cmp.eta", style="font-size: 11px")
@@ -58,8 +58,8 @@
                       span.label.label-success.pull-right(ng-show="cmp.eta") {{cmp.eta | moment}}
                     td
                       -if (userData.account_type !== 5)
-                        button.btn.btn-warning.btn-xs(ng-click="toggleModal('manage-order-modal', cmp, $index);") Manage this      
-                      button.btn.btn-info.btn-xs(ng-click="get_status_updates(cmp); toggleModal('manage-order-updates', cmp.statusLog, $index)") Tracking      
+                        button.btn.btn-warning.btn-xs(ng-click="toggleModal('manage-order-modal', cmp, $index);") Manage this
+                      button.btn.btn-info.btn-xs(ng-click="get_status_updates(cmp); toggleModal('manage-order-updates', cmp.statusLog, $index)") Tracking
               //- .x-pagination(pagination="orders", page-to="page(pageNo, limit, cb)")
 include ../widgets/order/manage-order-modal
 include ../widgets/order/manage-order-updates

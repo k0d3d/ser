@@ -131,6 +131,11 @@ module.exports = function(app, passport) {
           roles: ['x'],
           url: '/x/orders',
           menu: true
+        },{
+          name: 'Items',
+          roles: ['x'],
+          url: '/x/drugs',
+          menu: true
         }
       ]
     }
