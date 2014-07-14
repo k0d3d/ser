@@ -1,0 +1,83 @@
+.contentpanel
+    .row
+        .col-sm-4.col-md-3
+          h4.subtitle.mb5 Find A User
+          input.form-control(type='text', placeholder='Email Address', ng-model="query.email")
+          .mb20
+          input.form-control(type='text', placeholder='Mobile Phone Number', ng-model="query.phone")
+          .mb20
+          input.form-control(type='text', placeholder='Name', ng-model="query.name")
+          .mb20
+
+
+          a.btn.btn-primary.btn-block(ng-click="search_user(query)") Search
+          br
+        //
+           col-sm-4
+        .col-sm-8.col-md-9
+          .panel.panel-default
+            .panel-heading
+              ul.pagination.nomargin.pull-right
+                li.disabled
+                  a(href='#')
+                    i.fa.fa-angle-left
+                li
+                  a(href='#') 1
+                li.active
+                  a(href='#') 2
+                li
+                  a(href='#') 3
+                li
+                  a(href='#') 4
+                li
+                  a(href='#') 5
+                li
+                  a(href='#')
+                    i.fa.fa-angle-right
+              h4.panel-title Search results for "Users"
+              p About {{users_list.length}}+ results
+            //
+               panel-heading
+            .panel-body
+              .results-list
+                .media(ng-repeat="u in users_list")
+                  a.pull-left(href='#')
+                    img.media-object(alt='', src='images/photos/media1.jpg')
+                  .media-body
+                    h4.filename.text-primary {{u.name || '--- ---'}}
+                    small.text-muted Email: <strong> {{u.email}}</strong>
+                    br
+                    small.text-muted Phone Number: <strong> {{u.phone || 'None'}}</strong>
+                    br
+                    small.text-muted Account Type: <strong> {{u.account_type | acctype}}</strong>
+                    hr
+                    div(style="display: block")
+                    .btn-group.pull-left
+                      button.btn.btn-white.btn-sm()
+                        |  <b> Admin: </b>
+                        input(type="checkbox", ng-model="u.isAdmin", ng-change="toggle_admin($index)")
+                        button.btn.btn-success.btn-sm(ng-click="u.activated = true; manage_user('activateUser', u._id)", ng-disabled="u.activated")
+                            i.fa.fa-user
+                            i.fa.fa-check
+                            |  Activate User
+                        button.btn.btn-warning.btn-sm(ng-click="u.activated = false; manage_user('deactivateUser', u._id)", ng-disabled="!u.activated")
+                            i.fa.fa-user
+                            i.fa.fa-times
+                            |  Deactivate User
+                        button.btn.btn-danger.btn-sm(ng-click="manage_user('deleteUser', u._id)")
+                          i.fa.fa-times
+                          | Delete User
+                    .btn-group.pull-right
+                      a.btn.btn-black.btn-sm(ng-href="/a/organization/people/{{u._id}}/person/{{u.account_type}}") User profile
+                      button.btn.btn-black.btn-sm User History
+
+              //
+                 results-list
+            //
+               panel-body
+          //
+             panel
+        //
+           col-sm-8
+      //
+         row

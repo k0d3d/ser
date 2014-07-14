@@ -1,0 +1,66 @@
+.contentpanel
+    .panel.panel-default
+      .col-md-12
+        .panel.panel-default()
+            .panel-heading(ng-init="orderFilter = {}; orderFilter.status = 2", style="height: 70px")  
+              .row
+                .form-content(style="margin-bottom: 30px")
+                  form.form-inline(name="searchform", novalidate, ng-submit="search_orders(search)")
+                    .col-md-2
+                      .form-group
+                        p.form-control-static Search Orders
+                    .col-md-2
+                      .form-group
+                        input.input-large.form-control(type="search", ng-model="search.orderId", placeholder="orders id...")
+                    .col-md-2
+                      .form-group
+                        input.input-large.form-control(type="search", ng-model="search.hospitalId", placeholder="hospital name...")
+                    .col-md-2
+                      .form-group
+                        input.input-large.form-control(type="search", ng-model="search.itemId.itemName", placeholder="item name...")
+                    .col-md-2
+                      .form-group
+                        input.input-large.form-control(type="search", ng-model="search.orderSupplier.name", placeholder="Supplier")
+                    .col-md-2
+                      .form-group
+                        button.btn.btn-primary(type="submit") Search                        
+              .row
+                div(style="background-color: #ddd; height: 22px;border: solid 1px #BBBBBB;")
+                  .col-md-4
+                    | Showing {{funnel.length}} Order(s)                        
+            .panel-body
+              table.table.table-hover.table-bordered(style="margin-top: 30px")
+                thead
+                  tr
+                    th Order Id
+                    th Drug Name
+                    th Amount
+                    th Date / Time
+                    -if (userData.account_type === 5)
+                      th Supplier
+                    th Status
+                    th Hospital
+                    th 
+                tbody
+                  tr(ng-repeat="cmp in funnel = (orders | filter: search)")
+                    td {{cmp.idmask}}
+                    td 
+                      a(ng-href="/a/drugs/{{cmp.itemId._id}}/item") {{cmp.itemId.itemName}}
+                    td {{cmp.orderAmount}}
+                    td {{cmp.orderDate | date:medium}}
+                    -if (userData.account_type === 5)
+                      td 
+                        a(ng-href='/a/organization/people/{{cmp.orderSupplier.userId}}/person/2') {{cmp.orderSupplier.name}}
+                    td {{cmp.status | orderState}}
+                    td 
+                      a(ng-href='/a/organization/people/{{cmp.hospitalId.userId}}/person/5') {{cmp.hospitalId.name}}
+                      span.label.label-success.pull-right(ng-show="cmp.eta") {{cmp.eta | moment}}
+                    td
+                      -if (userData.account_type !== 5)
+                        button.btn.btn-warning.btn-xs(ng-click="toggleModal('manage-order-modal', cmp, $index);") Manage this      
+                      button.btn.btn-info.btn-xs(ng-click="get_status_updates(cmp); toggleModal('manage-order-updates', cmp.statusLog, $index)") Tracking      
+              //- .x-pagination(pagination="orders", page-to="page(pageNo, limit, cb)")
+include ../widgets/order/manage-order-modal
+include ../widgets/order/manage-order-updates
++manageOrderModal(userData.account_type)
++orderStatusUpdates()
