@@ -13,7 +13,7 @@
         var s = Q.defer();
 
         if (param === 'sciName') {
-          param = 'composition';
+          param = 'sciName';
         }
 
         if (param === 'itemName') {
@@ -49,7 +49,7 @@
       },
       searchByNDL : function searchByNDL (query, param, filter, option) {
         var s = Q.defer();
-        
+
         if (param === 'sciName') {
           param = 'composition';
         }
@@ -105,7 +105,7 @@
           }
         });
 
-        return d.promise;        
+        return d.promise;
       },
       /**
        * removes a drug item, expect an object containing
@@ -131,7 +131,7 @@
           }
         });
 
-        return d.promise;        
+        return d.promise;
       },
       createPrimaryStockRecord: function createPrimaryStockRecord (doc) {
         var loot = Q.defer();
@@ -223,7 +223,7 @@
           }
         });
 
-        return loot.promise;        
+        return loot.promise;
       },
       /**
        * queries the list of stockup request
@@ -256,7 +256,7 @@
           }
         });
 
-        return loot.promise;        
+        return loot.promise;
       },
       /**
        * queries the list of  stock down request initiated by
@@ -286,8 +286,8 @@
           }
           if (i) {
             return loot.resolve(i);
-          }      
-              
+          }
+
           // if (i) {
           //   staffUtils.getMeMyModel(i.destType)
           //   .populate(i, {path: 'destId', select: 'name userId'},
@@ -298,7 +298,7 @@
           //     console.log(docs);
           //     return loot.resolve(docs);
           //    });
-            
+
           // }
         });
 
@@ -338,7 +338,7 @@
         StockCount.findOne({
           userId: doc.primary.destId,
           accountType: doc.primary.destType,
-          itemId: doc.primary.itemId          
+          itemId: doc.primary.itemId
         })
         .exec(function (err, i) {
           console.log('Finding one stockcount record..');
@@ -351,7 +351,7 @@
             var sc = new StockCount();
             sc.userId =  doc.primary.destId;
             sc.accountType = doc.primary.destType;
-            sc.itemId = doc.primary.itemId;        
+            sc.itemId = doc.primary.itemId;
             sc.lastOperationTimeStamp = Date.now();
             sc.amount = parseInt(doc.primary.amount);
             sc.save(function (err, savedDoc) {
@@ -365,7 +365,7 @@
                 // if (i === 0 ){
                 //   return med.resolve(new Error('stock operation execution failed'));
                 // }
-            });            
+            });
           } else {
             i.lastOperationTimeStamp = Date.now();
             i.amount = parseInt(i.amount + doc.primary.amount);
@@ -380,7 +380,7 @@
                 // if (i === 0 ){
                 //   return med.resolve(new Error('stock operation execution failed'));
                 // }
-            });            
+            });
           }
 
         });
@@ -471,7 +471,7 @@
           //   code: doc.nextStatus
           // });
           // docs.status = doc.nextStatus;
-          
+
           if (err) {
             return med.reject(err);
           }
@@ -515,7 +515,7 @@
           m.resolve([]);
           return m.promise;
         }
-        
+
 
         return m.promise;
       }
@@ -573,8 +573,8 @@ DrugController.prototype.search = function(query, param, filter, option) {
         } else {
           return populate.resolve();
         }
-        
-      });        
+
+      });
     }
 
     if (found_drugs.length === 0) {
@@ -610,7 +610,7 @@ DrugController.prototype.search = function(query, param, filter, option) {
 /**
  * adds a health / medical item to the database
  * @param {Object} item         an object containing name, desciption,
- * item form, packaging, images ,...etc 
+ * item form, packaging, images ,...etc
  * @param {ObjectId} owner        the objectId of the user uploading
  * adding this drug item
  * @param {Number} account_type the account type of the user.
@@ -647,7 +647,7 @@ DrugController.prototype.summary = function (id, callback) {
       callback(err);
     } else {
       callback(i);
-    }    
+    }
   });
 };
 
@@ -674,7 +674,7 @@ DrugController.prototype.priceUpdate = function (id, price, callback){
         callback(err);
       } else {
         callback(i);
-      }     
+      }
     });
   }
 };
@@ -700,7 +700,7 @@ DrugController.prototype.updateItem = function (id, body){
       console.log(err, i);
       if(err){
         return updater.reject(err);
-      } 
+      }
       if (i > 0) {
         return updater.resolve(i);
       } else {
@@ -713,7 +713,7 @@ DrugController.prototype.updateItem = function (id, body){
 };
 
 DrugController.prototype.checkUpdate = function(since, cb){
-  
+
   DUH.find()
   .gt('lastUpdated', since)
   .populate('product_id', 'productName composition man_imp_supp regNo')
@@ -754,7 +754,7 @@ DrugController.prototype.fetchAllMyDrugs = function (options, userId, accountTyp
         if (err) {
           return d.reject(err);
         } else {
-          //add resolve to check current 
+          //add resolve to check current
           //stock for every item
           drugsFunctions.populateUserDrugStoc(i, {
             userId: userId,
@@ -765,9 +765,9 @@ DrugController.prototype.fetchAllMyDrugs = function (options, userId, accountTyp
           }, function (err) {
             return d.reject(err);
           });
-          
+
         }
-      });      
+      });
 
     });
 
@@ -782,7 +782,7 @@ DrugController.prototype.fetchAllMyDrugs = function (options, userId, accountTyp
         if (err) {
           return d.reject(err);
         } else {
-          //add resolve to check current 
+          //add resolve to check current
           //stock for every item
           drugsFunctions.populateUserDrugStoc(i, {
             userId: userId,
@@ -821,11 +821,11 @@ DrugController.prototype.fetchOneById = function (id) {
   return d.promise;
 };
 /**
- * a stoc down transaction is a pair of stock operation 
- * records.i.e. a primary and secondary operation. 
+ * a stoc down transaction is a pair of stock operation
+ * records.i.e. a primary and secondary operation.
  * A primary operation is recorded with the userId of the currently logged in user
- * as the originId . 
- * 
+ * as the originId .
+ *
  * A few rules guide stockdown operations
  *  - only a distributor and a manager can stock down
  *  - a manager or staff can receive stock i.e. stocked down to...
@@ -833,9 +833,9 @@ DrugController.prototype.fetchOneById = function (id) {
  *  - a managers stock for an item cannot go below zero
  *  - the currently logged in user is the source of the stock i.e. origin (primary)
  *  - the user submitted with the form is the receiver of stock i.e. destination (secondary).
- * a child operation is a record of a stock operation 
+ * a child operation is a record of a stock operation
  * with the userId of the user receiving the stock as the destinantion.
- * 
+ *
  * @param  {[type]} doc [description]
  * @return {[type]}     [description]
  */
@@ -854,38 +854,38 @@ DrugController.prototype.createStockDownTransaction = function createStockTransa
     op.reject(new Error('not allowed'));
     return op.promise;
   }
-  
-  //here the currently logged in user is
-  //giving out stock, being debitted.       
-  primary_doc.originId = body.staff.userId._id;
-  primary_doc.originType =  body.staff.userId.account_type;    
-  
 
-  //the form sends the id of the employee 
-  //receiving stock from the currently 
+  //here the currently logged in user is
+  //giving out stock, being debitted.
+  primary_doc.originId = body.staff.userId._id;
+  primary_doc.originType =  body.staff.userId.account_type;
+
+
+  //the form sends the id of the employee
+  //receiving stock from the currently
   //logged in user.
   if (body.staff) {
     primary_doc.destId = userId;
-    primary_doc.destType = accountType;    
+    primary_doc.destType = accountType;
   } else {
     op.reject(new Error('invalid request'));
   }
 
-  //amount here is a negative int. being that this is 
+  //amount here is a negative int. being that this is
   //a primary record and a stockdown operation for originId.
   //i.e. origin is giving his stock to dest
-  primary_doc.amount = parseInt('-' + body.amount); 
-     
+  primary_doc.amount = parseInt('-' + body.amount);
 
 
-  
+
+
 
   primary_doc.statusLog = [{
       code: 0
     }];
   primary_doc.status = 0;
   primary_doc.recordType =  'primary';
-  
+
   //---end of primary processing---//
 
 
@@ -899,30 +899,30 @@ DrugController.prototype.createStockDownTransaction = function createStockTransa
 
   //if this is a stockdown request
 
-  
+
   //here the form should send the user
-  //who will be credited with the stock     
+  //who will be credited with the stock
   if (body.staff) {
     secondary_doc.originId = userId;
-    secondary_doc.originType = accountType;    
+    secondary_doc.originType = accountType;
   } else {
     op.reject(new Error('invalid request'));
-  } 
-  
+  }
 
 
-  //the currently logged in user is 
+
+  //the currently logged in user is
   //being debitted for the record
   //
   secondary_doc.destId = body.staff.userId._id;
-  secondary_doc.destType = body.staff.userId.account_type;    
-  
+  secondary_doc.destType = body.staff.userId.account_type;
 
-  //amount here is a positive int. being that this is 
+
+  //amount here is a positive int. being that this is
   //a secondary record and a stockdown operation for originId.
   //i.e. origin is giving his stock to dest
-  secondary_doc.amount = parseInt(body.amount); 
-   
+  secondary_doc.amount = parseInt(body.amount);
+
 
 
 
@@ -931,7 +931,7 @@ DrugController.prototype.createStockDownTransaction = function createStockTransa
     }];
   secondary_doc.status = 0;
   secondary_doc.recordType =  'secondary';
-  
+
 
 
   //transaction pair
@@ -946,7 +946,7 @@ DrugController.prototype.createStockDownTransaction = function createStockTransa
   .then(function (done) {
     //if this is a distributors stockup
     //operation, lets auto add the stock
-    //without needing to 
+    //without needing to
     return op.resolve(done);
   })
   .catch(function (err) {
@@ -958,7 +958,7 @@ DrugController.prototype.createStockDownTransaction = function createStockTransa
 
 };
 /**
- * a stoc transaction is a pair of stock operation 
+ * a stoc transaction is a pair of stock operation
  * records.i.e. a parent and child operation. A parent operation
  * is recorded with the userId of the currently logged in user
  * as the origin. A few rules guide stockdown operations
@@ -968,9 +968,9 @@ DrugController.prototype.createStockDownTransaction = function createStockTransa
  *  - a managers stock for an item cannot go below zero
  *  - the currently logged in user is the source of the stock i.e. origin (primary)
  *  - the user submitted with the form is the receiver of stock i.e. destination (secondary).
- * a child operation is a record of a stock operation 
+ * a child operation is a record of a stock operation
  * with the userId of the user receiving the stock as the destinantion.
- * 
+ *
  * @param  {[type]} doc [description]
  * @return {[type]}     [description]
  */
@@ -986,38 +986,38 @@ DrugController.prototype.createStockUpTransaction = function createStockTransact
 
   //stock up
 
-  //here the form sends the Id and account type 
+  //here the form sends the Id and account type
   //of the user who is approving his stock to be
   //given to 'destId'.  th quanitity requested is
   //being debitted from him
   if (body.staff) {
     primary_doc.originId = body.staff.userId._id || body.staff.userId;
-    primary_doc.originType = body.staff.userId.account_type || 2;    
+    primary_doc.originType = body.staff.userId.account_type || 2;
   }
 
   //here the currently logged in user
-  //becomes the destination for a 
+  //becomes the destination for a
   //stock up request. because the quantity
   //requested is being credited to him
   primary_doc.destId = userId;
   primary_doc.destType = accountType;
 
-  //amount here is a positive int. being that this is 
+  //amount here is a positive int. being that this is
   //a primary record and a stockup operation for destId.
   //i.e. dest is adding to his stock from origin
-  primary_doc.amount = parseInt(body.amount);    
+  primary_doc.amount = parseInt(body.amount);
 
 
 
 
-  
+
 
   primary_doc.statusLog = [{
       code: 0
     }];
   primary_doc.status = 0;
   primary_doc.recordType =  'primary';
-  
+
   //---end of primary processing---//
 
 
@@ -1031,32 +1031,32 @@ DrugController.prototype.createStockUpTransaction = function createStockTransact
   //stock up
 
   //here we keep a record of the currently
-  //logged in user, giving out stock to 
-  //an employee. 
+  //logged in user, giving out stock to
+  //an employee.
 
   secondary_doc.originId = userId;
-  secondary_doc.originType = accountType;    
-  
+  secondary_doc.originType = accountType;
 
-  //Now this operation can exist 
-  //in a scenerio where the currently logged in 
+
+  //Now this operation can exist
+  //in a scenerio where the currently logged in
   //user is a distributor and is adding stock
-  //from outside stocCloud logic. So the staff 
-  //object might be empty.     
+  //from outside stocCloud logic. So the staff
+  //object might be empty.
   if (body.staff) {
     secondary_doc.destId = body.staff.userId._id || body.staff.userId;
-    secondary_doc.destType = body.staff.userId.account_type || 2;       
+    secondary_doc.destType = body.staff.userId.account_type || 2;
   } else if (accountType === 2) {
-    //allow this only if the currently 
+    //allow this only if the currently
     //logged in user is a distributor.
-    //this provides distributor stocking up 
+    //this provides distributor stocking up
     //from an external source
     secondary_doc.destId = userId;
-    secondary_doc.destType = accountType;  
+    secondary_doc.destType = accountType;
   }
- 
 
-  //amount here is a negative int. being that this is 
+
+  //amount here is a negative int. being that this is
   //a secondary record and a stockup operation for userId.
   //i.e. userId is adding to his stock from destId
   secondary_doc.amount = parseInt('-' + body.amount);
@@ -1070,7 +1070,7 @@ DrugController.prototype.createStockUpTransaction = function createStockTransact
     }];
   secondary_doc.status = 0;
   secondary_doc.recordType =  'secondary';
-  
+
 
 
   //transaction pair
@@ -1085,7 +1085,7 @@ DrugController.prototype.createStockUpTransaction = function createStockTransact
   .then(function (done) {
     //if this is a distributors stockup
     //operation, lets auto add the stock
-    //without needing to 
+    //without needing to
     return op.resolve(done);
   })
   .catch(function (err) {
@@ -1097,11 +1097,11 @@ DrugController.prototype.createStockUpTransaction = function createStockTransact
 
 };
 /**
- * processes a stock request. depending on what 
- * decision the user takes, a request can be 
+ * processes a stock request. depending on what
+ * decision the user takes, a request can be
  * confirmed i.e. record updated to 1 or denied / rejected
  * i.e. record updated to -1. If a record has already been attended,
- * any further request to attend to this record will be cancelled . 
+ * any further request to attend to this record will be cancelled .
  * @param  {[type]} itemId        [description]
  * @param  {[type]} userId        [description]
  * @param  {[type]} accountType   [description]
@@ -1138,12 +1138,12 @@ DrugController.prototype.attendRequest = function attendRequest (itemId, userId,
     doc.primary = _.where(trans, {recordType: 'primary'})[0];
     doc.secondary = _.where(trans, {recordType: 'secondary'})[0];
 
-    //validate this transaction 
+    //validate this transaction
     if (permittedTransitions(doc.primary.destId, doc.primary.status, nextStatus)) {
       //proceed with operation
       //
-      //if nextStatus is -1 which is rejecting 
-      //the transaction. 
+      //if nextStatus is -1 which is rejecting
+      //the transaction.
       //then lets skip the stockCount update operation
       //to the next task of updating the transaction
       if (nextStatus === -1) {
@@ -1156,7 +1156,7 @@ DrugController.prototype.attendRequest = function attendRequest (itemId, userId,
           return mid.resolve(w);
         }, function (err) {
           return mid.reject(err);
-        });  
+        });
 
       }
 
@@ -1174,7 +1174,7 @@ DrugController.prototype.attendRequest = function attendRequest (itemId, userId,
     var upd = Q.defer();
 
     drugsFunctions.execTransactionUpdate({
-      transactionId: transactionId, 
+      transactionId: transactionId,
       nextStatus: nextStatus
     })
     .then(function (done) {
@@ -1194,7 +1194,7 @@ DrugController.prototype.attendRequest = function attendRequest (itemId, userId,
     console.log(err);
     loot.reject(err);
   });
-  
+
   //execute request
   //send response
 
@@ -1202,7 +1202,7 @@ DrugController.prototype.attendRequest = function attendRequest (itemId, userId,
 };
 
 /**
- * queries the records of stock operations. 
+ * queries the records of stock operations.
  * @param  {[type]} itemId      [description]
  * @param  {[type]} userId      [description]
  * @param  {[type]} accountType [description]
@@ -1250,7 +1250,7 @@ DrugController.prototype.stockLog = function stockLog (userId, accountType, acti
   return loot.promise;
 };
 /**
- * queries the records of stock operations. 
+ * queries the records of stock operations.
  * @param  {[type]} itemId      [description]
  * @param  {[type]} userId      [description]
  * @param  {[type]} accountType [description]
@@ -1319,17 +1319,17 @@ DrugController.prototype.stockRequest = function stockRequest (userId, accountTy
       }, function (err) {
         return loot.reject(err);
       });
-      
+
     });
   }
 
 
 
-  return loot.promise;  
+  return loot.promise;
 };
 
 /**
- * finds a drug by using the nafdac registration number 
+ * finds a drug by using the nafdac registration number
  * supplied as an argument
  * @param  {[type]} query [description]
  * @return {[type]}       [description]
@@ -1349,7 +1349,7 @@ DrugController.prototype.fetchByRegNo = function(query){
     }
   });
 
-  return loot.promise; 
+  return loot.promise;
 };
 
 DrugController.prototype.removeItem = function (drugId, owner) {
@@ -1363,10 +1363,10 @@ DrugController.prototype.removeItem = function (drugId, owner) {
     d.resolve(true);
   })
   .fail(function(err) {
-    d.reject(err); 
+    d.reject(err);
   })
   .done();
-  
+
   return d.promise;
 }
 

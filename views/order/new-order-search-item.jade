@@ -20,7 +20,7 @@
               button.btn.btn-primary.btn-sm(type="submit", ng-disabled="searchItemForm.$invalid") Search
           br
         //
-           col-sm-4 
+           col-sm-4
         .col-sm-8.col-md-9
           .panel.panel-default
             .panel-heading
@@ -42,11 +42,11 @@
                   a(href='#')
                     i.fa.fa-angle-right
               h4.panel-title Search results for {{searchedItems.s}}
-              p About {{searchedItems.drug.length + searchedItems.ndl.length}} results 
+              p About {{searchedItems.drug.length + searchedItems.ndl.length}} results
                 a(href="#", ng-click="show_ndl = !show_ndl", ng-init="show_ndl == false")
                   | {{show_ndl | showHide}} remaining {{searchedItems.ndl.length}}
             //
-               panel-heading 
+               panel-heading
             .panel-body
               .item-result-list
                 .media(ng-repeat="drugItem in searchedItems.drug")
@@ -58,20 +58,20 @@
                         h4.filename.text-primary {{drugItem.itemName}}
                         table.table
                           thead
-                            tr 
+                            tr
                               th Composition
-                              th Manufacturer 
-                              th Current Price                                                       
+                              th Manufacturer
+                              th Current Price
                           tbody
                             tr
                               td {{drugItem.sciName}}
-                              td {{drugItem.pharma.pharmaName}}                        
+                              td {{drugItem.pharma.pharmaName}}
                               td {{drugItem.instantQuote | instantQuote }}
                   .row
                     .col-sm-4
-                      span.label.label-info(style="display: inline-block")  <strong>Supplier: </strong> {{drugItem.owner.name}}                          
+                      span.label.label-info(style="display: inline-block")  <strong>Supplier: </strong> {{drugItem.owner.name}}
                     .col-sm-8
-                      div.pull-right  
+                      div.pull-right
                         div(style="width: 150px; float: left; margin-left: 5px", ng-show="drugItem.sentRequest == 'input'")
                           span(style="text-align: center; display: block") {{drugItem.packageQty}} \ {{drugItem.itemPackaging || '--'}}
                           span(style="text-align: center; display: block") <strong>Total items :</strong> {{drugItem.packageQty * drugItem.packageCount || 0}}
@@ -115,13 +115,13 @@
                 span.caret
               ul.dropdown-menu(role='menu', ng-init="item_query.param = 'itemName'")
                 li
-                  a(href='', ng-click="item_query.param == 'itemName'") Brand Name
+                  a(href='', ng-click="item_query.param = 'itemName'") Brand Name
                 li
-                  a(href='', ng-click="item_query.param == 'sciName'") Composition
+                  a(href='', ng-click="item_query.param = 'sciName'") Composition
                 li
-                  a(href='', ng-click="item_query.param == 'manufacturer'") Manufacturer 
+                  a(href='', ng-click="item_query.param = 'manufacturer'") Manufacturer
                 li
-                  a(href='', ng-click="item_query.param == 'nafdacRegNo'") NAFDAC Reg Number
+                  a(href='', ng-click="item_query.param = 'nafdacRegNo'") NAFDAC Reg Number
             input.form-control(type='text', name='x', placeholder='Search term...', ng-model="item_query.s", autofocus)
             span.input-group-btn
               button.btn.btn-default(type='button', ng-click="search(item_query)", ng-disabled="item_query.s == 0")
