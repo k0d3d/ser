@@ -79,7 +79,7 @@
                           input.form-control(type='number', ng-model="drugItem.packageCount", required, ng-init="drugItem.packageCount = 0", placeholder="number of packages")
                         div(style="float: left; margin-left: 5px")
                           button.btn.btn-default.dropdown-toggle(type='button', ng-show="!drugItem.sentRequest || drugItem.sentRequest == 'no'", ng-click="drugItem.sentRequest = 'input'; drugItem.isSendin = false")
-                            | Request Quote
+                            | N20 per Quote
                         div(style="width: 150px; float: left; margin-left: 5px", ng-show="drugItem.sentRequest == 'sent'")
                           button.btn.btn-success-alt.dropdown-toggle(type='button', disabled)
                             | Request Sent
@@ -101,31 +101,34 @@
                   .col-sm-8.col-sm-offset-5
 
 
-.contentpanel(ng-hide="searchedItems")
+.contentpanel.cool-bg(ng-hide="searchedItems", style="min-height: 500px")
     .row
       p.text-center
-        img(src="/images/search-icon.png", style="width: 190px")
+        //- img(src="/images/search-icon.png", style="width: 190px")
 
     .row
         .col-xs-8.col-xs-offset-2
-          .input-group
-            .input-group-btn.search-panel
-              button.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown', )
-                span#search_concept Search by: {{item_query.paramName}}
-                span.caret
-              ul.dropdown-menu(role='menu', ng-init="item_query.param = 'itemName'; item_query.paramName = 'Brand Name'")
-                li
-                  a(href='', ng-click="item_query.param = 'itemName'; item_query.paramName = 'Brand Name'") Brand Name
-                li
-                  a(href='', ng-click="item_query.param = 'sciName'; item_query.paramName = 'Composition'") Composition
-                li
-                  a(href='', ng-click="item_query.param = 'manufacturer'; item_query.paramName = 'Manufacturer'") Manufacturer
-                li
-                  a(href='', ng-click="item_query.param = 'nafdacRegNo'; item_query.paramName = 'NAFDAC Reg Number'") NAFDAC Reg Number
-            input.form-control(type='text', name='x', placeholder='Search term...', ng-model="item_query.s", autofocus)
-            span.input-group-btn
-              button.btn.btn-default(type='button', ng-click="search(item_query)", ng-disabled="item_query.s == 0")
-                span.glyphicon.glyphicon-search
+          form
+            .input-group
+              .input-group-btn.search-panel
+                button.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown', )
+                  span#search_concept Search by: {{item_query.paramName}}
+                  span.caret
+                ul.dropdown-menu(role='menu', ng-init="item_query.param = 'itemName'; item_query.paramName = 'Brand Name'")
+                  li
+                    a(href='', ng-click="item_query.param = 'itemName'; item_query.paramName = 'Brand Name'") Brand Name
+                  li
+                    a(href='', ng-click="item_query.param = 'sciName'; item_query.paramName = 'Composition'") Composition
+                  li
+                    a(href='', ng-click="item_query.param = 'manufacturer'; item_query.paramName = 'Manufacturer'") Manufacturer
+                  li
+                    a(href='', ng-click="item_query.param = 'nafdacRegNo'; item_query.paramName = 'NAFDAC Reg Number'") NAFDAC Reg Number
+              input.form-control(type='text', name='x', placeholder='Search term...', ng-model="item_query.s", autofocus)
+              span.input-group-btn
+                button.btn.btn-default(type='submit', ng-click="search(item_query)", ng-disabled="item_query.s == 0")
+                  span.glyphicon.glyphicon-search
 
 append foot
   //- script(src="/js/modules/order/google-search.js")
+script.
+  $('.cool-bg').backstretch('/images/cool-bg.jpg')

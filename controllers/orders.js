@@ -71,6 +71,9 @@ module.exports.routes = function(app, login){
   app.post('/api/internal/orders',function(req, res){
     order.requestItemQuotation(req.body, req.user._id)
     .then(function(r){
+      if (r.message) {
+        return res.json(200, r);        
+      }
       res.json(200, true);
     }, function (err) {
       res.json(400, err.message);

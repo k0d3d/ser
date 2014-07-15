@@ -194,7 +194,11 @@ UserController.prototype.session = function(req, res, next) {
       if (err) {
         next(err);
       } else {
-        res.json(200, {nextUrl: '/a/profile'});
+        if (user.account_type === 5) {
+          res.json(200, {nextUrl: '/a/orders/new'});
+        } else {
+          res.json(200, {nextUrl: '/a/profile'});
+        }
       }
     });
   })(req, res, next);

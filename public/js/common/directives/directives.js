@@ -31,14 +31,14 @@ app.directive('onFinish',function($timeout){
             break;
           }
         });
-
+        
       }
     }
   };
 });
 
 app.directive('alertMessage', ['$interpolate', '$sce', function ($interpolate, $sce) {
-  //passing in the status for different
+  //passing in the status for different 
   //alert type and stages. this function
   //return the right sentence, and html
   //formating to be displayed
@@ -62,7 +62,7 @@ app.directive('alertMessage', ['$interpolate', '$sce', function ($interpolate, $
       scope.phrase = $sce.trustAsHtml(phrase);
     },
     scope: {
-      act: '=alertMessage'
+      act: '=alertMessage' 
     },
     template: '<strong ng-bind-html="phrase"></strong>'
   };
@@ -131,21 +131,30 @@ app.directive('pagination', [function(){
       if(scope.currentPage === 0) return false;
       scope.currentPage--;
       scope.$apply();
+
+      // var page = scope.pageno - 1;
+      // scope.pageTo({pageNo: page, limit: scope.limit, cb: function(r){
+      //   if(r) scope.pageno--;
+      // }});
     });
     $('button.nextbtn', element).on('click', function(e){
       scope.currentPage++;
       scope.$apply();
+      // var page = scope.pageno + 1;
+      // scope.pageTo({pageNo: page, limit: scope.limit, cb: function(r){
+      //   if(r) scope.pageno++;
+      // }});
     });
     scope.pagelimit = function(pageLimit){
       scope.pageTo({
-        currentPage: scope.currentPage,
-        pageLimit: pageLimit,
+        currentPage: scope.currentPage, 
+        pageLimit: pageLimit, 
         cb: function(r){
           if(r) scope.pageLimit = pageLimit;
         }
-      });
+      });  
       //quick hack!! should suffice for now
-      scope.pageLimit = pageLimit;
+      scope.pageLimit = pageLimit;      
     };
   }
   return {

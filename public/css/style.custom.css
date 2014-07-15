@@ -1,10 +1,12 @@
 a.btn-line {
   display: block;
 }
-.people-item{
+
+.people-item {
   border: solid 1px #ddd;
 }
-.dropzone{
+
+.dropzone {
   min-height: 0px;
 }
 
@@ -15,6 +17,7 @@ a.btn-line {
   font-family: Prociono;
   src: url(../font/Prociono-Regular-webfont.ttf);
 }
+
 
 /* scaffolding */
 /* ----------- */
@@ -107,8 +110,8 @@ p + p {
   line-height: 30px;
   border: 2px solid #ccc;
   -webkit-border-radius: 8px;
-     -moz-border-radius: 8px;
-          border-radius: 8px;
+  -moz-border-radius: 8px;
+  border-radius: 8px;
   outline: none;
 }
 
@@ -122,8 +125,8 @@ p + p {
 
 .tt-query {
   -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-     -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
 }
 
 .tt-hint {
@@ -140,11 +143,11 @@ p + p {
   border: 1px solid #ccc;
   border: 1px solid rgba(0, 0, 0, 0.2);
   -webkit-border-radius: 8px;
-     -moz-border-radius: 8px;
-          border-radius: 8px;
-  -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
-     -moz-box-shadow: 0 5px 10px rgba(0,0,0,.2);
-          box-shadow: 0 5px 10px rgba(0,0,0,.2);
+  -moz-border-radius: 8px;
+  border-radius: 8px;
+  -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
 
 .tt-suggestion {
@@ -156,7 +159,6 @@ p + p {
 .tt-suggestion.tt-cursor {
   color: #fff;
   background-color: #0097cf;
-
 }
 
 .tt-suggestion p {
@@ -166,15 +168,17 @@ p + p {
 .gist {
   font-size: 14px;
 }
+
 span.twitter-typeahead {
   display: block !important;
 }
+
 /* example specific styles */
 /* ----------------------- */
 
 #custom-templates .empty-message {
   padding: 5px 10px;
- text-align: center;
+  text-align: center;
 }
 
 #multiple-datasets .league-name {
@@ -192,86 +196,96 @@ span.twitter-typeahead {
   text-align: right;
 }
 
-
-.cart-table .item-image{
+.cart-table .item-image {
   width: 50px;
 }
+
 .profile-img {
   height: 200px;
-  width: 200px; 
+  width: 200px;
   display: inline-block;
-  background-image: url('../images/default-avatar.jpg');
+  background-image: url("../images/default-avatar.jpg");
 }
+
 .drug-search-img {
   height: 100px;
-  width: 100px; 
+  width: 100px;
   display: inline-block;
-  background-image: url('../images/item-images/default/item-avatar-small.jpg');
+  background-image: url("../images/item-images/default/item-avatar-small.jpg");
 }
 
 .item-result-list .label {
   padding: 10px 25px;
-  font-size: 14px
+  font-size: 14px;
 }
+
 .item-result-list .table {
-  margin-bottom: 5px
+  margin-bottom: 5px;
 }
 
 .item-result-list .media-body {
   line-height: 35px;
-  padding-left: 5px
+  padding-left: 5px;
 }
 
 .status-row {
   border-bottom: solid 2px #72C2F0;
   box-shadow: 0px 1px 4px #C5C5C5;
-  margin-bottom: 3px;  
+  margin-bottom: 3px;
 }
 
 .status-row .status-title {
   display: block;
 }
+
 .status-row p {
   font-size: 12px;
   margin: 0;
 }
+
 .people-item i.fa-arrows {
   position: absolute;
   top: 5px;
   left: 4px;
-  color: #ddd;  
+  color: #ddd;
 }
+
 .people-item i.fa-arrows:hover {
   color: #000;
   cursor: move;
 }
+
 .collection-li li {
   text-transform: capitalize;
   list-style: none;
   margin: 2px 5px;
 }
+
 .collection-li {
   margin-top: 10px;
   background-color: #ddd;
   padding: 2px 5px;
-  border: solid 1px #BEBEBE;  
+  border: solid 1px #BEBEBE;
 }
+
 .collection-li-over {
   height: 225px;
   border: solid 2px #2DC539 !important;
   box-sizing: border-box;
 }
+
 p.text-area {
   height: 50px;
   border-bottom: solid 1px #ddd;
 }
+
 .editable-wrap {
-/*  padding: 5px;
-  background-color: #C4C4C4;
-  border: solid 1px #949494;
-  position: absolute;
-  z-index: 9;  
-  top: -5px;*/
+  /*  padding: 5px;
+    background-color: #C4C4C4;
+    border: solid 1px #949494;
+    position: absolute;
+    z-index: 9;
+    top: -5px;*/
 }
 
 span.media-desc {
@@ -280,57 +294,74 @@ span.media-desc {
   border: solid 1px #ddd;
   margin: 0 4px;
 }
+
 select.editable-has-buttons {
-  max-width: 170px
+  max-width: 170px;
 }
+
 .sr-ol i:hover {
   color: #D9534F;
 }
+
 .act-spr-img {
   background-image: url(../images/order-status-sprite.png);
   width: 16px;
   height: 16px;
   display: block;
 }
+
 .act-spr-img.a0 {
   background-position: 112px 0;
 }
+
 .act-spr-img.a1 {
   background-position: 96px 0;
 }
+
 .act-spr-img.a3 {
   background-position: 80px 0;
 }
+
 .act-spr-img.a2 {
   background-position: 64px 0;
 }
+
 .act-spr-img.a4 {
   background-position: 32px 0;
 }
+
 .act-spr-img.a5 {
   background-position: 16px 0;
 }
+
 .act-spr-img.a6 {
   background-position: 48px 0;
 }
 
 [ng-cloak].splash {
-    display: block !important;
+  display: block !important;
 }
+
 .splash {
-    display: none;
+  display: none;
 }
 
 .toggle-UAN {
   background-color: #000;
   font-weight: normal;
 }
+
 .toggle-UAN:active, .toggle-UAN.active {
   background-color: #3276B1;
   font-weight: bold;
 }
+
 .dropdown-menu .divider {
   background-color: rgba(255, 255, 255, 0.19);
   display: block;
-  margin: 10px 0;  
+  margin: 10px 0;
+}
+
+.x-view {
+  min-height: 700px;
 }

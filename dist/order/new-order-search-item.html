@@ -80,7 +80,7 @@
                       <input type="number" ng-model="drugItem.packageCount" required="required" ng-init="drugItem.packageCount = 0" placeholder="number of packages" class="form-control"/>
                     </div>
                     <div style="float: left; margin-left: 5px">
-                      <button type="button" ng-show="!drugItem.sentRequest || drugItem.sentRequest == 'no'" ng-click="drugItem.sentRequest = 'input'" class="btn btn-default dropdown-toggle">Request Quote</button>
+                      <button type="button" ng-show="!drugItem.sentRequest || drugItem.sentRequest == 'no'" ng-click="drugItem.sentRequest = 'input'" class="btn btn-default dropdown-toggle">N20 per Quote</button>
                     </div>
                     <div style="width: 150px; float: left; margin-left: 5px" ng-show="drugItem.sentRequest == 'sent'">
                       <button type="button" disabled="disabled" class="btn btn-success-alt dropdown-toggle">Request Sent</button>

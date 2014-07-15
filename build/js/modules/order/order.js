@@ -340,7 +340,7 @@ config(['$routeProvider',function($routeProvider){
       .then(function (r) {
         N.notifier({
           title: L[L.set].titles.success,
-          text: L[L.set].order.cart.place.success,
+          text: r.message || L[L.set].order.cart.place.success,
           class_name: 'growl-success'
         });
         return r.data;

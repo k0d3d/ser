@@ -717,18 +717,10 @@ PostmanController.prototype.constructor = PostmanController;
  * @return {[type]}     [description]
  */
 PostmanController.prototype.sendTmplSMS = function sendTmplSMS (listOfRecpt, typeOfMessage, noticeData) {
-  console.log(listOfRecpt);
-  console.log(noticeData);
+
   return sendSms.sendSMS(messageStrings(typeOfMessage + '.sms.message', {meta: noticeData.meta, user: listOfRecpt}), listOfRecpt.phone)
-          // .then(function (done) {
-          //   //just wanna log to console for now..
-          //   //TODO:: log to file
-          //   console.log(done);
-          // },  function (err) {
-          //   //log to file later
-          //   console.log(err.stack);
-          // });
-}
+
+};
 
 /**
  * get

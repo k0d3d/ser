@@ -8,7 +8,7 @@ module.exports = function(grunt) {
         //   options: {
         //     livereload: true,
         //   },
-        // },            
+        // },
         js: {
           files: ['build/**/*.js'],
           tasks: ['clean:modules', 'copy:modulesjs','copy:vendorjs', 'uglify:js'],
@@ -47,7 +47,7 @@ module.exports = function(grunt) {
           ],
           filename: 'fingerprint.txt',
         },
-      },   
+      },
       bump: {
         options: {
           files: ['package.json'],
@@ -62,7 +62,7 @@ module.exports = function(grunt) {
           pushTo: 'origin',
           gitDescribeOptions: '--tags --always --abbrev=1 --dirty=-d'
         }
-      },       
+      },
       jshint: {
         all: ['gruntfile.js', 'public/js/**/*.js', 'test/**/*.js', 'app/**/*.js']
       },
@@ -84,7 +84,7 @@ module.exports = function(grunt) {
         }
       },
       concurrent: {
-        tasks: ['nodemon', 'watch'], 
+        tasks: ['nodemon', 'watch'],
         options: {
           logConcurrentOutput: true
         }
@@ -133,7 +133,7 @@ module.exports = function(grunt) {
             ]
           }
         }
-      },      
+      },
       copy: {
         build: {
           cwd: 'build',
@@ -157,7 +157,7 @@ module.exports = function(grunt) {
             'css/ng-tags-input.min.css',
             'css/jquery-ui-1.10.3.css',
             'css/dropzone.css',
-            'css/xeditable.css',          // 
+            'css/xeditable.css',          //
             'css/bootstrap-override.css',
             'css/lato.css',
             // 'css/.css',
@@ -169,7 +169,7 @@ module.exports = function(grunt) {
             'js/pace.js',
             'js/bootstrap.min.js',
             'js/angular.min.js',
-            'js/angular-route.min.js',      
+            'js/angular-route.min.js',
             'js/easing.js',
             'js/typer.js',
             'js/nicescroll.js',
@@ -193,12 +193,13 @@ module.exports = function(grunt) {
             'js/ketchup.all.js',
             'js/dropzone.min.js',
             'js/tooltip.js',
+            'js/jquery.backstretch.min.js',
             // Splash Template JS
             'js/startup.js',
             'js/modules/public.js',
             //Application Init JS
             'js/app.js',
-            'js/modules/lang.js',    
+            'js/modules/lang.js',
             'js/common/services/services.js',
             'js/common/filters/filters.js',
             'js/common/directives/directives.js',
@@ -222,9 +223,9 @@ module.exports = function(grunt) {
         },
         modulesjs: {
           cwd: 'build',
-          src: [            
+          src: [
             'js/app.js',
-            'js/modules/lang.js',    
+            'js/modules/lang.js',
             'js/common/services/services.js',
             'js/common/filters/filters.js',
             'js/common/directives/directives.js',
@@ -248,12 +249,12 @@ module.exports = function(grunt) {
         },
         vendorjs: {
           cwd: 'build',
-          src: [            
+          src: [
             'js/jquery-2.1.1.min.js',
             'js/pace.js',
             'js/bootstrap.min.js',
             'js/angular.min.js',
-            'js/angular-route.min.js',      
+            'js/angular-route.min.js',
             'js/easing.js',
             'js/typer.js',
             'js/nicescroll.js',
@@ -277,6 +278,7 @@ module.exports = function(grunt) {
             'js/ketchup.all.js',
             'js/dropzone.min.js',
             'js/tooltip.js',
+            'js/jquery.backstretch.min.js'
             ],
           dest: 'public/',
           expand: true
@@ -293,7 +295,7 @@ module.exports = function(grunt) {
           dest: 'mobile/',
           expand: true
         }
-      }, 
+      },
       clean:{
         build:{
           src:['public']
@@ -302,7 +304,7 @@ module.exports = function(grunt) {
           src: ['mobile']
         },
         modules: ['public/js/default-vendor.min.js', 'public/js/modules.min.js']
-      }, 
+      },
       uglify: {
         build:{
           options:{
@@ -341,6 +343,7 @@ module.exports = function(grunt) {
               'public/js/xeditable.min.js',
               'public/js/ui-bootstrap-custom-tpls-0.10.0.min.js',
               // 'public/js/jquery.prettyPhoto.js',
+              'public/js/jquery.backstretch.min.js',
               'public/js/dropzone.min.js',
               'public/js/tooltip.js',
             ],
@@ -406,6 +409,7 @@ module.exports = function(grunt) {
               // 'public/js/jquery.prettyPhoto.js',
               'public/js/dropzone.min.js',
               'public/js/tooltip.js',
+              'public/js/jquery.backstretch.min.js'
             ],
             //application ng modules
             'public/js/modules.min.js': [
@@ -431,20 +435,20 @@ module.exports = function(grunt) {
             ]
           }
         },
-      },                  
+      },
       jade: {
-        debug:{            
+        debug:{
           options: {
             pretty: true,
             data: {
               debug: true
             }
           },
-          files: [{ 
-            expand: true, 
-            src: '**/*.jade', 
-            dest: 'dist/', 
-            cwd: 'views', 
+          files: [{
+            expand: true,
+            src: '**/*.jade',
+            dest: 'dist/',
+            cwd: 'views',
             ext: '.html'
           }]
         },
@@ -455,13 +459,13 @@ module.exports = function(grunt) {
               debug: false
             }
           },
-          files: [{ 
-            expand: true, 
-            src: '**/*.jade', 
-            dest: 'dist/', 
-            cwd: 'views', 
+          files: [{
+            expand: true,
+            src: '**/*.jade',
+            dest: 'dist/',
+            cwd: 'views',
             ext: '.html'
-          }]           
+          }]
         },
         compile: {
           options: {
@@ -470,11 +474,11 @@ module.exports = function(grunt) {
               debug: false
             }
           },
-          files: [{ 
-            expand: true, 
-            src: '**/*.jade', 
-            dest: 'dist/', 
-            cwd: 'views', 
+          files: [{
+            expand: true,
+            src: '**/*.jade',
+            dest: 'dist/',
+            cwd: 'views',
             ext: '.html'
           }]
         },
@@ -490,12 +494,12 @@ module.exports = function(grunt) {
                     people: ["Staff"],
                     isPermitted: function (permission) {
                       // var permits = _.intersection(permission, [
-                      //   'activity-count', 
-                      //   'view-activity', 
-                      //   'view-drug-pages', 
-                      //   'employer', 
-                      //   'coverage', 
-                      //   'profile-activity', 
+                      //   'activity-count',
+                      //   'view-activity',
+                      //   'view-drug-pages',
+                      //   'employer',
+                      //   'coverage',
+                      //   'profile-activity',
                       //   'manager'
                       //   ]);
                       // if (permits.length > 0) {
@@ -530,11 +534,11 @@ module.exports = function(grunt) {
                 ext: '.html'
             }]
         }
-      }          
+      }
 
     });
 
-    //Load NPM tasks 
+    //Load NPM tasks
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-jade');
@@ -545,7 +549,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
-    grunt.loadNpmTasks('grunt-contrib-clean');    
+    grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-fingerprint');
     grunt.loadNpmTasks('grunt-bump');
 

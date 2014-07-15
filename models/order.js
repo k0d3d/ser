@@ -780,49 +780,60 @@ OrderController.prototype.requestItemQuotation = function requestItemQuotation (
   var order = _.omit(orderData, '_id');
   orderManager.cartOrder(order)
   .then(function (d) {
-    //return here makes sure , no notices are
-    //sent.. pilot version hack
 
-    //check if the user has reached his
-    //quotation limits.
+
     orderManager.checkQuotationLimits(d)
     .then(function (_do) {
       console.log(_do);
-        //send sms as quote
+        //check if the user has reached his
+        //quotation limits.
+        if (_do.request.flag) {
 
-        var noticeData = {
-          alertType: 'send_quote',
-          meta : orderData
-        },
-        sender = new postman.Notify();
+          return procs.resolve({
+            message: 'DrugStoc will find you, and call you.'
+          });
 
-        postman.noticeFn.getConcernedStaff({
-          userId: orderData.hospitalId,
-          accountType: 5,
-          operation: 'user'
-        })
-        .then(function (listOfRecpt) {
+        }  else {          
+          //send sms as quote
 
-          return sender.sendTmplSMS(
-            listOfRecpt[0],
-            'send_quote',
-            noticeData
-          );
-        })
-        .then(function () {
-          //send alert about being charged if
-          //true
-          return procs.resolve(d);
-        })
-        .catch(function (err) {
-          console.log(err.stack);
-          return procs.reject(err);
-        });
+          var noticeData = {
+            alertType: 'send_quote',
+            meta : orderData
+          },
+          sender = new postman.Notify();
 
-      // return procs.resolve(d);
+          postman.noticeFn.getConcernedStaff({
+            userId: orderData.hospitalId,
+            accountType: 5,
+            operation: 'user'
+          })
+          .then(function (listOfRecpt) {
+
+            return sender.sendTmplSMS(
+              listOfRecpt[0],
+              'send_quote',
+              noticeData
+            );
+          })
+          .then(function () {
+            //send alert about being charged if
+            //true
+            return procs.resolve(d);
+          })
+          .catch(function (err) {
+            console.log(err.stack);
+            return procs.reject(err);
+          });
+        }
+
     });
 
+
+    //return here makes sure , no notices are
+    //sent.. pilot version hack
     return;
+
+
     //simple hack to ensure i have the
     //lastUpdate property. Usually with a find
     //or findOne query, lastUpdate is a virtual.

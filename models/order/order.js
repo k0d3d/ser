@@ -123,6 +123,12 @@ OrderSchema.statics = {
   }
 };
 
+var InvoiceSchema = new Schema({
+  order: [OrderSchema],
+  invoicedDate: {type: Date},
+  status: {type: Number}
+})
+
 OrderSchema.plugin(textSearch);
 OrderSchema.index({orderId: 'text'});
 
