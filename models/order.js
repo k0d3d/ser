@@ -780,7 +780,7 @@ OrderController.prototype.requestItemQuotation = function requestItemQuotation (
   var order = _.omit(orderData, '_id');
   orderManager.cartOrder(order)
   .then(function (d) {
-
+    return procs.resolve(d);
 
     orderManager.checkQuotationLimits(d)
     .then(function (_do) {
@@ -793,7 +793,7 @@ OrderController.prototype.requestItemQuotation = function requestItemQuotation (
             message: 'DrugStoc will find you, and call you.'
           });
 
-        }  else {          
+        }  else {
           //send sms as quote
 
           var noticeData = {
@@ -827,7 +827,6 @@ OrderController.prototype.requestItemQuotation = function requestItemQuotation (
         }
 
     });
-
 
     //return here makes sure , no notices are
     //sent.. pilot version hack

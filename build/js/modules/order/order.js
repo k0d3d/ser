@@ -19,17 +19,6 @@ config(['$routeProvider',function($routeProvider){
   '$route',
   function($scope, $http, ordersService, $rootScope, N, $route) {
   $scope.$parent.headerTitle = 'Pending Quotations';
-  $scope.cart_meta = {
-    string: function () {
-      var count = $scope.orderCart.length;
-      if (count < 5) {
-        return "Add (" + (5 - count) + ") more times to checkout";
-      } else {
-        return "Request Quotation";
-      }
-    },
-    state: ($scope.orderCart < 5) ? true : false
-  };
 
   $scope.orderCart = [];
 
@@ -56,6 +45,19 @@ config(['$routeProvider',function($routeProvider){
 
 
     });
+
+    $scope.cart_meta = {
+      string: function () {
+        var count = $scope.orderCart.length;
+        if (count < 5) {
+          return "Add (" + (5 - count) + ") more times to checkout";
+        } else {
+          return "Request Quotation";
+        }
+      },
+      state: ($scope.orderCart < 5) ? true : false
+    };
+
    // $rootScope.my_quotation = i;
   });
 
