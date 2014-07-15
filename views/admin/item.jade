@@ -1,0 +1,65 @@
+.contentpanel
+    .panel.panel-default
+      .col-md-2
+        .row
+          .form-content(style="margin-bottom: 30px")
+            form(name="searchform", novalidate)
+                .form-group
+                  p.form-control-static Filter Orders
+                .form-group
+                  label.control-label NAFDAC No
+                  input.input-large.form-control(type="search", ng-model="search.orderId", placeholder="...")
+                .form-group
+                  label.control-label Composition
+                  input.input-large.form-control(type="search", ng-model="search.hospitalId", placeholder="...")
+                .form-group
+                  label.control-label Item Name
+                  input.input-large.form-control(type="search", ng-model="search.itemId.itemName", placeholder="...")
+                .form-group
+                  label.control-label Supplier Name
+                  input.input-large.form-control(type="search", ng-model="search.orderSupplier.name", placeholder="...")
+                .form-group
+                  label.control-label Manufacturer
+                  input.form-control.input-large(type="date", ng-model="search.orderDate")
+                .form-group
+                  label.control-label Price Range
+                  input.form-control.input-large(type="range", ng-model="search.orderDate")
+
+                //- .form-group
+                //-   button.btn.btn-primary(type="submit") Search
+      .col-md-10
+        .panel.panel-default()
+            .panel-heading(style="height: 70px")
+              .row
+                .col-md-8
+                .col-md-4
+                  div.pull-right
+                    | Showing {{items.length}} Order(s)
+            .panel-body
+              .x-pagination(pagination="valRes", page-to="getPageItems(currentPage, pageLimit, cb)", current-page="currentPage", page-limit="pageLimit")
+              table.table.table-hover.table-bordered()
+                thead
+                  tr
+                    th NAFDAC No
+                    th Drug Name
+                    th Composition
+                    th Manufacturer
+                    th Supplier
+                    th Current Prices
+                    th Images
+                    th
+                tbody
+                  tr(ng-repeat="cmp in items")
+                    td {{cmp.nafdacRegNo}}
+                    td
+                      a(ng-href="/a/drugs/{{cmp.itemId._id}}/item") {{cmp.itemName}}
+                    td {{cmp.sciName}}
+                    td {{cmp.pharma.pharmaName}}
+                    td
+                    td
+                      span.label.label-info(title="Retail Price") {{cmp.currentPrice.retail}}
+                      span.label.label-warning(title="Institution Price") {{cmp.currentPrice.institution}}
+                      span.label.label-success(title="Wholesale Price") {{cmp.currentPrice.wholesale}}
+                    td
+
+              .x-pagination(pagination="valRes", page-to="getPageItems(currentPage, pageLimit, cb)", current-page="currentPage", page-limit="pageLimit")
