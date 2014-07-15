@@ -79,7 +79,7 @@
                           input.form-control(type='number', ng-model="drugItem.packageCount", required, ng-init="drugItem.packageCount = 0", placeholder="number of packages")
                         div(style="float: left; margin-left: 5px")
                           button.btn.btn-default.dropdown-toggle(type='button', ng-show="!drugItem.sentRequest || drugItem.sentRequest == 'no'", ng-click="drugItem.sentRequest = 'input'; drugItem.isSendin = false")
-                            | N20 per Quote
+                            | Add to Quote List
                         div(style="width: 150px; float: left; margin-left: 5px", ng-show="drugItem.sentRequest == 'sent'")
                           button.btn.btn-success-alt.dropdown-toggle(type='button', disabled)
                             | Request Sent
@@ -88,6 +88,10 @@
                             | Send Request
                         div.sr-ol(style="width: 50px; float: left; margin-left: 5px", ng-show="drugItem.sentRequest == 'input'", ng-click="drugItem.sentRequest = 'no'")
                           i.fa.fa-times-circle
+                        div(style="float: left; margin-left: 5px")
+                          button.btn.btn-orange.dropdown-toggle(title="Add to your DrugStoc list" type='button', ng-click="add_to_list(drugItem)")
+                            i.fa.fa-star
+                            | Add
 
 
               .ndl-list(ng-show="show_ndl", style="border-top: solid 1px #1489A0;padding-top: 20px;")

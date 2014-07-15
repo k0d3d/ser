@@ -219,7 +219,15 @@ config(['$routeProvider',function($routeProvider){
 
 
 }])
-.controller('orderAddController',function($scope, $http, $location, ordersService, drugService, $routeParams){
+.controller('orderAddController', [
+  '$scope',
+  '$http',
+  '$location',
+  'ordersService',
+  'drugService',
+  '$routeParams',
+  'organizeStaffService',
+  function($scope, $http, $location, ordersService, drugService, $routeParams, oss){
   $scope.form = {
     itemData: {},
     supplierData: {}
@@ -283,12 +291,16 @@ config(['$routeProvider',function($routeProvider){
         $scope.my_quotation.push(data);
         $scope.form = '';
     });
-
-
   };
 
+  $scope.add_to_list = function (item) {
+    oss.addToMyList({drugId: item._id})
+    .then(function (r) {
 
-})
+    });
+  };
+
+}])
 .factory('ordersService',['$http', 'Notification','Language', function($http, N, L){
     var f = {};
 
