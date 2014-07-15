@@ -38,6 +38,7 @@ var UserSchema = new Schema({
         mobile: {type: Boolean, default: false}
     },
     approvedNotices: {},
+    permits: [],
     isAdmin: {type: Boolean, default: false},
     lastLogin: {type: Date}
 
@@ -52,7 +53,7 @@ var clientSchema = new Schema({
 
 /**
  * Virtuals
- */ 
+ */
 UserSchema.virtual('password').set(function(password) {
     this._password = password;
     this.salt = this.makeSalt();

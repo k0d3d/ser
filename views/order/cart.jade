@@ -8,8 +8,8 @@
     .panel.panel-default(ng-show="orderCart.length > 0")
       .panel-heading
         .panel-btns
-          //- button.btn.btn-xs.btn-darkblue Place Order
-          //- button.btn.btn-xs.btn-white Remove All
+          button.btn.btn-xs.btn-darkblue(ng-disabled="cart_meta.state") {{cart_meta.string()}}
+          button.btn.btn-xs.btn-white Request Invoice
         .panel-title
       .panel-body
         +allCart()
