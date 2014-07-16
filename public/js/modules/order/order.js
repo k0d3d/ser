@@ -8,7 +8,14 @@ angular.module('order', []).
 config(['$routeProvider',function($routeProvider){
   $routeProvider.when('/a/orders', {templateUrl: '/order/index', controller: 'ordersIndexController'})
   .when('/a/orders/new', {templateUrl: '/order/new-order-search-item', controller: 'orderAddController'})
+  .when('/a/invoices', {templateUrl: '/order/invoice', controller: 'invoiceController'})
   .when('/a/orders/cart', {templateUrl: '/order/cart', controller: 'orderCartController'});
+}])
+.controller('invoiceController', ['$scope', 'ordersService', function ($scope, ordersService) {
+  ordersService.loadInvoices()
+  .then(function (i) {
+    $scope.invoices = i;
+  });
 }])
 .controller('orderCartController', [
   '$scope',
@@ -45,7 +52,7 @@ config(['$routeProvider',function($routeProvider){
 
 
     });
-
+    //within callback.
     $scope.cart_meta = {
       string: function () {
         var count = $scope.orderCart.length;
@@ -70,6 +77,17 @@ config(['$routeProvider',function($routeProvider){
       $scope.my_quotation.splice(index, 1);
       $route.reload();
     });
+  };
+
+  $scope.send_request_invoice = function send_request_invoice (cart) {
+    if (cart.length < 5) {
+      return alert('Cart is incomplete: minimum of 5 items');
+    }
+    ordersService.sendInvoiceRequest(cart)
+    .then(function () {
+
+    });
+
   };
 
   $scope.removeFromCart = function removeFromCart (index) {
@@ -318,7 +336,21 @@ config(['$routeProvider',function($routeProvider){
 .factory('ordersService',['$http', 'Notification','Language', function($http, N, L){
     var f = {};
 
-    f.searchCmp = function(queryCmp){
+    f.loadInvoices = function loadInvoices () {
+      return $http.get('/api/internal/invoices')
+      .then(function (r) {
+        return r.data;
+      });
+    };
+
+    f.sendInvoiceRequest = function sendInvoiceRequest(cart) {
+      return $http.post('/api/internal/invoice', cart)
+      .then(function (inv) {
+        return inv.data;
+      });
+    };
+
+    f.searchCmp = function searchCmp (queryCmp){
 
       return $http.get('/api/internal/item/search?' + $.param(queryCmp))
       .then(function (i) {
@@ -330,7 +362,7 @@ config(['$routeProvider',function($routeProvider){
     };
 
     //Gets orders by status and display
-    f.orders = function(status, displayType){
+    f.orders = function orders (status, displayType){
       return $http.get('/api/internal/orders/' + status + '/display/' + displayType)
       .then(function (d){
         return d.data;
@@ -341,7 +373,7 @@ config(['$routeProvider',function($routeProvider){
 
     //Post one item to be sent as an order.
     //Accepts a replied quotation.
-    f.postCartItem = function(form){
+    f.postCartItem = function postCartItem (form){
       return $http.put('/api/internal/orders/' + form.orderId + '/status/2', form)
       .then(function (r) {
         N.notifier({

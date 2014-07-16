@@ -56,6 +56,13 @@ module.exports = function(app, passport) {
       menu: true
     },
     {
+      name: "Invoices",
+      roles: [5],
+      icon: '',
+      url: '/a/invoices',
+      menu: true
+    },
+    {
       name: 'Suppliers',
       roles: [],
       icon: '',
@@ -131,7 +138,14 @@ module.exports = function(app, passport) {
           roles: ['x'],
           url: '/x/orders',
           menu: true
-        },{
+        },
+        {
+          name: 'Invoice',
+          roles: ['x'],
+          url: '/x/invoices',
+          menu: true
+        },
+        {
           name: 'Items',
           roles: ['x'],
           url: '/x/drugs',

@@ -14,6 +14,10 @@ angular.module('admin', [])
     templateUrl: '/admin/orders',
     controller: 'adminOrdersCt'
     })
+  .when('/x/invoices', {
+    templateUrl: '/admin/invoice',
+    controller: 'adminInvoicesCt'
+    })
   .when('/x/drugs', {
     templateUrl: '/admin/item',
     controller: 'adminItemsCt'
@@ -78,7 +82,7 @@ angular.module('admin', [])
 
 }])
 .controller('adminOrdersCt', ['$scope', 'adminService', function ($scope, adminService) {
-
+  $scope.$parent.headerTitle = 'Admin:: Manage Orders';
   $scope.orderFilter = {};
 
   (function(){
@@ -120,7 +124,7 @@ angular.module('admin', [])
 
 }])
 .controller('adminItemsCt', ['$scope', 'adminService', function ($scope, adminService) {
-
+  $scope.$parent.headerTitle = 'Admin:: Manage Items';
   $scope.orderFilter = {};
 
   (function(){
@@ -161,8 +165,42 @@ angular.module('admin', [])
 
 
 }])
+.controller('adminInvoicesCt', ['$scope', 'adminService', function ($scope, adminService) {
+  $scope.$parent.headerTitle = 'Admin:: Manage Invoices';
+  adminService.loadInvoices()
+  .then(function (d) {
+    $scope.invoices = d;
+  });
+
+  $scope.send_invoice = function (id, state) {
+    adminService.updateInvoices(id, state, {})
+    .then(function () {
+
+    });
+  };
+}])
 .factory('adminService', function ($http) {
     return {
+        loadInvoices: function loadInvoices (page, limit) {
+          return $http({
+            url: '/api/internal/admin/invoices',
+            method: 'GET',
+            params: {page: page, limit: limit}
+          })
+          .then(function (d) {
+            return d.data;
+          });
+        },
+        updateInvoices: function loadInvoices (id, state, query) {
+          return $http({
+            url: '/api/internal/admin/invoices/' + id ,
+            method: 'PUT',
+            params: {page: query.page, limit: query.limit, state: state}
+          })
+          .then(function (d) {
+            return d.data;
+          });
+        },
         updateUserType: function updateUserType (userId, params) {
             return $http.post('/api/internal/admin/users/' + userId , params)
             .then(function () {

@@ -27,8 +27,4 @@ module.exports.routes = function(app, login){
     });
   });
 
-
-
-
-
 };

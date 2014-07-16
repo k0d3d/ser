@@ -57,9 +57,4 @@ module.exports.routes = function(app, login){
       res.json(400, err);
     });
   });
-
-
-
-
-
 };

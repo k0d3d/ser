@@ -1,5 +1,6 @@
 var Order = require('./order/order.js').Order,
   OrderStatus = require('./order/order.js').OrderStatus,
+  Invoice = require('./order/order.js').Invoice,
   Item = require('./item/drug.js').drug,
   _ = require('underscore'),
   //Hospital = require('./organization/hospital.js') ,
@@ -776,7 +777,8 @@ OrderController.prototype.requestItemQuotation = function requestItemQuotation (
     orderStatus: 0,
     date : Date.now()
   }];
-  orderData.orderId = utilz.uid(32);
+  // orderData.orderId = utilz.uid(16);
+  orderData.orderId = utilz.alphaNumDocId(16);
   var order = _.omit(orderData, '_id');
   orderManager.cartOrder(order)
   .then(function (d) {
@@ -1183,5 +1185,103 @@ OrderController.prototype.processSMSRequest = function processSMSRequest (body) 
 
   return bot.promise;
 };
+
+/**
+ * creates an invoice out of items in a cart.
+ * @param  {[type]} userId [description]
+ * @param  {[type]} cart   [description]
+ * @return {[type]}        [description]
+ */
+OrderController.prototype.requestOrderQuotation = function requestOrderQuotation (userId, cart) {
+  // return console.log(arguments);
+  var q = Q.defer();
+
+  if (_.isEmpty(cart)) {
+    q.reject(new Error('cart has no items'));
+  } else {
+    var invoiceId = utilz.alphaNumDocId(16);
+    var invoice = new Invoice();
+
+    invoice.invoiceId = invoiceId;
+    var collectn = [];
+    _.forEach(cart, function (c) {
+      delete c._id;
+      delete c.__v;
+      collectn.push(c);
+    });
+
+    invoice.order = collectn;
+    invoice.invoicedDate = Date.now();
+    invoice.hospitalId = userId;
+    invoice.save(function (err) {
+      if (err) {
+        return q.reject(err);
+      }
+      return q.resolve(invoiceId);
+    });
+  }
+
+
+  return q.promise;
+};
+
+
+OrderController.prototype.queryInvoices = function queryInvoices (query) {
+  var q = Q.defer(), dr;
+
+  // Invoice.find({})
+  // .execQ()
+  // .then(function (doc) {
+  //   if (_.isEmpty(doc)) {
+  //     q.resolve(doc);
+  //   } else {
+  //     dr = doc;
+  //     console.log(doc.order);
+  //     staffUtils.populateProfile(doc.order, 'hospitalId', 5)
+  //     .then(function (popdWOrders) {
+  //       console.log('message');
+  //       dr.orders = popdWOrders;
+  //       return q.resolve(dr);
+  //     });
+  //   }
+  // });
+
+  return Invoice.find({})
+  .execQ();
+
+  // return q.promise;
+};
+
+OrderController.prototype.updateInvoice = function updateInvoice (id, userId, state) {
+  var q = Q.defer();
+
+  Invoice.update({
+    _id: id
+  }, {
+    $set: {
+      status: state,
+      approvedBy: userId
+    }
+  }, function (err, done) {
+    if (err) {
+      q.reject(err);
+    } else if (done) {
+      q.resolve(done);
+    } else {
+      q.reject(new Error('can not update invoice'));
+    }
+  });
+
+  return q.promise;
+};
+
+OrderController.prototype.getUserInvoices = function getUserInvoices (userId, account_type, query) {
+  return Invoice.find({
+    hospitalId: userId
+  })
+  .sort('-invoicedDate')
+  .execQ();
+};
+
 
 module.exports = OrderController;

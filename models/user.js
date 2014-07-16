@@ -391,7 +391,7 @@ UserController.prototype.getProfile = function (userId, account_type) {
   staffUtils.getMeMyModel(account_type).findOne({
     userId: userId
   })
-  .populate('drugs.drug', 'itemName images', 'drug')
+  .populate('drugs.drug', 'itemName images category itemPackaging packageQty', 'drug')
   .lean()
   .exec(function (err, user_profile) {
     if (err) {
@@ -440,6 +440,7 @@ UserController.prototype.getProfile = function (userId, account_type) {
         }
 
       } else {
+          return d.resolve(user_profile);
           //lets check if the account is
           //a facility account, if it is,
           //we wanna have all the facilities orders
