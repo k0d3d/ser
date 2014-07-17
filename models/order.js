@@ -510,7 +510,7 @@ OrderController.prototype.getOrders = function getOrders (orderStatus, displayTy
  * @param  {Number} accountType the account level of the currently logged in user
  * @return {Object}             Promise Object
  */
-OrderController.prototype.distUpdateOrder = function(orderData, userId, accountType){
+OrderController.prototype.distUpdateOrder = function distUpdateOrder (orderData, userId, accountType){
   console.log('Updating order...');
   //Updates the order statuses, these are useful for order history
   //queries, etc
@@ -563,7 +563,6 @@ OrderController.prototype.distUpdateOrder = function(orderData, userId, accountT
   //if the order has been confirmed.. it cannot be
   //replace again, or confirmed again
   //if(__body.status)
-  try {
     Order.update({
       'orderId': orderData.orderId
     }, options)
@@ -644,11 +643,7 @@ OrderController.prototype.distUpdateOrder = function(orderData, userId, accountT
         return law.reject(new Error('updating order failed'));
       }
     });
-  }catch (e) {
-    console.log(e);
-    law.reject(e);
-    return law.promise;
-  }
+
 
 
   return law.promise;
@@ -1187,38 +1182,57 @@ OrderController.prototype.processSMSRequest = function processSMSRequest (body) 
 };
 
 /**
- * creates an invoice out of items in a cart.
+ * sends sms quotations to the logged in user
  * @param  {[type]} userId [description]
  * @param  {[type]} cart   [description]
  * @return {[type]}        [description]
  */
-OrderController.prototype.requestOrderQuotation = function requestOrderQuotation (userId, cart) {
-  // return console.log(arguments);
+OrderController.prototype.requestSMSQuotation = function requestSMSQuotation (userId, cart) {
   var q = Q.defer();
+  function _de () {
+    var task = cart.pop();
+    //send sms as quote
+
+    var noticeData = {
+      alertType: 'send_quote',
+      meta : task
+    },
+    sender = new postman.Notify();
+
+    postman.noticeFn.getConcernedStaff({
+      userId: userId,
+      accountType: 5,
+      operation: 'user'
+    })
+    .then(function (listOfRecpt) {
+
+      return sender.sendTmplSMS(
+        listOfRecpt[0],
+        'send_quote',
+        noticeData
+      );
+    })
+    .then(function () {
+      //send alert about being charged if
+      //true
+      if (cart.length) {
+        _de();
+      } else {
+        return q.resolve();
+      }
+    })
+    .catch(function (err) {
+      console.log(err.stack);
+      return q.reject(err);
+    });
+
+  }
 
   if (_.isEmpty(cart)) {
     q.reject(new Error('cart has no items'));
   } else {
-    var invoiceId = utilz.alphaNumDocId(16);
-    var invoice = new Invoice();
+    _de();
 
-    invoice.invoiceId = invoiceId;
-    var collectn = [];
-    _.forEach(cart, function (c) {
-      delete c._id;
-      delete c.__v;
-      collectn.push(c);
-    });
-
-    invoice.order = collectn;
-    invoice.invoicedDate = Date.now();
-    invoice.hospitalId = userId;
-    invoice.save(function (err) {
-      if (err) {
-        return q.reject(err);
-      }
-      return q.resolve(invoiceId);
-    });
   }
 
 
@@ -1281,6 +1295,66 @@ OrderController.prototype.getUserInvoices = function getUserInvoices (userId, ac
   })
   .sort('-invoicedDate')
   .execQ();
+};
+
+/**
+ * check if this user has used anu
+ * @param  {[type]} id [description]
+ * @return {[type]}    [description]
+ */
+OrderController.prototype.checkUserIsTrying = function checkUserIsTrying (id) {
+    var q = Q.defer();
+
+    Order.count({
+      hospitalId: id
+    })
+    .where('status').gt(0)
+    .exec(function (err, count) {
+      if (err) {
+        return q.reject(err);
+      }
+      if (count >=  5) {
+        q.resolve(true);
+      } else {
+        q.resolve(false);
+      }
+    });
+
+    return q.promise;
+};
+
+/**
+ * saves a request / collection of orders as an invoice to
+ *
+ * @param  {[type]} userId [description]
+ * @param  {[type]} cart   [description]
+ * @return {[type]}        [description]
+ */
+OrderController.prototype.requestOrderQuotation = function requestOrderQuotation (userId, cart) {
+    var q = Q.defer();
+
+    var invoiceId = utilz.alphaNumDocId(16);
+    var invoice = new Invoice();
+
+    invoice.invoiceId = invoiceId;
+    var collectn = [];
+    _.forEach(cart, function (c) {
+      delete c._id;
+      delete c.__v;
+      collectn.push(c);
+    });
+
+    invoice.order = collectn;
+    invoice.invoicedDate = Date.now();
+    invoice.hospitalId = userId;
+    invoice.save(function (err) {
+      if (err) {
+        return q.reject(err);
+      }
+      return q.resolve(invoiceId);
+    });
+
+    return q.promise;
 };
 
 

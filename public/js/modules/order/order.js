@@ -62,7 +62,7 @@ config(['$routeProvider',function($routeProvider){
           return "Request Quotation";
         }
       },
-      state: ($scope.orderCart < 5) ? true : false
+      state: ($scope.orderCart.length < 5) ? true : false
     };
 
    // $rootScope.my_quotation = i;
@@ -85,6 +85,9 @@ config(['$routeProvider',function($routeProvider){
     }
     ordersService.sendInvoiceRequest(cart)
     .then(function () {
+      $scope.canVerify = true;
+      $scope.cart_meta.string = function () {return 'Quotation Sent';};
+      $scope.cart_meta.state = false;
 
     });
 

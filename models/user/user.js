@@ -38,7 +38,7 @@ var UserSchema = new Schema({
         mobile: {type: Boolean, default: false}
     },
     approvedNotices: {},
-    permits: [],
+    isPremium: {type: Boolean, default: false},
     isAdmin: {type: Boolean, default: false},
     lastLogin: {type: Date}
 

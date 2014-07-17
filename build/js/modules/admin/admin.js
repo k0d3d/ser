@@ -76,6 +76,17 @@ angular.module('admin', [])
             });
         });
     };
+    $scope.toggle_premium = function (index) {
+        adminService.updateUserType($scope.users_list[index]._id, {isPremium: $scope.users_list[index].isPremium})
+        .then(function () {
+            //possibly update UI
+            N.notifier({
+              title: 'Awesome!',
+              text: 'You have updated this users account.',
+              class_name: 'growl-success'
+            });
+        });
+    };
 
     //load the users into the scope
     $scope.load_users(0, 20);
