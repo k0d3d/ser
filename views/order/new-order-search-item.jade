@@ -84,9 +84,9 @@
                           button.btn.btn-success-alt.dropdown-toggle(type='button', disabled)
                             | Request Sent
                         div(style="width: 150px; float: left; margin-left: 5px")
-                          button.btn.btn-default.dropdown-toggle.pull-right(ng-click="add_to_cart(drugItem); drugItem.isSending=true", ng-show="drugItem.sentRequest == 'input'", ng-disabled="drugItem.isSending")
+                          button.btn.btn-default.dropdown-toggle.pull-right(ng-click="add_to_cart(drugItem); drugItem.isSending=true", ng-show="drugItem.sentRequest == 'input'", ng-disabled="drugItem.isSending || !drugItem.packageCount")
                             | Send Request
-                        div.sr-ol(style="width: 50px; float: left; margin-left: 5px", ng-show="drugItem.sentRequest == 'input'", ng-click="drugItem.sentRequest = 'no'")
+                        div.sr-ol(style="width: 25px; float: left; margin-left: 5px", ng-show="drugItem.sentRequest == 'input'", ng-click="drugItem.sentRequest = 'no'")
                           i.fa.fa-times-circle
                         div(style="float: left; margin-left: 5px")
                           button.btn.btn-orange.dropdown-toggle(title="Add to your DrugStoc list" type='button', ng-click="add_to_list(drugItem)")

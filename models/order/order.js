@@ -4,7 +4,7 @@
  */
 var mongoose = require('mongoose-q')(),
     Schema = mongoose.Schema,
-    textSearch = require('mongoose-text-search');
+    textSearch = require('mongoose-text-search'),
     xInStr = require('../../lib/utils.js').xInStr;
 
 
@@ -14,19 +14,20 @@ var OrderStatusSchema = new Schema({
   date: {type: Date},
   orderStatus: {type: Number, required: true},
   orderCharge: {type: Schema.ObjectId},
-});    
+});
 
 /**
  * Orders Schema
  */
 var OrderSchema = new Schema({
+  invoiceId: {type: Schema.ObjectId},
   orderAmount: {type: Number, default: '0'},
   orderDate: {type: Date},
   itemId: {type: Schema.ObjectId},
   perItemPrice: {type: Number},
   finalPrice: {type: Number},
   /**
-   * the account / user objectId of the distributor / manager / pharma who received 
+   * the account / user objectId of the distributor / manager / pharma who received
    * the order
    * @type {Object}
    */
@@ -40,7 +41,7 @@ var OrderSchema = new Schema({
    */
   orderCharge: {type: Schema.ObjectId},
   /**
-   * orderStatus values 
+   * orderStatus values
    * -1: order canceld
    * 0 : quote request
    * 1: quote reply
@@ -124,10 +125,31 @@ OrderSchema.statics = {
 };
 
 var InvoiceSchema = new Schema({
-  order: [OrderSchema],
+  invoiceId: {type: String},
+  order: [Schema.Types.Mixed],
   invoicedDate: {type: Date},
-  status: {type: Number}
-})
+  status: {type: Number, default: 0},
+  hospitalId: {type: Schema.ObjectId},
+  approvedBy: {type: Schema.ObjectId}
+});
+
+InvoiceSchema.virtual('idmask')
+.get(function () {
+  if (this.invoiceId) {
+    return xInStr(this.invoiceId);
+  }
+});
+
+InvoiceSchema.set('toObject' , {
+  getters: true,
+  virtuals: true
+});
+InvoiceSchema.set('toJSON' , {
+  getters: true,
+  virtuals: true
+});
+
+
 
 OrderSchema.plugin(textSearch);
 OrderSchema.index({orderId: 'text'});
@@ -135,6 +157,8 @@ OrderSchema.index({orderId: 'text'});
 
 mongoose.model('Order', OrderSchema);
 mongoose.model('OrderStatus', OrderStatusSchema);
+mongoose.model('Invoice', InvoiceSchema);
 
 module.exports.Order = mongoose.model('Order');
 module.exports.OrderStatus = mongoose.model('OrderStatus');
+module.exports.Invoice = mongoose.model('Invoice');

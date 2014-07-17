@@ -23,14 +23,12 @@ mixin loadDrugPages()
               .row
                 .col-sm-9.col-md-9
                   .media-body
-                    h3.follower-name {{drug.itemId.itemName}}
+                    h3.follower-name {{drug.drug.itemName}}
                     dl.dl-horizontal
-                      dt Last Ordered
-                      dd {{drug.orderDate | date:'medium'}}
                       dt Category
-                      dd {{drug.itemId.category}}
+                      dd {{drug.drug.category}}
                       dt Packaging
-                      dd {{drug.itemId.packageQty|| '--'}} per {{drug.itemId.itemPackaging || '--'}}
+                      dd {{drug.drug.packageQty|| '--'}} per {{drug.drug.itemPackaging || '--'}}
 
                     .mb20
                 .col-sm-2.col-md-2

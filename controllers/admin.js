@@ -10,6 +10,9 @@ module.exports.routes = function (app, login) {
   //load the api routes from users.js
   require('./admin/items.js').routes(app, login);
 
+  //load the api routes from users.js
+  require('./admin/invoice.js').routes(app, login);
+
   // //load the api routes from orders.js
   // require('./api/activities').routes(app);
 };

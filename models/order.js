@@ -1,5 +1,6 @@
 var Order = require('./order/order.js').Order,
   OrderStatus = require('./order/order.js').OrderStatus,
+  Invoice = require('./order/order.js').Invoice,
   Item = require('./item/drug.js').drug,
   _ = require('underscore'),
   //Hospital = require('./organization/hospital.js') ,
@@ -509,7 +510,7 @@ OrderController.prototype.getOrders = function getOrders (orderStatus, displayTy
  * @param  {Number} accountType the account level of the currently logged in user
  * @return {Object}             Promise Object
  */
-OrderController.prototype.distUpdateOrder = function(orderData, userId, accountType){
+OrderController.prototype.distUpdateOrder = function distUpdateOrder (orderData, userId, accountType){
   console.log('Updating order...');
   //Updates the order statuses, these are useful for order history
   //queries, etc
@@ -562,7 +563,6 @@ OrderController.prototype.distUpdateOrder = function(orderData, userId, accountT
   //if the order has been confirmed.. it cannot be
   //replace again, or confirmed again
   //if(__body.status)
-  try {
     Order.update({
       'orderId': orderData.orderId
     }, options)
@@ -643,11 +643,7 @@ OrderController.prototype.distUpdateOrder = function(orderData, userId, accountT
         return law.reject(new Error('updating order failed'));
       }
     });
-  }catch (e) {
-    console.log(e);
-    law.reject(e);
-    return law.promise;
-  }
+
 
 
   return law.promise;
@@ -776,11 +772,12 @@ OrderController.prototype.requestItemQuotation = function requestItemQuotation (
     orderStatus: 0,
     date : Date.now()
   }];
-  orderData.orderId = utilz.uid(32);
+  // orderData.orderId = utilz.uid(16);
+  orderData.orderId = utilz.alphaNumDocId(16);
   var order = _.omit(orderData, '_id');
   orderManager.cartOrder(order)
   .then(function (d) {
-
+    return procs.resolve(d);
 
     orderManager.checkQuotationLimits(d)
     .then(function (_do) {
@@ -793,7 +790,7 @@ OrderController.prototype.requestItemQuotation = function requestItemQuotation (
             message: 'DrugStoc will find you, and call you.'
           });
 
-        }  else {          
+        }  else {
           //send sms as quote
 
           var noticeData = {
@@ -827,7 +824,6 @@ OrderController.prototype.requestItemQuotation = function requestItemQuotation (
         }
 
     });
-
 
     //return here makes sure , no notices are
     //sent.. pilot version hack
@@ -1184,5 +1180,182 @@ OrderController.prototype.processSMSRequest = function processSMSRequest (body) 
 
   return bot.promise;
 };
+
+/**
+ * sends sms quotations to the logged in user
+ * @param  {[type]} userId [description]
+ * @param  {[type]} cart   [description]
+ * @return {[type]}        [description]
+ */
+OrderController.prototype.requestSMSQuotation = function requestSMSQuotation (userId, cart) {
+  var q = Q.defer();
+  function _de () {
+    var task = cart.pop();
+    //send sms as quote
+
+    var noticeData = {
+      alertType: 'send_quote',
+      meta : task
+    },
+    sender = new postman.Notify();
+
+    postman.noticeFn.getConcernedStaff({
+      userId: userId,
+      accountType: 5,
+      operation: 'user'
+    })
+    .then(function (listOfRecpt) {
+
+      return sender.sendTmplSMS(
+        listOfRecpt[0],
+        'send_quote',
+        noticeData
+      );
+    })
+    .then(function () {
+      //send alert about being charged if
+      //true
+      if (cart.length) {
+        _de();
+      } else {
+        return q.resolve();
+      }
+    })
+    .catch(function (err) {
+      console.log(err.stack);
+      return q.reject(err);
+    });
+
+  }
+
+  if (_.isEmpty(cart)) {
+    q.reject(new Error('cart has no items'));
+  } else {
+    _de();
+
+  }
+
+
+  return q.promise;
+};
+
+
+OrderController.prototype.queryInvoices = function queryInvoices (query) {
+  var q = Q.defer(), dr;
+
+  // Invoice.find({})
+  // .execQ()
+  // .then(function (doc) {
+  //   if (_.isEmpty(doc)) {
+  //     q.resolve(doc);
+  //   } else {
+  //     dr = doc;
+  //     console.log(doc.order);
+  //     staffUtils.populateProfile(doc.order, 'hospitalId', 5)
+  //     .then(function (popdWOrders) {
+  //       console.log('message');
+  //       dr.orders = popdWOrders;
+  //       return q.resolve(dr);
+  //     });
+  //   }
+  // });
+
+  return Invoice.find({})
+  .execQ();
+
+  // return q.promise;
+};
+
+OrderController.prototype.updateInvoice = function updateInvoice (id, userId, state) {
+  var q = Q.defer();
+
+  Invoice.update({
+    _id: id
+  }, {
+    $set: {
+      status: state,
+      approvedBy: userId
+    }
+  }, function (err, done) {
+    if (err) {
+      q.reject(err);
+    } else if (done) {
+      q.resolve(done);
+    } else {
+      q.reject(new Error('can not update invoice'));
+    }
+  });
+
+  return q.promise;
+};
+
+OrderController.prototype.getUserInvoices = function getUserInvoices (userId, account_type, query) {
+  return Invoice.find({
+    hospitalId: userId
+  })
+  .sort('-invoicedDate')
+  .execQ();
+};
+
+/**
+ * check if this user has used anu
+ * @param  {[type]} id [description]
+ * @return {[type]}    [description]
+ */
+OrderController.prototype.checkUserIsTrying = function checkUserIsTrying (id) {
+    var q = Q.defer();
+
+    Order.count({
+      hospitalId: id
+    })
+    .where('status').gt(0)
+    .exec(function (err, count) {
+      if (err) {
+        return q.reject(err);
+      }
+      if (count >=  5) {
+        q.resolve(true);
+      } else {
+        q.resolve(false);
+      }
+    });
+
+    return q.promise;
+};
+
+/**
+ * saves a request / collection of orders as an invoice to
+ *
+ * @param  {[type]} userId [description]
+ * @param  {[type]} cart   [description]
+ * @return {[type]}        [description]
+ */
+OrderController.prototype.requestOrderQuotation = function requestOrderQuotation (userId, cart) {
+    var q = Q.defer();
+
+    var invoiceId = utilz.alphaNumDocId(16);
+    var invoice = new Invoice();
+
+    invoice.invoiceId = invoiceId;
+    var collectn = [];
+    _.forEach(cart, function (c) {
+      delete c._id;
+      delete c.__v;
+      collectn.push(c);
+    });
+
+    invoice.order = collectn;
+    invoice.invoicedDate = Date.now();
+    invoice.hospitalId = userId;
+    invoice.save(function (err) {
+      if (err) {
+        return q.reject(err);
+      }
+      return q.resolve(invoiceId);
+    });
+
+    return q.promise;
+};
+
 
 module.exports = OrderController;

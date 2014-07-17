@@ -28,6 +28,14 @@ module.exports.routes = function(app, login){
       });
     }
   );
+
+  app.get('/a/invoices', login.ensureLoggedIn(), function(req, res){
+      res.render('index',{
+        title: 'All orders'
+      });
+    }
+  );
+
   //Show place new order page
   app.get('/a/orders/new', login.ensureLoggedIn(), function(req, res){
     console.log(res.locals.user);
@@ -67,17 +75,85 @@ module.exports.routes = function(app, login){
     });
   });
 
+  app.get('/api/internal/invoices', function (req, res) {
+    order.getUserInvoices(req.user._id, req.user.account_type)
+    .then(function (r) {
+      res.json(200, r);
+    }, function (err) {
+      res.json(400, err.message);
+    });
+  });
+
   // Order POST Routes
   app.post('/api/internal/orders',function(req, res){
     order.requestItemQuotation(req.body, req.user._id)
     .then(function(r){
       if (r.message) {
-        return res.json(200, r);        
+        return res.json(200, r);
       }
       res.json(200, true);
     }, function (err) {
       res.json(400, err.message);
     });
+  });
+
+  // Order POST Routes
+  app.post('/api/internal/invoice',function(req, res){
+    // order.requestOrderQuotation(req.user._id, req.body)
+    // .then(function(r){
+    //   if (r.message) {
+    //     return res.json(200, r);
+    //   }
+    //   res.json(200, true);
+    // }, function (err) {
+    //   res.json(400, err.message);
+    // });
+    if (req.user.isPremium) {
+      order.requestOrderQuotation(req.user._id, req.body)
+      .then(function(r){
+        if (r.message) {
+          return res.json(200, r);
+        }
+        res.json(200, true);
+      }, function (err) {
+        res.json(400, err.message);
+      });
+    } else {
+      // first check if the user has 5 orders. if he has more than
+      // 5.. and isnt activated to KYC ... send a message wit advise
+      // ...if partially used trial..send a message with remaining trial
+      // units.
+      //
+      // loop over every item and send d user an sms quotation for each
+      if (req.body.length >= 5) {
+        //check if he got upto 5 orders that have been accepted.
+        //that will mean he's still a trial user and he's used up
+        //his trial.
+        order.checkUserIsTrying(req.user._id)
+        .then(function (i) {
+          if (i) {
+            return res.json(200, 'DrugStoc will contact you in a few minutes regarding this order');
+          }
+
+          order.requestSMSQuotation(req.user._id, req.body)
+          .then(function(){
+
+              // return res.json(200, r);
+
+              res.json(200, true);
+          }, function (err) {
+            res.json(400, err.message);
+          });
+        })
+        .fail(function (err) {
+          res.json(400, err.message);
+        })
+        .done();
+
+      } else {
+        res.json(400, 'You must have a minimum of 5 items to checkout');
+      }
+    }
   });
 
   app.post('/api/sms-point', function (req, res) {

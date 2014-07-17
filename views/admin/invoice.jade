@@ -1,0 +1,71 @@
+.contentpanel
+    .panel.panel-default
+      -if (false)
+        .col-md-2
+          .row
+            .form-content(style="margin-bottom: 30px")
+              form(name="searchform", novalidate, ng-submit="search_orders(search)")
+                  .form-group
+                    p.form-control-static Filter Orders
+                  .form-group
+                    label.control-label Order Id
+                    input.input-large.form-control(type="search", ng-model="search.orderId", placeholder="orders id...")
+                  .form-group
+                    label.control-label Hospital Id
+                    input.input-large.form-control(type="search", ng-model="search.hospitalId", placeholder="hospital name...")
+                  .form-group
+                    label.control-label Item Name
+                    input.input-large.form-control(type="search", ng-model="search.itemId.itemName", placeholder="item name...")
+                  .form-group
+                    label.control-label Supplier Name
+                    input.input-large.form-control(type="search", ng-model="search.orderSupplier.name", placeholder="Supplier")
+                  .form-group
+                    label.control-label Date
+                    input.form-control.input-large(type="date", ng-model="search.orderDate")
+                  //- .form-group
+                  //-   button.btn.btn-primary(type="submit") Search
+      .col-md-12
+        #accordion.panel-group
+          .panel.panel-default(ng-repeat="inv in invoices")
+            .panel-heading
+              h4.panel-title
+                .col-md-10
+                  a.collapsed(data-toggle='collapse', data-parent='#accordion', href='#collapseOne', style="height: 60px")
+                    .col-md-3
+                      | {{inv.idmask}}
+                    .col-md-3
+                      {{inv.hospitalId.name}}
+                    .col-md-3
+                      {{inv.invoicedDate | date:'medium'}}
+                .col-md-2
+                  button.btn.btn-primary.pull-right(style="margin-top:10px", ng-click="send_invoice(inv._id, 1)", ng-disabled="inv.status == 1") Send Invoice
+            #collapseOne.panel-collapse.collapse(style='height: 0px;')
+              .panel-body
+                table.table.table-hover.table-bordered(style="margin-top: 30px")
+                  thead
+                    tr
+                      th Order Id
+                      th Drug Name
+                      th Amount
+                      th Date / Time
+                      th Supplier
+                      th Status
+                      th Hospital
+                      th
+                  tbody
+                    tr(ng-repeat="cmp in inv.order")
+                      td {{cmp.idmask}}
+                      td
+                        a(ng-href="/a/drugs/{{cmp.itemId._id}}/item") {{cmp.itemId.itemName}}
+                      td {{cmp.orderAmount}}
+                      td {{cmp.orderDate | date:medium}}
+                      td
+                        a(ng-href='/a/organization/people/{{cmp.orderSupplier.userId}}/person/2') {{cmp.orderSupplier.name}}
+                      td {{cmp.status | orderState}}
+                      td
+                        a(ng-href='/a/organization/people/{{cmp.hospitalId.userId}}/person/5') {{cmp.hospitalId.name}}
+                        span.label.label-success.pull-right(ng-show="cmp.eta") {{cmp.eta | moment}}
+                      td
+                        button.btn.btn-danger.btn-xs(ng-click="toggleModal('manage-order-modal', cmp, $index);") Remove
+                        button.btn.btn-info.btn-xs(ng-click="get_status_updates(cmp); toggleModal('manage-order-updates', cmp.statusLog, $index)") Tracking
+                //- .x-pagination(pagination="orders", page-to="page(pageNo, limit, cb)")

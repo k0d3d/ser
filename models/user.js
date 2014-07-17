@@ -78,7 +78,7 @@ var userManager = {
     return luda.promise;
   },
   allUsers: function allUsers (doc) {
-    return User.find({}, 'email account_type activated isAdmin')
+    return User.find({}, 'email account_type activated isAdmin isPremium')
     .lean()
     // .skip(doc.page || 0)
     // .limit(doc.page || 20)
@@ -89,7 +89,7 @@ var userManager = {
   //as a result.
   _composeResponseUser : function _composeResponseUser (user, profile) {
     var i = {},
-        userInfo = _.pick(user, ['email', 'account_type', '_id', 'activated', 'isAdmin']),
+        userInfo = _.pick(user, ['email', 'account_type', '_id', 'activated', 'isAdmin', 'isPremium']),
         profileInfo = _.pick(profile, ['name', 'phone', 'image']);
 
     return _.extend(i, userInfo, profileInfo);
@@ -391,7 +391,7 @@ UserController.prototype.getProfile = function (userId, account_type) {
   staffUtils.getMeMyModel(account_type).findOne({
     userId: userId
   })
-  .populate('drugs.drug', 'itemName images', 'drug')
+  .populate('drugs.drug', 'itemName images category itemPackaging packageQty', 'drug')
   .lean()
   .exec(function (err, user_profile) {
     if (err) {
@@ -440,6 +440,7 @@ UserController.prototype.getProfile = function (userId, account_type) {
         }
 
       } else {
+          return d.resolve(user_profile);
           //lets check if the account is
           //a facility account, if it is,
           //we wanna have all the facilities orders
