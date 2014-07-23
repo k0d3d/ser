@@ -22,16 +22,16 @@ var userManager = {
    * @param  {[type]} doc [description]
    * @return {[type]}     [description]
    */
-  findUserByEmailPhone: function findUserByEmailPhone (doc) {
-    // return User.findOne({
+  findUserByEmail: function findUserByEmail (doc) {
+    // return User.find({
     //   $or: [
     //     {email: doc.email},
     //     {phone: doc.phone}
     //   ]
     // })
     return User.find({
-        email: doc.email,
-        phone: doc.phone
+        email: doc.email
+        // phone: doc.phone
     })
     .execQ();
   },
@@ -42,7 +42,7 @@ var userManager = {
    * @param  {[type]} doc [description]
    * @return {[type]}     [description]
    */
-  findUserByName: function findUserByName (doc) {
+  findUserByNamePhone: function findUserByNamePhone (doc) {
     var s = [], models = [2,3,4,5], luda = Q.defer();
 
     function _doItForHiphop () {
@@ -52,7 +52,7 @@ var userManager = {
       //match out query.
       staffUtils.getMeMyModel(task)
       .find({})
-      .regex('name', new RegExp(doc.name, 'i'))
+      .regex(doc.field, new RegExp(doc.val, 'i'))
       .populate('userId', 'email account_type created', 'User' )
       .exec(function (err, d){
         if (err) {
@@ -459,13 +459,14 @@ UserController.prototype.findAUser = function findAUser (query) {
       result = [];
 
 
-
-  if (query.email || query.phone) {
-    userManager.findUserByEmailPhone({
+    console.log(query);
+  if (query.email) {
+    userManager.findUserByEmail({
       email: query.email,
       phone: query.phone
     })
     .then(function (f) {
+      console.log(f);
       //loop over and find the profiles for
       //each user result found.
       function _obPop () {
@@ -506,9 +507,10 @@ UserController.prototype.findAUser = function findAUser (query) {
     .done();
   }
 
-  if (query.name) {
-    userManager.findUserByName({
-      name: query.name
+  if (query.name || query.phone) {
+    userManager.findUserByNamePhone({
+      val: query.name,
+      field: (query.phone) ? 'phone' : 'name'
     })
     .then(function (profiles) {
       if (!profiles.length) {
