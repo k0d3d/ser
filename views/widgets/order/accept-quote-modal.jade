@@ -33,7 +33,7 @@
                         | you are ..TOS........
 
         .modal-footer
-          button.btn.btn-success(type='button', data-dismiss='modal', ng-click="order_this(__modal_data, __modal_index);", ng-disabled="__modal_data.idmask !== __modal_data.orderIdConfirm") Accept Quotation
+          button.btn.btn-success(type='button', data-dismiss='modal', ng-click="order_this(__modal_data, __modal_index);", ng-disabled="__modal_data.idmask !== 'xxxx-' + __modal_data.orderIdConfirm") Accept Quotation
           button.btn.btn-white(type='button', data-dismiss='modal') Close
       //
          modal-content

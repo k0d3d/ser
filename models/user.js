@@ -251,7 +251,6 @@ UserController.prototype.findOrCreate = function (doc) {
     email : doc.email
   })
   .exec(function (err, i) {
-    console.log(err, i);
     //if error occurs
     if (err) {
       return findOrCreateUser.reject(err);
@@ -262,19 +261,20 @@ UserController.prototype.findOrCreate = function (doc) {
       user.email = doc.email;
       user.password = doc.password;
       user.account_type = doc.account_type;
+      user.phone = doc.phone;
       user.save(function (err, new_user) {
         if (err) {
           return findOrCreateUser.reject(err);
         }
         if (new_user) {
           console.log('Created new account');
-          return findOrCreateUser.resolve(new_user);
+          return findOrCreateUser.resolve({res: new_user, status: 'new-user'});
         }
       });
     } else {
       //if user found
       console.log('Found existing account');
-      return findOrCreateUser.resolve(i);
+      return findOrCreateUser.resolve({res: i, status: 'found-user'});
     }
 
   });
@@ -339,21 +339,6 @@ UserController.prototype.update = function update (id, body, account_type) {
   return d.promise;
 };
 
-UserController.prototype.accountUser = function accountUser (userId, props) {
-
-};
-
-/**
- *  Show profile
- */
-UserController.prototype.show = function(req, res) {
-  var user = req.profile;
-
-  res.render('users/show', {
-    title: user.name,
-    user: user
-  });
-};
 
 /**
  * Send User

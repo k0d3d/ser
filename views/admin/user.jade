@@ -67,7 +67,7 @@
                           i.fa.fa-user
                           i.fa.fa-times
                           |  Deactivate User
-                      button.btn.btn-danger.btn-sm(ng-click="manage_user('deleteUser', u._id)")
+                      button.btn.btn-danger.btn-sm(ng-click="manage_user('deleteUser', u._id, $index)")
                         i.fa.fa-times
                         | Delete User
                     .btn-group.pull-right

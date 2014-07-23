@@ -1291,7 +1291,8 @@ OrderController.prototype.updateInvoice = function updateInvoice (id, userId, st
 
 OrderController.prototype.getUserInvoices = function getUserInvoices (userId, account_type, query) {
   return Invoice.find({
-    hospitalId: userId
+    hospitalId: userId,
+    status: 1
   })
   .sort('-invoicedDate')
   .execQ();

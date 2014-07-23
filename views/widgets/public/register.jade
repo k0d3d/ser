@@ -8,23 +8,32 @@ mixin register()
       .alert.alert-danger(ng-show="auth_message.length > 0")
         | {{auth_message}}
       .mb10
-        label.control-label Email Address
-        input.form-control(type='email', required, ng-model="form.email")
+        .form-group(ng-class="{'has-error': register_new_account.email.$invalid}")
+          label.control-label Email Address
+          input.form-control(type='email', required, ng-model="form.email", name="email")
       .mb10
-        label.control-label Password
-        input.form-control(type='password', required, equals, ng-model="form.password", id="password_true")
-        span.msg-error(ng-show="register_new_account.verifyPassword.$error.passwordMatch") Passwords Must Match.
-          
+        .form-group(ng-class="{'has-error': register_new_account.phone.$invalid}")
+          label.control-label Phone Number
+          input.form-control(type='tel', required, ng-model="form.phone", name="phone")
       .mb10
-        label.control-label Retype Password
-        input.form-control(type='password', required, equals, ng-model="form.password_c", password-match, name="verifyPassword")
+        .form-group(ng-class="{'has-error': register_new_account.password.$invalid}")
+          label.control-label Password
+          input.form-control(type='password', required, equals, ng-model="form.password", id="password_true", name="password")
+          span.msg-error(ng-show="register_new_account.verifyPassword.$error.passwordMatch") Passwords Must Match.
+
       .mb10
-        label.control-label Account Type
-        select.form-control.chosen-select(data-placeholder='Facility, Distributor, Sales Agent..', required, ng-model="form.account_type")
-          each p, index in people
-            option(value=index) #{p.name}
+        .form-group(ng-class="{'has-error': register_new_account.verifyPassword.$invalid}")
+          label.control-label Retype Password
+          input.form-control(type='password', required, equals, ng-model="form.password_c", password-match, name="verifyPassword")
+      .mb10
+        .form-group(ng-class="{'has-error': register_new_account.account_type.$invalid}")
+          label.control-label Account Type
+          select.form-control.chosen-select(data-placeholder='Facility, Distributor, Sales Agent..', required, ng-model="form.account_type", name="account_type")
+            each p, index in people
+              -if (index > 1)
+                option(value=index) #{p.name}
 
       br
       button.btn.btn-success.btn-block(type="submit", ng-disabled="register_new_account.$invalid") Sign Up
   //
-     col-sm-6 
+     col-sm-6

@@ -58,10 +58,12 @@ angular.module('admin', [])
         });
     };
 
-    $scope.manage_user = function (action, userId) {
+    $scope.manage_user = function (action, userId, index) {
         adminService[action](userId)
         .then(function(r) {
-
+          if (action === 'deleteUser') {
+            $scope.users_list.splice(index, 1);
+          }
         });
     };
 

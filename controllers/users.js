@@ -10,16 +10,20 @@ module.exports.routes = function(app, passport, login, people){
 
   app.route('/p/login')
   .get(function (req, res, next){res.locals.people = people; next(); }, users.signin);
-  
+
   app.route('/p/signup')
   .get(function (req, res, next){res.locals.people = people; next(); }, users.signup);
-  
+
   app.route('/p/signout')
   .get(users.signout);
 
   app.route('/p/user-registered')
   .get(function(req, res) {
-    res.render('user/user-registered');
+    if (!req.headers.referer) {
+      res.redirect('/');
+    } else {
+      res.render('user/user-registered');
+    }
   });
 
   app.route('/a/profile')
@@ -42,24 +46,33 @@ module.exports.routes = function(app, passport, login, people){
   app.route('/users')
   .post(function (req, res){
     // return console.log(req.body);
-    users.create(req.body, function (r){
-      if (util.isError(r)) {
-        res.json(400, {message: r.message});
-      } else {
+    users.findOrCreate(req.body)
+    .then(function (r){
+      if (r.status === 'new-user') {
         // TODO::
-        // block this url from 
-        // direct access. 
+        // block this url from
+        // direct access.
         res.json(200, {nextUrl: '/p/user-registered'});
       }
-    });
+      if (r.status === 'found-user') {
+        res.json(400, {message: 'User already exists. Please reset your password or use another email.'});
+      }
+
+    })
+    .fail(function (err) {
+      if (util.isError(err)) {
+        res.json(400, {message: err.message});
+      }
+    })
+    .done();
   });
-  
+
   app.route('/api/internal/users', login.ensureLoggedIn())
   .put(function (req, res, next) {
     var id = req.user._id;
     var body = {};
 
-    body[req.body.name] = req.body.value;    
+    body[req.body.name] = req.body.value;
     users.update(id, body)
     .then(function () {
       res.json(200, {message: 'Saved'});
