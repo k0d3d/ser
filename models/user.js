@@ -182,13 +182,15 @@ UserController.prototype.signout = function(req, res) {
  * @param  {[type]} res [description]
  * @return {[type]}     [description]
  */
-UserController.prototype.session = function(req, res, next) {
-  passport.authenticate('local', function (err, user) {
+UserController.prototype.session = function session (req, res, next) {
+  passport.authenticate('local', function (err, user, info) {
+    console.log(info);
     if (err) {
       return next(err);
     }
     if (!user) {
-      return res.json(401, {message: 'Username / Password  is wrong.'});
+      // return res.json(401, {message: 'Username / Password  is wrong.'});
+      return res.json(401, {message: info.message});
     }
     req.login (user, function (err) {
       if (err) {
@@ -268,7 +270,13 @@ UserController.prototype.findOrCreate = function (doc) {
         }
         if (new_user) {
           console.log('Created new account');
-          return findOrCreateUser.resolve({res: new_user, status: 'new-user'});
+          sendEmail({
+              to: doc.email, // list of receivers
+              subject: 'DrugStoc Registeration', // Subject line
+          }, 'views/templates/email-templates/sign-up.jade')
+          .then(function () {
+            return findOrCreateUser.resolve({res: new_user, status: 'new-user'});
+          })
         }
       });
     } else {
@@ -293,7 +301,6 @@ UserController.prototype.findOrCreate = function (doc) {
  */
 UserController.prototype.update = function update (id, body, account_type) {
   var d = Q.defer();
-  console.log(arguments);
   if (account_type) {
     staffUtils.getMeMyModel(account_type).update({
       userId : id

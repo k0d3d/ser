@@ -94,7 +94,7 @@ angular.module('admin', [])
     $scope.load_users(0, 20);
 
 }])
-.controller('adminOrdersCt', ['$scope', 'adminService', function ($scope, adminService) {
+.controller('adminOrdersCt', ['$scope', 'adminService', 'ordersService', function ($scope, adminService, ordersService) {
   $scope.$parent.headerTitle = 'Admin:: Manage Orders';
   $scope.orderFilter = {};
 
@@ -133,7 +133,6 @@ angular.module('admin', [])
     };
     console.log($scope.orderFilter);
   };
-
 
 }])
 .controller('adminItemsCt', ['$scope', 'adminService', function ($scope, adminService) {
@@ -178,8 +177,14 @@ angular.module('admin', [])
 
 
 }])
-.controller('adminInvoicesCt', ['$scope', 'adminService', function ($scope, adminService) {
+.controller('adminInvoicesCt', [
+  '$scope',
+  'adminService',
+  'ordersService',
+  function ($scope, adminService, ordersService) {
   $scope.$parent.headerTitle = 'Admin:: Manage Invoices';
+  $scope.activeInv = {};
+
   adminService.loadInvoices()
   .then(function (d) {
     $scope.invoices = d;
@@ -191,9 +196,63 @@ angular.module('admin', [])
 
     });
   };
+
+
+  $scope.search = function(queryObj){
+    console.log('message');
+
+    ordersService.searchCmp(queryObj)
+    .then(function (r) {
+      angular.forEach(r.drug, function (v, i) {
+        r.drug[i].packageQty = 1;
+      });
+      $scope.searchedItems = r;
+      $scope.searchedItems.s = queryObj.s;
+
+    });
+  };
+
+
+  $scope.add_to_invoice = function (item){
+    if (!item.packageCount || !$scope.activeInv.thisHospitalId || !$scope.activeInv.thisInvoiceId) return false;
+    item.orderAmount = item.packageCount * item.packageQty;
+    //return console.log(item);
+    adminService.addItemToInvoice($scope.activeInv.thisInvoiceId, $scope.activeInv.thisHospitalId, item)
+    .then(function(data){
+        item.sentRequest = 'sent';
+        $scope.my_quotation.push(data);
+        $scope.form = '';
+    });
+  };
+
+  $scope.delete_invoice_item = function (index, thisOrder) {
+    adminService.deleteInvoiceItem()
+  };
+
 }])
 .factory('adminService', function ($http) {
     return {
+        deleteInvoiceItem: function deleteInvoiceItem (invoiceId, item) {
+          return $http({
+            url: '/api/internal/admin/invoices/' + invoiceId,
+            method: 'DELETE',
+            params: {orderId: item}
+          })
+          .then(function (d) {
+            return d.data;
+          });
+        },
+        addItemToInvoice: function addItemToInvoice (invoiceId, hospitalId, item) {
+          return $http({
+            url : '/api/internal/admin/invoices/' + invoiceId,
+            data: item,
+            method: 'PUT',
+            params: {hospitalId: hospitalId, action: 'request'}
+          })
+          .then(function (d) {
+            return d.data;
+          });
+        },
         loadInvoices: function loadInvoices (page, limit) {
           return $http({
             url: '/api/internal/admin/invoices',
@@ -204,11 +263,11 @@ angular.module('admin', [])
             return d.data;
           });
         },
-        updateInvoices: function loadInvoices (id, state, query) {
+        updateInvoices: function updateInvoices (id, state, query) {
           return $http({
             url: '/api/internal/admin/invoices/' + id ,
             method: 'PUT',
-            params: {page: query.page, limit: query.limit, state: state}
+            params: {page: query.page, limit: query.limit, state: state, action: 'update'}
           })
           .then(function (d) {
             return d.data;

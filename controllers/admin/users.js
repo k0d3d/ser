@@ -58,7 +58,7 @@ module.exports.routes = function (app, login) {
     });
   })
   .put(function (req, res, next){
-    var id = req.user._id;
+    var id = req.params.userId;
     var body = {};
 
     body[req.body.name] = req.body.value;

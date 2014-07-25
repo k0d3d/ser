@@ -88,6 +88,7 @@ config(['$routeProvider',function($routeProvider){
       $scope.canVerify = true;
       $scope.cart_meta.string = function () {return 'Quotation Sent';};
       $scope.cart_meta.state = false;
+      $route.reload();
 
     });
 

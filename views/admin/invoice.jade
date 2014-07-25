@@ -30,20 +30,25 @@
             .panel-heading
               h4.panel-title
                 .col-md-10
-                  a.collapsed(data-toggle='collapse', data-parent='#accordion', href='#collapseOne', style="height: 60px")
+                  a.collapsed(data-toggle='collapse', data-parent='#accordion', ng-href='#collapse{{$index}}', style="height: 60px")
                     .col-md-3
                       | {{inv.idmask}}
                     .col-md-3
-                      {{inv.hospitalId.name}}
+                      | {{inv.hospitalId.name}}
                     .col-md-3
-                      {{inv.invoicedDate | date:'medium'}}
+                      | {{inv.invoicedDate | date:'medium'}}
                 .col-md-2
                   button.btn.btn-primary.pull-right(style="margin-top:10px", ng-click="send_invoice(inv._id, 1)", ng-disabled="inv.status == 1") Send Invoice
-            #collapseOne.panel-collapse.collapse(style='height: 0px;')
+            .panel-collapse.collapse(id="collapse{{$index}}", style='height: 0px;')
               .panel-body
+                button.btn.btn-success.pull-right(ng-click="activeInv.thisInvoiceId = inv._id; activeInv.thisHospitalId = inv.hospitalId; toggleModal('alter-order-modal', inv, $index);", style="margin-top:10px", ng-disabled="inv.status == 1")
+                  i.fa.fa-plus
+                  |  Add
+                .mb10
                 table.table.table-hover.table-bordered(style="margin-top: 30px")
                   thead
                     tr
+                      th No.
                       th Order Id
                       th Drug Name
                       th Amount
@@ -54,6 +59,7 @@
                       th
                   tbody
                     tr(ng-repeat="cmp in inv.order")
+                      td {{$index + 1}}
                       td {{cmp.idmask}}
                       td
                         a(ng-href="/a/drugs/{{cmp.itemId._id}}/item") {{cmp.itemId.itemName}}
@@ -66,6 +72,8 @@
                         a(ng-href='/a/organization/people/{{cmp.hospitalId.userId}}/person/5') {{cmp.hospitalId.name}}
                         span.label.label-success.pull-right(ng-show="cmp.eta") {{cmp.eta | moment}}
                       td
-                        button.btn.btn-danger.btn-xs(ng-click="toggleModal('manage-order-modal', cmp, $index);") Remove
-                        button.btn.btn-info.btn-xs(ng-click="get_status_updates(cmp); toggleModal('manage-order-updates', cmp.statusLog, $index)") Tracking
+                        button.btn.btn-danger.btn-xs(ng-click="delete_invoice_item($index, inv.order)") Remove
+                        button.btn.btn-info.btn-xs(ng-click="get_status_updates(cmp); toggleModal('manage-order-updates', cmp.statusLog, $index)") Status Logs
                 //- .x-pagination(pagination="orders", page-to="page(pageNo, limit, cb)")
+
+include ../widgets/admin/alter-order-modal

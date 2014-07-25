@@ -89,22 +89,19 @@ var orderManager = {
   },
   getOrders: function getOrders (doc) {
     console.log('Attempting to get orders..');
-    // console.log(doc);
     var query = {
       orderVisibility: true,
       //orderStatus: doc.orderStatus,
     };
 
-    if (!doc.orderStatus) {
-      query.status = {$gt: -1};
-
-    }
-
     if(doc.orderStatus === 'quotes') {
       query.status = {$gt: -1, $lt: 2};
       // query.status = doc.orderStatus;
+    } else if (doc.orderStatus === 'admin') {
+      query.status = {$gte : -1};
     } else {
-      query.status = doc.orderStatus;
+
+      query.status = (doc.orderStatus === undefined) ? {$gte: 2} : doc.orderStatus;
     }
     //query.orderStatus = (doc.orderStatus && (doc.orderStatus !== 0)) ? {$gt: 0} : undefined;
 
@@ -123,6 +120,8 @@ var orderManager = {
     if (doc.displayType === 'count') {
       fields = 'itemId';
     }
+    console.log('here is the query');
+    console.log(_.compactObject(query));
 
     Order.find(_.compactObject(query), fields)
     // .where(doc.where, doc.whrVal)
@@ -131,7 +130,7 @@ var orderManager = {
     // .lean()
     //.limit(perPage)
     //.skip(perPage * page)
-    .sort('-orderDate')
+    .sort('orderDate')
     .exec(function(err, o) {
       //console.log(err, o);
       if (err){
@@ -396,7 +395,8 @@ OrderController.prototype.getOrders = function getOrders (orderStatus, displayTy
   //get all orders for admin users
   if (accountType === 'admin') {
     orderManager.getOrders({
-      displayType: displayType
+      displayType: displayType,
+      orderStatus: 'admin'
     })
     .then(function (orderList) {
       if (orderList.length) {
@@ -659,7 +659,6 @@ OrderController.prototype.distUpdateOrder = function distUpdateOrder (orderData,
  * @param  {[type]} accountType [description]
  * @return {[type]}             [description]
  */
-//OrderController.prototype.getOrderStatuses = function getOrderStatuses (orderId, userId, accountType) {
 OrderController.prototype.getOrderStatuses = function getOrderStatuses (orderId) {
   console.log('Getting order statuses...');
   var d = Q.defer();
@@ -769,7 +768,7 @@ OrderController.prototype.requestItemQuotation = function requestItemQuotation (
   orderData.orderSupplier = {supplierId: orderData.owner.userId, supplier_type: orderData.owner.account_type};
   orderData.hospitalId = orderOwner;
   orderData.statusLog = [{
-    orderStatus: 0,
+    orderStatus: orderData.status || 0,
     date : Date.now()
   }];
   // orderData.orderId = utilz.uid(16);
@@ -913,11 +912,13 @@ OrderController.prototype.requestItemQuotation = function requestItemQuotation (
  * changes the status of an order. An order state can only
  * be increased. An order status cannot reduce or move backwards.
  * meaning newState > oldState. The only excuse would be a cancelled order.
- * @param  {Object} object containing data sent from
+ * @param  {Object} order object containing data sent from
  * the browser.
+ * @param {Boolean} dontNotify A true or false value that specifies whether
+ * notifications will be sent out for this transaction.
  * @return {[type]}       [description]
  */
-OrderController.prototype.addressQuotation = function addressQuotation (order, status, userId, accountType) {
+OrderController.prototype.addressQuotation = function addressQuotation (order, status, dontNotify) {
   console.log('Placing order');
   var ot = Q.defer();
 
@@ -948,6 +949,10 @@ OrderController.prototype.addressQuotation = function addressQuotation (order, s
     order_model.save(function (err, saved_order_model) {
 
         saved_order_model = saved_order_model.toObject();
+
+        if (dontNotify === true) {
+          return ot.resolve(saved_order_model);
+        }
 
         //populate hospitalId,
         staffUtils.getMeMyModel(5)
@@ -1261,6 +1266,14 @@ OrderController.prototype.queryInvoices = function queryInvoices (query) {
   // });
 
   return Invoice.find({})
+  .populate({
+    path: 'order',
+    model: 'Order',
+    options: {
+      sort: 'orderDate'
+    }
+  })
+  // .populate('order.itemId', 'itemName', 'drug')
   .execQ();
 
   // return q.promise;
@@ -1338,14 +1351,14 @@ OrderController.prototype.requestOrderQuotation = function requestOrderQuotation
     var invoice = new Invoice();
 
     invoice.invoiceId = invoiceId;
-    var collectn = [];
-    _.forEach(cart, function (c) {
-      delete c._id;
-      delete c.__v;
-      collectn.push(c);
-    });
+    // var collectn = [];
+    // _.forEach(cart, function (c) {
+    //   delete c._id;
+    //   delete c.__v;
+    //   collectn.push(c);
+    // });
 
-    invoice.order = collectn;
+    invoice.order = _.pluck(cart, '_id');
     invoice.invoicedDate = Date.now();
     invoice.hospitalId = userId;
     invoice.save(function (err) {
@@ -1358,5 +1371,64 @@ OrderController.prototype.requestOrderQuotation = function requestOrderQuotation
     return q.promise;
 };
 
+/**
+ * removes an item from an invoice.
+ * @param  {[type]} invoiceId the ObjectId of the invoice to be updated
+ * @param  {[type]} orderId      the Obhect Id of the order being removed
+ * from an invoice.
+ * @return {[type]}           Promise
+ */
+OrderController.prototype.removeItemInvoice = function removeItemInvoice (invoiceId, orderId) {
+  var q = Q.defer();
+
+  Invoice.update({
+    _id: invoiceId
+  }, {
+    $pull: {
+      order: orderId
+    }
+  }, function (err, count) {
+    if (err) {
+      return q.reject(err);
+    }
+    if (count) {
+      return q.resolve(true);
+    } else  {
+      return q.reject(new Error('update invoice failed'));
+    }
+  });
+
+  return q.promise;
+};
+
+/**
+ * adds one item to an already existing invoice.
+ * @param {[type]} invoiceId      objectId of the invoice being
+ * updated.
+ * @param {[type]} orderId objectId of an order to be added
+ * to this invoice
+ */
+OrderController.prototype.addOneItemInvoice = function addOneItemInvoice(invoiceId, orderId) {
+  var q = Q.defer();
+
+  Invoice.update({
+    _id: invoiceId
+  }, {
+    $push: {
+      order: orderId
+    }
+  }, function (err, count) {
+    if (err) {
+      return q.reject(err);
+    }
+    if (count) {
+      return q.resolve(true);
+    } else  {
+      return q.reject(new Error('update invoice failed'));
+    }
+  });
+
+  return q.promise;
+};
 
 module.exports = OrderController;

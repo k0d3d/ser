@@ -46,7 +46,8 @@
                     th Hospital
                     th
                 tbody
-                  tr(ng-repeat="cmp in funnel = (orders | filter: routeFilterParam)")
+                  //- tr(ng-repeat="cmp in funnel = (orders | filter: routeFilterParam)")
+                  tr(ng-repeat="cmp in funnel = (orders)")
                     td {{cmp.idmask}}
                     td
                       a(ng-href="/a/drugs/{{cmp.itemId._id}}/item") {{cmp.itemId.itemName}}

@@ -108,13 +108,29 @@ module.exports.routes = function(app, login){
     // }, function (err) {
     //   res.json(400, err.message);
     // });
+    var ordersObj = req.body;
     if (req.user.isPremium) {
-      order.requestOrderQuotation(req.user._id, req.body)
+      order.requestOrderQuotation(req.user._id, ordersObj)
       .then(function(r){
-        if (r.message) {
-          return res.json(200, r);
+
+        function _recur () {
+          var task = ordersObj.pop();
+          order.addressQuotation(task, 2, true)
+          .then(function () {
+            if (ordersObj.length) {
+              _recur();
+            } else {
+
+              if (r.message) {
+                return res.json(200, r);
+              }
+              res.json(200, true);
+            }
+          });
         }
-        res.json(200, true);
+
+        _recur();
+
       }, function (err) {
         res.json(400, err.message);
       });

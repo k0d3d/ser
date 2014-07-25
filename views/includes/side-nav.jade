@@ -1,15 +1,15 @@
 .leftpanel
     .logopanel
-        h1
+        h1(style="text-align: center")
           a(href='/')
-            span [
-            | DrugStoc
-            span ]
+            span
+              img( src="/images/splash-logo.png", width="143px")
+
       //
-         logopanel 
+         logopanel
       .leftpanelinner
         //
-           This is only visible to small devices 
+           This is only visible to small devices
         .visible-xs.hidden-sm.hidden-md.hidden-lg
           .media.userlogged
             img.media-object(alt='', src='/images/photos/loggeduser.png')
@@ -27,13 +27,13 @@
                 span Sign Out
         h5.sidebartitle Navigation
         -if (isPermitted(['place-order']))
-          a.btn.btn-success-alt.btn-block(style="margin-bottom: 5px",  href="/a/orders/new") 
+          a.btn.btn-success-alt.btn-block(style="margin-bottom: 5px",  href="/a/orders/new")
             i.fa.fa-shopping-cart
             | New Order
         -if (isPermitted(['add-item']))
-          a.btn.btn-success-alt.btn-block(style="margin-bottom: 5px", href='/a/drugs/add-new') 
+          a.btn.btn-success-alt.btn-block(style="margin-bottom: 5px", href='/a/drugs/add-new')
             i.fa.fa-shopping-cart
-            | Add Item    
-        hr     
+            | Add Item
+        hr
         include ../widgets/side-menu.jade
         +sidemenu(navs)
