@@ -127,7 +127,7 @@ OrderSchema.statics = {
 var InvoiceSchema = new Schema({
   invoiceId: {type: String},
   order: [
-    {type: Schema.ObjectId}
+    {type: Schema.Types.Mixed}
   ],
   invoicedDate: {type: Date},
   status: {type: Number, default: 0},

@@ -176,15 +176,20 @@ var staffUtils = {
      * populated. If accountType is a number, its used directly as an argument for
      * self.getMeMyModel(). If it is a string, it assumes accountType is a field
      * in doc.
+     * @param {Function} cb Optional Callback to be executed.
      * @return {Object}            Promise Object
      */
-    populateProfile: function populateProfile (doc, fieldToPop, accountType) {
+    populateProfile: function populateProfile (doc, fieldToPop, accountType, cb) {
       console.log('Populating...');
-      var pop = Q.defer(), poppedObject = [], at;
+      var pop = Q.defer(),
+          poppedObject = [],
+          at,
+          plainDoc = doc;
       var self = this;
 
       function __pop() {
-        var task = doc.pop();
+        var task = plainDoc.pop(),
+            ftp = (fieldToPop.indexOf('.') > -1) ? sysUtils(task, fieldToPop) : task[fieldToPop];
         // task = task.toObject();
 
         if (_.isNumber(accountType)) {
@@ -196,19 +201,34 @@ var staffUtils = {
 
         self.getMeMyModel(at)
         .findOne({
-          userId: task[fieldToPop]
+          userId: ftp
         }, 'name userId')
         .exec(function (err, i) {
           if (err) {
+            if (cb) {
+              cb(err);
+            }
             return pop.reject(err);
           }
 
-          task[fieldToPop] = i;
-          poppedObject.push(task);
+          var ash = JSON.parse(JSON.stringify(task));
 
-          if (doc.length) {
+          if (fieldToPop.indexOf('.') > -1) {
+            ash = sysUtils.setObjStrToVal(task, 'fieldToPop', i);
+          } else {
+            ash[fieldToPop] = i;
+            // ash.fieldToPop = i;
+          }
+          poppedObject.push(ash);
+
+          if (plainDoc.length) {
             __pop();
           } else {
+            //call the call back
+            if (cb) {
+              cb(null, poppedObject);
+            }
+
             return pop.resolve(poppedObject);
           }
         });
@@ -220,8 +240,8 @@ var staffUtils = {
         __pop();
       }
 
-
       return pop.promise;
+
     },
     /**
      * removes a user profile.

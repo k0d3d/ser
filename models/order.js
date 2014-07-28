@@ -1246,37 +1246,47 @@ OrderController.prototype.requestSMSQuotation = function requestSMSQuotation (us
 
 
 OrderController.prototype.queryInvoices = function queryInvoices (query) {
-  var q = Q.defer(), dr;
+  var q = Q.defer(), dr = [], bigI;
 
-  // Invoice.find({})
-  // .execQ()
-  // .then(function (doc) {
-  //   if (_.isEmpty(doc)) {
-  //     q.resolve(doc);
-  //   } else {
-  //     dr = doc;
-  //     console.log(doc.order);
-  //     staffUtils.populateProfile(doc.order, 'hospitalId', 5)
-  //     .then(function (popdWOrders) {
-  //       console.log('message');
-  //       dr.orders = popdWOrders;
-  //       return q.resolve(dr);
-  //     });
-  //   }
-  // });
+  function _recur () {
+    var task = bigI.pop();
+    staffUtils.populateProfile(task, 'hospitalId', 5, function (err, d) {
+      if (err) {
 
-  return Invoice.find({})
-  .populate({
-    path: 'order',
-    model: 'Order',
-    options: {
-      sort: 'orderDate'
+        dr.push(task);
+      } else {
+        dr.push(d);
+      }
+
+      if (bigI.length) {
+        _recur();
+      } else {
+        return q.resolve(dr);
+      }
+    });
+  }
+
+  Invoice.find({})
+  .exec(function (err, i) {
+    if (err) {
+      return q.reject(err);
     }
-  })
-  // .populate('order.itemId', 'itemName', 'drug')
-  .execQ();
 
-  // return q.promise;
+    // bigI = i;
+    // console.log('this is i');
+    // console.log(bigI);
+    // _recur();
+    staffUtils.populateProfile(i, 'hospitalId', 5)
+    .then(function (popped) {
+      q.resolve(popped);
+    })
+    .fail(function (err) {
+      err.stack();
+      q.reject(err);
+    });
+  });
+
+  return q.promise;
 };
 
 OrderController.prototype.updateInvoice = function updateInvoice (id, userId, state) {
@@ -1358,7 +1368,8 @@ OrderController.prototype.requestOrderQuotation = function requestOrderQuotation
     //   collectn.push(c);
     // });
 
-    invoice.order = _.pluck(cart, '_id');
+    invoice.order = cart;
+    // invoice.order = _.pluck(cart, '_id');
     invoice.invoicedDate = Date.now();
     invoice.hospitalId = userId;
     invoice.save(function (err) {
@@ -1374,7 +1385,7 @@ OrderController.prototype.requestOrderQuotation = function requestOrderQuotation
 /**
  * removes an item from an invoice.
  * @param  {[type]} invoiceId the ObjectId of the invoice to be updated
- * @param  {[type]} orderId      the Obhect Id of the order being removed
+ * @param  {[type]} orderId      the Object Id of the order being removed
  * from an invoice.
  * @return {[type]}           Promise
  */
@@ -1405,17 +1416,17 @@ OrderController.prototype.removeItemInvoice = function removeItemInvoice (invoic
  * adds one item to an already existing invoice.
  * @param {[type]} invoiceId      objectId of the invoice being
  * updated.
- * @param {[type]} orderId objectId of an order to be added
+ * @param {[type]} orderData object of an order to be added
  * to this invoice
  */
-OrderController.prototype.addOneItemInvoice = function addOneItemInvoice(invoiceId, orderId) {
+OrderController.prototype.addOneItemInvoice = function addOneItemInvoice (invoiceId, orderData) {
   var q = Q.defer();
 
   Invoice.update({
     _id: invoiceId
   }, {
     $push: {
-      order: orderId
+      order: orderData
     }
   }, function (err, count) {
     if (err) {

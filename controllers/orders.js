@@ -131,9 +131,11 @@ module.exports.routes = function(app, login){
 
         _recur();
 
-      }, function (err) {
+      })
+      .fail(function (err) {
         res.json(400, err.message);
-      });
+      })
+      .done();
     } else {
       // first check if the user has 5 orders. if he has more than
       // 5.. and isnt activated to KYC ... send a message wit advise

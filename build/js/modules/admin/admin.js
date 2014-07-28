@@ -225,6 +225,11 @@ angular.module('admin', [])
     });
   };
 
+  $scope.getTotal = function (order) {
+    console.log(order.length);
+    return order.length;
+  };
+
   $scope.delete_invoice_item = function (index, thisOrder) {
     adminService.deleteInvoiceItem()
   };

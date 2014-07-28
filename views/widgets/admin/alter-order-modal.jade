@@ -1,0 +1,81 @@
+#alter-order-modal.modal.fade.in(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
+  .modal-dialog(style="width: 80%")
+      .modal-content
+        .modal-header
+          button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+          h4#myModalLabel.modal-title Search and Add
+        .modal-body
+          .contentpanel
+            .row
+              .col-sm-4.col-md-3
+                form.form(ng-submit="search(item_query)", name="searchItemForm")
+                  .form-groupg
+                    input.form-control(type='text', placeholder='Search for Drugs...', ng-model="item_query.s")
+                  .mb20
+                  .form-group
+                    label.control-label Search by:
+                    select.form-control(ng-model="item_query.param", required)
+                      option(value="itemName") Brand Name
+                      option(value="sciName") Composition
+                      option(value="manufacturer") Manufacturer
+                      option(value="nafdacRegNo") NAFDAC Reg Number
+                  .form-group
+                    button.btn.btn-primary.btn-sm(type="submit", ng-disabled="searchItemForm.$invalid") Search
+
+
+              .col-sm-8.col-md-9
+                .panel.panel-default
+                  .panel-heading
+                    h4.panel-title Search results for {{searchedItems.s}}
+                    p About {{searchedItems.drug.length + searchedItems.ndl.length}} results
+
+                  //
+                     panel-heading
+                  .panel-body
+                    .item-result-list
+                      .media(ng-repeat="drugItem in searchedItems.drug")
+                        .row
+                          .col-sm-12.col-md-12
+                            a.pull-left(href='#')
+                              img.media-object.drug-search-img(alt='', ng-src='/images/item-images/{{drugItem.images[0] || "default/item-avatar-small.jpg"}}')
+                            .media-body
+                              h4.filename.text-primary {{drugItem.itemName}}
+                              table.table
+                                thead
+                                  tr
+                                    th Composition
+                                    th Manufacturer
+                                    th Current Price
+                                tbody
+                                  tr
+                                    td {{drugItem.sciName}}
+                                    td {{drugItem.pharma.pharmaName}}
+                                    td {{drugItem.instantQuote | instantQuote }}
+                        .row
+                          .col-sm-4
+                            span.label.label-info(style="display: inline-block")  <strong>Supplier: </strong> {{drugItem.owner.name}}
+                          .col-sm-8
+                            div.pull-right
+                              div(style="width: 150px; float: left; margin-left: 5px", ng-show="drugItem.sentRequest == 'input'")
+                                span(style="text-align: center; display: block") {{drugItem.packageQty}} \ {{drugItem.itemPackaging || '--'}}
+                                span(style="text-align: center; display: block") <strong>Total items :</strong> {{drugItem.packageQty * drugItem.packageCount || 0}}
+                              div(style="width: 70px; float: left; margin-left: 5px", ng-show="drugItem.sentRequest == 'input'")
+                                input.form-control(type='number', ng-model="drugItem.packageCount", required, ng-init="drugItem.packageCount = 0", placeholder="number of packages")
+                              div(style="float: left; margin-left: 5px")
+                                button.btn.btn-default.dropdown-toggle(type='button', ng-show="!drugItem.sentRequest || drugItem.sentRequest == 'no'", ng-click="drugItem.sentRequest = 'input'; drugItem.isSendin = false")
+                                  | Add to Invoice
+                              div(style="width: 150px; float: left; margin-left: 5px", ng-show="drugItem.sentRequest == 'sent'")
+                                button.btn.btn-success-alt.dropdown-toggle(type='button', disabled)
+                                  | Item Added
+                              div(style="width: 150px; float: left; margin-left: 5px")
+                                button.btn.btn-default.dropdown-toggle.pull-right(ng-click="add_to_invoice(drugItem); drugItem.isSending=true", ng-show="drugItem.sentRequest == 'input'", ng-disabled="drugItem.isSending || !drugItem.packageCount")
+                                  | Add this
+                              div.sr-ol(style="width: 25px; float: left; margin-left: 5px", ng-show="drugItem.sentRequest == 'input'", ng-click="drugItem.sentRequest = 'no'")
+                                i.fa.fa-times-circle
+
+
+
+
+        .modal-footer
+          button.btn.btn-white(type='button', data-dismiss='modal') Close
+
