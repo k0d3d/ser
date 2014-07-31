@@ -15,7 +15,7 @@ var app = angular.module('stocUser', [
   'facility',
   'ngTagsInput',
   'ngDragDrop',
-  'xeditable',
+  // 'xeditable',
   'checklist-model'
   ]);
 

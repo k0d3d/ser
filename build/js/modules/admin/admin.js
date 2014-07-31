@@ -230,12 +230,24 @@ angular.module('admin', [])
     return order.length;
   };
 
-  $scope.delete_invoice_item = function (index, thisOrder) {
-    adminService.deleteInvoiceItem()
+  $scope.delete_invoice_item = function (index, invoiceId, thisOrder) {
+    var orderId = thisOrder[index].orderId;
+    adminService.deleteInvoiceItem(invoiceId, orderId)
+    .then(function () {
+      thisOrder.splice(index, 1);
+    });
+  };
+
+  $scope.send_item_sms = function (index, invoiceId, thisOrder) {
+    var orderId = thisOrder[index];
+    adminService.sendInvoiceItemBySms(invoiceId, orderId)
+    .then(function () {
+
+    });
   };
 
 }])
-.factory('adminService', function ($http) {
+.factory('adminService', ['Notification', function ($http, N) {
     return {
         deleteInvoiceItem: function deleteInvoiceItem (invoiceId, item) {
           return $http({
@@ -252,7 +264,7 @@ angular.module('admin', [])
             url : '/api/internal/admin/invoices/' + invoiceId,
             data: item,
             method: 'PUT',
-            params: {hospitalId: hospitalId, action: 'request'}
+            params: {hospitalId: hospitalId.userId, action: 'request'}
           })
           .then(function (d) {
             return d.data;
@@ -265,6 +277,22 @@ angular.module('admin', [])
             params: {page: page, limit: limit}
           })
           .then(function (d) {
+            return d.data;
+          });
+        },
+        sendInvoiceItemBySms: function sendInvoiceItemBySms (id, orderData) {
+          return $http({
+            url: '/api/internal/admin/invoices/' + id ,
+            method: 'PUT',
+            data: orderData,
+            params: {action: 'send-sms'}
+          })
+          .then(function (d) {
+            N.notifier({
+              title: 'Success!',
+              text: 'The order has been send to the supplier via sms',
+              class_name: 'growl-success'
+            });
             return d.data;
           });
         },
@@ -343,4 +371,4 @@ angular.module('admin', [])
             });
         }
     };
-});
+}]);

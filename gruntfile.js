@@ -64,7 +64,8 @@ module.exports = function(grunt) {
         }
       },
       jshint: {
-        all: ['gruntfile.js', 'public/js/**/*.js', 'test/**/*.js', 'app/**/*.js']
+        all: ['gruntfile.js', 'public/js/**/*.js', 'test/**/*.js', 'app/**/*.js'],
+        'build': ['gruntfile.js', 'build/js/**/*.js']
       },
       nodemon: {
         dev: {
@@ -427,7 +428,7 @@ module.exports = function(grunt) {
               'public/js/modules/bills/bills.js',
               'public/js/modules/dispense/dispense.js',
               'public/js/modules/supplier/supplier.js',
-              'public/js/modules/admin/admin.js',
+              // 'public/js/modules/admin/admin.js',
               'public/js/modules/stock/stock.js',
               'public/js/modules/user/user.js',
               'public/js/modules/organization/organization.js',

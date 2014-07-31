@@ -7,10 +7,10 @@ var mongoose = require('mongoose-q')(),
 
 function getQuoteString (bool) {
   console.log(bool);
-  return (bool === false) ? 'No' : 'Yes'; 
+  return (bool === false) ? 'No' : 'Yes';
 }
 function setQuoteString (word) {
-  return (word === 'No') ? false : true; 
+  return (word === 'No') ? false : true;
 }
 
 
@@ -36,7 +36,7 @@ var DrugSchema = new Schema ({
   dosage: {type: String, default: ''},
   //this represents the user who added this item.
   //possibly a distributor, pharma manager, or pharma comp.
-  //supplier_type represend the account_type or account level 
+  //supplier_type represend the account_type or account level
   //of the supplier. It should be a number
   supplier: {
     supplierId: {type: Schema.ObjectId},
@@ -50,7 +50,8 @@ var DrugSchema = new Schema ({
   images: [{type: String}],
   drugTags: [{type: String}],
   instantQuote: {type: Boolean, default: false, get: getQuoteString, set: setQuoteString},
-  packageQty: {type: Number, default: 0}
+  packageQty: {type: Number, default: 0},
+  productId: {type: Number}
 });
 
 DrugSchema.statics = {

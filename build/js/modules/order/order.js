@@ -77,7 +77,6 @@ config(['$routeProvider',function($routeProvider){
       $scope.my_quotation.splice(index, 1);
       $route.reload();
     });
-  };
 
   $scope.send_request_invoice = function send_request_invoice (cart) {
     if (cart.length < 5) {

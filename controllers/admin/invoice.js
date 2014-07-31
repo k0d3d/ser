@@ -33,7 +33,7 @@ module.exports.routes = function(app, login){
   //adds an item to an invoice or updates an invoice status.
   app.route('/api/internal/admin/invoices/:invoiceId')
   .delete(function (req, res) {
-    order.removeItemInvoice(req.params.invoiceId)
+    order.removeItemInvoice(req.params.invoiceId, req.query.orderId)
     .then(function () {
       res.json(200, true);
     })
@@ -71,6 +71,10 @@ module.exports.routes = function(app, login){
         res.json(400, err.message);
       })
       .done();
+    }
+
+    if (req.query.action === 'send-sms') {
+      // order.
     }
 
   });

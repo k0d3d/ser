@@ -49,6 +49,16 @@ var orderManager = {
     return or.promise;
   },
   /**
+   * sends an sms / email and portal notification
+   * to a supplier and his / her employees about an
+   * order and its status.
+   * @param  {[type]} doc [description]
+   * @return {[type]}     [description]
+   */
+  notifySupplier: function notifySupplier (doc) {
+
+  },
+  /**
    * finds all orders that match orderId.
    * @param  {String | Numbers} orderId the last four digits of the
    * orderId.
@@ -1385,23 +1395,26 @@ OrderController.prototype.requestOrderQuotation = function requestOrderQuotation
 /**
  * removes an item from an invoice.
  * @param  {[type]} invoiceId the ObjectId of the invoice to be updated
- * @param  {[type]} orderId      the Object Id of the order being removed
+ * @param  {[type]} orderId      the orderId of the order being removed
  * from an invoice.
  * @return {[type]}           Promise
  */
 OrderController.prototype.removeItemInvoice = function removeItemInvoice (invoiceId, orderId) {
   var q = Q.defer();
-
+  console.log(orderId);
   Invoice.update({
-    _id: invoiceId
+    invoiceId: invoiceId
   }, {
     $pull: {
-      order: orderId
+      order: {
+        orderId : orderId
+      }
     }
   }, function (err, count) {
     if (err) {
       return q.reject(err);
     }
+    console.log(err, count);
     if (count) {
       return q.resolve(true);
     } else  {
@@ -1422,24 +1435,46 @@ OrderController.prototype.removeItemInvoice = function removeItemInvoice (invoic
 OrderController.prototype.addOneItemInvoice = function addOneItemInvoice (invoiceId, orderData) {
   var q = Q.defer();
 
-  Invoice.update({
-    _id: invoiceId
-  }, {
-    $push: {
-      order: orderData
-    }
-  }, function (err, count) {
-    if (err) {
-      return q.reject(err);
-    }
-    if (count) {
-      return q.resolve(true);
-    } else  {
-      return q.reject(new Error('update invoice failed'));
-    }
+  Item.findOne({
+    _id: orderData.itemId
+  }, 'itemName instantQuote')
+  .execQ()
+  .then(function (d) {
+    orderData.itemId = d;
+
+    Invoice.update({
+      _id: invoiceId
+    }, {
+      $push: {
+        order: orderData
+      }
+    }, function (err, count) {
+      if (err) {
+        return q.reject(err);
+      }
+      if (count) {
+        return q.resolve(true);
+      } else  {
+        return q.reject(new Error('update invoice failed'));
+      }
+    });
+  })
+  .fail(function (err) {
+    q.reject(err);
   });
 
+
   return q.promise;
+};
+
+/**
+ * notifies a supplier and his employees about an order.
+ * @param  {[type]} orderData An array containing objects that are
+ * orders already placed on DrugStoc.
+ * @return {[type]}           [description]
+ */
+OrderController.prototype.reNotifySupplier = function reNotifySupplier (orderData) {
+
 };
 
 module.exports = OrderController;
