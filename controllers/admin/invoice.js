@@ -74,7 +74,14 @@ module.exports.routes = function(app, login){
     }
 
     if (req.query.action === 'send-sms') {
-      // order.
+      order.reNotifySupplier(req.body)
+      .then(function () {
+        res.json(200, true);
+      })
+      .fail(function (err) {
+        res.json(400, err.message);
+      })
+      .done();
     }
 
   });

@@ -71,7 +71,7 @@
                         span.label.label-success.pull-right(ng-show="cmp.eta") {{cmp.orderDate | etaMoment}}
                         button.btn.btn-info.btn-xs(ng-click="get_status_updates(cmp); toggleModal('manage-order-updates', cmp.statusLog, $index)")
                           i.fa.fa-ellipsis-h
-                        button.btn.btn-white.btn-xs(ng-click="send_item_sms($index, inv.invoiceId, inv.order)")
+                        button.btn.btn-white.btn-xs(ng-click="send_item_sms($index, inv.invoiceId, inv.order, inv.hospitalId)")
                           i.fa.fa-envelope-square
                         button.btn.btn-danger.btn-xs(ng-click="delete_invoice_item($index, inv.invoiceId, inv.order)")
                           i.fa.fa-times

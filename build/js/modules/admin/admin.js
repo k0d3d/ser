@@ -238,9 +238,10 @@ angular.module('admin', [])
     });
   };
 
-  $scope.send_item_sms = function (index, invoiceId, thisOrder) {
-    var orderId = thisOrder[index];
-    adminService.sendInvoiceItemBySms(invoiceId, orderId)
+  $scope.send_item_sms = function (index, invoiceId, thisOrder, hospitalId) {
+    var orderData = thisOrder[index];
+    orderData.hospitalId = hospitalId;
+    adminService.sendInvoiceItemBySms(invoiceId, orderData)
     .then(function () {
 
     });
@@ -290,7 +291,7 @@ angular.module('admin', [])
           .then(function (d) {
             N.notifier({
               title: 'Success!',
-              text: 'The order has been send to the supplier via sms',
+              text: 'The order has been sent to the supplier via sms',
               class_name: 'growl-success'
             });
             return d.data;

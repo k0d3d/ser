@@ -1487,7 +1487,7 @@ OrderController.prototype.reNotifySupplier = function reNotifySupplier (orderDat
     // concerned..i.e. sales staff,
     // by now, a sales staff should be incharge of the order
     postman.noticeFn.getConcernedStaff({
-      userId: orderData.orderSupplier.supplierId,
+      userId: orderData.orderSupplier.userId,
       accountType: (orderData.orderCharge) ? 4 : 2,
       operation: (orderData.orderCharge) ? 'user' : 'organization'
     })
