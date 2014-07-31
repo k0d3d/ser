@@ -56,7 +56,10 @@ var orderManager = {
    * @return {[type]}     [description]
    */
   notifySupplier: function notifySupplier (doc) {
+      var q = Q.defer();
 
+
+      return q.promise;
   },
   /**
    * finds all orders that match orderId.
@@ -1474,7 +1477,48 @@ OrderController.prototype.addOneItemInvoice = function addOneItemInvoice (invoic
  * @return {[type]}           [description]
  */
 OrderController.prototype.reNotifySupplier = function reNotifySupplier (orderData) {
+    var ot = Q.defer();
 
+    var noticeData = {
+      alertType: 'order',
+      meta : orderData
+    };
+    // if order has been updates, notify
+    // concerned..i.e. sales staff,
+    // by now, a sales staff should be incharge of the order
+    postman.noticeFn.getConcernedStaff({
+      userId: orderData.orderSupplier.supplierId,
+      accountType: (orderData.orderCharge) ? 4 : 2,
+      operation: (orderData.orderCharge) ? 'user' : 'organization'
+    })
+    .then(function (listOfRecpt) {
+      var tom = 'notify_supplier';
+        // tom = 'quotation_accepted';
+
+      return postman.noticeFn.deliveryAgent(
+        listOfRecpt,
+        tom,
+        noticeData
+      );
+    })
+    .then(function () {
+
+      // postman.noticeFn.checkIfNotified([d], userId, noticeData)
+      // .then(function (done) {
+      //   //use done to send email and sms
+      //   return procs.resolve(d);
+      // }, function (err) {
+      //   return procs.reject(err);
+      // });
+      return ot.resolve(orderData);
+    })
+    .catch(function (err) {
+      console.log(err.stack);
+      return ot.reject(err);
+    })
+    .done();
+
+    return ot.promise;
 };
 
 module.exports = OrderController;

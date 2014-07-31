@@ -60,7 +60,7 @@ angular.module('admin', [])
 
     $scope.manage_user = function (action, userId, index) {
         adminService[action](userId)
-        .then(function(r) {
+        .then(function() {
           if (action === 'deleteUser') {
             $scope.users_list.splice(index, 1);
           }
@@ -94,7 +94,7 @@ angular.module('admin', [])
     $scope.load_users(0, 20);
 
 }])
-.controller('adminOrdersCt', ['$scope', 'adminService', 'ordersService', function ($scope, adminService, ordersService) {
+.controller('adminOrdersCt', ['$scope', 'adminService', function ($scope, adminService) {
   $scope.$parent.headerTitle = 'Admin:: Manage Orders';
   $scope.orderFilter = {};
 
@@ -247,7 +247,7 @@ angular.module('admin', [])
   };
 
 }])
-.factory('adminService', ['Notification', function ($http, N) {
+.factory('adminService', ['$http', 'Notification', function ($http, N) {
     return {
         deleteInvoiceItem: function deleteInvoiceItem (invoiceId, item) {
           return $http({
@@ -334,7 +334,7 @@ angular.module('admin', [])
         },
         search: function search (q) {
             return $http({
-                url: '/api/internal/admin/search?',
+                url: '/api/internal/admin/users/search?',
                 method: 'GET',
                 params: q
             })

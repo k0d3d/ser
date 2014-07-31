@@ -66,7 +66,6 @@ var userManager = {
         if (models.length) {
           _doItForHiphop();
         } else {
-          console.log(s);
           return luda.resolve(s);
         }
       });
@@ -89,9 +88,12 @@ var userManager = {
   //as a result.
   _composeResponseUser : function _composeResponseUser (user, profile) {
     var i = {},
-        userInfo = _.pick(user, ['email', 'account_type', '_id', 'activated', 'isAdmin', 'isPremium']),
-        profileInfo = _.pick(profile, ['name', 'phone', 'image']);
+        userInfo = (user) ? _.pick(user, ['email', 'account_type', '_id', 'activated', 'isAdmin', 'isPremium']) : {},
+        profileInfo = (profile) ? _.pick(profile, ['name', 'phone', 'image']) : {};
 
+
+    // console.log(_.extend(i, userInfo, profileInfo));
+    // return true;
     return _.extend(i, userInfo, profileInfo);
   },
   /**
@@ -465,8 +467,6 @@ UserController.prototype.findAUser = function findAUser (query) {
   var cas = Q.defer(),
       result = [];
 
-
-    console.log(query);
   if (query.email) {
     userManager.findUserByEmail({
       email: query.email,
@@ -520,16 +520,29 @@ UserController.prototype.findAUser = function findAUser (query) {
       field: (query.phone) ? 'phone' : 'name'
     })
     .then(function (profiles) {
+      // return cas.resolve(profiles);
       if (!profiles.length) {
         return cas.resolve([]);
       }
 
-      for (var i = 0; i < profiles.length; i++) {
-        result.push(userManager._composeResponseUser(profiles[i].userId, profiles[i]));
-      }
+      // for (var i = 0; i < profiles.length; i++) {
+      //   result.push(userManager._composeResponseUser(profiles[i].userId, profiles[i]));
+      // }
+
+      _.forEach(profiles, function (n) {
+        console.log(n);
+        result.push(userManager._composeResponseUser(n.userId, n));
+      });
+
 
       return cas.resolve(result);
-    }, function (err) {
+    })
+    .fail(function (err) {
+      console.log(err.stack);
+      return cas.reject(err);
+    })
+    .catch(function (err) {
+      console.log(err.stack);
       return cas.reject(err);
     });
   }

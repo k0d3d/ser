@@ -29,7 +29,7 @@ config(['$routeProvider',function($routeProvider){
 
   $scope.orderCart = [];
 
-  //Fetch All Orders
+  // //Fetch All Orders
   ordersService.orders('quotes', 'full')
   .then(function (i) {
     angular.forEach(i, function (v) {
@@ -49,17 +49,15 @@ config(['$routeProvider',function($routeProvider){
           class_name: 'growl-danger'
         });
       }
-
-
     });
     //within callback.
     $scope.cart_meta = {
       string: function () {
         var count = $scope.orderCart.length;
         if (count < 5) {
-          return "Add (" + (5 - count) + ") more times to checkout";
+          return 'Add (' + (5 - count) + ') more times to checkout';
         } else {
-          return "Request Quotation";
+          return 'Request Quotation';
         }
       },
       state: ($scope.orderCart.length < 5) ? true : false
@@ -77,6 +75,7 @@ config(['$routeProvider',function($routeProvider){
       $scope.my_quotation.splice(index, 1);
       $route.reload();
     });
+  };
 
   $scope.send_request_invoice = function send_request_invoice (cart) {
     if (cart.length < 5) {

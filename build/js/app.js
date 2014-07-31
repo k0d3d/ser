@@ -15,7 +15,7 @@ var app = angular.module('stocUser', [
   'facility',
   'ngTagsInput',
   'ngDragDrop',
-  // 'xeditable',
+  'xeditable',
   'checklist-model'
   ]);
 
@@ -30,7 +30,7 @@ app.config(function ($routeProvider, $locationProvider, $httpProvider) {
       redirectTo: '/a/profile'
     });
   $locationProvider.html5Mode(true);
-  $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+  // $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
   $httpProvider.interceptors.push('errorNotifier');
 
 });
