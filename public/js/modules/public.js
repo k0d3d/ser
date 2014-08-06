@@ -6,6 +6,12 @@ var publicModule = angular.module('stocPublic', [
   'drug',
   ]);
 
+publicModule.config(function ($httpProvider) {
+
+  $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+
+});
+
 
 publicModule.controller('userController', [
   '$scope',

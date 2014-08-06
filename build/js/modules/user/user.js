@@ -7,14 +7,14 @@ angular.module('user', [])
 
 .config(['$routeProvider', function ($routeProvider){
   $routeProvider.when('/a/profile', {
-    templateUrl: '/user/profile', 
+    templateUrl: '/user/profile',
     controller: 'userController'
   });
 }])
 .controller('userController', [
-  '$scope', 
-  'userServices', 
-  'ordersService', 
+  '$scope',
+  'userServices',
+  'ordersService',
   'Notification',
   'drugService',
   'organizeStaffService',
@@ -50,7 +50,7 @@ angular.module('user', [])
     .then(function () {
 
     });
-  };  
+  };
 
   $scope.update_profile = function update_profile (data, value) {
     var field = value.split('.');
@@ -71,7 +71,7 @@ angular.module('user', [])
         text: 'Alert preference changed!!',
         class_name: 'growl-success'
       });
-    });    
+    });
   };
 
   $scope.validate_facility = function validate_facility (data) {
@@ -82,7 +82,7 @@ angular.module('user', [])
       } else {
         $scope.valRes = 'none';
       }
-      
+
     });
   };
 
@@ -98,16 +98,16 @@ angular.module('user', [])
   //Places a quick quote
   $scope.place_quick_cart = function place_quick_cart (load) {
     var l = 0;
-    function __qu () {    
+    function __qu () {
       var item = load.pop();
       if (!item.packageCount) return alert('please check the amount to be ordered.');
-      item.orderAmount = item.packageCount * item.itemId.packageQty;
+      item.orderAmount = item.packageCount * item.drug.packageQty;
       item.owner = {
-        "userId" : item.itemId.supplier.supplierId,
+        "userId" : item.drug.supplier.supplierId,
         "account_type": 2
       };
-      item.currentPrice =  item.itemId.currentPrice;
-      item.itemId = item.itemId._id;
+      item.currentPrice =  item.drug.currentPrice;
+      item.itemId = item.drug._id;
       // item.instantQuote = true;
       delete item._id;
       ordersService.addToQuotations(item)
@@ -116,7 +116,7 @@ angular.module('user', [])
           $scope.my_quotation.push(data);
 
           l++;
-          
+
           if (load.length) {
             __qu();
           } else {
@@ -126,13 +126,13 @@ angular.module('user', [])
               class_name: 'growl-success'
             });
           }
-      });    
+      });
     }
 
     __qu();
 
   };
-  //removes a drug from the users profile.+ 
+  //removes a drug from the users profile.+
   $scope.remove_my_drug = function (drugId, index) {
     oss.removeMyDrug(drugId)
     .then(function () {
@@ -141,7 +141,7 @@ angular.module('user', [])
   };
 
   $scope.change_profile_photo = function (name) {
-    return US.updateProfile({name : 'image', value: name});   
+    return US.updateProfile({name : 'image', value: name});
   };
 
   $scope.hide_activity = function (index) {

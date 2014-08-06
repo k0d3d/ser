@@ -12,6 +12,7 @@ var ActivityNotification = require('./activity/notification.js'),
     sendEmail = require('../lib/email/sendMail.js').sendHTMLMail,
     sendSms = require('../lib/sms/smsSend.js'),
     messageStrings = require('../lib/message-strings.js'),
+    jade = require('jade'),
     lingua = require('lingua'),
 
 noticeFn = {
@@ -208,23 +209,18 @@ noticeFn = {
    * @param  {String} typeOfMessage The type of message to deliver or send out.
    * @param {Object} noticeData object {alertType, alertDescription, meta} containing the alert type , alert description,
    * and meta data (i.e. the object to be used in creating the alert )- properties.
+   * @param {Object} config
    * @return {Promise}               Returns Promise
    */
-  deliveryAgent : function deliveryAgent (listOfRecpt, typeOfMessage, noticeData) {
+  deliveryAgent : function deliveryAgent (listOfRecpt, typeOfMessage, noticeData, cfg) {
     var da = Q.defer();
     da.longStackSupport = true;
     var self = this;
-    // var allowed_defaults = {
-    //   email : {type: Boolean, default: true},
-    //   sms : {type: Boolean, default: false},
-    //   portal: {type: Boolean, default: true},
-    //   mobile: {type: Boolean, default: false}
-    // };
-    // console.log(doc);
-    // da.resolve();
-    // return da.promise;
+    var emailTmplUri = 'views/templates/email-templates/';
+    var smsTmplUri = 'views/templates/sms-templates/';
+    var useEmailDeliveryTemplate = (cfg.emailDeliveryTemplate) ? true : false;
+    var useSmsDeliveryTemplate = (cfg.smsDeliveryTemplate) ? true : false;
 
-    // var noticeData
 
     function __pushMessages () {
 
@@ -264,6 +260,8 @@ noticeFn = {
         //just a check.. he def has
         //to have an email.
         if (task.userId.email) {
+          var emailDeliveryTemplate = (useEmailDeliveryTemplate) ? emailTmplUri + cfg.emailDeliveryTemplate : emailTmplUri + 'default-note.jade';
+
           //send an email.
           sendEmail({
             to: to(task.userId.email, task.alt_email) ,
@@ -272,7 +270,7 @@ noticeFn = {
             subject: messageStrings(typeOfMessage + '.email.subject', {meta: noticeData.meta, user: task, statuses: config.app.statuses}),
             // text: "you have received a new quotation request"
             // text: messageStrings(typeOfMessage + '.email.message', {meta: noticeData.meta, user: task})
-          }, 'views/templates/email-templates/order-note.jade', {meta: noticeData.meta, user: task, statuses: config.app.statuses})
+          }, emailDeliveryTemplate, {meta: noticeData.meta, user: task, statuses: config.app.statuses})
           .then(function (done) {
             //just wanna log to console for now..
             //TODO:: log to file
@@ -291,8 +289,9 @@ noticeFn = {
       //try sending sms
       if (allowedSMS) {
         if (task.phone) {
+          var message = (useSmsDeliveryTemplate) ? jade.renderFile(smsTmplUri + cfg.smsDeliveryTemplate, {meta: noticeData.meta}) : messageStrings(typeOfMessage + '.sms.message', {meta: noticeData.meta, user: task});
 
-          sendSms.sendSMS(messageStrings(typeOfMessage + '.sms.message', {meta: noticeData.meta, user: task}), task.phone)
+          sendSms.sendSMS(message, task.phone)
           .then(function (done) {
             //just wanna log to console for now..
             //TODO:: log to file

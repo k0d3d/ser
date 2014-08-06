@@ -76,11 +76,17 @@ var userManager = {
 
     return luda.promise;
   },
+  /**
+   * returns an object will all the users
+   * accounts on drugStoc
+   * @param  {[type]} doc [description]
+   * @return {[type]}     [description]
+   */
   allUsers: function allUsers (doc) {
     return User.find({}, 'email account_type activated isAdmin isPremium')
     .lean()
-    // .skip(doc.page || 0)
-    // .limit(doc.page || 20)
+    .skip(doc.page * doc.limit || 0)
+    .limit(doc.limit || 20)
     .execQ();
   },
   //picks the properties necessary
@@ -385,7 +391,7 @@ UserController.prototype.getProfile = function (userId, account_type) {
   staffUtils.getMeMyModel(account_type).findOne({
     userId: userId
   })
-  .populate('drugs.drug', 'itemName images category itemPackaging packageQty', 'drug')
+  .populate('drugs.drug', null, 'drug')
   .lean()
   .exec(function (err, user_profile) {
     if (err) {

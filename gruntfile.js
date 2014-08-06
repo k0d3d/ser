@@ -108,9 +108,10 @@ module.exports = function(grunt) {
             'public/css/splash.css': ['public/css/splash.css'],
             //vendor css for application
             'public/css/vendor.min.css': [
+              'public/css/bootstrap.min.css',
               'public/css/bootstrap-override.css',
               'public/css/jquery-ui-1.10.3.css',
-              'public/css/animate.min.css',
+              'public/css/animate.css',
               'public/css/animate.delay.css',
               'public/css/toggles.css',
               'public/css/chosen.css',
@@ -161,6 +162,8 @@ module.exports = function(grunt) {
             'css/xeditable.css',          //
             'css/bootstrap-override.css',
             'css/lato.css',
+            'css/animate.css',
+            'css/animate.delay.css',
             // 'css/.css',
             // Template CSS
             'css/style.custom.css',
@@ -251,11 +254,11 @@ module.exports = function(grunt) {
         vendorjs: {
           cwd: 'build',
           src: [
-            'js/jquery-2.1.1.min.js',
+            // 'js/jquery-2.1.1.min.js',
             'js/pace.js',
-            'js/bootstrap.min.js',
-            'js/angular.min.js',
-            'js/angular-route.min.js',
+            // 'js/bootstrap.min.js',
+            // 'js/angular.min.js',
+            // 'js/angular-route.min.js',
             'js/easing.js',
             'js/typer.js',
             'js/nicescroll.js',
@@ -328,6 +331,9 @@ module.exports = function(grunt) {
             ],
             //application vendor js
             'public/js/default-vendor.min.js': [
+              // 'public/js/jquery-2.1.1.min.js',
+              // 'public/js/jquery-ui-1.10.3.min.js',
+              // 'public/js/angular.min.js',
               'public/js/modernizr.min.js',
               'public/js/retina.min.js',
               'public/js/toggles.min.js',
@@ -372,7 +378,7 @@ module.exports = function(grunt) {
             ],
             //public vendor js
             'public/js/public-vendor.min.js': [
-              // 'public/js/jquery-1.10.2.min.js',
+              // 'public/js/jquery-2.1.1.min.js',
               // 'public/js/angular.min.js',
               'public/js/angular-route.min.js',
               // 'public/js/jquery-migrate-1.2.1.min.js',
@@ -392,6 +398,9 @@ module.exports = function(grunt) {
           files:{
             //application vendor js
             'public/js/default-vendor.min.js': [
+              'public/js/jquery-2.1.1.min.js',
+              'public/js/jquery-ui-1.10.3.min.js',
+              'public/js/angular.min.js',
               'public/js/modernizr.min.js',
               'public/js/retina.min.js',
               'public/js/toggles.min.js',

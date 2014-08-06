@@ -42,6 +42,18 @@ module.exports.routes = function(app, login){
     })
     .done();
   })
+  .post(function (req, res) {
+    if (req.query.action === 'orders-to-supplier') {
+      order.sendOrdersAsEmailSms(req.body, req.query.action, req.params.invoiceId)
+      .then(function () {
+        res.json(200, true);
+      })
+      .fail(function (err) {
+        res.json(400, err.message);
+      })
+      .done();
+    }
+  })
   .put(function(req, res){
 
     if (req.query.action === 'update') {

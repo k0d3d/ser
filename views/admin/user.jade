@@ -17,25 +17,13 @@
         .col-sm-8.col-md-9
           .panel.panel-default
             .panel-heading
-              ul.pagination.nomargin.pull-right
-                li.disabled
-                  a(href='#')
-                    i.fa.fa-angle-left
-                li
-                  a(href='#') 1
-                li.active
-                  a(href='#') 2
-                li
-                  a(href='#') 3
-                li
-                  a(href='#') 4
-                li
-                  a(href='#') 5
-                li
-                  a(href='#')
-                    i.fa.fa-angle-right
-              h4.panel-title Search results for "Users"
-              p About {{users_list.length}}+ results
+              .row
+                .col-md-6
+                  h4.panel-title Search results for "Users"
+                  p About {{users_list.length}}+ results
+                .col-md-6
+                  //- .x-pagination.pull-right(pagination, page-to="load_users(currentPage, pageLimit, cb)", current-page="currentPage", page-limit="pageLimit")
+                  .x-pagination.pull-right(pagination, page-to="load_users(currentPage, pageLimit, cb)")
             //
                panel-heading
             .panel-body

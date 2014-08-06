@@ -54,13 +54,13 @@ config(['$routeProvider',function($routeProvider){
     $scope.cart_meta = {
       string: function () {
         var count = $scope.orderCart.length;
-        if (count < 5) {
+        if (count < 1) {
           return 'Add (' + (5 - count) + ') more times to checkout';
         } else {
           return 'Request Quotation';
         }
       },
-      state: ($scope.orderCart.length < 5) ? true : false
+      state: ($scope.orderCart.length < 1) ? true : false
     };
 
    // $rootScope.my_quotation = i;
@@ -78,12 +78,21 @@ config(['$routeProvider',function($routeProvider){
   };
 
   $scope.send_request_invoice = function send_request_invoice (cart) {
-    if (cart.length < 5) {
-      return alert('Cart is incomplete: minimum of 5 items');
+    if (cart.length < 1) {
+      return alert('Cart is incomplete: minimum of 1 items');
     }
     ordersService.sendInvoiceRequest(cart)
-    .then(function () {
-      $scope.canVerify = true;
+    .then(function (nd) {
+      if (nd.confirmId) {
+        $scope.canVerify = true;
+      } else {
+        N.notifier({
+          title: 'Welldone!',
+          text: nd.message,
+          class_name: 'growl-success'
+        });
+      }
+
       $scope.cart_meta.string = function () {return 'Quotation Sent';};
       $scope.cart_meta.state = false;
       $route.reload();

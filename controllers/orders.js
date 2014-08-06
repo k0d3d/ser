@@ -143,14 +143,17 @@ module.exports.routes = function(app, login){
       // units.
       //
       // loop over every item and send d user an sms quotation for each
-      if (req.body.length >= 5) {
+      if (req.body.length >= 1) {
         //check if he got upto 5 orders that have been accepted.
         //that will mean he's still a trial user and he's used up
         //his trial.
         order.checkUserIsTrying(req.user._id)
         .then(function (i) {
           if (i) {
-            return res.json(200, 'DrugStoc will contact you in a few minutes regarding this order');
+            return res.json(200, {
+              message: 'DrugStoc will contact you in a few minutes regarding this order',
+              confirmId: false
+            });
           }
 
           order.requestSMSQuotation(req.user._id, req.body)
@@ -169,7 +172,7 @@ module.exports.routes = function(app, login){
         .done();
 
       } else {
-        res.json(400, 'You must have a minimum of 5 items to checkout');
+        res.json(400, 'You must have a minimum of 1 items to checkout');
       }
     }
   });

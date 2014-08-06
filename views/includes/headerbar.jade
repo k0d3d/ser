@@ -5,18 +5,20 @@
       input.form-control(type='text', name='keyword', placeholder='Search here...')
     .header-right
       ul.headermenu
-        -if (isPermitted(['order-cart'])) 
+        li(style="padding: 1px 5px", ng-show="isLoading")
+          i.fa.fa-clock-o.animated(style="font-size: 42px; color: #88BDFF", ng-class="{zoomIn: isLoading, zoomOut: !isLoading}")
+        -if (isPermitted(['order-cart']))
           li
             .btn-group
               a.btn.btn-default.tp-icon(href="/a/orders/cart", order-cart-basket="my_quotation")
                 | My Quotations
                 i.fa.fa-shopping-cart
                 span.badge {{my_quotation.length}}
-        -if (isPermitted(['activity-count'])) 
+        -if (isPermitted(['activity-count']))
           li
             .btn-group
               a.btn.btn-default.tp-icon(href="/a/profile")
-                | Updates 
+                | Updates
                 i.fa.fa-star-o
                 span.badge {{activity || 0}}
 
@@ -42,7 +44,7 @@
                     label.btn.btn-primary.btn-xs.toggle-UAN(ng-click="update_account_notices('sms')" ng-model='userAccount.allowedNotifications.sms', btn-radio="false") Off
               li
                 a.disabled(href='')
-                  | EMail                
+                  | EMail
                   .btn-group.pull-right
                     label.btn.btn-primary.btn-xs.toggle-UAN(ng-click="update_account_notices('email')" ng-model='userAccount.allowedNotifications.email', btn-radio="true") On
                     label.btn.btn-primary.btn-xs.toggle-UAN(ng-click="update_account_notices('email')" ng-model='userAccount.allowedNotifications.email', btn-radio="false") Off
@@ -58,4 +60,4 @@
                   i.glyphicon.glyphicon-log-out
                   | Log Out
     //
-       header-right 
+       header-right

@@ -33,14 +33,17 @@ angular.module('admin', [])
     $scope.$parent.headerTitle = 'Admin:: Manage Users';
     $scope.users_list = [];
 
-    $scope.load_users = function (page, limit) {
-        adminService.loadUsers({
-            page: page,
-            limit: limit
-        })
-        .then(function (res) {
-            $scope.users_list = res;
-        });
+    $scope.load_users = function (page, limit, cb) {
+      adminService.loadUsers({
+          page: page,
+          limit: limit
+      })
+      .then(function (res) {
+        if (res.length) {
+          cb(res.length);
+          $scope.users_list = res;
+        }
+      });
     };
 
     $scope.search_user = function (q) {
@@ -91,7 +94,7 @@ angular.module('admin', [])
     };
 
     //load the users into the scope
-    $scope.load_users(0, 20);
+    // $scope.load_users($scope.currentPage, $scope.pageLimit);
 
 }])
 .controller('adminOrdersCt', ['$scope', 'adminService', function ($scope, adminService) {
@@ -138,12 +141,14 @@ angular.module('admin', [])
 .controller('adminItemsCt', ['$scope', 'adminService', function ($scope, adminService) {
   $scope.$parent.headerTitle = 'Admin:: Manage Items';
   $scope.orderFilter = {};
+  $scope.currentPage = 0;
+  $scope.pageLimit = 10;
 
-  (function(){
+  $scope.getPageItems = function (currentPage, pageLimit) {
     $scope.items = [];
     $scope.__temp = {};
 
-    adminService.fetchAllItems(0, 20)
+    adminService.fetchAllItems({page: currentPage, limit: pageLimit})
     .then(function(r){
       angular.forEach(r, function(v){
         //v.nextStatus = v.orderStatus + 1;
@@ -152,7 +157,10 @@ angular.module('admin', [])
     });
 
 
-  })();
+  };
+
+  // get the first page
+  $scope.getPageItems($scope.currentPage, $scope.pageLimit);
 
   $scope.routeFilterParam = function routeFilterParam (item) {
       //is it after e.g. 5days ago and before today
@@ -187,7 +195,14 @@ angular.module('admin', [])
 
   adminService.loadInvoices()
   .then(function (d) {
-    $scope.invoices = d;
+    var ew = [];
+    angular.forEach(d, function (iv) {
+      var ld = iv;
+      ld.groupedOrders = _.groupBy(iv.order, function (ob) {return ob.orderSupplier.name;});
+      ew.push(ld);
+    });
+    console.log(ew);
+    $scope.invoices = ew;
   });
 
   $scope.send_invoice = function (id, state) {
@@ -247,9 +262,31 @@ angular.module('admin', [])
     });
   };
 
+  $scope.orders2sup = function (orders, invoiceId, kind) {
+    adminService.sendInvoiceItemToSup(orders, invoiceId, kind)
+    .then(function () {
+
+    });
+  };
+
 }])
 .factory('adminService', ['$http', 'Notification', function ($http, N) {
     return {
+        sendInvoiceItemToSup: function sendSMSToSup (orders, invoiceId, kind) {
+          return $http({
+            url: '/api/internal/admin/invoices/' + invoiceId,
+            method: 'POST',
+            data: orders,
+            params: {action: kind}
+          })
+          .then(function () {
+            N.notifier({
+              title: 'Welldone!',
+              text: 'Supplier has been notified about these orders.',
+              class_name: 'growl-success'
+            });
+          });
+        },
         deleteInvoiceItem: function deleteInvoiceItem (invoiceId, item) {
           return $http({
             url: '/api/internal/admin/invoices/' + invoiceId,

@@ -633,7 +633,10 @@ OrderController.prototype.distUpdateOrder = function distUpdateOrder (orderData,
             return postman.noticeFn.deliveryAgent(
               listOfRecpt,
               tom,
-              noticeData
+              noticeData,
+              {
+                emailDeliveryTemplate: 'order-note.jade'
+              }
             );
           })
           .then(function () {
@@ -882,7 +885,10 @@ OrderController.prototype.requestItemQuotation = function requestItemQuotation (
         return postman.noticeFn.deliveryAgent(
           listOfRecpt,
           'new_quotation_request',
-          noticeData
+          noticeData,
+          {
+            emailDeliveryTemplate: 'order-note.jade'
+          }
         );
       })
       .then(function () {
@@ -1010,7 +1016,10 @@ OrderController.prototype.addressQuotation = function addressQuotation (order, s
             return postman.noticeFn.deliveryAgent(
               listOfRecpt,
               tom,
-              noticeData
+              noticeData,
+              {
+                emailDeliveryTemplate: 'order-note.jade'
+              }
             );
           })
           .then(function () {
@@ -1498,14 +1507,17 @@ OrderController.prototype.reNotifySupplier = function reNotifySupplier (orderDat
       return postman.noticeFn.deliveryAgent(
         listOfRecpt,
         tom,
-        noticeData
+        noticeData,
+        {
+          emailDeliveryTemplate: 'order-note.jade'
+        }
       );
     })
     .then(function () {
 
       // postman.noticeFn.checkIfNotified([d], userId, noticeData)
       // .then(function (done) {
-      //   //use done to send email and sms
+      //   //use done to send email and sm
       //   return procs.resolve(d);
       // }, function (err) {
       //   return procs.reject(err);
@@ -1520,5 +1532,65 @@ OrderController.prototype.reNotifySupplier = function reNotifySupplier (orderDat
 
     return ot.promise;
 };
+
+/**
+ * sends a list of orders as an sms or email to a supplier
+ * and his / her employees.
+ *
+ * @param  {[type]} orders    [description]
+ * @param  {[type]} action    [description]
+ * @param  {[type]} invoiceId [description]
+ * @return {[type]}           [description]
+ */
+OrderController.prototype.sendOrdersAsEmailSms = function sendOrdersAsEmailSms (orders, action, invoiceId) {
+    var q = Q.defer();
+
+    var saved_order_model = orders[0];
+
+    var noticeData = {
+      alertType: 'order',
+      meta : orders
+    };
+
+    // if order has been updates, notify
+    // concerned..i.e. sales staff,
+    // by now, a sales staff should be incharge of the order
+    postman.noticeFn.getConcernedStaff({
+      userId: saved_order_model.orderSupplier.userId ,
+      accountType: 2,
+      operation: 'organization'
+    })
+    .then(function (listOfRecpt) {
+      return postman.noticeFn.deliveryAgent(
+        listOfRecpt,
+        'notify_supplier',
+        noticeData,
+        {
+          emailDeliveryTemplate: 'invoice-note.jade',
+          smsDeliveryTemplate: 'invoice-note.jade'
+        }
+      );
+    })
+    .then(function () {
+
+      // postman.noticeFn.checkIfNotified([d], userId, noticeData)
+      // .then(function (done) {
+      //   //use done to send email and sms
+      //   return procs.resolve(d);
+      // }, function (err) {
+      //   return procs.reject(err);
+      // });
+      return q.resolve(saved_order_model);
+    })
+    .catch(function (err) {
+      console.log(err.stack);
+      return q.reject(err);
+    })
+    .done();
+
+    return q.promise;
+};
+
+
 
 module.exports = OrderController;

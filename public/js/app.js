@@ -32,6 +32,7 @@ app.config(function ($routeProvider, $locationProvider, $httpProvider) {
   $locationProvider.html5Mode(true);
   // $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
   $httpProvider.interceptors.push('errorNotifier');
+  $httpProvider.interceptors.push('loaderIndicator');
 
 });
 
@@ -40,11 +41,12 @@ app.controller('MainController', [
   '$rootScope',
   '$http',
   '$location',
+  '$timeout',
   'Notification',
   'ordersService',
   'organizeStaffService',
   'appServices',
-  function ($scope, $rootScope, $http, $location, Notification, OS, OSS, appServices) {
+  function ($scope, $rootScope, $http, $location, $timeout, Notification, OS, OSS, appServices) {
 
 
     $scope.workForce = {};
@@ -97,6 +99,22 @@ app.controller('MainController', [
 
     $scope.$on('activity_refresh', function () {
       $scope.activity = Notification.activityCount;
+    });
+
+    $scope.$on('ajax-request', function (e, xhrKind) {
+      if (xhrKind === 'requesting') {
+        $scope.isLoading = true;
+      }
+
+      if (xhrKind === 'responded') {
+        $timeout(function () {
+          $scope.isLoading = false;
+        }, 2000);
+      }
+
+      // if (xhrKind === 'requesting') {
+      //   $scope.
+      // }
     });
 
     $scope.toggleModal = function (modalId, modalData, index) {
@@ -251,7 +269,29 @@ app.factory('errorNotifier', ['$q', 'Notification', 'Language', function($q, N, 
       });
       return $q.reject(response);
     }
-  }
+  };
+}]);
+
+app.factory('loaderIndicator', ['$rootScope', '$q', function ($rootScope, $q) {
+  return {
+    request: function (config) {
+      $rootScope.$broadcast('ajax-request', 'requesting');
+      return config;
+    },
+    requestError: function (rejection) {
+      $rootScope.$broadcast('ajax-request', 'request-error');
+      return $q.reject(rejection);
+    },
+    response: function (config) {
+      $rootScope.$broadcast('ajax-request', 'responded');
+      return config;
+    },
+    responseError: function (rejection) {
+      $rootScope.$broadcast('ajax-request', 'response-error');
+      return $q.reject(rejection);
+    },
+
+  };
 }]);
 
 app.directive('linkTo', function () {

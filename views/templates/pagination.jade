@@ -1,8 +1,8 @@
-button.btn.btn-success.prevbtn(ng-disabled="currentPage == 0")
+button.btn.btn-success.prevbtn(ng-disabled="currentPage == 0", ng-click="prevBtn()")
   | Previous
 .btn-group.dropup
   button.btn.pageNo.btn-bell.btn-small(type="button", style="border-radius: 0")
-    |  {{currentPage}}  
+    |  {{currentPage}}
   button.btn.dropdown-toggle(data-toggle="dropdown", style="border-radius: 0")
     span.caret
   ul.dropdown-menu.alt-text(role="menu", style="text-transform: capitalize;z-index: 99999")
@@ -14,13 +14,5 @@ button.btn.btn-success.prevbtn(ng-disabled="currentPage == 0")
       a(ng-click="pagelimit(50)") 50
     li
       a(ng-click="pagelimit(100)") 100
-button.btn.btn-success.nextbtn()
+button.btn.btn-success.nextbtn(ng-click="nextBtn()")
   | Next
-
-//- ul.pagination
-//-   li(ng-class='{disabled: currentPage == 0}')
-//-       a(href='href', ng-click='prevPage()') « Prev
-//-   li(ng-repeat='n in range(pagedItems.length, currentPage, currentPage + gap) ', ng-class='{active: n == currentPage}', ng-click='setPage()')
-//-     a(href='href', ng-bind='n + 1') 1
-//-   li(ng-class='{disabled: (currentPage) == pagedItems.length - 1}')
-//-     a(href='href', ng-click='nextPage()') Next »

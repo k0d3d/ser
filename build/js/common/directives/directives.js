@@ -31,14 +31,14 @@ app.directive('onFinish',function($timeout){
             break;
           }
         });
-        
+
       }
     }
   };
 });
 
 app.directive('alertMessage', ['$interpolate', '$sce', function ($interpolate, $sce) {
-  //passing in the status for different 
+  //passing in the status for different
   //alert type and stages. this function
   //return the right sentence, and html
   //formating to be displayed
@@ -62,7 +62,7 @@ app.directive('alertMessage', ['$interpolate', '$sce', function ($interpolate, $
       scope.phrase = $sce.trustAsHtml(phrase);
     },
     scope: {
-      act: '=alertMessage' 
+      act: '=alertMessage'
     },
     template: '<strong ng-bind-html="phrase"></strong>'
   };
@@ -123,47 +123,107 @@ app.directive('scrollBar', function(){
     };
 });
 
+/**
+ * pagination directive. this adds previous and next pager
+ * buttons to the dom.
+ * @return {[type]} [description]
+ */
 app.directive('pagination', [function(){
   function link(scope, element, attrs){
-    scope.currentPage = 0;
+    // scope.currentPage = 0;
     // scope.limit = 10;
-    $('button.prevbtn', element).on('click', function(e){
-      if(scope.currentPage === 0) return false;
-      scope.currentPage--;
-      scope.$apply();
+    // $('button.prevbtn', element).on('click', function(){
+    //   if(scope.currentPage === 0) return false;
+    //   scope.currentPage--;
+    //   scope.pageTo(scope.currentPage, scope.pageLimit);
+    //   scope.$apply(function () {
 
-      // var page = scope.pageno - 1;
-      // scope.pageTo({pageNo: page, limit: scope.limit, cb: function(r){
-      //   if(r) scope.pageno--;
-      // }});
-    });
-    $('button.nextbtn', element).on('click', function(e){
-      scope.currentPage++;
-      scope.$apply();
-      // var page = scope.pageno + 1;
-      // scope.pageTo({pageNo: page, limit: scope.limit, cb: function(r){
-      //   if(r) scope.pageno++;
-      // }});
-    });
-    scope.pagelimit = function(pageLimit){
-      scope.pageTo({
-        currentPage: scope.currentPage, 
-        pageLimit: pageLimit, 
-        cb: function(r){
-          if(r) scope.pageLimit = pageLimit;
+    //   });
+
+    //   // var page = scope.pageno - 1;
+    //   // scope.pageTo({pageNo: page, limit: scope.limit, cb: function(r){
+    //   //   if(r) scope.pageno--;
+    //   // }});
+    // });
+    // $('button.nextbtn', element).on('click', function(){
+    //   scope.currentPage++;
+    //   scope.pageTo(scope.currentPage, scope.pageLimit);
+    //   scope.$apply();
+    //   // var page = scope.pageno + 1;
+    //   // scope.pageTo({pageNo: page, limit: scope.limit, cb: function(r){
+    //   //   if(r) scope.pageno++;
+    //   // }});
+    // });
+
+  }
+  function pageCtrl ($scope) {
+    $scope.currentPage = 0;
+    $scope.pageLimit = 10;
+
+    $scope.prevBtn = function () {
+      if($scope.currentPage === 0) return false;
+      $scope.pageTo({
+        currentPage: $scope.currentPage - 1,
+        pageLimit: $scope.pageLimit,
+        cb: function () {
+              --$scope.currentPage;
         }
-      });  
-      //quick hack!! should suffice for now
-      scope.pageLimit = pageLimit;      
+      });
     };
+
+    $scope.nextBtn = function () {
+      // if($scope.currentPage === 0) return false;
+      $scope.pageTo({
+        currentPage: $scope.currentPage + 1,
+        pageLimit: $scope.pageLimit,
+        cb: function (len) {
+          if (len) {
+              ++$scope.currentPage;
+          }
+        }
+      });
+    };
+
+    $scope.pagelimit = function(pageLimit){
+      $scope.pageTo({
+        currentPage: $scope.currentPage,
+        pageLimit: pageLimit,
+        cb: function(r){
+          if(r) $scope.pageLimit = pageLimit;
+        }
+      });
+      //quick hack!! should suffice for now
+      $scope.pageLimit = pageLimit;
+    };
+
+    // loads the initial page
+    $scope.pageTo({
+      currentPage: $scope.currentPage,
+      pageLimit: $scope.pageLimit,
+      cb: function () {
+
+        }
+    });
+
+
+    // $('button.nextbtn', element).on('click', function(){
+    //   scope.currentPage++;
+    //   scope.pageTo(scope.currentPage, scope.pageLimit);
+    //   scope.$apply();
+    //   // var page = scope.pageno + 1;
+    //   // scope.pageTo({pageNo: page, limit: scope.limit, cb: function(r){
+    //   //   if(r) scope.pageno++;
+    //   // }});
+    // });
   }
   return {
     link: link,
     scope: {
       pageTo: '&',
-      currentPage: '=',
-      pageLimit: '='
+      // currentPage: '=',
+      // pageLimit: '='
     },
+    controller: pageCtrl,
     templateUrl: '/templates/pagination'
   };
 }]);

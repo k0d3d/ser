@@ -21,7 +21,9 @@ mixin loadDrugPages()
           -if (userData.account_type === 5)
             .media(ng-repeat="drug in userProfile.drugs | filter: quickOrderFilter")
               .row
-                .col-sm-9.col-md-9
+                .col-sm-1.col-md-1
+                  i.fa.fa-times(ng-click="remove_my_drug(drug.drug._id, $index)")
+                .col-sm-8.col-md-8
                   .media-body
                     h3.follower-name {{drug.drug.itemName}}
                     dl.dl-horizontal
@@ -38,10 +40,11 @@ mixin loadDrugPages()
                         button.btn.btn-sm.btn-danger
                           i.fa.fa-times
                       -if (userData.account_type === 5 )
-                        input.form-control(type="number", placeholder="Amount", ng-model="drug.packageCount")
-                        span.hepl-text <strong> Total Qty: </strong> {{drug.itemId.packageQty * drug.packageCount || 0}}
+                        input.form-control(type="number", placeholder="Amount", ng-model="drug.packageCount", min="0")
+                        span.hepl-text <strong> Total Qty: </strong> {{drug.drug.packageQty * drug.packageCount || 0}}
                 .col-md-1.col-sm-1
-                  input.pull-right(type="checkbox", checklist-model="quickQuote",  checklist-value="drug")
+                  input.pull-right(type="checkbox", checklist-model="quickQuote",  checklist-value="drug", ng-disabled="!drug.packageCount")
+                  //- button.btn.btn-danger
                 .clearfix
           -if (userData.account_type !== 5)
             .media(ng-repeat="drug in userProfile.drugs | filter: quickOrderFilter")

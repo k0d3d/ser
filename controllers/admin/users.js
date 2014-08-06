@@ -9,7 +9,7 @@ module.exports.routes = function (app, login) {
     res.render('index');
   });
 
-  app.get('/api/internal/admin/users/search?', function (req, res) {
+  app.get('/api/internal/admin/users/search', function (req, res) {
     users.findAUser(req.query)
     .then(function (lst) {
       res.json(200, lst);
@@ -20,7 +20,7 @@ module.exports.routes = function (app, login) {
     .done();
   });
 
-  app.get('/api/internal/admin/users?', function (req, res) {
+  app.get('/api/internal/admin/users', function (req, res) {
     users.loadAllUsers(req.query)
     .then(function (lst) {
       res.json(200, lst);
