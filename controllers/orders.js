@@ -109,10 +109,14 @@ module.exports.routes = function(app, login){
     //   res.json(400, err.message);
     // });
     var ordersObj = req.body;
+
+
+    //check if the user is a premium
+    //drugstoc user.
+    //
     if (req.user.isPremium) {
       order.requestOrderQuotation(req.user._id, ordersObj)
       .then(function(r){
-
         function _recur () {
           var task = ordersObj.pop();
           order.addressQuotation(task, 2, true)
@@ -128,7 +132,6 @@ module.exports.routes = function(app, login){
             }
           });
         }
-
         _recur();
 
       })
@@ -143,19 +146,62 @@ module.exports.routes = function(app, login){
       // units.
       //
       // loop over every item and send d user an sms quotation for each
-      if (req.body.length >= 1) {
-        //check if he got upto 5 orders that have been accepted.
-        //that will mean he's still a trial user and he's used up
-        //his trial.
-        order.checkUserIsTrying(req.user._id)
-        .then(function (i) {
-          if (i) {
-            return res.json(200, {
-              message: 'DrugStoc will contact you in a few minutes regarding this order',
-              confirmId: false
-            });
-          }
 
+      //check if he got upto 5 orders that have been accepted.
+      //that will mean he's still a trial user and he's used up
+      //his trial.
+      order.checkUserIsTrying(req.user._id)
+      .then(function (i) {
+
+        function _recur (r) {
+          var task = ordersObj.pop();
+          order.addressQuotation(task, 2, true)
+          .then(function () {
+            if (ordersObj.length) {
+              _recur();
+            } else {
+
+              if (r.message) {
+                return res.json(200, {
+                  message: 'DrugStoc will contact you in a few minutes regarding this order',
+                  confirmId: false
+                });
+              }
+              res.json(200, true);
+            }
+          });
+        }
+
+        //if we find 5 orders already by this user
+        if (i) {
+
+          order.requestOrderQuotation(req.user._id, ordersObj)
+          .then(function(r){
+            function _recur () {
+              var task = ordersObj.pop();
+              order.addressQuotation(task, 2, true)
+              .then(function () {
+                if (ordersObj.length) {
+                  _recur();
+                } else {
+
+                  if (r.message) {
+                    return res.json(200, r);
+                  }
+                  res.json(200, true);
+                }
+              });
+            }
+            _recur();
+
+          })
+          .fail(function (err) {
+            res.json(400, err.message);
+          })
+          .done();
+        } else {
+          //else it should send a quotation
+          //
           order.requestSMSQuotation(req.user._id, req.body)
           .then(function(){
 
@@ -165,15 +211,15 @@ module.exports.routes = function(app, login){
           }, function (err) {
             res.json(400, err.message);
           });
-        })
-        .fail(function (err) {
-          res.json(400, err.message);
-        })
-        .done();
+          
+        }
 
-      } else {
-        res.json(400, 'You must have a minimum of 1 items to checkout');
-      }
+      })
+      .fail(function (err) {
+        res.json(400, err.message);
+      })
+      .done();
+
     }
   });
 

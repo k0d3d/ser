@@ -398,9 +398,9 @@ module.exports = function(grunt) {
           files:{
             //application vendor js
             'public/js/default-vendor.min.js': [
-              'public/js/jquery-2.1.1.min.js',
-              'public/js/jquery-ui-1.10.3.min.js',
-              'public/js/angular.min.js',
+              // 'public/js/jquery-2.1.1.min.js',
+              // 'public/js/jquery-ui-1.10.3.min.js',
+              // 'public/js/angular.min.js',
               'public/js/modernizr.min.js',
               'public/js/retina.min.js',
               'public/js/toggles.min.js',

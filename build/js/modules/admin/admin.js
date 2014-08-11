@@ -141,8 +141,8 @@ angular.module('admin', [])
 .controller('adminItemsCt', ['$scope', 'adminService', function ($scope, adminService) {
   $scope.$parent.headerTitle = 'Admin:: Manage Items';
   $scope.orderFilter = {};
-  $scope.currentPage = 0;
-  $scope.pageLimit = 10;
+  // $scope.currentPage = 0;
+  // $scope.pageLimit = 10;
 
   $scope.getPageItems = function (currentPage, pageLimit) {
     $scope.items = [];
@@ -154,6 +154,8 @@ angular.module('admin', [])
         //v.nextStatus = v.orderStatus + 1;
         $scope.items.push(v);
       });
+
+      $scope.pageTo();
     });
 
 
@@ -180,9 +182,22 @@ angular.module('admin', [])
         fromDate : moment().subtract('days', 5).format('MM-DD-YYYY'),
         toDate : moment().add('days', 1).format('MM-DD-YYYY')
     };
-    console.log($scope.orderFilter);
   };
 
+  $scope.pageTo = function () {
+    var begin = (($scope.paginateOptions.currentPage - 1) * $scope.paginateOptions.numPerPage),
+        end = begin + $scope.paginateOptions.numPerPage;
+    // console.log(currentPage);
+    $scope.filteredItems = $scope.items.slice(begin, end);
+  };
+
+
+  // $scope.$watch('paginateOptions.currentPage', function(chgd) {
+  //   var begin = (($scope.paginateOptions.currentPage - 1) * $scope.paginateOptions.numPerPage),
+  //       end = begin + $scope.paginateOptions.numPerPage;
+  //   console.log(chgd);
+  //   $scope.filteredItems = $scope.items.slice(begin, end);
+  // });
 
 }])
 .controller('adminInvoicesCt', [
@@ -198,7 +213,9 @@ angular.module('admin', [])
     var ew = [];
     angular.forEach(d, function (iv) {
       var ld = iv;
-      ld.groupedOrders = _.groupBy(iv.order, function (ob) {return ob.orderSupplier.name;});
+      ld.groupedOrders = _.groupBy(iv.order, function (ob) {
+        return (ob.orderSupplier) ? ob.orderSupplier.name : 'Unknown Supplier';
+      });
       ew.push(ld);
     });
     console.log(ew);
@@ -235,8 +252,7 @@ angular.module('admin', [])
     adminService.addItemToInvoice($scope.activeInv.thisInvoiceId, $scope.activeInv.thisHospitalId, item)
     .then(function(data){
         item.sentRequest = 'sent';
-        $scope.my_quotation.push(data);
-        $scope.form = '';
+
     });
   };
 

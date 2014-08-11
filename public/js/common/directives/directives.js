@@ -128,33 +128,8 @@ app.directive('scrollBar', function(){
  * buttons to the dom.
  * @return {[type]} [description]
  */
-app.directive('pagination', [function(){
+app.directive('paging', [function(){
   function link(scope, element, attrs){
-    // scope.currentPage = 0;
-    // scope.limit = 10;
-    // $('button.prevbtn', element).on('click', function(){
-    //   if(scope.currentPage === 0) return false;
-    //   scope.currentPage--;
-    //   scope.pageTo(scope.currentPage, scope.pageLimit);
-    //   scope.$apply(function () {
-
-    //   });
-
-    //   // var page = scope.pageno - 1;
-    //   // scope.pageTo({pageNo: page, limit: scope.limit, cb: function(r){
-    //   //   if(r) scope.pageno--;
-    //   // }});
-    // });
-    // $('button.nextbtn', element).on('click', function(){
-    //   scope.currentPage++;
-    //   scope.pageTo(scope.currentPage, scope.pageLimit);
-    //   scope.$apply();
-    //   // var page = scope.pageno + 1;
-    //   // scope.pageTo({pageNo: page, limit: scope.limit, cb: function(r){
-    //   //   if(r) scope.pageno++;
-    //   // }});
-    // });
-
   }
   function pageCtrl ($scope) {
     $scope.currentPage = 0;
@@ -205,16 +180,6 @@ app.directive('pagination', [function(){
         }
     });
 
-
-    // $('button.nextbtn', element).on('click', function(){
-    //   scope.currentPage++;
-    //   scope.pageTo(scope.currentPage, scope.pageLimit);
-    //   scope.$apply();
-    //   // var page = scope.pageno + 1;
-    //   // scope.pageTo({pageNo: page, limit: scope.limit, cb: function(r){
-    //   //   if(r) scope.pageno++;
-    //   // }});
-    // });
   }
   return {
     link: link,

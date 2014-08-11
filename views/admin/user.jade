@@ -22,8 +22,7 @@
                   h4.panel-title Search results for "Users"
                   p About {{users_list.length}}+ results
                 .col-md-6
-                  //- .x-pagination.pull-right(pagination, page-to="load_users(currentPage, pageLimit, cb)", current-page="currentPage", page-limit="pageLimit")
-                  .x-pagination.pull-right(pagination, page-to="load_users(currentPage, pageLimit, cb)")
+                  .x-pagination.pull-right(paging, page-to="load_users(currentPage, pageLimit, cb)")
             //
                panel-heading
             .panel-body

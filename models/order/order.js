@@ -127,12 +127,27 @@ OrderSchema.statics = {
 var InvoiceSchema = new Schema({
   invoiceId: {type: String},
   order: [
-    {type: Schema.Types.Mixed}
+    {
+      id: {type: String},
+      orderAmount: {type: Number, default: '0'},
+      idmask: {type: String},
+      orderDate: {type: Date},
+      itemId: {
+        itemName: {type: String},
+        id: {type: String}
+      },
+      perItemPrice: {type: Number},
+      finalPrice: {type: Number},
+      orderSupplier: {
+        name: {type: String},
+        userId: {type: Schema.ObjectId}
+      },
+      orderId: {type: String, unique: true},
+    }
   ],
   invoicedDate: {type: Date},
   status: {type: Number, default: 0},
   hospitalId: {type: Schema.ObjectId},
-  approvedBy: {type: Schema.ObjectId}
 });
 
 InvoiceSchema.virtual('idmask')

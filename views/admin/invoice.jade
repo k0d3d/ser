@@ -39,7 +39,7 @@
                       | {{inv.invoicedDate | date:'medium'}}
                 .col-md-3
                   button.btn.btn-primary.pull-right(style="margin-top:10px", ng-click="send_invoice(inv._id, 1)", ng-disabled="inv.status == 1") Send Invoice
-                  button.btn.btn-success.pull-right(ng-click="activeInv.thisInvoiceId = inv.invoiceId; activeInv.thisHospitalId = inv.hospitalId; toggleModal('alter-order-modal', inv, $index);", style="margin-top:10px", ng-disabled="inv.status == 1")
+                  button.btn.btn-success.pull-right(ng-click="activeInv.thisInvoiceId = inv._id; activeInv.thisHospitalId = inv.hospitalId; toggleModal('alter-order-modal', inv, $index);", style="margin-top:10px", ng-disabled="inv.status == 1")
                     i.fa.fa-plus
                     |  Add
             .panel-collapse.collapse(id="collapse{{$index}}", style='height: 0px;')

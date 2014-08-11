@@ -1378,6 +1378,7 @@ OrderController.prototype.checkUserIsTrying = function checkUserIsTrying (id) {
  */
 OrderController.prototype.requestOrderQuotation = function requestOrderQuotation (userId, cart) {
     var q = Q.defer();
+    console.log('Request Order Quotation....');
 
     var invoiceId = utilz.alphaNumDocId(16);
     var invoice = new Invoice();
@@ -1390,10 +1391,22 @@ OrderController.prototype.requestOrderQuotation = function requestOrderQuotation
     //   collectn.push(c);
     // });
 
-    invoice.order = cart;
+    invoice.order = _.map(cart, function (n) {
+      return {
+        id: n.id,
+        orderAmount: n.orderAmount,
+        orderDate: n.orderDate,
+        itemId: n.itemId,
+        perItemPrice: n.perItemPrice,
+        orderSupplier: n.orderSupplier,
+        orderId: n.orderId,
+        idmask: n.idmask
+      };
+    });
     // invoice.order = _.pluck(cart, '_id');
     invoice.invoicedDate = Date.now();
     invoice.hospitalId = userId;
+    console.log(invoice);
     invoice.save(function (err) {
       if (err) {
         return q.reject(err);
@@ -1447,6 +1460,9 @@ OrderController.prototype.removeItemInvoice = function removeItemInvoice (invoic
 OrderController.prototype.addOneItemInvoice = function addOneItemInvoice (invoiceId, orderData) {
   var q = Q.defer();
 
+  orderData = _.omit(orderData, ['_id', '__v', 'statusLog']);
+  console.log(orderData);
+
   Item.findOne({
     _id: orderData.itemId
   }, 'itemName instantQuote')
@@ -1454,13 +1470,38 @@ OrderController.prototype.addOneItemInvoice = function addOneItemInvoice (invoic
   .then(function (d) {
     orderData.itemId = d;
 
+    return staffUtils.getMeMyModel(orderData.orderSupplier.supplier_type)
+    .findOne({
+      userId: orderData.orderSupplier.supplierId
+    }, 'name userId')
+    .execQ()
+
+  })
+  .then(function (supProfile) {
     Invoice.update({
       _id: invoiceId
     }, {
       $push: {
-        order: orderData
+        order:     {
+          id: orderData._id,
+          orderAmount: orderData.orderAmount,
+          idmask: orderData.idmask,
+          orderDate: orderData.orderDate,
+          itemId: {
+            itemName: orderData.itemId.itemName,
+            id: orderData.itemId._id
+          },
+          perItemPrice: orderData.perItemPrice,
+          finalPrice: orderData.finalPrice,
+          orderSupplier: {
+            name: supProfile.name,
+            userId: supProfile.userId
+          },
+          orderId: orderData.orderId,
+        }
       }
     }, function (err, count) {
+      console.log(err);
       if (err) {
         return q.reject(err);
       }
@@ -1469,7 +1510,7 @@ OrderController.prototype.addOneItemInvoice = function addOneItemInvoice (invoic
       } else  {
         return q.reject(new Error('update invoice failed'));
       }
-    });
+    });    
   })
   .fail(function (err) {
     q.reject(err);

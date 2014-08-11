@@ -33,7 +33,7 @@
                 .col-md-4
                   div.pull-right
                     | Showing {{funnel.length}} Order(s)
-            .panel-body
+            .panel-body(style="padding: 0px")
               table.table.table-hover.table-bordered(style="margin-top: 30px")
                 thead
                   tr
@@ -47,7 +47,7 @@
                     th
                 tbody
                   //- tr(ng-repeat="cmp in funnel = (orders | filter: routeFilterParam)")
-                  tr(ng-repeat="cmp in funnel = (orders)")
+                  tr(ng-repeat="cmp in funnel = (orders | filter: search )")
                     td {{cmp.idmask}}
                     td
                       a(ng-href="/a/drugs/{{cmp.itemId._id}}/item") {{cmp.itemId.itemName}}

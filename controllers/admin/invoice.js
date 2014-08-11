@@ -54,7 +54,7 @@ module.exports.routes = function(app, login){
       .done();
     }
   })
-  .put(function(req, res){
+  .put(function(req, res, next){
 
     if (req.query.action === 'update') {
 
@@ -62,7 +62,8 @@ module.exports.routes = function(app, login){
       .then(function(r){
           res.json(200, true);
       }, function (err) {
-        res.json(400, err.message);
+        next(err);
+        // res.json(400, err.message);
       });
     }
 
@@ -80,7 +81,8 @@ module.exports.routes = function(app, login){
         res.json(200, true);
       })
       .fail(function (err) {
-        res.json(400, err.message);
+        next(err);
+        // res.json(400, err.message);
       })
       .done();
     }
@@ -91,7 +93,8 @@ module.exports.routes = function(app, login){
         res.json(200, true);
       })
       .fail(function (err) {
-        res.json(400, err.message);
+        next(err);
+        // res.json(400, err.message);
       })
       .done();
     }

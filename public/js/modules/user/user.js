@@ -101,7 +101,7 @@ angular.module('user', [])
     function __qu () {
       var item = load.pop();
       if (!item.packageCount) return alert('please check the amount to be ordered.');
-      item.orderAmount = item.packageCount * item.drug.packageQty;
+      item.orderAmount = item.packageCount;
       item.owner = {
         "userId" : item.drug.supplier.supplierId,
         "account_type": 2
@@ -122,7 +122,7 @@ angular.module('user', [])
           } else {
             N.notifier({
               title: 'Welldone!',
-              text: l + 'Quick Quote(s) Requested',
+              text: l + ' Quick Quote(s) Requested',
               class_name: 'growl-success'
             });
           }

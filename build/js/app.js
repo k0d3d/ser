@@ -62,6 +62,17 @@ app.controller('MainController', [
     $scope.waiting = '';
     $scope.headerTitle = 'Dashboard';
 
+    //pagination options
+    $scope.paginateOptions = {
+      filteredTodos : [],
+      currentPage : 1,
+      numPerPage : 10,
+      maxSize : 5,
+
+      numPages : function (col) {
+        return Math.ceil(col.length / this.numPerPage);
+      }
+    };
 
 
     $scope.appName = 'stocCloud';

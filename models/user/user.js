@@ -8,6 +8,7 @@ var mongoose = require('mongoose'),
 
 
 function toLower (v) {
+  // return v.toLowerCase();
   return v.toLowerCase();
 }
 /**
@@ -17,9 +18,9 @@ var UserSchema = new Schema({
     email: {
         type: String,
         required: true,
-        unique: true,
-        get: toLower,
-        set: toLower
+        unique: true
+        // get: toLower,
+        // set: toLower
     },
     phone: {
         type: String
@@ -66,10 +67,10 @@ UserSchema.virtual('password').set(function(password) {
 /**
  * getters
  */
-UserSchema.path('email').get(function (value) {
-    console.log(value);
-    return value.toLowerCase();
-});
+// UserSchema.path('email').get(function (value) {
+//     console.log(value);
+//     return value.toLowerCase();
+// });
 
 /**
  * Validations

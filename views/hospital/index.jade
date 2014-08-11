@@ -9,7 +9,7 @@
                 label.control-label.col-sm-4.col-md-4 Hospital Name
                 .col-sm-5.col-md-5
                   input.form-control(type="text", ng-model="__temp.name", required)
-                  span.help-text 
+                  span.help-text
                 .col-sm-3.col-md-3
                   button.btn.btn-small.btn-white(ng-disabled="") Search
                   button.btn.btn-small.btn-lightblue(type="reset" ng-click="__temp.name = ''; search_gvt({})") Reset
@@ -43,4 +43,4 @@
                         | {{h.facilityType}}
                       td
                         | {{h.ownership}}
-                .x-pagination(pagination="valRes", page-to="getPageItems(currentPage, pageLimit, cb)", current-page="currentPage", page-limit="pageLimit")
+                .x-pagination(pager="valRes", page-to="getPageItems(currentPage, pageLimit, cb)", current-page="currentPage", page-limit="pageLimit")

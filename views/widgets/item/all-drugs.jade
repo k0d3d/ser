@@ -12,14 +12,14 @@ mixin allDrugs()
           th
       tbody
         tr(ng-repeat="d in _drugs | filter: itemFilter")
-          td 
+          td
             -if (userData.account_type === 2 || userData.account_type === 4)
               a(ng-href='/a/users/{{d.supplier.supplierId}}/drugs/{{d._id}}/item') {{d.itemName}}
             -else
               a(ng-href='/a/drugs/{{d._id}}/item') {{d.itemName}}
           td {{d.sciName}}
           td {{d.nafdacRegNo}}
-          td 
+          td
             span.label.label-info(title="Retail Price") {{d.currentPrice.retail}}
             span.label.label-warning(title="Institution Price") {{d.currentPrice.institution}}
             span.label.label-success(title="Wholesale Price") {{d.currentPrice.wholesale}}
@@ -33,7 +33,7 @@ mixin allDrugs()
                       span.caret
                       span.sr-only Click
                     ul.dropdown-menu(role='menu')
-                      -if (false && userData.account_type < 4) 
+                      -if (false && userData.account_type < 4)
                         li
                           a(href='#', ng-click="view_stock_down(d); toggleModal('stock-history-modal')") Stock Down History
                       -if (false)
@@ -44,11 +44,11 @@ mixin allDrugs()
                           a(href='#', ng-click="item_stock(d); toggleModal('manage-stock-modal');") Stock Operations
                       li
                         a(href='#', ng-click="add_to_list(d)") Add to My List
-           
+
                   button.btn.btn-sm.btn-danger(ng-click="remove_item(d._id, $index)")
                     i.fa.fa-times
-    
-    .x-pagination(pagination="valRes", page-to="getPageItems(currentPage, pageLimit, cb)", current-page="currentPage", page-limit="pageLimit")
+
+    .x-pagination(pager="valRes", page-to="getPageItems(currentPage, pageLimit, cb)", current-page="currentPage", page-limit="pageLimit")
 
 mixin allRequest()
   .table-responsive
@@ -58,7 +58,7 @@ mixin allRequest()
           th Item Name
           th Requester
           th Amount
-          th Date 
+          th Date
           th Last Update
           th Current Status
           th Reference
@@ -67,12 +67,12 @@ mixin allRequest()
         tr(ng-repeat="tr in _request")
           td {{tr.itemId.itemName}}
           td {{tr.destId.name}}
-          td 
-            | {{tr.amount}} 
+          td
+            | {{tr.amount}}
             i.fa.fa-exclamation(style="color: #1CAF9A", tooltips, title="This is an internal deduction being added here", ng-show="tr.destId == tr.originId")
           td {{tr.dateInitiated | date: 'short'}}
           td <strong>Status: </strong>{{tr.statusLog[0].code | stockRequestState}}, <em> {{tr.statusLog[0].dateStated | date: 'medium'}} </em>
-             
+
           td {{tr.status | stockRequestState}}
           td {{tr.referenceId}}
           td
@@ -87,7 +87,7 @@ mixin allPending()
           th Item Name
           th Recipient
           th Amount
-          th Date 
+          th Date
           th Last Update
           th Current Status
           th Reference
@@ -96,13 +96,13 @@ mixin allPending()
         tr(ng-repeat="tr in _pending")
           td {{tr.itemId.itemName}}
           td {{tr.destId.name}}
-          td 
-            | {{tr.amount}} 
+          td
+            | {{tr.amount}}
             i.fa.fa-exclamation(style="color: #1CAF9A", tooltips, title="This is an internal deduction being added here", ng-show="tr.destId == tr.originId")
           td {{tr.dateInitiated | date: 'short'}}
           td <strong>Status: </strong>{{tr.statusLog[0].code | stockRequestState}}, <em> {{tr.statusLog[0].dateStated | date: 'medium'}} </em>
-             
+
           td {{tr.status | stockRequestState}}
           td {{tr.referenceId}}
           td
-    .x-pagination(pagination="valRes", page-to="getPageItems(currentPage, pageLimit, cb)", current-page="currentPage", page-limit="pageLimit")            
+    .x-pager(pager="valRes", page-to="getPageItems(currentPage, pageLimit, cb)", current-page="currentPage", page-limit="pageLimit")

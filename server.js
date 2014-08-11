@@ -56,7 +56,7 @@ function afterResourceFilesLoad() {
     app.use(express.static(__dirname + '/public', {
       maxAge: 86400000
     }));
-    
+
     // efficient favicon return - will enable when we have a favicon
     app.use(favicon('public/images/favicon.ico'));
 
@@ -88,7 +88,7 @@ function afterResourceFilesLoad() {
     app.use(function (req, res, next) {
       res.locals.pkg = pjson;
       next();
-    });      
+    });
 
     // signed cookies
     app.use(cookieParser(config.express.secret));
@@ -169,6 +169,8 @@ function afterResourceFilesLoad() {
     // valid, you can do whatever you like, set
     // properties, use instanceof etc.
     app.use(function(err, req, res, next){
+      console.log('Error Stack');
+      console.error(err.stack);
       // treat as 404
       if  ( err.message &&
           (~err.message.indexOf('not found') ||
@@ -181,20 +183,19 @@ function afterResourceFilesLoad() {
       // log it
       // send emails if you want
       // console.error(err);
-      console.error(err.stack);
 
       // error page
       //res.status(500).json({ error: err.stack });
 
       var t = '/api/internal/';
       if (req.url.indexOf(t) > -1) {
-        res.json(500, err.message);        
+        res.json(500, err.message);
       } else {
         res.status(500).render('500', {
           url: req.originalUrl,
           error: err.message
-        }); 
-      }    
+        });
+      }
 
 
     });
@@ -204,15 +205,15 @@ function afterResourceFilesLoad() {
 
       var t = '/api/internal/';
       if (req.url.indexOf(t) > -1) {
-        res.json(404, {message: 'resource not found'});        
+        res.json(404, {message: 'resource not found'});
       } else {
         res.status(404).render('404', {
           url: req.originalUrl,
           error: 'Not found'
         });
-      }          
+      }
 
-    });      
+    });
 
 
     // development env config
@@ -240,12 +241,12 @@ require('./lib/db').open()
   exports = module.exports = app;
   // CATASTROPHIC ERROR
   app.use(function(err, req, res){
-    
+
     console.error(err.stack);
-    
+
     // make this a nicer error later
     res.send(500, 'Ewww! Something got broken on Integra. Getting some tape and glue');
-    
+
   });
 
 })
